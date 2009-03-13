@@ -1,0 +1,76 @@
+Assertion Bugs:
+
+ObjectAssert.hasProperty - 
+- provides inaccurate results. Instead of checking for the presence of a property, Assert.hasProperty checks the 
+value. 
+
+2/3/2008 - I have patched this in the source code 
+
+ObjectAssert.hasOwnProperty 
+ - relies on YAHOO.lang.hasOwnProperty, which is broken. 
+2/3/2008 - Added patch to invoke Object.prototype.hasOwnProperty.
+
+ObjectAssert: Added two assertions for typechecking.
+
+/**  
+ * Assert that (typeof object) and typeofString are equal.
+ * @param {String} typeofString expected type.
+ * @param {Object} object to typecheck.
+ * @param {String} [message] The message to display if the assertion fails.
+ * @author gsmith
+ */
+isTypeof : function(typeofString /*:String*/, object /*:Object*/, message /*:String*/) {
+	YAHOO.util.Assert.areEqual(typeofString, typeof object, message||"objects was not of the expected type");
+},
+
+/**  
+ * Assert that object is an instanceof constructor.
+ * @param {Object} constructor expected type.
+ * @param {Object} object to typecheck.
+ * @param {String} [message] The message to display if the assertion fails.
+ * @author gsmith
+ */
+isInstanceof : function(constructor /*:String*/, instance /*:Object*/, message /*:String*/) {
+	if(!(instance instanceof constructor)) {
+		YAHOO.util.Assert.fail(message||"object was not an instance of supplied constructor");
+	}     
+}
+
+
+
+ArrayAssert: better message for contains(), so you can see the Array:
+
+    contains : function (needle /*:Object*/, haystack /*:Array*/, 
+                           message /*:String*/) /*:Void*/ {
+        
+        var found /*:Boolean*/ = false;
+        
+        //begin checking values
+        for (var i=0; i < haystack.length && !found; i++){
+            if (haystack[i] === needle) {
+                found = true;
+            }
+        }
+        
+        if (!found) { // print contents of array.
+            YAHOO.util.Assert.fail(message || "Value (" + needle + ") not found in [ " + haystack + " ]");
+        }
+    },
+
+===========================================================
+TestCase constructor:
+		// Garrett, added hasOwnProperty, 
+		// useful for cloning templates.
+		if(template.hasOwnProperty(prop))
+	        this[prop] = template[prop];
+
+
+===========================================================
+
+ArrayAssert.itemsAreEqual
+ - should check length of both Arrays first. If a1.length != a2.length, fail.
+Needs Patch. I'm inclined to write a new method, as the existing one provides results based on order. Order should not matter.
+I mostly want the functionality of areEqual, which, for Array, means they both have the same length and same items, and order does 
+not matter. 
+
+ArrayAssert.areEqual - the method is missing! See note on ArrayAssert.itemsAreEqual.

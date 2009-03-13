@@ -1,0 +1,50 @@
+ <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+    <title>Lock Example</title>
+<link type="text/css" rel="stylesheet" href="../resources/example.css"/>
+
+<script type="text/javascript" src="../../build/APE.js"></script>
+<script type="text/javascript" src="../../build/aop/Advice.js"></script>
+<script type="text/javascript" src="../../build/timing/Lock-a.js"></script>
+
+</head>
+<body>
+<script type="text/javascript">(function(){
+
+var Lock = APE.Lock;
+var O = function() { };
+
+O.prototype = {
+    start : function() {
+        setTimeout(this.run, 300);
+    },
+
+    run : function() {
+        alertFunction('all Done');
+    }
+};
+
+var o = new O;
+APE.crossCut( O.prototype, Lock, ["getLock", "releaseLock"]);
+APE.aop.Advice.addBefore(o, "start", Lock.getLock);
+APE.aop.Advice.addAfter(o, "run", Lock.releaseLock);
+
+function alertFunction(m){
+    window.alert(m + ', alertCount: ' + alertCount++);
+}
+
+for(var i = 0, alertCount = 0; i < 10; i++)
+    o.start(i); // should only see first alert
+    
+if(alertCount > 1) alert("failure: alert count should have been 1, but was " + alertCount);
+})();
+</script>
+<div class='lock-div'>
+    Lock example
+</div>
+
+</body>
+</html>

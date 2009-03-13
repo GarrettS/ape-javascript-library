@@ -1,0 +1,222 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+    <title>Viewport Test</title>
+
+    <link rel="stylesheet" type="text/css" href="../../yui-test/build/logger/assets/logger.css" />
+    <link rel="stylesheet" type="text/css" href="../../yui-test/build/yuitest/assets/yuitest.css" />
+    <link rel="stylesheet" type="text/css" href="../../yui-test/assets/testlogger.css" />
+
+    <script type="text/javascript" src="../../yui-test/build/yahoo-dom-event/yahoo-dom-event.js"></script>
+    <script type="text/javascript" src="../../yui-test/build/logger/logger.js"></script>
+    <script type="text/javascript" src="../../yui-test/build/yuitest/yuitest-beta.js"></script>
+
+    <script type="text/javascript" src="../../../build/APE.js"></script>
+    <script type="text/javascript" src="../../../build/dom/viewport-f.js"></script>
+
+</head>
+<body>
+<div id="testLogger"></div>
+<!-- 
+<div id='ruler'
+style="position: absolute; top:0; background: red; height: 690px">s</div>
+-->
+
+<iframe id='iframe' src='iframe.html'></iframe>
+
+<script type="text/javascript">
+setTimeout(function(){
+
+var dom = APE.dom,
+    Assert = YAHOO.util.Assert,
+    documentElement = document.documentElement,
+    body = document.body,
+    ds = documentElement.style,
+    bs = body.style,
+    ts,
+    bCssText;
+
+var shim = document.createElement('div'),
+    ss = shim.style;
+ss.position="absolute";
+ss.top = "0";
+ss.left = "0";
+bs.margin = "0";
+document.body.appendChild(shim);
+
+var viewportTestCase = new YAHOO.tool.TestCase({
+    name : "Viewport Test Case",
+
+    setUp : function() {
+        bs = body.style;
+        ds = documentElement.style;
+        bCssText = bs.cssText;
+        scrollTo( 0, 0 );
+        shim.style.height = shim.style.width = "0";
+
+        // Make testLogger height:0, width: 0.
+        // Used for avoiding scrollbar.
+        ts = document.getElementById('testLogger').style;
+        ts.display = 'none';
+    },
+
+    // TODO: implement these.
+    _should : {
+        ignore : {
+            testGetScrollOffsetsIframe : true,
+            testGetViewportDimensionsIframe : true
+        }
+    },
+
+    tearDown : function() {
+        bs.cssText = ds.cssText = "";
+        ts.display = '';
+    },
+
+    testGetScrollOffsets : function() {
+        ds.padding = bs.margin="10px";
+        bs.border = "10px solid";
+        ds.width = ds.height = "110%";
+        ss.height = ss.width = "4000px";
+        
+        var offsets = dom.getScrollOffsets();
+        Assert.areEqual(0, offsets.left);
+        Assert.areEqual(0, offsets.top);
+        
+        scrollTo( 10, 123 );
+
+        this.wait(function(){
+            offsets = dom.getScrollOffsets();
+            Assert.areEqual(10, offsets.left);
+            Assert.areEqual(123, offsets.top);
+        }, 20);
+    },
+
+    testGetScrollOffsetsIframe : function() {
+        var iframe = document.getElementById('iframe');
+
+        iframe.style.height = "90px";
+        iframe.style.width = "90px";
+        
+        var w = iframe.contentWindow,
+            d = w.document,
+            ds = d.documentElement.style,
+            bs = d.body.style;
+
+        ds.padding = bs.margin="10px";
+        bs.border = "10px solid";
+        ds.width = ds.height = "110%";
+        if(w.innerHeight) {
+            ds.height = w.innerHeight * 1.1 + 'px';
+            ds.width = w.innerWidth * 1.1 + 'px';
+        }
+        
+        var offsets = dom.getScrollOffsets.call(w);
+        Assert.areEqual(0, offsets.left);
+        Assert.areEqual(0, offsets.top);
+        
+        w.scrollTo( 10, 123 );
+
+        var offsets = dom.getScrollOffsets.call(w);
+
+        this.wait(function(){
+            offsets = dom.getScrollOffsets.call(w);
+            Assert.areEqual(10, offsets.left);
+            Assert.areEqual(123, offsets.top);
+        }, 20);
+    },
+
+    testGetViewportDimensions : function() {
+        var dims = dom.getViewportDimensions();
+        Assert.isTypeOf("number", dims.width);
+        Assert.isTypeOf("number", dims.height);
+    },
+
+    testGetViewportHeightNoScroll: function() {
+
+    // Grab viewport dimensions, save as 'dims'.
+        var dims = dom.getViewportDimensions()
+    
+    // Grab the scrollHeight (different strategy here for Opera 9.25)
+    // This value should be equal to dims.height.
+    // XXX: IE8 documentElement.scrollHeight will be html element's
+    // scrollHeight.
+        var scrollHeight = Math.max(
+          document.scrollHeight||0,  // Safari 2.
+          documentElement.scrollHeight, documentElement.clientHeight);
+    
+    // Set the shim to the height dims.height - 1.
+        shim.style.height = dims.height -1 + "px";
+        this.wait(function(){
+          Assert.areEqual(scrollHeight-1, shim.offsetHeight, "window was sized wrong");
+        }, 10);
+    },
+
+    testGetViewportHeightScroll: function() {
+
+    // Grab viewport dimensions, save as 'dims'.
+        var dims = dom.getViewportDimensions();
+    
+    // Force a horz scrollbar.
+        shim.style.width = dims.width +3000 + "px";
+
+
+    // dims should be smaller now, window has a scrollbar.
+        dims = dom.getViewportDimensions();
+
+    // Set the shim to the height dims.height -1.
+        shim.style.height = dims.height -1 + "px";
+
+        this.wait(function(){
+        // Grab the scrollHeight (should be equal to dims.height).
+        // XXX: IE8 documentElement.scrollHeight will be html element's
+        // scrollHeight.
+
+        // Safari needs this or scrollHeight is off.
+            ds.height = "100%";
+            var scrollHeight = getScrollHeight();
+
+            Assert.areEqual(scrollHeight-1, shim.offsetHeight, "horz scrollbar added");
+            }, 10);
+    },
+
+    testGetViewportDimensionsIframe : function() {
+        var iframe = document.getElementById('iframe');
+        var dims = dom.getViewportDimensions.call(iframe.contentWindow);
+
+        iframe.style.height = "90px";
+        iframe.style.width = "90px";
+        var thisDims = dom.getViewportDimensions();
+
+        Assert.areNotEqual(thisDims.height, dims.height);
+    }
+
+});
+
+function getScrollHeight(){
+    var scrollHeight = document.scrollHeight||0;  // Safari 2. 
+    var body = document.body;
+
+    if(!scrollHeight) { 
+    // XXX: IE returns element values (not viewport values)
+    // for documentElement.scrollHeight.
+        scrollHeight = document.documentElement.scrollHeight || documentElement.clientHeight;
+    }
+    
+    return scrollHeight;
+}
+
+var logger = new YAHOO.tool.TestLogger("testLogger");
+YAHOO.tool.TestRunner.add( viewportTestCase );
+
+// run the tests, or put them in the TestRunner.
+if (parent && parent != window) {
+    YAHOO.tool.TestManager.load();
+} else {
+    YAHOO.tool.TestRunner.run();
+}
+}, 100);</script>
+</body>
+</html>

@@ -1,0 +1,300 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+    <title>EventPublisher Test</title>
+    <link rel="stylesheet" type="text/css" href="../yui-test/build/logger/assets/logger.css" />
+    <link rel="stylesheet" type="text/css" href="../yui-test/build/yuitest/assets/yuitest.css" />
+    <link rel="stylesheet" type="text/css" href="../yui-test/assets/testlogger.css" />
+
+    <script type="text/javascript" src="../yui-test/build/yahoo-dom-event/yahoo-dom-event.js"></script>
+    <script type="text/javascript" src="../yui-test/build/logger/logger.js"></script>
+    <script type="text/javascript" src="../yui-test/build/yuitest/yuitest-beta.js"></script>
+
+    <script type="text/javascript" src="../../build/APE.js"></script>
+    <script type="text/javascript" src="../../build/EventPublisher.js"></script>
+</head>
+<body>
+<div id="testLogger"></div>
+<script type="text/javascript">
+var Assert = YAHOO.util.Assert,
+    testObject, ep;
+
+var eventPublisherTest = new YAHOO.tool.TestCase({
+
+    //name of the test case - if not provided, one is auto-generated
+    name : "EventPublisher tests",
+    
+    //---------------------------------------------------------------------
+    // setUp and tearDown methods - optional
+    //---------------------------------------------------------------------
+    
+    /*
+     * Sets up data that is needed by each test.
+     */
+    setUp : function() {
+        testObject = {
+            fire : function( ev ) {}
+        };
+        ep = APE.EventPublisher.get(testObject, "fire");
+    },
+
+    testAdd : function(){
+        var called = false;
+        ep.add(function( ev ) {
+            called = true;
+            Assert.isTrue( ev.isTest );
+        });
+        testObject.fire( { isTest: true} );
+        Assert.isTrue( called );
+    },
+    
+    testEventPublisherAddContext : function(){
+        var called = false;
+        var f = function(){
+            Assert.areEqual(this, testObject);
+            called = true;
+        };
+
+        var ep = APE.EventPublisher.add(testObject, "fire", f, testObject);
+        testObject.fire();
+        Assert.isTrue( called );
+    },
+
+
+    testAddBefore : function() {
+        var called = false, calledBefore = false;
+
+        // this function should be called first.
+        ep.add(function( ev ) {
+            called = true;
+            Assert.isTrue( calledBefore );
+        });
+
+        // this function should be called second.
+        ep.addBefore(function( ev ) {
+            calledBefore = true;
+            Assert.isFalse( called );
+        });
+
+        testObject.fire( );
+        Assert.isTrue( called );       
+        Assert.isTrue( calledBefore );       
+    },
+    
+    testAddAfter : function() {
+        var called = false, calledAfter = false;
+        ep.add(function( ev ) {
+            called = true;
+            Assert.isFalse( calledAfter );
+        });
+        ep.addAfter(function( ev ) {
+            calledAfter = true;
+            Assert.isTrue( called );
+        });
+        testObject.fire( );
+        Assert.isTrue( called );       
+        Assert.isTrue( calledAfter );       
+    },
+
+    testGetEvent : function() {
+
+        var f = ep.getEvent("beforeFire");
+        Assert.isFunction( f.add );
+
+        f = ep.getEvent("afterFire");
+        Assert.isFunction( f.add );
+    },
+    
+    // Add 2 callbacks, remove the first, 
+    // then make sure that only the second one fires.
+    testRemove : function(){
+        var called1 = false, called2 = false;
+
+        function cb( ev ) {
+            called1 = true;
+            Assert.isTrue( ev.isTest );
+        };
+        function cb2( ev ) {
+            called2 = true;
+            Assert.isTrue( ev.isTest );
+        };
+        ep.add(cb);
+        ep.add(cb2);
+        ep.remove(cb);
+
+        testObject.fire( { isTest: true} );
+        Assert.isFalse( called1 );
+        Assert.isTrue( called2 );
+    },
+
+    testAsConstructor : function() {
+        var firedSuccessfully = false;
+
+        var contextArg = {
+            toString : function() { 
+                return"Context Object";
+            }
+        };
+        contextArg.ep = new APE.EventPublisher(contextArg, "suck");
+        contextArg.ep.add(
+            function(e){
+                firedSuccessfully = true;
+                Assert.areEqual(contextArg, this,"contextArg");
+                Assert.areEqual(e.i, 10);
+                Assert.areEqual("suck", this.ep.type);
+            }
+        );
+        contextArg.ep.fire({ i : 10 });
+        this.wait(function(){
+            Assert.isTrue(firedSuccessfully);
+        }, 10);
+    },
+
+    // Add 2 callbacks, remove the first, 
+    // then make sure that only the second one fires.
+    testRemoveBefore : function(){
+        var called = false;
+
+        function cb( ev ) {
+            called = true;
+            Assert.isTrue( ev.isTest );
+        };
+        function cb2( ev ) {
+            Assert.fail("should not have been called.");
+        };
+        ep.add(cb);
+        ep.addBefore(cb2);
+        ep.removeBefore(cb2);
+
+        testObject.fire( { isTest: true} );
+        Assert.isTrue( called );
+    },
+
+    // Add 2 callbacks, remove the first, 
+    // then make sure that only the second one fires.
+    testRemoveAfter : function(){
+        var called = false;
+
+        function cb( ev ) {
+            called = true;
+            Assert.isTrue( ev.isTest );
+        };
+        function cb2( ev ) {
+            Assert.fail("should not have been called.");
+        };
+        ep.add(cb);
+        ep.addAfter(cb2);
+        ep.removeAfter(cb2);
+
+        testObject.fire( { isTest: true} );
+        Assert.isTrue( called );
+    },
+
+    // calling toString should not throw an error.
+    testToString : function() {
+        YAHOO.util.Assert.isString( ep.toString() );
+    },
+
+    testCleanUp : function() {
+        
+        var regItems = [];
+
+        var bodyClick = APE.EventPublisher.get( document.body, "onclick" );
+        bodyClick.add( function() { setTimeout('showTestResult( "s" )', 500); } );
+        bodyClick.add( function() { throw Error("bad (expected error)"); } );
+        bodyClick.add( function() { setResult('s'); } );
+
+        bodyClick.addBefore( function() { setTimeout('showTestResult( "sBefore" )', 500); } );
+        bodyClick.addBefore( function() { throw Error("bad before (expected error)"); } );
+        bodyClick.addBefore( function() { setResult('sBefore'); } );
+
+        bodyClick.addAfter( function() { setTimeout('showTestResult( "sAfter" )', 500); } );
+        bodyClick.addAfter( function() { throw Error("bad after (expected error)"); } );
+        bodyClick.addAfter( function(){ setResult("sAfter"); } );
+
+        // unregister all callbacks.
+        APE.EventPublisher.cleanUp();
+        
+        for(var type in APE.EventPublisher.Registry) {
+            var publisherList = APE.EventPublisher.Registry[type];
+            for(var i = 0, len = publisherList.length; i < len; i++) {
+
+                var publisher = publisherList[i];
+                YAHOO.util.ObjectAssert.hasProperty(publisher.type, publisher.src, "event type not found in src");
+                
+                Assert.isNull(publisher.src[ publisher.type ],
+                "event handler callback was not removed, but should have been: " +  publisher.src);
+            }
+        }
+    },
+
+    // Test to make sure all event callbacks fire,
+    // even after an error occurred.
+    // Test also verifies that the callbacks fire in the correct order, 
+    // regardless of the error.
+    testDeferErrors : function() {
+        var caughtErrorMessage = "";
+
+        // This callback will throw an error,
+        // but should not prevent other callbacks from firing.
+        var errBack = function() {
+            order.push(errBack);
+            throw Error("err back!");
+        };
+
+        var order = [];
+        function cb() { 
+            called = true;
+            order.push(cb);
+        };
+        function cb2() { 
+            called2 = true;
+            order.push(cb2);
+        };
+        ep.add(cb);
+        ep.add(errBack);
+        ep.add(cb2);
+
+        // We're going to wrap APE.deferError so we can trap the error.
+        // First, store the reference to APE.deferError.
+        var old = APE.deferError;
+
+        // Next, wrap the error, so we can see if EventPublisher.fire 
+        // caught it and passed it to deferError.
+        APE.deferError = function errorStoppingAdvice(err) {
+            caughtErrorMessage = "err back!";
+            APE.deferError = old; // Put it back.
+        };
+        
+        // Now, fire the event, to run the above.
+        testObject.fire();
+        
+        // Make sure we caught the error and all callbacks fired.
+        function deferredSegment() {
+            Assert.isTrue(called);
+            Assert.areEqual("err back!", caughtErrorMessage);
+            Assert.isTrue(called2);
+            YAHOO.util.ArrayAssert.itemsAreEqual([cb, errBack, cb2], order);
+        }
+        this.wait(deferredSegment, 10);
+     }
+});
+
+// 
+var logger = new YAHOO.tool.TestLogger("testLogger");
+
+// 
+YAHOO.tool.TestRunner.add( eventPublisherTest );
+ //run the tests
+if (parent && parent != window) {
+    YAHOO.tool.TestManager.load();
+} else {
+    YAHOO.tool.TestRunner.run();
+}
+
+ </script>
+</body>
+
+</html>

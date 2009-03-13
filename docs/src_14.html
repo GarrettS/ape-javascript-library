@@ -1,0 +1,29 @@
+<html><head><meta http-equiv="content-type" content="text/html; charset=utf-8"> <style>
+	.KEYW {color: #933;}
+	.COMM {color: #bbb; font-style: italic;}
+	.NUMB {color: #393;}
+	.STRN {color: #393;}
+	.REGX {color: #339;}
+	.linenumber {border-right: 1px dotted #666; color: #666; font-style: normal;}
+	</style></head><body><pre><span class='linenumber'>  1</span> <span class="COMM">/** Locking aspect. 
+<span class='linenumber'>  2</span>  * @author Garrett Smith
+<span class='linenumber'>  3</span>  *
+<span class='linenumber'>  4</span>  * Can be used for AsyncRequest, Animation, or anything that 
+<span class='linenumber'>  5</span>  * involves setTimeout or setInterval.
+<span class='linenumber'>  6</span>  * @aspect
+<span class='linenumber'>  7</span>  * @scope {Object} Anything. APE.lock has no use independently - 
+<span class='linenumber'>  8</span>  * it is purely a locking mechanism.
+<span class='linenumber'>  9</span>  */</span><span class="WHIT">
+<span class='linenumber'> 10</span> </span><span class="NAME">APE.Lock</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'> 11</span> </span><span class="WHIT">	</span><span class="NAME">getLock</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'> 12</span> </span><span class="WHIT">		</span><span class="KEYW">if</span><span class="PUNC">(</span><span class="NAME">this.__ape_lock_has_lock</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'> 13</span> </span><span class="WHIT">		</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.__ape_lock_has_lock</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">true</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'> 14</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='linenumber'> 15</span> </span><span class="WHIT">	</span><span class="NAME">releaseLock</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'> 16</span> </span><span class="WHIT">		</span><span class="NAME">this.__ape_lock_has_lock</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'> 17</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='linenumber'> 18</span> </span><span class="WHIT">	</span><span class="NAME">isLocked</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'> 19</span> </span><span class="WHIT">		</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">true</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="NAME">this.__ape_lock_has_lock</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'> 20</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
+<span class='linenumber'> 21</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'> 22</span> </span></pre></body></html>

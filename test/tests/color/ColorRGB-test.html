@@ -1,0 +1,239 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+    <title>ColorRGB Test</title>
+    <link rel="stylesheet" type="text/css" href="../../yui-test/build/logger/assets/logger.css" />
+    <link rel="stylesheet" type="text/css" href="../../yui-test/build/yuitest/assets/yuitest.css" />
+    <link rel="stylesheet" type="text/css" href="../../yui-test/assets/testlogger.css" />
+
+    <script type="text/javascript" src="../../yui-test/build/yahoo-dom-event/yahoo-dom-event.js"></script>
+    <script type="text/javascript" src="../../yui-test/build/logger/logger.js"></script>
+    <script type="text/javascript" src="../../yui-test/build/yuitest/yuitest-beta.js"></script>
+
+    <script type="text/javascript" src="../../../build/APE.js"></script>
+    <script type="text/javascript" src="../../../build/color/ColorRGB.js"></script>
+</head>
+<body>
+<div id="testLogger"></div>
+<script type="text/javascript">
+var rgbTest = new YAHOO.tool.TestCase({
+
+    //name of the test case - if not provided, one is auto-generated
+    name : "ColorRGB and ColorHSV tests",
+    
+    //---------------------------------------------------------------------
+    // setUp and tearDown methods - optional
+    //---------------------------------------------------------------------
+    
+    /*
+     * Sets up data that is needed by each test.
+     */
+    setUp : function () {
+        
+        this.data = {
+            color : new APE.color.ColorRGB(0x00, 0x00, 0xFF)
+        }
+    },
+    
+    /*
+     * Cleans up everything that was created by setUp().
+     */
+    tearDown : function () {
+        delete this.data;
+    },
+    
+    _should : {
+        error : {
+            testFailFromHexString : true
+        }
+    },
+
+    //---------------------------------------------------------------------
+    // Test methods - names must begin with "test"
+    //---------------------------------------------------------------------
+    
+    testToHexString : function () {
+        var Assert = YAHOO.util.Assert;
+        var data = this.data;
+        var string = data.color.toHexString();
+        Assert.isString(string);
+        Assert.areEqual("#0000FF", string.toUpperCase());
+    },
+    
+    testToHexString : function () {
+        var Assert = YAHOO.util.Assert;
+        var data = this.data;
+        var string = data.color.toHexString();
+        Assert.isString(string);
+        Assert.areEqual("#0000FF", string.toUpperCase());
+    },
+
+    testEquals : function() {
+        var Assert = YAHOO.util.Assert;
+        var data = this.data;
+        var other = new APE.color.ColorRGB(0, 0, 255);
+        Assert.isTrue(data.color.equals(other));
+    },
+
+    testEqualsFail : function() {
+        var Assert = YAHOO.util.Assert;
+        var data = this.data;
+        var other = new APE.color.ColorRGB(0, 1, 255);
+        Assert.isFalse(data.color.equals(other));
+    },
+
+    testIsValid : function() {
+        YAHOO.util.Assert.isTrue(this.data.color.isValid());
+    },
+
+    testValueOf : function() {
+        YAHOO.util.Assert.areEqual(0xFF, this.data.color.valueOf());
+    },
+
+    testFromNumber : function() {
+        var c = APE.color.ColorRGB.fromNumber(0xFFCC00);
+        YAHOO.util.Assert.areEqual(0xFF, c.r);
+        YAHOO.util.Assert.areEqual(0xCC, c.g);
+        YAHOO.util.Assert.areEqual(0, c.b);
+    },
+
+    testFromHexString : function() {
+        
+        // Try shorthand hex: #369.
+        var c = APE.color.ColorRGB.fromHexString("#369");
+        YAHOO.util.Assert.areEqual(0x33, c.r);
+        YAHOO.util.Assert.areEqual(0x66, c.g);
+        YAHOO.util.Assert.areEqual(0x99, c.b);
+
+        // Now try full hex.
+        c = APE.color.ColorRGB.fromHexString("#FCC037");
+
+        YAHOO.util.Assert.areEqual(0xFC, c.r);
+        YAHOO.util.Assert.areEqual(0xC0, c.g);
+        YAHOO.util.Assert.areEqual(0x37, c.b);
+    },
+
+    testFailFromHexString : function() {
+        var c = APE.color.ColorRGB.fromHexString("369");
+        YAHOO.util.Assert.isFalse(this.data.color.isValid());
+        
+        c = APE.color.ColorRGB.fromHexString("3699FF");
+        YAHOO.util.Assert.isFalse(this.data.color.isValid());
+        
+        c = APE.color.ColorRGB.fromHexString("3699FF");
+        YAHOO.util.Assert.isFalse(this.data.color.isValid());
+        
+        c = APE.color.ColorRGB.fromHexString("#699FF"); 
+        YAHOO.util.Assert.isFalse(this.data.color.isValid());
+    },
+
+    testFromString : function() {
+        var rgb = APE.color.ColorRGB.fromString("rgb(10, 11, 12)");
+        YAHOO.util.Assert.areEqual(10, rgb.r);
+        YAHOO.util.Assert.areEqual(11, rgb.g);
+        YAHOO.util.Assert.areEqual(12, rgb.b);
+
+        // THis should create a null color object, as the string format is not valid.
+        rgb = APE.color.ColorRGB.fromString("rgb(-0, 11, 12)");
+        YAHOO.util.Assert.isFalse(rgb.isValid());
+
+        rgb = APE.color.ColorRGB.fromString("#3f4");
+        YAHOO.util.Assert.areEqual(0x33, rgb.r);
+        YAHOO.util.Assert.areEqual(0xFF, rgb.g);
+        YAHOO.util.Assert.areEqual(0x44, rgb.b);
+    },
+
+    testFromRgbString : function() {
+        var rgb = APE.color.ColorRGB.fromRgbString("rgb(20, 99, 255)");
+        YAHOO.util.Assert.areEqual(20, rgb.r);
+        YAHOO.util.Assert.areEqual(99, rgb.g);
+        YAHOO.util.Assert.areEqual(255, rgb.b);
+    },
+
+    testBlend : function() {
+        var rgb = new APE.color.ColorRGB(20, 99, 255);
+
+        var other = new APE.color.ColorRGB(40, 0, 10);
+
+        var rv = .5;
+        
+        var mixed = APE.color.ColorRGB.blend(rgb, other, rv);
+
+        YAHOO.util.Assert.areEqual( (20 + 40) / 2, mixed.r);
+
+        rv = 1;
+        var mixed = APE.color.ColorRGB.blend(rgb, other, rv);
+        YAHOO.util.Assert.areEqual( 10, mixed.b);
+    },
+
+    // blend() takes an optional argument of a color that 
+    // is to be the mixed result. This test verifies that.
+    testBlendMixed : function() {
+        var rgb = new APE.color.ColorRGB(20, 99, 255);
+
+        var other = new APE.color.ColorRGB(40, 0, 10);
+
+        var mixed = new APE.color.ColorRGB();
+
+        var rv = .5;
+        
+        var mixedReturn = APE.color.ColorRGB.blend(rgb, other, rv, mixed);
+
+        // They should be the exact same object at this point.
+        YAHOO.util.Assert.areEqual( mixed, mixedReturn );
+        YAHOO.util.Assert.areEqual( (20 + 40) / 2, mixed.r);
+        YAHOO.util.Assert.areEqual( (20 + 40) / 2, mixedReturn.r);
+
+        rv = 1;
+        var mixed = APE.color.ColorRGB.blend(rgb, other, rv);
+
+        YAHOO.util.Assert.areEqual( 10, mixed.b);
+    },
+
+    testToHSV : function() {
+        var rgb = new APE.color.ColorRGB(0, 0, 255);
+        var hsv = rgb.toHSV();
+        YAHOO.util.Assert.areEqual( 240, hsv.h);
+        YAHOO.util.Assert.areEqual( 1, hsv.s);
+        YAHOO.util.Assert.areEqual( 1, hsv.v);
+    },
+
+    testRgbForHue : function() {
+        var ColorHSV = APE.color.ColorHSV;
+
+        var rgb = ColorHSV.rgbForHue(0);
+        YAHOO.util.Assert.areEqual( 255, rgb.r);
+
+        rgb = ColorHSV.rgbForHue(360);
+        YAHOO.util.Assert.areEqual( 255, rgb.r);
+
+    
+        rgb = ColorHSV.rgbForHue(180); // Green, midpoint.
+        YAHOO.util.Assert.areEqual( 0, rgb.r);
+        YAHOO.util.Assert.areEqual( 255, rgb.g);
+    
+        rgb = ColorHSV.rgbForHue(60); // Yellow, between red and green.
+        YAHOO.util.Assert.areEqual( 255, rgb.r, "rgb.r");
+        YAHOO.util.Assert.areEqual( 255, rgb.g, "rgb.g");
+    }
+});
+
+//create the logger
+var logger = new YAHOO.tool.TestLogger("testLogger");
+YAHOO.tool.TestRunner.add( rgbTest );
+
+//run the tests
+YAHOO.tool.TestRunner.add( rgbTest );
+ //run the tests
+if (parent && parent != window) {
+    YAHOO.tool.TestManager.load();
+} else {
+    YAHOO.tool.TestRunner.run();
+}
+
+</script>
+</body>
+
+</html>

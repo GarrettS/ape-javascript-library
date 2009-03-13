@@ -1,0 +1,105 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US">
+<head>
+	<title>Calendar</title>
+
+<link rel="stylesheet" type="text/css" href="../../../build/widget/calendar/css/Calendar.css" />
+<style type="text/css">
+    html {
+        background: #8bf;
+    }
+
+    label {
+        font: 15px Tahoma, sans-serif;
+        position: relative;
+        display: block;
+        width: 200px;
+    }
+    label input {
+        position: absolute;
+        right: 0;
+    }
+
+    /* for the style transition */
+    .ape-calendar {
+        opacity: .2;
+    	filter:progid:DXImageTransform.Microsoft.Alpha(Opacity=20);
+        height: 5em;
+        width: 5em;
+    }
+</style>
+
+<link rel="stylesheet" type="text/css" href="../../../build/widget/calendar/css/Calendar.css" />
+
+</head>
+<body>
+
+<div>
+    <label for="start" id='sf'>Start <input id="start" type="text" size="18"/></label>
+</div>
+
+<div>
+    <label for="end">End <input id="end" type="text" size="18"/></label>
+</div>
+
+<script src="../../../build/ape-ep-dom.js" type="text/javascript"></script>
+
+<script src="../../../build/anim/Animation.js" type="text/javascript"></script>
+<script src="../../../build/anim/StyleTransition.js" type="text/javascript"></script>
+<script src="../../../build/widget/calendar/Calendar.js" type="text/javascript"></script>
+<script src="../../../build/widget/calendar/Calendar_en.js" type="text/javascript"></script>
+<script type="text/javascript">
+setTimeout(function(){
+
+    var APE = window.APE;
+        window.start = APE.widget.Calendar.getById( "start" );
+        window.end = APE.widget.Calendar.getById( "end" );
+
+    start.create();
+    end.create();
+
+
+// Add a style transition to show() and hide() the calendar.
+    var anim = APE.anim,
+        styleTransition,
+        styleTransition2,
+        endStyle = {
+            opacity: .96, 
+            width: "14.4em", 
+            height: "13.8em",
+            visibility: "visible"
+        };
+
+    styleTransition = new anim.StyleTransition(
+        start.calendarId, 
+        endStyle, .2,
+        anim.Transitions.sigmoid3
+    );
+
+    styleTransition2 = new anim.StyleTransition(
+        end.calendarId, 
+        endStyle, .2,
+        anim.Transitions.sigmoid3
+    );
+
+    start.show =  function(cs) {
+        styleTransition.seekTo(1);
+    };
+
+    start.hide = function() {
+        styleTransition.seekTo(0);
+    };
+
+    end.show =  function(cs) {
+        styleTransition2.seekTo(1);
+    };
+
+    end.hide = function() {
+        styleTransition2.seekTo(0);
+    };
+
+}, 10);
+</script>
+</body>
+</html>

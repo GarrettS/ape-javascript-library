@@ -1,0 +1,106 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+    <title>DOM Event Test</title>
+
+    <link rel="stylesheet" type="text/css" href="../../yui-test/build/logger/assets/logger.css" />
+    <link rel="stylesheet" type="text/css" href="../../yui-test/build/yuitest/assets/yuitest.css" />
+    <link rel="stylesheet" type="text/css" href="../../yui-test/assets/testlogger.css" />
+
+    <script type="text/javascript" src="../../yui-test/build/yahoo-dom-event/yahoo-dom-event.js"></script>
+    <script type="text/javascript" src="../../yui-test/build/logger/logger.js"></script>
+    <script type="text/javascript" src="../../yui-test/build/yuitest/yuitest-beta.js"></script>
+
+    <script type="text/javascript" src="../../../build/APE.js"></script>
+    <script type="text/javascript" src="../../../build/dom/Event.js"></script>
+    <script type="text/javascript" src="../../../build/dom/viewport-f.js"></script>
+
+</head>
+<body style="position:relative;top: 10px">
+<div id="testNode"></div>
+
+<div id="testLogger"></div>
+
+<script type="text/javascript">
+setTimeout(function(){
+
+var dom = APE.dom,
+    Assert = YAHOO.util.Assert,
+    Action = YAHOO.util.UserAction;
+
+var eventTestCase = new YAHOO.tool.TestCase({
+    name : "Event Test Case",
+
+    setUp : function() {
+    },
+
+    tearDown : function() {
+    },
+
+    testGetTarget : function() {
+        var target;
+        document.body.onclick = function(e) {
+            target = dom.Event.getTarget(e);
+        };
+        Action.click(document.body);
+        Assert.areEqual(document.body, target);
+    },
+
+    testAddCallback : function() {
+        var context;
+        dom.Event.addCallback(document.body, "click", bodyClicked);
+        Action.click(document.body);
+
+        this.wait(function() {
+            Assert.areSame(document.body, context, "context was wrong");
+        }, 50);
+
+        function bodyClicked() {
+            context = this;
+        }
+    },
+
+    testRemoveCallback : function() {
+        var called = false;
+        var cb = dom.Event.addCallback(document.body, "click", bodyClicked);
+        dom.Event.removeCallback(document.body, "click", cb);
+        
+        Action.click(document.body);
+        
+        this.wait(function() {
+            Assert.isFalse(called, "removed function should not have been called.");
+        }, 50);
+        
+        function bodyClicked() {
+            called = true;
+        }
+    },
+
+    testGetCoords : function() {
+        var coords,
+            testNode = document.getElementById('testNode');
+
+        document.body.onclick = function(e) {
+            coords = dom.Event.getCoords(e||event);
+        };
+
+        Action.click(testNode, {canBubble:true, clientX: 10, clientY: 10 } );
+        Assert.areEqual(10, coords.x, "coords x");
+        Assert.areEqual(10, coords.y, "coords y");
+    }
+});
+
+var logger = new YAHOO.tool.TestLogger("testLogger");
+YAHOO.tool.TestRunner.add( eventTestCase );
+
+// run the tests, or put them in the TestRunner.
+if (parent && parent != window) {
+    YAHOO.tool.TestManager.load();
+} else {
+    YAHOO.tool.TestRunner.run();
+}
+}, 100);</script>
+</body>
+</html>

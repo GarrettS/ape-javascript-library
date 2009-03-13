@@ -1,0 +1,513 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+	"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+	<title>JsDoc: APE.ajax.AsyncRequest</title>
+	<link rel="stylesheet" href="default.css" type="text/css" media="screen">
+</head>
+
+<body>
+
+<table style="width: 100%" class="navbar">
+<tr>
+<td class="NavBar" valign="top"><font size="-2">SUMMARY:&nbsp;<a href="#field_summary">FIELD</a>&nbsp;|&nbsp;<a href="#constructor_summary">CONSTR</a>&nbsp;|&nbsp;<a href="#method_summary">METHOD</a></font></td>
+<td class="NavBar" valign="top"><font size="-2">DETAIL:&nbsp;<a href="#field_detail">FIELD</a>&nbsp;|&nbsp;<a href="#constructor_detail">CONSTR</a>&nbsp;|&nbsp;<a href="#method_detail">METHOD</a></font></td>
+</tr>
+</table>
+
+<h2>Class APE.ajax.AsyncRequest</h2>
+
+
+<i>Defined in <a href="AsyncRequest.src.html">AsyncRequest.js</a></i>
+
+
+
+
+
+
+
+
+
+<hr>
+
+<!-- =========== FIELD SUMMARY =========== -->
+
+<a name="field_summary"> </a> 
+<table border="1" cellpadding="3" cellspacing="0" width="100%">
+	<tr class="TableHeadingColor">
+		<td colspan=2>
+			<b>Field Summary</b>
+		</td>
+	</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>uint</code></font>
+			</td>
+			<td>
+				<code><b><a href="#timeoutMillis">timeoutMillis</a></b></code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			</td>
+		</tr>
+	
+</table>
+&nbsp;
+
+<!-- =========== END FIELD SUMMARY =========== -->
+
+
+<!-- ======== CONSTRUCTOR SUMMARY ======== -->
+<a name="constructor_summary"> </a>
+<table border="1" cellpadding="3" cellspacing="0" width="100%">
+<tr class="TableHeadingColor">
+	<th colspan=2>Constructor Summary</th>
+</tr>
+
+	<tr bgcolor="white" class="TableRowColor">
+	   <td>
+	
+		<code>
+		<b><a href="#APE.ajax.AsyncRequest">APE.ajax.AsyncRequest</a></b>(formConfig)
+		</code>
+		  <br>
+		  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		  
+		  </td>
+	</tr>
+
+	<tr bgcolor="white" class="TableRowColor">
+	   <td>
+	
+		<code>
+		<b><a href="#APE.ajax.AsyncRequest">APE.ajax.AsyncRequest</a></b>(formConfig)
+		</code>
+		  <br>
+		  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		  
+		  </td>
+	</tr>
+
+</table>
+&nbsp;
+<!-- ======== END CONSTRUCTOR SUMMARY ======== -->
+
+
+<!-- ========== METHOD SUMMARY =========== -->
+
+<a name="method_summary"> </a> 
+<table border="1" cellpadding="3" cellspacing="0" width="100%">
+	<tr class="TableHeadingColor">
+		<th colspan=2>
+			Method Summary
+		</th>
+	</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code></code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#abort">abort</a></b>() </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Aborts call.
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>
+				&nbsp;ajax.AsyncRequest
+				</code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#send">send</a></b>(data) </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Sends the call.
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code></code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#toString">toString</a></b>() </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; undocumented
+ 
+			</td>
+		</tr>
+	
+</table>
+&nbsp;
+
+
+<!-- ========== EVENT SUMMARY =========== -->
+
+
+<a name="event_summary"> </a> 
+<table border="1" cellpadding="3" cellspacing="0" width="100%">
+	<tr class="TableHeadingColor">
+		<th colspan=2>
+			Event Summary
+		</th>
+	</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>
+                
+                
+                
+                  void
+				</code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#onabort">onabort</a></b>() </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>
+                
+                
+                
+                  void
+				</code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#oncomplete">oncomplete</a></b>() </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>
+                
+                
+                
+                  void
+				</code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#onfail">onfail</a></b>() </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>
+                
+                
+                
+                  void
+				</code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#onsucceed">onsucceed</a></b>() </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>
+                
+                
+                
+                  void
+				</code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#ontimeout">ontimeout</a></b>() </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+ 
+			</td>
+		</tr>
+	
+</table>
+&nbsp;
+
+
+
+<!-- ========== INHERITED METHODS SUMMARY =========== -->
+
+<br/>
+
+<!-- ========== END INHERITED METHODS SUMMARY =========== -->
+
+<!-- ============ FIELD DETAIL START ========= -->
+
+<a name="field_detail"> </a> 
+<table border="1" cellpadding="3" cellspacing="0" width="100%">
+	<tr class="TableHeadingColor">
+		<th colspan=1>
+			Field Detail
+		</th>
+	</tr>
+</table>
+
+
+	<!-- One single method detail entry -->
+	<a name="timeoutMillis">
+	<!-- -->
+	</a> <h3>timeoutMillis</h3>
+		<pre>uint <b>timeoutMillis</b></pre> 
+	<ul>
+		
+		
+		
+	</ul>
+
+
+
+<!-- ============ FIELD DETAIL END ========== -->
+
+
+<!-- ========= CONSTRUCTOR DETAIL START ======== -->
+<a name="constructor_detail"> </a>
+<table border="1" cellpadding="3" cellspacing="0" width="100%">
+   <tr class="TableHeadingColor">
+      <th colspan=1>
+	Constructor Detail
+      </th>
+   </tr>
+
+</table>
+
+<a name="APE.ajax.AsyncRequest"> </a>
+<h3>APE.ajax.AsyncRequest</h3>
+
+	<pre><b>APE.ajax.AsyncRequest</b>(formConfig)</pre>
+	<ul>
+		
+		
+	</ul>
+	
+	<!-- PARAMETERS START -->
+	
+	<ul>
+		<b>Parameters:</b>
+		
+		<ul>
+			<code><i><a href="Object.html">Object</a></i>&nbsp;formConfig</code> - like:<pre> {  action : "foo.jsp",  enctype : "multipart/form-data",  method : "post"}</pre>In most cases, passing in a <code>FORM</code> will work. 
+		</ul>
+		
+	</ul>
+	
+	<!-- PARAMETERS END -->
+
+	<pre><b>APE.ajax.AsyncRequest</b>(formConfig)</pre>
+	<ul>
+		
+		
+	</ul>
+	
+	<!-- PARAMETERS START -->
+	
+	<ul>
+		<b>Parameters:</b>
+		
+		<ul>
+			<code><i><a href="Object.html">Object</a></i>&nbsp;formConfig</code> - like:<pre> {  action : "foo.jsp",  enctype : "multipart/form-data",  method : "post"}</pre>In most cases, passing in a <code>FORM</code> will work. 
+		</ul>
+		
+	</ul>
+	
+	<!-- PARAMETERS END -->
+
+<hr/>
+<!-- END ADDITIONAL ATTRIBUTES  -->
+<!-- ========= CONSTRUCTOR DETAIL END ======== -->
+
+
+<!-- ============ METHOD DETAIL START ======= -->
+
+<a name="method_detail"> </a> 
+<table border="1" cellpadding="3" cellspacing="0" width="100%">
+	<tr class="TableHeadingColor">
+		<th colspan=1>
+			Method Detail
+		</th>
+	</tr>
+</table>
+
+
+	<a name="abort"> </a> <h3>abort</h3>
+		<pre><b>abort</b>()</pre> 
+	<ul>
+		
+		Aborts call. Fires "onabort", passing the request,then fires "oncomplete" with {successful : false}
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="send"> </a> <h3>send</h3>
+		<pre>ajax.AsyncRequest&nbsp;<b>send</b>(data)</pre> 
+	<ul>
+		
+		Sends the call.
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	<ul>
+		<b>Parameters:</b>
+		<ul>
+			<code><i>String, Array</i>&nbsp;data</code><a title="optional parameter" class="optional">?</a> - post data. If an array, it is assumed that the request is an unencoded, multipart/form-data. The array is joined on a boundary. 
+		</ul>
+	</ul>
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	<ul>
+		<b>Returns:</b>
+		<ul>
+			<code><i>ajax.AsyncRequest</i>&nbsp;</code>The AsyncRequest wrapper object is returned. 
+		</ul>
+	</ul>
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="toString"> </a> <h3>toString</h3>
+		<pre><b>toString</b>()</pre> 
+	<ul>
+		
+		undocumented
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+
+<!-- ============ METHOD DETAIL END ========== -->
+
+<!-- ============ EVENT DETAIL START ======= -->
+
+
+<a name="method_detail"> </a> 
+<table border="1" cellpadding="3" cellspacing="0" width="100%">
+	<tr class="TableHeadingColor">
+		<th colspan=1>
+			Event Detail
+		</th>
+	</tr>
+</table>
+
+
+	<a name="onabort"> </a> <h3>onabort</h3>
+		<pre><b>onabort</b>()</pre> 
+	<ul>
+		
+		
+		
+	</ul>
+	<!-- EVENT PARAMETERS START -->
+	
+	<!-- EVENT PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="oncomplete"> </a> <h3>oncomplete</h3>
+		<pre><b>oncomplete</b>()</pre> 
+	<ul>
+		
+		
+		
+	</ul>
+	<!-- EVENT PARAMETERS START -->
+	
+	<!-- EVENT PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="onfail"> </a> <h3>onfail</h3>
+		<pre><b>onfail</b>()</pre> 
+	<ul>
+		
+		
+		
+	</ul>
+	<!-- EVENT PARAMETERS START -->
+	
+	<!-- EVENT PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="onsucceed"> </a> <h3>onsucceed</h3>
+		<pre><b>onsucceed</b>()</pre> 
+	<ul>
+		
+		
+		
+	</ul>
+	<!-- EVENT PARAMETERS START -->
+	
+	<!-- EVENT PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="ontimeout"> </a> <h3>ontimeout</h3>
+		<pre><b>ontimeout</b>()</pre> 
+	<ul>
+		
+		
+		
+	</ul>
+	<!-- EVENT PARAMETERS START -->
+	
+	<!-- EVENT PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+
+
+<!-- ============ EVENT DETAIL END ========== -->
+<div class="jsdoc_ctime">Documentation generated by <a href="http://jsdoctoolkit.org/" target="_parent">JsDoc Toolkit</a> 1.4.0 on Sun Aug 17 2008 17:08:27 GMT-0700 (PDT)</div>
+</body>
+</html>

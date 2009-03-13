@@ -1,0 +1,261 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+	"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+	<title>JsDoc: APE.anim.StyleTransition</title>
+	<link rel="stylesheet" href="default.css" type="text/css" media="screen">
+</head>
+
+<body>
+
+<table style="width: 100%" class="navbar">
+<tr>
+<td class="NavBar" valign="top"><font size="-2">SUMMARY:&nbsp;<a href="#field_summary">FIELD</a>&nbsp;|&nbsp;<a href="#constructor_summary">CONSTR</a>&nbsp;|&nbsp;<a href="#method_summary">METHOD</a></font></td>
+<td class="NavBar" valign="top"><font size="-2">DETAIL:&nbsp;<a href="#field_detail">FIELD</a>&nbsp;|&nbsp;<a href="#constructor_detail">CONSTR</a>&nbsp;|&nbsp;<a href="#method_detail">METHOD</a></font></td>
+</tr>
+</table>
+
+<h2>Class APE.anim.StyleTransition</h2>
+
+
+	Extends <a href="APE.anim.Animation.html">APE.anim.Animation</a>.<br/>
+
+<i>Defined in <a href="StyleTransition.src.html">StyleTransition.js</a></i>
+
+
+
+
+
+	<li><strong>class: </strong> StyleTransition</li>
+
+	<li><strong>static: </strong> </li>
+
+	<li><strong>class: </strong> APE.anim<p>For morphing an objects styles across a css-time-continuum.</p></li>
+
+	<li><strong>author: </strong> Garrett Smith</li>
+
+	<li><strong>requires: </strong> APE.anim.Animation</li>
+
+	<li><strong>requires: </strong> APE.color</li>
+
+	<li><strong>requires: </strong> APE.dom.style-f</li>
+
+
+
+
+
+<hr>
+
+<!-- =========== FIELD SUMMARY =========== -->
+
+<!-- =========== END FIELD SUMMARY =========== -->
+
+
+<!-- ======== CONSTRUCTOR SUMMARY ======== -->
+<a name="constructor_summary"> </a>
+<table border="1" cellpadding="3" cellspacing="0" width="100%">
+<tr class="TableHeadingColor">
+	<th colspan=2>Constructor Summary</th>
+</tr>
+
+	<tr bgcolor="white" class="TableRowColor">
+	   <td>
+	
+		<code>
+		<b><a href="#APE.anim.StyleTransition">APE.anim.StyleTransition</a></b>(id, styleObject, duration, transition)
+		</code>
+		  <br>
+		  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		  
+		  </td>
+	</tr>
+
+	<tr bgcolor="white" class="TableRowColor">
+	   <td>
+	
+		<code>
+		<b><a href="#APE.anim.StyleTransition">APE.anim.StyleTransition</a></b>(id, styleObject, duration, transition)
+		</code>
+		  <br>
+		  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		  
+		  </td>
+	</tr>
+
+</table>
+&nbsp;
+<!-- ======== END CONSTRUCTOR SUMMARY ======== -->
+
+
+<!-- ========== METHOD SUMMARY =========== -->
+
+
+<!-- ========== EVENT SUMMARY =========== -->
+
+
+
+
+<!-- ========== INHERITED METHODS SUMMARY =========== -->
+
+	
+	<table border="1" cellpadding="3" cellspacing="0" width="100%">
+		<tr>
+		<th>
+				<b>Methods inherited from class <a href="APE.anim.Animation.html">APE.anim.Animation</a></b>
+		</th>
+		<tr>
+		<tr bgcolor="#EEEEFF" class="TableSubHeadingColor">
+		
+				<td>
+				<a href="APE.anim.Animation.html#transition">transition</a>(p)
+				</td>
+		
+				<td>
+				<a href="APE.anim.Animation.html#run">run</a>(position)
+				</td>
+		
+				<td>
+				<a href="APE.anim.Animation.html#start">start</a>()
+				</td>
+		
+				<td>
+				<a href="APE.anim.Animation.html#seekTo">seekTo</a>(pos, transitionBackwards)
+				</td>
+		
+				<td>
+				<a href="APE.anim.Animation.html#toggleDirection">toggleDirection</a>()
+				</td>
+		
+				<td>
+				<a href="APE.anim.Animation.html#reset">reset</a>()
+				</td>
+		
+				<td>
+				<a href="APE.anim.Animation.html#pause">pause</a>()
+				</td>
+		
+				<td>
+				<a href="APE.anim.Animation.html#resume">resume</a>()
+				</td>
+		
+				<td>
+				<a href="APE.anim.Animation.html#toString">toString</a>()
+				</td>
+		
+				<td>
+				<a href="APE.anim.Animation.html#stop">stop</a>(ended)
+				</td>
+		
+				<td>
+				<a href="APE.anim.Animation.html#abort">abort</a>(ex)
+				</td>
+		
+		</tr>
+	</table>
+	
+	<br/>
+
+<br/>
+
+<!-- ========== END INHERITED METHODS SUMMARY =========== -->
+
+<!-- ============ FIELD DETAIL START ========= -->
+
+<!-- ============ FIELD DETAIL END ========== -->
+
+
+<!-- ========= CONSTRUCTOR DETAIL START ======== -->
+<a name="constructor_detail"> </a>
+<table border="1" cellpadding="3" cellspacing="0" width="100%">
+   <tr class="TableHeadingColor">
+      <th colspan=1>
+	Constructor Detail
+      </th>
+   </tr>
+
+</table>
+
+<a name="APE.anim.StyleTransition"> </a>
+<h3>APE.anim.StyleTransition</h3>
+
+	<pre><b>APE.anim.StyleTransition</b>(id, styleObject, duration, transition)</pre>
+	<ul>
+		
+		
+	</ul>
+	
+	<!-- PARAMETERS START -->
+	
+	<ul>
+		<b>Parameters:</b>
+		
+		<ul>
+			<code><i>String</i>&nbsp;id</code> - of the element 
+		</ul>
+		
+		<ul>
+			<code><i><a href="Object.html">Object</a></i>&nbsp;styleObject</code> - in the form of {color: "#030", fontSize : "12px"} 
+		</ul>
+		
+		<ul>
+			<code><i>ufloat</i>&nbsp;duration</code><a title="optional parameter" class="optional">?</a> - optional number of seconds. 
+		</ul>
+		
+		<ul>
+			<code><i>Function</i>&nbsp;transition</code><a title="optional parameter" class="optional">?</a> - optional funtion that takes a float [0-1] and returns a float [0-1] 
+		</ul>
+		
+	</ul>
+	
+	<!-- PARAMETERS END -->
+
+	<pre><b>APE.anim.StyleTransition</b>(id, styleObject, duration, transition)</pre>
+	<ul>
+		
+		
+	</ul>
+	
+	<!-- PARAMETERS START -->
+	
+	<ul>
+		<b>Parameters:</b>
+		
+		<ul>
+			<code><i>String</i>&nbsp;id</code> - of the element 
+		</ul>
+		
+		<ul>
+			<code><i><a href="Object.html">Object</a></i>&nbsp;styleObject</code> - in the form of {color: "#030", fontSize : "12px"} 
+		</ul>
+		
+		<ul>
+			<code><i>ufloat</i>&nbsp;duration</code><a title="optional parameter" class="optional">?</a> - optional number of seconds. 
+		</ul>
+		
+		<ul>
+			<code><i>Function</i>&nbsp;transition</code><a title="optional parameter" class="optional">?</a> - optional funtion that takes a float [0-1] and returns a float [0-1] 
+		</ul>
+		
+	</ul>
+	
+	<!-- PARAMETERS END -->
+
+<hr/>
+<!-- END ADDITIONAL ATTRIBUTES  -->
+<!-- ========= CONSTRUCTOR DETAIL END ======== -->
+
+
+<!-- ============ METHOD DETAIL START ======= -->
+
+<!-- ============ METHOD DETAIL END ========== -->
+
+<!-- ============ EVENT DETAIL START ======= -->
+
+
+
+<!-- ============ EVENT DETAIL END ========== -->
+<div class="jsdoc_ctime">Documentation generated by <a href="http://jsdoctoolkit.org/" target="_parent">JsDoc Toolkit</a> 1.4.0 on Sun Aug 17 2008 17:08:27 GMT-0700 (PDT)</div>
+</body>
+</html>

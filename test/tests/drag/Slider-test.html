@@ -1,0 +1,304 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+    <title>Slider Test</title>
+
+    <link rel="stylesheet" type="text/css" href="../../yui-test/build/logger/assets/logger.css" />
+    <link rel="stylesheet" type="text/css" href="../../yui-test/build/yuitest/assets/yuitest.css" />
+    <link rel="stylesheet" type="text/css" href="../../yui-test/assets/testlogger.css" />
+
+    <script type="text/javascript" src="../../yui-test/build/yahoo-dom-event/yahoo-dom-event.js"></script>
+    <script type="text/javascript" src="../../yui-test/build/logger/logger.js"></script>
+    <script type="text/javascript" src="../../yui-test/build/yuitest/yuitest-beta.js"></script>
+
+    <script type="text/javascript" src="../../../build/ape-ep-dom.js"></script>
+    <script type="text/javascript" src="../../../build/drag/Draggable.js"></script>
+    <script type="text/javascript" src="../../../build/drag/Slider.js"></script>
+    <link type="text/css" rel="stylesheet" href="../../../build/drag/css/Slider.css" />
+
+</head>
+<body style="position:relative;">
+<div id="testLogger"></div>
+<div id="template" style="height: 100%; width: 100%;">
+    <div id="testNode" style="position: relative;margin:0; width: 200px;left: 0" 
+        tabindex="0"
+    class="ape-slider-track ape-slider-h-track">
+        <div id="testNode-handle" class="ape-slider-handle ape-slider-h-handle"></div>
+    </div>
+    <div id="testNode2" style="position: relative; width: 10px; height: 100px;" 
+        tabindex="0"
+        class="ape-slider-track ape-slider-v-track">
+        <div id="testNode2-handle" class="ape-slider-handle ape-slider-v-handle"></div>
+    </div>
+</div>
+<script type="text/javascript">
+setTimeout(function(){
+
+// window.focus() seems to fix false failures 
+// with testNodeHandle.focus() not taking effect.
+self.focus();
+
+// fix for broken pageX in initMouseEvent
+document.body.style.margin= "0";
+
+
+var Assert = YAHOO.util.Assert,
+    StringAssert = YAHOO.util.StringAssert,
+    ArrayAssert = YAHOO.util.ArrayAssert,
+    dom = APE.dom,
+    Action = YAHOO.util.UserAction,
+    EventPublisher = APE.EventPublisher,
+    TestRunner = YAHOO.tool.TestRunner,
+    Draggable = APE.drag.Draggable,
+    Slider = APE.drag.Slider,
+    testNodeHandle = document.getElementById('testNode-handle'),
+    testNode2Handle = document.getElementById('testNode2-handle'),
+    template = document.getElementById('template'),
+    templateHTML = template.innerHTML,
+    oldBodyCssText = document.body.style.cssText;
+
+var draggableTestCase = new YAHOO.tool.TestCase({
+
+    name : "Slider Test Case",
+
+    // pageX broken, so all tests test target from 0, 0.
+
+    tearDown : function() {
+        Draggable.instanceDestructor();
+        Slider.instances = {};
+        testNodeHandle.className = "";
+        template.innerHTML = templateHTML;
+        document.body.style.cssText = oldBodyCssText;
+        testNodeHandle = document.getElementById('testNode-handle');
+        testNode2Handle = document.getElementById('testNode2-handle');
+    },
+
+    testFocusBlur : function() {
+        
+        testNodeHandle.className = "orig";
+        
+        var d = Slider.getByNode( testNodeHandle, Slider.direction.HORZ );
+
+        if(testNodeHandle.focus)
+            testNodeHandle.focus();
+        Action.mousedown( testNodeHandle );
+
+        this.wait(function(){
+            
+            var orig = testNodeHandle.className;
+
+            StringAssert.contains( "ape-slider-h-handle-focus", testNodeHandle.className );
+            StringAssert.contains( "ape-slider-track-active", testNodeHandle.parentNode.className );
+            Action.mouseup( document );
+
+            if(testNodeHandle.blur)
+                testNodeHandle.blur();
+        }, 10);
+
+    },
+    
+    testOnslide : function() {
+        
+        var d = Slider.getByNode( testNodeHandle, Slider.direction.HORZ ),
+            slid = false;
+
+        d.onslide = function() {
+            slid = true;
+        };
+
+        if(testNodeHandle.focus)
+            testNodeHandle.focus();
+        Action.mousedown( testNodeHandle );
+        
+        Action.mousemove( document, {clientX : 12 } );
+        this.wait(function(){
+            
+            Action.mouseup( document );
+            Assert.isTrue( slid, "onslide didn't fire." );
+            if(testNodeHandle.blur)
+                testNodeHandle.blur();
+        }, 30);
+    },
+
+    testRationalValue : function() {
+                
+        var d = Slider.getByNode( testNodeHandle, Slider.direction.HORZ );
+
+        if(testNodeHandle.focus)
+            testNodeHandle.focus();
+        Action.mousedown( testNodeHandle );
+
+        var x = (testNodeHandle.parentNode.offsetWidth/2) - (testNodeHandle.offsetWidth/2);
+        Action.mousemove( document, {clientX : x} );
+        this.wait(function(){
+            
+            Action.mouseup( document, {clientX : x} );
+
+            // Chop off those long decimals.
+            Assert.areEqual( .5, ((d.rationalValue * 10) | 0) / 10 ); 
+            if(testNodeHandle.blur)
+                testNodeHandle.blur();
+        }, 10);
+    },
+
+    testSetValue : function() {
+        var d = Slider.getByNode( testNode2Handle, Slider.direction.VERT );
+
+        d.minValue = 200;
+        d.maxValue = 800;
+
+        d.setValue( 500 );
+
+        Assert.areEqual( .5, (d.rationalValue * 10 | 0) / 10, "rationalValue was wrong." )
+        var x = (testNode2Handle.parentNode.offsetWidth/2) - (testNodeHandle.offsetWidth/2);
+        Action.mousemove( document, {clientX : x} );
+
+        // Chop off those long decimals.
+        Assert.areEqual( .5, ((d.rationalValue * 10) | 0) / 10 ); 
+    },
+
+    testSetValueNegMin : function() {
+        var d = Slider.getByNode( testNode2Handle, Slider.direction.VERT );
+
+        d.minValue = -200;
+        d.maxValue = 800;
+
+        d.setValue( 300 );
+
+        Assert.areEqual( .5, (d.rationalValue * 10 | 0) / 10, "rationalValue was wrong." )
+        var x = (testNode2Handle.parentNode.offsetWidth/2) - (testNodeHandle.offsetWidth/2);
+        Action.mousemove( document, {clientX : x} );
+
+        // Chop off those long decimals.
+        Assert.areEqual( .5, ((d.rationalValue * 10) | 0) / 10 ); 
+    },
+
+    testSetValueNegMin0Max : function() {
+        var d = Slider.getByNode( testNode2Handle, Slider.direction.VERT );
+
+        d.minValue = -200;
+        d.maxValue = 0;
+
+        d.setValue( -100 );
+
+        Assert.areEqual( .5, (d.rationalValue * 10 | 0) / 10, "rationalValue was wrong." )
+        var x = (testNode2Handle.parentNode.offsetWidth/2) - (testNodeHandle.offsetWidth/2);
+        Action.mousemove( document, {clientX : x} );
+
+        // Chop off those long decimals.
+        Assert.areEqual( .5, ((d.rationalValue * 10) | 0) / 10 ); 
+    },
+
+    testTrackbarMousedown : function() {
+        var d = Slider.getByNode( testNodeHandle, Slider.direction.HORZ );
+
+        Action.mousedown( testNodeHandle.parentNode,  {clientX : 100 } );
+        Action.mouseup( document );
+        
+        this.wait(function(){
+            Assert.areEqual( .5, (d.rationalValue * 10 | 0) / 10, "rationalValue was wrong." )
+        }, 30);
+    },
+
+    testSetRationalValue : function() {
+        var d = Slider.getByNode( testNode2Handle, Slider.direction.VERT );
+        d.minValue = 100;
+        d.maxValue = 1100;
+        d.setRationalValue( .9 );
+        Assert.areEqual( 1000, d.value );
+        Assert.areEqual( .9, d.rationalValue );
+    },
+
+    testSetRationalValueNegMin : function() {
+        var d = Slider.getByNode( testNode2Handle, Slider.direction.VERT );
+        d.minValue = -900;
+        d.maxValue = 100;
+        d.setRationalValue( .9 );
+        Assert.areEqual( 0, d.value );
+        Assert.areEqual( .9, d.rationalValue );
+    },
+
+    testDragEnd : function() {
+        var d = Slider.getByNode( testNodeHandle, Slider.direction.HORZ ),
+            ended = false;
+
+        d.onslideend = function() {
+            ended = true;
+        };
+    
+        if(testNodeHandle.focus)
+            testNodeHandle.focus();
+        Action.mousedown( testNodeHandle );
+        
+        Action.mousemove( document, {clientX : 12 } );
+        Action.mouseup( document );
+
+        this.wait(function(){  
+            Assert.isTrue( ended, "onslideend didn't fire." );
+            if(testNodeHandle.blur)
+                testNodeHandle.blur();
+        }, 30);
+    },
+
+
+    testKeyNeg : function() {
+        var d = Slider.getByNode( testNodeHandle, Slider.direction.HORZ );
+
+        if(testNodeHandle.focus)
+            testNodeHandle.focus();
+        Action.mousedown( testNodeHandle );
+
+        var lArr = 37,
+            rArr = 39,
+            uArr = 38,
+            dArr = 40;
+
+        Action.keydown( document, {keyCode: lArr } );
+        Action.mouseup( document );
+
+        this.wait(function(){ 
+            Assert.areEqual( 0, d.value );
+            if(testNodeHandle.blur)
+                testNodeHandle.blur();
+        }, 30);
+    },
+
+    testKey1tic : function() {
+        var d = Slider.getByNode( testNodeHandle, Slider.direction.HORZ );
+
+        d.maxValue = 150;
+
+        if(testNodeHandle.focus)
+            testNodeHandle.focus();
+        Action.mousedown( testNodeHandle );
+        
+        var lArr = 37,
+            rArr = 39,
+            uArr = 38,
+            dArr = 40;
+
+        Action.keydown( document, {keyCode: rArr } );
+        this.wait(function(){ 
+            Action.keyup(document);
+            Assert.areEqual( 10, d.value );
+            if(testNodeHandle.blur)
+                testNodeHandle.blur();
+        }, 10);
+    }
+});
+
+// Set the TestRunner's logger by invoking a constructor
+new YAHOO.tool.TestLogger("testLogger");
+TestRunner.add( draggableTestCase );
+
+if (parent && parent != window) {
+    YAHOO.tool.TestManager.load();
+} else {
+    YAHOO.tool.TestRunner.run();
+}
+
+}, 100);</script>
+</body>
+</html>

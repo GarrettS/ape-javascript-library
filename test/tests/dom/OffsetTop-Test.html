@@ -1,0 +1,517 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+    <title>offsetTop Test</title>
+
+    <link rel="stylesheet" type="text/css" href="../../yui-test/build/logger/assets/logger.css" />
+    <link rel="stylesheet" type="text/css" href="../../yui-test/build/yuitest/assets/yuitest.css" />
+    <link rel="stylesheet" type="text/css" href="../../yui-test/assets/testlogger.css" />
+
+    <script type="text/javascript" src="../../yui-test/build/yahoo-dom-event/yahoo-dom-event.js"></script>
+    <script type="text/javascript" src="../../yui-test/build/logger/logger.js"></script>
+    <script type="text/javascript" src="../../yui-test/build/yuitest/yuitest-beta.js"></script>
+
+</head>
+<body style="position: relative;margin:0;padding:0;">
+
+<div id="container" style="position: absolute; top: 0; left: 0;">
+    <!-- isInsideElement -->
+    <!-- 20 + 11 = 33 -->
+    <a id="overlapping" style='position: absoulte; top: 20px; right: 0; height: 0;border: 11px solid #ccc;background: #900'></a>
+
+
+ 
+    <!-- +12 -->
+        <div id="c1" style="position: absolute; top: 12px;height: 20px;background: #00c;">
+        <!-- +3 -->
+            <a id="target" style='top: 3px; left: 1px;display: block;position: absolute;'></a>
+
+        </div>
+
+        <div id="not-table" style="position: absolute; height: 10px"></div>
+        <table id="table">
+            <tr>
+                <td>r1 c1</td><td><div>r1 c2</div></td>
+            </tr>
+            <tr>
+                <td>r2 c1</td><td><div>r1 c2</div></td>
+            </tr>
+        </table>
+
+         <table id="table2">
+            <tr>
+                <td>r1 c1</td><td style="position: relative"><div>r1 c2</div></td>
+            </tr>
+            <tr>
+                <td>r2 c1</td><td>r2 c2</td>
+            </tr>
+        </table>
+
+         <table id="table3" style="position: relative">
+            <tr>
+                <td>r1 c1</td><td style="position: relative"><div>r1 c2</div></td>
+            </tr>
+            <tr>
+                <td>r2 c1</td><td>r2 c2</td>
+            </tr>
+        </table>
+
+         <table id="table3">
+            <tbody style="position: relative;">
+                <tr>
+                    <td>r1 c1</td><td style="position: relative"><div>r1 c2</div></td>
+                </tr>
+                <tr>
+                    <td>r2 c1</td><td>r2 c2</td>
+                </tr>
+            </tbody>
+        </table>
+</div>
+<div id="testLogger"></div>
+
+<script type="text/javascript">
+
+setTimeout(function(){
+
+var Assert = YAHOO.util.Assert,
+    container = document.getElementById("container"),
+    template = container.innerHTML,
+    body = document.body,
+    docEl = document.documentElement,
+    containerCssText = container.style.cssText,
+    htmlCssText = document.documentElement.style.cssText,
+    bodyCssText = document.body.style.cssText;
+
+var offsetTopTestCase = new YAHOO.tool.TestCase({
+
+    //name of the test case - if not provided, one is auto-generated
+    name : "offsetTop Tests",
+    setUp : function () {
+    },
+
+    /*
+     * Cleans up everything that was created by setUp().
+     */
+    tearDown : function () {
+        body.style.cssText = bodyCssText;
+        docEl.style.cssText = htmlCssText;
+        // Mozilla needs this before setting cssText.
+        container.scrollLeft = container.scrollTop = 0; 
+        container.style.cssText = containerCssText;
+        container.innerHTML = template;
+    },
+    
+
+    //---------------------------------------------------------------------
+    // Test methods 
+    //---------------------------------------------------------------------
+    testTargetOffsetTop : function() {
+        var target = document.getElementById("target");
+        target.style.position = "";
+        Assert.areEqual( 0, target.offsetTop );
+    },
+    
+    testTargetAbsoluteOffsetTop : function() {
+        var target = document.getElementById("target");
+        target.style.position = "absolute";
+        Assert.areEqual( 3, target.offsetTop );
+    },
+    
+    testTargetBorderAbsoluteOffsetTop : function() {
+        var target = document.getElementById("target");
+        target.style.position = "absolute";
+        target.style.border = "1px solid red";
+        Assert.areEqual( 3, target.offsetTop );
+    },
+
+    testBodyRelMarginChildRel : function() {
+        var container = document.getElementById("container"),
+            body = document.body;
+        body.style.position = "relative";
+        body.style.margin = "21px";
+        container.style.position= "relative";
+        YAHOO.log("container.offsetTop: " + container.offsetTop, "info", "TestLogger");
+        Assert.areEqual(0, container.offsetTop, "container offsetTop wrong");
+        Assert.areEqual(21, body.offsetTop, "body offsetTop wrong.");
+    },
+
+    testBodyStaticMarginChildRel : function() {
+        var container = document.getElementById("container"),
+            body = document.body;
+        body.style.position = "static";
+        body.style.margin = "21px";
+        container.style.position = "relative";
+
+        YAHOO.log("container offsetTop: " + container.offsetTop, "info", "TestLogger");
+        YAHOO.log("body offsetTop: " + body.offsetTop, "info", "TestLogger");
+
+        Assert.areEqual(document.documentElement, container.offsetParent, 
+            "container offsetParent wrong.");
+        Assert.areEqual(document.documentElement, body.offsetParent, 
+            "body offsetParent wrong.");
+
+        Assert.areEqual(21, container.offsetTop, "container offsetTop wrong");
+        Assert.areEqual(0, body.offsetTop, "body offsetTop wrong.");
+    },
+
+    testBodyStaticMarginNestedChildRel : function() {
+        var container = document.getElementById("container"),
+            overlapping = document.getElementById("overlapping"),
+            c1 = document.getElementById("c1"),
+            body = document.body;
+        body.style.position = "static";
+        body.style.margin = "21px";
+        container.style.position= "static";
+        c1.style.position = "relative";
+        c1.style.top = "0";
+        
+        Assert.areEqual(21, c1.offsetTop, "c1 offsetTop wrong");
+    },
+
+    testContainerStaticC1Static : function() {
+        var container = document.getElementById("container"),
+            c1 = document.getElementById("c1");
+        
+        container.style.margin= "10px";
+        container.style.position= "static";
+        c1.style.position = "static";
+        c1.style.top = "0";
+        Assert.areEqual("container", c1.offsetParent.id, "c1 offsetParent wrong. Found: " + c1.offsetParent.tagName);
+        Assert.areEqual(10, c1.offsetTop, "c1 offsetTop wrong");
+    },
+    
+    testBodyStaticMarginChildStatic : function() {
+        var container = document.getElementById("container"),
+            body = document.body;
+        body.style.position = "static";
+        body.style.margin = "21px";
+        container.style.position= "static";
+
+        YAHOO.log("container offsetTop: " + container.offsetTop, "info", "TestLogger");
+        YAHOO.log("body offsetTop: " + body.offsetTop, "info", "TestLogger");
+
+        Assert.areEqual(document.documentElement.tagName, container.offsetParent.tagName, 
+            "container offsetParent wrong.");
+        Assert.areEqual(document.documentElement.tagName, body.offsetParent.tagName, 
+            "body offsetParent wrong.");
+
+        Assert.areEqual(21, container.offsetTop, "container offsetTop wrong");
+        Assert.areEqual(21, body.offsetTop, "body offsetTop wrong.");
+    },
+
+    testBodyStaticMarginChildRelChildStatic : function() {
+        var container = document.getElementById("container"),
+            c1 = document.getElementById("c1"),
+            body = document.body;
+        body.style.position = "static";
+        body.style.margin = "21px";
+        container.style.position= "relative";
+
+        YAHOO.log("container offsetTop: " + container.offsetTop, "info", "TestLogger");
+        YAHOO.log("body offsetTop: " + body.offsetTop, "info", "TestLogger");
+
+        Assert.areEqual(document.documentElement.tagName, container.offsetParent.tagName, 
+            "container offsetParent wrong.");
+        Assert.areEqual(document.documentElement.tagName, body.offsetParent.tagName, 
+            "body offsetParent wrong.");
+
+        Assert.areEqual(21, container.offsetTop, "container offsetTop wrong");
+        Assert.areEqual(21, body.offsetTop, "body offsetTop wrong.");
+    },
+
+    testTargetRelativeBlock : function() {
+        var target = document.getElementById("target");
+        target.style.width="";
+        target.style.position = "relative";
+
+    // Has layout is false -
+    // test this only for browser that support currentStyle.
+        if(target.currentStyle)
+            Assert.isTrue(!target.currentStyle.hasLayout);
+        target.style.border = "1px solid red";
+        Assert.areEqual( 3, target.offsetTop );
+    },
+
+        
+    testTargetRelativeInline : function() {
+        var target = document.getElementById("target");
+        target.style.width="";
+        target.style.position = "relative";
+        target.style.display="inline";
+
+    // Has layout is false -
+    // test this only for browser that support currentStyle.
+        if(target.currentStyle)
+            Assert.isTrue(!target.currentStyle.hasLayout);
+        target.style.border = "1px solid red";
+        Assert.areEqual( 3, target.offsetTop );
+    },
+
+    /** 
+     * Opera gets this wrong.
+     * Opera: If target has position: relative, it includes offsetTop  
+     * from the nearest absolute container. 
+     */
+    testTargetRelativeOffsetTop : function() {
+
+        var target = document.getElementById("target"),
+            c1 = target.parentNode;
+        target.style.position = "relative";
+        target.style.border = "";
+        Assert.areEqual( 3, target.offsetTop );
+    },
+    
+    testTargetRelativeBorderOffsetTop : function() {
+
+
+        var target = document.getElementById("target");
+        target.style.position = "relative";
+        target.style.border = "1px solid red";
+        Assert.areEqual( 3, target.offsetTop );
+    },
+
+
+// border on parent.
+    testTargetAbsoluteParentBorder : function() {
+
+        var target = document.getElementById("target");
+        target.style.position = "absolute";
+        target.style.border = "";
+        target.parentNode.style.border = "1px solid red";
+        Assert.areEqual( 3, target.offsetTop );
+    },
+    
+    /** 
+     * In Opera the parent's border affects the offsetTop of a 
+     * rel pos'd element. 
+     */
+
+    testTargetRelativeParentBorder : function() {
+
+        var target = document.getElementById("target");
+        target.style.position = "relative";
+        target.parentNode.style.border = "1px solid red";
+        target.parentNode.style.marginTop = "0";
+        Assert.areNotEqual( 4, target.offsetTop, "target's offsetTop included the parent's border width." );
+        Assert.areEqual( 3, target.offsetTop, "target's offsetTop was wrong." );
+    },
+
+    testTargetMargin : function() {
+
+        var target = document.getElementById("target");
+        target.style.position = "relative";
+        target.style.top = "0";
+        target.style.margin = "5px";
+        Assert.areEqual( 5, target.offsetTop, "target's offsetTop was wrong." );
+    },
+
+/** 
+ * Opera bug:
+ * Opera takes the marginTop/Left of the body or documentElement and applies it 
+ * to the offsetTop/Left of the child who is asking for offsetTop/Left. 
+ */
+    testBodyMargin  : function() {
+        var bs = document.body.style,
+            container = document.getElementById("container");
+        bs.margin = "21px";
+        bs.position = "relative";
+        Assert.areNotEqual( 21, container.offsetTop, "container's offsetTop was inherited from body, should be 0." );
+        Assert.areEqual( 0, container.offsetTop, "target's offsetTop was wrong." );
+    },
+
+    testRelativeBodyOffsetTop : function() {
+
+        var container = document.getElementById("container");
+        var bs = document.body.style;
+        bs.margin = "10px";
+        Assert.areNotEqual( 0, document.body.offsetTop, "body had a margin of 10px; offsetTop should not be 0" );
+        Assert.areEqual( 10, document.body.offsetLeft, "body had a margin of 10px, offsetLeft should be 10" );
+        Assert.areEqual( 0, container.offsetTop, "cotainer is abs pos; it should have offsetTop 0"  );
+    },
+    
+    /**
+     * Mozilla bug:
+     * offsetTop of body should be it's margin, but it's always 0.
+     */
+    testStaticBodyOffsetTop : function() {
+
+        var bs = document.body.style,
+            container = document.getElementById("container");
+        bs.margin = "10px";
+        bs.position = "static";
+
+        Assert.areNotEqual( 0, document.body.offsetTop, "body had a margin of 10px; offsetTop was wrong" );
+        Assert.areEqual( 10, document.body.offsetLeft, "body had a margin of 10px, offsetLeft should be 10" );
+        Assert.areEqual( 0, container.offsetTop, "cotainer is abs pos; it should have offsetTop 0"  );
+    },
+
+    testIsRelativeBodyOffsetParent : function() {
+
+        var bs = document.body.style,
+            container = document.getElementById("container");
+        bs.margin = "10px";
+        Assert.areEqual( document.body, container.offsetParent );
+        Assert.areNotEqual( document.documentElement, container.offsetParent );
+    },
+    
+    /**
+     * Mozilla bug:
+     * offsetParent - for abs pos'd element, it's nearest offset *positioned* ancestor.
+     * Since body is position static, this should be documentElement.
+     */
+    testIsStaticBodyOffsetParent : function() {
+        var bs = document.body.style,
+            container = document.getElementById("container");
+        bs.margin = "10px";
+        bs.position = "static";
+
+        Assert.areNotEqual( document.body, container.offsetParent, "container's offsetParent cannot be body; body is static pos." );
+
+        Assert.areEqual( document.documentElement, container.offsetParent, "documentElement must be offsetParent." );
+    },
+
+
+    testBodyMarginBody  : function() {
+        var bs = document.body.style;
+        bs.margin = "21px";
+        bs.position = "relative";
+        Assert.areEqual( 21, document.body.offsetTop, "body's offsetTop was wrong." );
+    },
+
+    
+    testBodyBorder : function() {
+        var bs = document.body.style;
+        bs.border = "10px solid red";
+        Assert.areNotEqual( -10, document.body.offsetTop, "body's offsetTop was equal to negative of it's border width." );
+        Assert.areEqual( 0, document.body.offsetTop, "body's offsetTop was wrong." );
+    },
+    
+    testContainerBodyBorder : function() {
+
+        var bs = document.body.style,
+            container = document.getElementById("container");
+        bs.border = "10px solid red";
+        Assert.areNotEqual( 10, container.offsetTop, "container's offsetTop was included body's border width." );
+        Assert.areEqual( 0, container.offsetTop, "container's offsetTop was wrong." );
+    },
+    
+    testInlineTarget : function() {
+        var target = document.getElementById("target");
+
+        target.style.display = "inline";
+        Assert.areEqual( 3, target.offsetTop, "target's offsetTop was wrong with display: inline." );
+    },
+
+    testBodyMarginTarget  : function() {
+        var bs = document.body.style,
+            target = document.getElementById("target");
+        bs.margin = "21px";
+        bs.position = "relative";
+        Assert.areEqual( 3, target.offsetTop, "target's offsetTop was wrong." );
+    },
+
+    testHtmlMargin  : function() {
+
+        var ds = document.documentElement.style,
+            container = document.getElementById("container");
+        ds.margin = "21px";
+        ds.position = "relative";
+        Assert.areNotEqual( 21, container.offsetTop, "container's offsetTop was inherited from body. should be 0" );
+        Assert.areEqual( 0, container.offsetTop, "target's offsetTop was wrong." );
+    },
+
+// padding on parent.
+    testTargetAbsoluteParentStaticPadding : function() {
+
+        var target = document.getElementById("target");
+
+        target.style.position = "absolute";
+        target.style.border = "";
+        target.parentNode.style.position = "static";
+        target.parentNode.style.padding = "5px";
+        target.parentNode.style.border = "";
+        Assert.areEqual( 3, target.offsetTop );
+    },
+
+// padding on parent.
+    testTargetAbsoluteParentStatic : function() {
+
+        var target = document.getElementById("target");
+        target.style.position = "absolute";
+        target.style.border = "";
+        target.style.top = '3px';
+        target.parentNode.style.padding = "5px";
+        target.parentNode.style.border = "";
+        target.parentNode.style.position = "static";
+        Assert.areEqual( 3, target.offsetTop );
+    },
+
+    testTargetAbsoluteParentPadding : function() {
+
+        var target = document.getElementById("target");
+        target.style.position = "relative";
+        target.parentNode.style.padding = "5px";
+        Assert.areEqual( 8, target.offsetTop );
+    },
+
+    testTable1 : function() {
+        var table = document.getElementById("table");
+        Assert.areEqual(0, table.offsetLeft, 'table offsetLeft wrong');
+        Assert.areEqual(0, table.offsetTop, 'table offsetTop wrong');
+
+        var notTable = document.getElementById("not-table");
+        Assert.areEqual(0, notTable.offsetLeft, 'not-table offsetLeft wrong');
+        Assert.areEqual(0, notTable.offsetTop, 'not-table offsetTop wrong');
+        
+        var tr = table.getElmentsByTagName("tr")[0];
+        Assert.areEqual(0, tr.offsetLeft, 'tr offsetLeft wrong');
+        Assert.areEqual(0, tr.offsetTop, 'tr offsetLeft wrong');
+
+        var tr1 = table.getElmentsByTagName("tr")[1];
+        Assert.areEqual(tr.offsetHeight, tr.offsetTop);
+
+        var td = tr.getElmentsByTagName("td")[1];
+        Assert.areEqual(0, td.offsetLeft, 'td offsetLeft wrong');
+        Assert.areEqual(0, td.offsetTop, 'td1 offsetTop wrong');
+
+        var td1 = tr.getElmentsByTagName("td")[1];
+        Assert.areEqual(td[0].offsetWidth, td1.offsetLeft, 'td1 offsetLeft wrong');
+        Assert.areEqual(0, td1.offsetTop, 'td1 offsetTop wrong');
+
+        var tr1td = tr1.getElmentsByTagName("td")[0];
+        Assert.areEqual(0, tr1td.offsetLeft, 'tr1td offsetLeft wrong');
+        Assert.areEqual(td.offsetHeight, tr1td.offsetTop, 'tr1td offsetTop wrong');
+
+        var tr1td1 = tr1.getElmentsByTagName("td")[1];
+        Assert.areEqual(tr1td.offsetWidth, tr1td1.offsetLeft, 'trtd1 offsetLeft wrong');
+        Assert.areEqual(td1.offsetHeight, tr1td1.offsetTop, 'tr1td1 offsetTop wrong');
+    }
+});
+
+offsetLeftTestCase = new YAHOO.tool.TestCase({
+    
+    testC1OffsetLeft : function() {
+     // overlapping should be taken out of normal flow.
+     // IE does not do this, but should.
+        Assert.areEqual( 0, document.getElementById("c1").offsetLeft );
+    }
+});
+
+//create the logger
+new YAHOO.tool.TestLogger("testLogger");
+YAHOO.tool.TestRunner.add(offsetTopTestCase );
+YAHOO.tool.TestRunner.add(offsetLeftTestCase );
+
+// run the tests, or put them in the TestRunner.
+if (parent && parent != window) {
+    YAHOO.tool.TestManager.load();
+} else {
+    YAHOO.tool.TestRunner.run();
+}
+}, 100);
+</script>
+</body>
+
+</html>

@@ -1,0 +1,767 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+	"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+	<title>JsDoc: APE.dom</title>
+	<link rel="stylesheet" href="default.css" type="text/css" media="screen">
+</head>
+
+<body>
+
+<table style="width: 100%" class="navbar">
+<tr>
+<td class="NavBar" valign="top"><font size="-2">SUMMARY:&nbsp;<a href="#field_summary">FIELD</a>&nbsp;|&nbsp;<a href="#constructor_summary">CONSTR</a>&nbsp;|&nbsp;<a href="#method_summary">METHOD</a></font></td>
+<td class="NavBar" valign="top"><font size="-2">DETAIL:&nbsp;<a href="#field_detail">FIELD</a>&nbsp;|&nbsp;<a href="#constructor_detail">CONSTR</a>&nbsp;|&nbsp;<a href="#method_detail">METHOD</a></font></td>
+</tr>
+</table>
+
+<h2>Static Class APE.dom</h2>
+
+
+<i>Defined in <a href="ape-ep-dom.src.html">ape-ep-dom.js</a></i>
+
+<p>
+</p>
+
+
+
+	<li><strong>static: </strong> </li>
+
+	<li><strong>class: </strong> APE.dom</li>
+
+	<li><strong>author: </strong> Garrett Smith<p>ClassName functions are added to APE.dom.</p></li>
+
+
+
+
+
+<hr>
+
+<!-- =========== FIELD SUMMARY =========== -->
+
+<!-- =========== END FIELD SUMMARY =========== -->
+
+
+
+<!-- ========== METHOD SUMMARY =========== -->
+
+<a name="method_summary"> </a> 
+<table border="1" cellpadding="3" cellspacing="0" width="100%">
+	<tr class="TableHeadingColor">
+		<th colspan=2>
+			Method Summary
+		</th>
+	</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code></code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#convertPixelToEmEx">convertPixelToEmEx</a></b>(parentNode, prop, val, computedStyle) </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Used for converting getComputedStyle(el,"") value to an em value.
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>
+				&nbsp;HTMLElement
+				</code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#findAncestorWithAttribute">findAncestorWithAttribute</a></b>(el, attName, value) </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>
+				&nbsp;String
+				</code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#findInheritedStyle">findInheritedStyle</a></b>(el, prop, units) </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; findInheritedStyle tries to find a cascaded style value for the element.
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>
+				&nbsp;String
+				</code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#getCascadedStyle">getCascadedStyle</a></b>(el, p, desiredUnit) </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Cross-browser adapter method for reading style.
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>
+				&nbsp;HTMLElement
+				</code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#getContainingBlock">getContainingBlock</a></b>(el) </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Finds the containing block of el, as per CSS 2.1 sec 10.1
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>
+				&nbsp;boolean
+				</code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#getContains">getContains</a></b>() </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>
+				&nbsp;ufloat
+				</code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#getFilterOpacity">getFilterOpacity</a></b>(el) </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Special method for a browser that supports el.filters and not style.opacity.
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>
+				&nbsp;x:Number, y:Number
+				</code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#getOffsetCoords">getOffsetCoords</a></b>(el, positionedContainer, coords) </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>
+				&nbsp;
+				</code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#getScrollOffsets">getScrollOffsets</a></b>() </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>
+				&nbsp;String
+				</code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#getStyle">getStyle</a></b>(el, p) </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; returns the computed style of property <code>p</code> of <code>el</code>.
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>
+				&nbsp;String
+				</code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#getStyleUnit">getStyleUnit</a></b>(value) </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>
+				&nbsp;
+				</code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#getViewportDimensions">getViewportDimensions</a></b>() </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>
+				&nbsp;boolean
+				</code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#isAboveElement">isAboveElement</a></b>(a, b) </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>
+				&nbsp;boolean
+				</code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#isBelowElement">isBelowElement</a></b>(a, b) </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>
+				&nbsp;boolean
+				</code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#isInsideElement">isInsideElement</a></b>(a, b) </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>
+				&nbsp;ufloat
+				</code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#setOpacity">setOpacity</a></b>(el, i) </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Cross-browser adapter method for style.filters vs style.opacity.
+ 
+			</td>
+		</tr>
+	
+</table>
+&nbsp;
+
+
+<!-- ========== EVENT SUMMARY =========== -->
+
+
+
+
+<!-- ========== INHERITED METHODS SUMMARY =========== -->
+
+<br/>
+
+<!-- ========== END INHERITED METHODS SUMMARY =========== -->
+
+<!-- ============ FIELD DETAIL START ========= -->
+
+<!-- ============ FIELD DETAIL END ========== -->
+
+
+
+<!-- ============ METHOD DETAIL START ======= -->
+
+<a name="method_detail"> </a> 
+<table border="1" cellpadding="3" cellspacing="0" width="100%">
+	<tr class="TableHeadingColor">
+		<th colspan=1>
+			Method Detail
+		</th>
+	</tr>
+</table>
+
+
+	<a name="convertPixelToEmEx"> </a> <h3>convertPixelToEmEx</h3>
+		<pre><b>convertPixelToEmEx</b>(parentNode, prop, val, computedStyle)</pre> 
+	<ul>
+		
+		Used for converting getComputedStyle(el,"") value to an em value. If the property is fontSize, it is necessary to get the parent's computed fontSize.
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	<ul>
+		<b>Parameters:</b>
+		<ul>
+			<code><i>HTMLElement</i>&nbsp;parentNode</code> 
+		</ul>
+		<ul>
+			<code><i>String</i>&nbsp;prop</code> - style property to work with. 
+		</ul>
+		<ul>
+			<code><i>String</i>&nbsp;val</code> - the value, such as "12.3px". 
+		</ul>
+		<ul>
+			<code><i>ComputedCSSStyleDeclaration</i>&nbsp;computedStyle</code> - object to work with. 
+		</ul>
+	</ul>
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="findAncestorWithAttribute"> </a> <h3>findAncestorWithAttribute</h3>
+		<pre>HTMLElement&nbsp;<b>findAncestorWithAttribute</b>(el, attName, value)</pre> 
+	<ul>
+		
+		
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	<ul>
+		<b>Parameters:</b>
+		<ul>
+			<code><i>HTMLElement</i>&nbsp;el</code> - the element to start from. 
+		</ul>
+		<ul>
+			<code><i>String</i>&nbsp;attName</code> - the name of the attribute. 
+		</ul>
+		<ul>
+			<code><i>String</i>&nbsp;value</code><a title="optional parameter" class="optional">?</a> - the value of the attribute. If omitted, then only the presence of attribute is checked and the value is anything. 
+		</ul>
+	</ul>
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	<ul>
+		<b>Returns:</b>
+		<ul>
+			<code><i>HTMLElement</i>&nbsp;</code>closest ancestor with <code>attName</code> matching value.Returns null if not found. 
+		</ul>
+	</ul>
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="findInheritedStyle"> </a> <h3>findInheritedStyle</h3>
+		<pre>String&nbsp;<b>findInheritedStyle</b>(el, prop, units)</pre> 
+	<ul>
+		
+		findInheritedStyle tries to find a cascaded style value for the element.If the value is inherit|transparent, it looks up the tree, recursively.
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	<ul>
+		<b>Parameters:</b>
+		<ul>
+			<code><i>Element</i>&nbsp;el</code> - - element's style you want. 
+		</ul>
+		<ul>
+			<code><i>String</i>&nbsp;prop</code> - style property, such as backgroundColor. 
+		</ul>
+		<ul>
+			<code><i>String</i>&nbsp;units</code><a title="optional parameter" class="optional">?</a> - optional unit to search for. Example: "em". 
+		</ul>
+	</ul>
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	<ul>
+		<b>Returns:</b>
+		<ul>
+			<code><i>String</i>&nbsp;</code>computed style or an empty string. 
+		</ul>
+	</ul>
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="getCascadedStyle"> </a> <h3>getCascadedStyle</h3>
+		<pre>String&nbsp;<b>getCascadedStyle</b>(el, p, desiredUnit)</pre> 
+	<ul>
+		
+		Cross-browser adapter method for reading style. Adapts for filters from opacity and styleFloat from cssFloat.For browsers that support computed styles, but not <code>currentStyle</code>(Firefox/Safari) pass in a <code>desiredUnit</code> of either <code>em<code> or <code>ex</code>
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	<ul>
+		<b>Parameters:</b>
+		<ul>
+			<code><i>HTMLElement</i>&nbsp;el</code> - the element to set opacity on. 
+		</ul>
+		<ul>
+			<code><i>String</i>&nbsp;p</code> - the property to retrieve. 
+		</ul>
+		<ul>
+			<code><i>String</i>&nbsp;desiredUnit</code> - one of: ["em", ] the type of unit to retrieve/compute - this is not really supported in IE - it is mostly for browsers that don't support currentStyle. 
+		</ul>
+	</ul>
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	<ul>
+		<b>Returns:</b>
+		<ul>
+			<code><i>String</i>&nbsp;</code>the cascaded style value or the empty string if no value was found. 
+		</ul>
+	</ul>
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="getContainingBlock"> </a> <h3>getContainingBlock</h3>
+		<pre>HTMLElement&nbsp;<b>getContainingBlock</b>(el)</pre> 
+	<ul>
+		
+		Finds the containing block of el, as per CSS 2.1 sec 10.1
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	<ul>
+		<b>Parameters:</b>
+		<ul>
+			<code><i>HTMLElement</i>&nbsp;el</code> 
+		</ul>
+	</ul>
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	<ul>
+		<b>Returns:</b>
+		<ul>
+			<code><i>HTMLElement</i>&nbsp;</code>el's containing block. 
+		</ul>
+	</ul>
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="getContains"> </a> <h3>getContains</h3>
+		<pre>boolean&nbsp;<b>getContains</b>()</pre> 
+	<ul>
+		
+		
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	<ul>
+		<b>Returns:</b>
+		<ul>
+			<code><i>boolean</i>&nbsp;</code>true if a contains b.Internet Explorer's native contains() is different. It will return true for:code body.contains(body); Whereas APE.dom.contains will return false. 
+		</ul>
+	</ul>
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="getFilterOpacity"> </a> <h3>getFilterOpacity</h3>
+		<pre>ufloat&nbsp;<b>getFilterOpacity</b>(el)</pre> 
+	<ul>
+		
+		Special method for a browser that supports el.filters and not style.opacity.
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	<ul>
+		<b>Parameters:</b>
+		<ul>
+			<code><i>HTMLElement</i>&nbsp;el</code> - the element to find opacity on. 
+		</ul>
+	</ul>
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	<ul>
+		<b>Returns:</b>
+		<ul>
+			<code><i>ufloat</i>&nbsp;</code>[0-1] amount of opacity.calling this method on a browser that does not support filtersresults in 1 being returned.  Use dom.getStyle or dom.getCascadedStyle instead 
+		</ul>
+	</ul>
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="getOffsetCoords"> </a> <h3>getOffsetCoords</h3>
+		<pre>x:Number, y:Number&nbsp;<b>getOffsetCoords</b>(el, positionedContainer, coords)</pre> 
+	<ul>
+		
+		
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	<ul>
+		<b>Parameters:</b>
+		<ul>
+			<code><i>HTMLElement</i>&nbsp;el</code> - you want coords of. 
+		</ul>
+		<ul>
+			<code><i>HTMLElement</i>&nbsp;positionedContainer</code> - container to look up to. The container must have position: (relative|absolute|fixed); 
+		</ul>
+		<ul>
+			<code><i>x:Number, y:Number</i>&nbsp;coords</code> - object to pass in. 
+		</ul>
+	</ul>
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	<ul>
+		<b>Returns:</b>
+		<ul>
+			<code><i>x:Number, y:Number</i>&nbsp;</code>coords of el from container.Passing in a container will improve performance in browsers that don't support getBoundingClientRect, but those that do will have a recursive call. Test accordingly.<p>Container is sometimes irrelevant. Container is irrelevant when comparing positions of objects who do not share a common ancestor. In this case, pass in document.</p><p>Passing in re-used coords can improve performance in all browsers.There is a side effect to passing in coords:For drag drop operations, reuse coords:</p><pre>// Update our coords:dom.getOffsetCoords(el, container, this.coords);</pre>Where <code>this.coords = {};</code> 
+		</ul>
+	</ul>
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="getScrollOffsets"> </a> <h3>getScrollOffsets</h3>
+		<pre>&nbsp;<b>getScrollOffsets</b>()</pre> 
+	<ul>
+		
+		
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	<ul>
+		<b>Returns:</b>
+		<ul>
+			<code></code>an object with <code>width</code> and <code>height</code>.This will exhibit a bug in Mozilla, which is often 5-7 pixels off. 
+		</ul>
+	</ul>
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="getStyle"> </a> <h3>getStyle</h3>
+		<pre>String&nbsp;<b>getStyle</b>(el, p)</pre> 
+	<ul>
+		
+		returns the computed style of property <code>p</code> of <code>el</code>.Returns different results in IE, so user beware! If your styleSheet has units like "em" or "in", this method does not attempt to convert those to px.Use "cssFloat" for getting an element's float and special "filters" treatment for "opacity".
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	<ul>
+		<b>Parameters:</b>
+		<ul>
+			<code><i>HTMLElement</i>&nbsp;el</code> - the element to set opacity on. 
+		</ul>
+		<ul>
+			<code><i>String</i>&nbsp;p</code> - the property to retrieve. 
+		</ul>
+	</ul>
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	<ul>
+		<b>Returns:</b>
+		<ul>
+			<code><i>String</i>&nbsp;</code>the computed style value or the empty string if no value was found. 
+		</ul>
+	</ul>
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="getStyleUnit"> </a> <h3>getStyleUnit</h3>
+		<pre>String&nbsp;<b>getStyleUnit</b>(value)</pre> 
+	<ul>
+		
+		
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	<ul>
+		<b>Parameters:</b>
+		<ul>
+			<code><i>String</i>&nbsp;value</code> - a string value of a measurement. Example: 5em 
+		</ul>
+	</ul>
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	<ul>
+		<b>Returns:</b>
+		<ul>
+			<code><i>String</i>&nbsp;</code>The unit portion of the string. If no matching unit is found,then the empty string is returned. 
+		</ul>
+	</ul>
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="getViewportDimensions"> </a> <h3>getViewportDimensions</h3>
+		<pre>&nbsp;<b>getViewportDimensions</b>()</pre> 
+	<ul>
+		
+		
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	<ul>
+		<b>Returns:</b>
+		<ul>
+			<code></code>an object with <code>width</code> and <code>height</code>.This will exhibit a bug in Mozilla, which is often 5-7 pixels off. 
+		</ul>
+	</ul>
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="isAboveElement"> </a> <h3>isAboveElement</h3>
+		<pre>boolean&nbsp;<b>isAboveElement</b>(a, b)</pre> 
+	<ul>
+		
+		
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	<ul>
+		<b>Parameters:</b>
+		<ul>
+			<code>a</code> 
+		</ul>
+		<ul>
+			<code>b</code> 
+		</ul>
+	</ul>
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	<ul>
+		<b>Returns:</b>
+		<ul>
+			<code><i>boolean</i>&nbsp;</code>true if a overlaps the top of b's content area. 
+		</ul>
+	</ul>
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="isBelowElement"> </a> <h3>isBelowElement</h3>
+		<pre>boolean&nbsp;<b>isBelowElement</b>(a, b)</pre> 
+	<ul>
+		
+		
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	<ul>
+		<b>Parameters:</b>
+		<ul>
+			<code>a</code> 
+		</ul>
+		<ul>
+			<code>b</code> 
+		</ul>
+	</ul>
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	<ul>
+		<b>Returns:</b>
+		<ul>
+			<code><i>boolean</i>&nbsp;</code>true if a overlaps the bottom of b's content area. 
+		</ul>
+	</ul>
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="isInsideElement"> </a> <h3>isInsideElement</h3>
+		<pre>boolean&nbsp;<b>isInsideElement</b>(a, b)</pre> 
+	<ul>
+		
+		
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	<ul>
+		<b>Parameters:</b>
+		<ul>
+			<code>a</code> 
+		</ul>
+		<ul>
+			<code>b</code> 
+		</ul>
+	</ul>
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	<ul>
+		<b>Returns:</b>
+		<ul>
+			<code><i>boolean</i>&nbsp;</code>true if a is vertically within b's content area (and does not overlap, top nor bottom). 
+		</ul>
+	</ul>
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="setOpacity"> </a> <h3>setOpacity</h3>
+		<pre>ufloat&nbsp;<b>setOpacity</b>(el, i)</pre> 
+	<ul>
+		
+		Cross-browser adapter method for style.filters vs style.opacity.
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	<ul>
+		<b>Parameters:</b>
+		<ul>
+			<code><i>HTMLElement</i>&nbsp;el</code> - the element to set opacity on. 
+		</ul>
+		<ul>
+			<code><i>ufloat</i>&nbsp;i</code> - [0-1] the amount of opacity. 
+		</ul>
+	</ul>
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	<ul>
+		<b>Returns:</b>
+		<ul>
+			<code><i>ufloat</i>&nbsp;</code>[0-1] amount of opacity. 
+		</ul>
+	</ul>
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+
+<!-- ============ METHOD DETAIL END ========== -->
+
+<!-- ============ EVENT DETAIL START ======= -->
+
+
+
+<!-- ============ EVENT DETAIL END ========== -->
+<div class="jsdoc_ctime">Documentation generated by <a href="http://jsdoctoolkit.org/" target="_parent">JsDoc Toolkit</a> 1.4.0 on Sun Aug 17 2008 17:08:28 GMT-0700 (PDT)</div>
+</body>
+</html>

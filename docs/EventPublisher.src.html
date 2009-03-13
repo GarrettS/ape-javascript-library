@@ -1,0 +1,260 @@
+<html><head><meta http-equiv="content-type" content="text/html; charset=utf-8"> <style>
+	.KEYW {color: #933;}
+	.COMM {color: #bbb; font-style: italic;}
+	.NUMB {color: #393;}
+	.STRN {color: #393;}
+	.REGX {color: #339;}
+	.linenumber {border-right: 1px dotted #666; color: #666; font-style: normal;}
+	</style></head><body><pre><span class='linenumber'>  1</span> <span class="COMM">/** 
+<span class='linenumber'>  2</span>  * @fileoverview 
+<span class='linenumber'>  3</span>  * EventPublisher
+<span class='linenumber'>  4</span>  *
+<span class='linenumber'>  5</span>  * Released under Academic Free Licence 3.0.
+<span class='linenumber'>  6</span>  * @author Garrett Smith
+<span class='linenumber'>  7</span>  * @class 
+<span class='linenumber'>  8</span>  * &lt;code>APE.EventPublisher&lt;/code> can be used for native browser events or custom events.
+<span class='linenumber'>  9</span>  *
+<span class='linenumber'> 10</span>  * &lt;p> For native browser events, use &lt;code>APE.EventPublisher&lt;/code>
+<span class='linenumber'> 11</span>  * steals the event handler off native elements and creates a callStack. 
+<span class='linenumber'> 12</span>  * that fires in its place.
+<span class='linenumber'> 13</span>  * &lt;/p>
+<span class='linenumber'> 14</span>  * &lt;p>
+<span class='linenumber'> 15</span>  * There are two ways to create custom events.
+<span class='linenumber'> 16</span>  * &lt;/p>
+<span class='linenumber'> 17</span>  * &lt;ol>
+<span class='linenumber'> 18</span>  * &lt;li>Create a function on the object that fires the "event", then call that function 
+<span class='linenumber'> 19</span>  * when the event fires (this happens automatically with native events).
+<span class='linenumber'> 20</span>  * &lt;/li>
+<span class='linenumber'> 21</span>  * &lt;li>
+<span class='linenumber'> 22</span>  * Instantiate an &lt;code>EventPublisher&lt;/code> using the constructor, then call &lt;code>fire&lt;/code>
+<span class='linenumber'> 23</span>  * when the callbacks should be run.
+<span class='linenumber'> 24</span>  * &lt;/li>
+<span class='linenumber'> 25</span>  * &lt;/ol>
+<span class='linenumber'> 26</span>  * &lt;p>
+<span class='linenumber'> 27</span>  * An &lt;code>EventPublisher&lt;/code> itself publishes &lt;code>beforeFire&lt;/code> and &lt;code>afterFire&lt;/code>.
+<span class='linenumber'> 28</span>  * This makes it possible to add AOP before advice to the callStack.
+<span class='linenumber'> 29</span>  * &lt;/p>&lt;p>
+<span class='linenumber'> 30</span>  * adding before-before advice is possible, but will impair performance.
+<span class='linenumber'> 31</span>  * Instead, add multiple beforeAdvice with: 
+<span class='linenumber'> 32</span>  * &lt;code>publisher.addBefore(fp, thisArg).add(fp2, thisArg);&lt;/code>
+<span class='linenumber'> 33</span>  * &lt;/p>&lt;p>
+<span class='linenumber'> 34</span>  * There are no &lt;code>beforeEach&lt;/code> and &lt;code>afterEach&lt;/code> methods; to create advice 
+<span class='linenumber'> 35</span>  * for each callback would require modification 
+<span class='linenumber'> 36</span>  * to the registry (see comments below). I have not yet found a real need for this.
+<span class='linenumber'> 37</span>  * &lt;/p>
+<span class='linenumber'> 38</span>  */</span><span class="WHIT">
+<span class='linenumber'> 39</span> </span><span class="COMM">/**
+<span class='linenumber'> 40</span>  * @constructor
+<span class='linenumber'> 41</span>  * @description creates an &lt;code>EventPublisher&lt;/code> with methods &lt;code>add()&lt;/code>,
+<span class='linenumber'> 42</span>  * &lt;code>fire&lt;/code>, et c.
+<span class='linenumber'> 43</span>  */</span><span class="WHIT">
+<span class='linenumber'> 44</span> </span><span class="NAME">APE.EventPublisher</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">src</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">type</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'> 45</span> </span><span class="WHIT">    </span><span class="NAME">this.src</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">src</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'> 46</span> </span><span class="WHIT">    </span><span class="COMM">// Really could use a List of bound methods here. </span><span class="WHIT">
+<span class='linenumber'> 47</span> </span><span class="WHIT">    </span><span class="NAME">this._callStack</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'> 48</span> </span><span class="WHIT">    </span><span class="NAME">this.type</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">type</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'> 49</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'> 50</span> 
+<span class='linenumber'> 51</span> </span><span class="NAME">APE.EventPublisher.prototype</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'> 52</span> 
+<span class='linenumber'> 53</span> </span><span class="COMM">/**  
+<span class='linenumber'> 54</span>  *  @param {Function} fp the callback function that gets called when src[sEvent] is called.
+<span class='linenumber'> 55</span>  *  @param {Object} thisArg the context that the function executes in.
+<span class='linenumber'> 56</span>  *  @return {EventPublisher} this;
+<span class='linenumber'> 57</span>  */</span><span class="WHIT">
+<span class='linenumber'> 58</span> </span><span class="WHIT">    </span><span class="NAME">add</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">fp</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">thisArg</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'> 59</span> </span><span class="WHIT">        </span><span class="NAME">this._callStack.push</span><span class="PUNC">(</span><span class="PUNC">[</span><span class="NAME">fp</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">thisArg</span><span class="PUNC">||</span><span class="NAME">this.src</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'> 60</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'> 61</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='linenumber'> 62</span> </span><span class="COMM">/**  Adds beforeAdvice to the callStack. This fires before the callstack. 
+<span class='linenumber'> 63</span>  *  @param {Function:boolean} fp the callback function that gets called when src[sEvent] is called.
+<span class='linenumber'> 64</span>  *  function's returnValue proceed false stops the callstack and returns false to the original call.
+<span class='linenumber'> 65</span>  *  @param {Object} thisArg the context that the function executes in.
+<span class='linenumber'> 66</span>  *  @return {EventPublisher} this;
+<span class='linenumber'> 67</span>  */</span><span class="WHIT">
+<span class='linenumber'> 68</span> </span><span class="WHIT">    </span><span class="NAME">addBefore</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">f</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">thisArg</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'> 69</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">APE.EventPublisher.add</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="STRN">"beforeFire"</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">f</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">thisArg</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="WHIT">
+<span class='linenumber'> 70</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='linenumber'> 71</span> </span><span class="WHIT">    </span><span class="WHIT">
+<span class='linenumber'> 72</span> </span><span class="COMM">/**  Adds afterAdvice to the callStack. This fires after the callstack. 
+<span class='linenumber'> 73</span>  *  @param {Function:boolean} fp the callback function that gets called when src[sEvent] is called.
+<span class='linenumber'> 74</span>  *  function's returnValue of false returns false to the original call.
+<span class='linenumber'> 75</span>  *  @param {Object} thisArg the context that the function executes in.
+<span class='linenumber'> 76</span>  *  @return {EventPublisher} this;
+<span class='linenumber'> 77</span>  */</span><span class="WHIT">
+<span class='linenumber'> 78</span> </span><span class="WHIT">    </span><span class="NAME">addAfter</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">f</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">thisArg</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'> 79</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">APE.EventPublisher.add</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="STRN">"afterFire"</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">f</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">thisArg</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="WHIT">
+<span class='linenumber'> 80</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='linenumber'> 81</span> 
+<span class='linenumber'> 82</span> </span><span class="WHIT">    </span><span class="COMM">/** 
+<span class='linenumber'> 83</span>      * @param {String} "beforeFire", "afterFire" conveneince.
+<span class='linenumber'> 84</span>      * @return {EventPublisher} this;
+<span class='linenumber'> 85</span>      */</span><span class="WHIT">
+<span class='linenumber'> 86</span> </span><span class="WHIT">    </span><span class="NAME">getEvent</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">type</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'> 87</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">APE.EventPublisher.get</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">type</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'> 88</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='linenumber'> 89</span> 
+<span class='linenumber'> 90</span> </span><span class="COMM">/**  Removes fp from callstack.
+<span class='linenumber'> 91</span>  *  @param {Function:boolean} fp the callback function to remove.
+<span class='linenumber'> 92</span>  *  @param {Object} [thisArg] the context that the function executes in.
+<span class='linenumber'> 93</span>  *  @return {Function} the function that was passed in, or null if not found;
+<span class='linenumber'> 94</span>  */</span><span class="WHIT">
+<span class='linenumber'> 95</span> </span><span class="WHIT">    </span><span class="NAME">remove</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">fp</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">thisArg</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'> 96</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">cs</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this._callStack</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">len</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">call</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'> 97</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">thisArg</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="NAME">thisArg</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.src</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'> 98</span> </span><span class="WHIT">        </span><span class="KEYW">for</span><span class="PUNC">(</span><span class="NAME">len</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">cs.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NAME">len</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">++</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'> 99</span> </span><span class="WHIT">            </span><span class="NAME">call</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">cs</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>100</span> </span><span class="WHIT">            </span><span class="KEYW">if</span><span class="PUNC">(</span><span class="NAME">call</span><span class="PUNC">[</span><span class="NUMB">0</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="NAME">fp</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">call</span><span class="PUNC">[</span><span class="NUMB">1</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="NAME">thisArg</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'>101</span> </span><span class="WHIT">                </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">cs.splice</span><span class="PUNC">(</span><span class="NAME">i</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>102</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="WHIT">
+<span class='linenumber'>103</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='linenumber'>104</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>105</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='linenumber'>106</span> 
+<span class='linenumber'>107</span> </span><span class="COMM">/**  Removes fp from callstack's beforeFire.
+<span class='linenumber'>108</span>  *  @param {Function:boolean} fp the callback function to remove.
+<span class='linenumber'>109</span>  *  @param {Object} [thisArg] the context that the function executes in.
+<span class='linenumber'>110</span>  *  @return {Function} the function that was passed in, or null if not found (uses remove());
+<span class='linenumber'>111</span>  */</span><span class="WHIT">
+<span class='linenumber'>112</span> </span><span class="WHIT">    </span><span class="NAME">removeBefore</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">fp</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">thisArg</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'>113</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.getEvent</span><span class="PUNC">(</span><span class="STRN">"beforeFire"</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">remove</span><span class="PUNC">(</span><span class="NAME">fp</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">thisArg</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>114</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='linenumber'>115</span> 
+<span class='linenumber'>116</span> 
+<span class='linenumber'>117</span> </span><span class="COMM">/**  Removes fp from callstack's afterFire.
+<span class='linenumber'>118</span>  *  @param {Function:boolean} fp the callback function to remove.
+<span class='linenumber'>119</span>  *  @param {Object} [thisArg] the context that the function executes in.
+<span class='linenumber'>120</span>  *  @return {Function} the function that was passed in, or null if not found (uses remove());
+<span class='linenumber'>121</span>  */</span><span class="WHIT">
+<span class='linenumber'>122</span> </span><span class="WHIT">    </span><span class="NAME">removeAfter</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">fp</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">thisArg</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'>123</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.getEvent</span><span class="PUNC">(</span><span class="STRN">"afterFire"</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">remove</span><span class="PUNC">(</span><span class="NAME">fp</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">thisArg</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>124</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='linenumber'>125</span> 
+<span class='linenumber'>126</span> </span><span class="COMM">/** Fires the event. */</span><span class="WHIT">
+<span class='linenumber'>127</span> </span><span class="WHIT">    </span><span class="NAME">fire</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">payload</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'>128</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">APE.EventPublisher.fire</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">)</span><span class="PUNC">(</span><span class="NAME">payload</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>129</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='linenumber'>130</span> 
+<span class='linenumber'>131</span> </span><span class="COMM">/** helpful debugging info */</span><span class="WHIT">
+<span class='linenumber'>132</span> </span><span class="WHIT">    </span><span class="NAME">toString</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'>133</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT">  </span><span class="STRN">"APE.EventPublisher: {src="</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">this.src</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">", type="</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">this.type</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT">
+<span class='linenumber'>134</span> </span><span class="WHIT">             </span><span class="STRN">", length="</span><span class="PUNC">+</span><span class="NAME">this._callStack.length</span><span class="PUNC">+</span><span class="STRN">"}"</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>135</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='linenumber'>136</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>137</span> 
+<span class='linenumber'>138</span> </span><span class="COMM">/** 
+<span class='linenumber'>139</span>  *  @static
+<span class='linenumber'>140</span>  *  @param {Object} src the object which calls the function
+<span class='linenumber'>141</span>  *  @param {String} sEvent the function that gets called.
+<span class='linenumber'>142</span>  *  @param {Function} fp the callback function that gets called when src[sEvent] is called.
+<span class='linenumber'>143</span>  *  @param {Object} thisArg the context that the function executes in.
+<span class='linenumber'>144</span>  */</span><span class="WHIT">
+<span class='linenumber'>145</span> </span><span class="NAME">APE.EventPublisher.add</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">src</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">sEvent</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">fp</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">thisArg</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'>146</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">APE.EventPublisher.get</span><span class="PUNC">(</span><span class="NAME">src</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">sEvent</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">add</span><span class="PUNC">(</span><span class="NAME">fp</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">thisArg</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>147</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>148</span> 
+<span class='linenumber'>149</span> </span><span class="COMM">/** 
+<span class='linenumber'>150</span>  * @static
+<span class='linenumber'>151</span>  * @private
+<span class='linenumber'>152</span>  * @memberOf {APE.EventPublisher}
+<span class='linenumber'>153</span>  * @return {boolean} false if any one of callStack's methods return false.
+<span class='linenumber'>154</span>  */</span><span class="WHIT">
+<span class='linenumber'>155</span> </span><span class="NAME">APE.EventPublisher.fire</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">publisher</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'>156</span> </span><span class="WHIT">    </span><span class="COMM">// This closure sucks. We should have partial/bind in ES.</span><span class="WHIT">
+<span class='linenumber'>157</span> </span><span class="WHIT">    </span><span class="COMM">// If we did, this could more reasonably be a prototype method.</span><span class="WHIT">
+<span class='linenumber'>158</span> </span><span class="WHIT">    </span><span class="WHIT">
+<span class='linenumber'>159</span> </span><span class="WHIT">    </span><span class="COMM">// return function w/identifier doesn't work in Safari 2.</span><span class="WHIT">
+<span class='linenumber'>160</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">fireEvent</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="WHIT">
+<span class='linenumber'>161</span> </span><span class="WHIT">    </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="NAME">fireEvent</span><span class="PUNC">(</span><span class="NAME">e</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'>162</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">preventDefault</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">,</span><span class="WHIT">
+<span class='linenumber'>163</span> </span><span class="WHIT">            </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">len</span><span class="PUNC">,</span><span class="WHIT">
+<span class='linenumber'>164</span> </span><span class="WHIT">            </span><span class="NAME">cs</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">publisher._callStack</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">csi</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>165</span> 
+<span class='linenumber'>166</span> </span><span class="WHIT">        </span><span class="COMM">// beforeFire can affect return value.</span><span class="WHIT">
+<span class='linenumber'>167</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="PUNC">(</span><span class="KEYW">typeof</span><span class="WHIT"> </span><span class="NAME">publisher.beforeFire</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="STRN">"function"</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'>168</span> </span><span class="WHIT">            </span><span class="KEYW">try</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'>169</span> </span><span class="WHIT">                </span><span class="KEYW">if</span><span class="PUNC">(</span><span class="NAME">publisher.beforeFire</span><span class="PUNC">(</span><span class="NAME">e</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">)</span><span class="WHIT">
+<span class='linenumber'>170</span> </span><span class="WHIT">                    </span><span class="NAME">preventDefault</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">true</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>171</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="WHIT"> </span><span class="KEYW">catch</span><span class="PUNC">(</span><span class="NAME">ex</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="NAME">APE.deferError</span><span class="PUNC">(</span><span class="NAME">ex</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="PUNC">}</span><span class="WHIT">
+<span class='linenumber'>172</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='linenumber'>173</span> 
+<span class='linenumber'>174</span> </span><span class="WHIT">        </span><span class="KEYW">for</span><span class="PUNC">(</span><span class="NAME">len</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">cs.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NAME">len</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">++</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'>175</span> </span><span class="WHIT">            </span><span class="NAME">csi</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">cs</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="WHIT">
+<span class='linenumber'>176</span> </span><span class="WHIT">            </span><span class="COMM">// If an error occurs, continue the event fire,</span><span class="WHIT">
+<span class='linenumber'>177</span> </span><span class="WHIT">            </span><span class="COMM">// but still throw the error.</span><span class="WHIT">
+<span class='linenumber'>178</span> </span><span class="WHIT">            </span><span class="KEYW">try</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'>179</span> </span><span class="WHIT">                </span><span class="COMM">// TODO: beforeEach to prevent or advise each call.</span><span class="WHIT">
+<span class='linenumber'>180</span> </span><span class="WHIT">                </span><span class="KEYW">if</span><span class="PUNC">(</span><span class="NAME">csi</span><span class="PUNC">[</span><span class="NUMB">0</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">call</span><span class="PUNC">(</span><span class="NAME">csi</span><span class="PUNC">[</span><span class="NUMB">1</span><span class="PUNC">]</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">e</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">)</span><span class="WHIT">
+<span class='linenumber'>181</span> </span><span class="WHIT">                    </span><span class="NAME">preventDefault</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">true</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="COMM">// continue main callstack and return false afterwards.</span><span class="WHIT">
+<span class='linenumber'>182</span> </span><span class="WHIT">                </span><span class="COMM">// TODO: afterEach</span><span class="WHIT">
+<span class='linenumber'>183</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="WHIT">
+<span class='linenumber'>184</span> </span><span class="WHIT">            </span><span class="KEYW">catch</span><span class="PUNC">(</span><span class="NAME">ex</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'>185</span> </span><span class="WHIT">                </span><span class="NAME">APE.deferError</span><span class="PUNC">(</span><span class="NAME">ex</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>186</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="WHIT">
+<span class='linenumber'>187</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='linenumber'>188</span> </span><span class="WHIT">        </span><span class="COMM">// afterFire can prevent default.</span><span class="WHIT">
+<span class='linenumber'>189</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="PUNC">(</span><span class="KEYW">typeof</span><span class="WHIT"> </span><span class="NAME">publisher.afterFire</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="STRN">"function"</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'>190</span> </span><span class="WHIT">            </span><span class="KEYW">if</span><span class="PUNC">(</span><span class="NAME">publisher.afterFire</span><span class="PUNC">(</span><span class="NAME">e</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">)</span><span class="WHIT">
+<span class='linenumber'>191</span> </span><span class="WHIT">                </span><span class="NAME">preventDefault</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">true</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>192</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='linenumber'>193</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="PUNC">!</span><span class="NAME">preventDefault</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>194</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='linenumber'>195</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>196</span> 
+<span class='linenumber'>197</span> </span><span class="COMM">/** 
+<span class='linenumber'>198</span>  * @static
+<span class='linenumber'>199</span>  * @param {Object} src the object which calls the function
+<span class='linenumber'>200</span>  * @param {String} sEvent the function that gets called.
+<span class='linenumber'>201</span>  * @memberOf {APE.EventPublisher}
+<span class='linenumber'>202</span>  * Looks for an APE.EventPublisher in the Registry.
+<span class='linenumber'>203</span>  * If none found, creates and adds one to the Registry.
+<span class='linenumber'>204</span>  */</span><span class="WHIT">
+<span class='linenumber'>205</span> </span><span class="NAME">APE.EventPublisher.get</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">src</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">sEvent</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'>206</span> 
+<span class='linenumber'>207</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">publisherList</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.Registry.hasOwnProperty</span><span class="PUNC">(</span><span class="NAME">sEvent</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">this.Registry</span><span class="PUNC">[</span><span class="NAME">sEvent</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="WHIT">
+<span class='linenumber'>208</span> </span><span class="WHIT">        </span><span class="PUNC">(</span><span class="NAME">this.Registry</span><span class="PUNC">[</span><span class="NAME">sEvent</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">,</span><span class="WHIT">
+<span class='linenumber'>209</span> </span><span class="WHIT">        </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">len</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">publisherList.length</span><span class="PUNC">,</span><span class="WHIT">
+<span class='linenumber'>210</span> </span><span class="WHIT">        </span><span class="NAME">publisher</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>211</span> </span><span class="WHIT">    </span><span class="WHIT">
+<span class='linenumber'>212</span> </span><span class="WHIT">    </span><span class="KEYW">for</span><span class="PUNC">(</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NAME">len</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">++</span><span class="PUNC">)</span><span class="WHIT">
+<span class='linenumber'>213</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="PUNC">(</span><span class="NAME">publisherList</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">src</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="NAME">src</span><span class="PUNC">)</span><span class="WHIT">
+<span class='linenumber'>214</span> </span><span class="WHIT">            </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">publisherList</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>215</span> </span><span class="WHIT">    </span><span class="WHIT">
+<span class='linenumber'>216</span> </span><span class="WHIT">    </span><span class="COMM">// not found.</span><span class="WHIT">
+<span class='linenumber'>217</span> </span><span class="WHIT">    </span><span class="NAME">publisher</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">APE.EventPublisher</span><span class="PUNC">(</span><span class="NAME">src</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">sEvent</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>218</span> </span><span class="WHIT">    </span><span class="COMM">// Steal. </span><span class="WHIT">
+<span class='linenumber'>219</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="PUNC">(</span><span class="NAME">src</span><span class="PUNC">[</span><span class="NAME">sEvent</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="WHIT">
+<span class='linenumber'>220</span> </span><span class="WHIT">        </span><span class="NAME">publisher.add</span><span class="PUNC">(</span><span class="NAME">src</span><span class="PUNC">[</span><span class="NAME">sEvent</span><span class="PUNC">]</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">src</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>221</span> </span><span class="WHIT">    </span><span class="NAME">src</span><span class="PUNC">[</span><span class="NAME">sEvent</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.fire</span><span class="PUNC">(</span><span class="NAME">publisher</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>222</span> </span><span class="WHIT">    </span><span class="NAME">publisherList</span><span class="PUNC">[</span><span class="NAME">publisherList.length</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">publisher</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>223</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">publisher</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>224</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>225</span> 
+<span class='linenumber'>226</span> </span><span class="COMM">/** 
+<span class='linenumber'>227</span>  * Map of [APE.EventPublisher], keyed by type.
+<span class='linenumber'>228</span>  * @private
+<span class='linenumber'>229</span>  * @static
+<span class='linenumber'>230</span>  * @memberOf {APE.EventPublisher}
+<span class='linenumber'>231</span>  */</span><span class="WHIT">
+<span class='linenumber'>232</span> </span><span class="NAME">APE.EventPublisher.Registry</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>233</span> 
+<span class='linenumber'>234</span> </span><span class="COMM">/**
+<span class='linenumber'>235</span>  * @static
+<span class='linenumber'>236</span>  * @memberOf {APE.EventPublisher}
+<span class='linenumber'>237</span>  * called onunload, automatically onunload. 
+<span class='linenumber'>238</span>  * This is only called for if window.CollectGarbage is 
+<span class='linenumber'>239</span>  * supported. IE has memory leak problems; other browsers have fast forward/back,
+<span class='linenumber'>240</span>  * but that won't work if there's an onunload handler.
+<span class='linenumber'>241</span>  */</span><span class="WHIT">
+<span class='linenumber'>242</span> </span><span class="NAME">APE.EventPublisher.cleanUp</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'>243</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">type</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">publisherList</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">publisher</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">len</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>244</span> </span><span class="WHIT">    </span><span class="KEYW">for</span><span class="PUNC">(</span><span class="NAME">type</span><span class="WHIT"> </span><span class="KEYW">in</span><span class="WHIT"> </span><span class="NAME">this.Registry</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'>245</span> </span><span class="WHIT">        </span><span class="NAME">publisherList</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.Registry</span><span class="PUNC">[</span><span class="NAME">type</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>246</span> </span><span class="WHIT">        </span><span class="KEYW">for</span><span class="PUNC">(</span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">len</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">publisherList.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NAME">len</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">++</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'>247</span> </span><span class="WHIT">            </span><span class="NAME">publisher</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">publisherList</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>248</span> </span><span class="WHIT">            </span><span class="NAME">publisher.src</span><span class="PUNC">[</span><span class="NAME">publisher.type</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>249</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='linenumber'>250</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='linenumber'>251</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>252</span> </span><span class="KEYW">if</span><span class="PUNC">(</span><span class="NAME">window.CollectGarbage</span><span class="PUNC">)</span><span class="WHIT">
+<span class='linenumber'>253</span> </span><span class="WHIT">    </span><span class="NAME">APE.EventPublisher.get</span><span class="PUNC">(</span><span class="WHIT"> </span><span class="NAME">window</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="STRN">"onunload"</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">addAfter</span><span class="PUNC">(</span><span class="WHIT"> </span><span class="NAME">APE.EventPublisher.cleanUp</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">APE.EventPublisher</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="PUNC">;</span></pre></body></html>

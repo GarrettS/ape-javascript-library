@@ -1,0 +1,43 @@
+<html style="height: 1000px">
+<head>
+        <title>Test dojo.coords</title>
+   
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <style type="text/css">
+                @import "../../dojo/resources/dojo.css";
+                @import "../../dijit/themes/dijit.css";
+                @import "../../dijit/themes/tundra/tundra.css";
+        </style>
+        <script src="../../build/APE.js"></script>
+        <script src="../../build/dom/dom.js"></script>
+        <script type="text/javascript">
+        function test(node){
+            var coords = APE.dom.getOffsetCoords(node);
+            alert(coords.y);
+        }
+        </script>
+</head>
+<body class="tundra" style="height: 1000px">
+    <div style="height:200px;padding-top:100px;">
+        <h1 class="testTitle">Postion test</h1>
+
+    <div>
+        <a href="javascript:;" onclick="test(this)" id="test1">Test 1</a>
+        <a href="javascript:;" onclick="test(this)" id="test2">Test 2</a>
+    </div>
+    <div style="height:200px;margin-top:100px;">
+        <h1 class="testTitle">Postion test</h1>
+    <div>
+        <a href="javascript:;" onclick="test(this)" id="test11">Test 1</a>
+        <a href="javascript:;" onclick="test(this)" id="test12">Test 12</a>
+    </div>
+
+<script type="text/javascript">
+setTimeout(function(){
+    if(document.getElementById("firebugToolbar"))
+        document.getElementById("firebugToolbar").parentNode.style.marginTop = "120px";
+}, 100);
+</script>
+
+</body>
+</html>

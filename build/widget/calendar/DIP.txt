@@ -1,0 +1,35 @@
+I'm working on a Calendar Widget in JavaScript and I ran into an area that seems ugly.
+
+Calendar Widget - Overview: -
+If you've been to Travelocity, you've seen these things.
+The user brings focus to the input, and then a calendar widget pops up. 
+
+The user chooses a date from the widget and the date goes into the text field in a format specified by the implementor.
+
+Problem:
+How is the date formatted, e.g. mm/dd/YY?
+
+I do not want my Calendar widget to depend on a DateFormat. 
+
+I'm thinking of using DIP and just force the client to provide a dateformatter. high level components should not depend on low level ones. That makes my API simpler and more flexible, but is not very nice to the poor client who has to cobble together a DateFormatter. JavaScript doesn't have any dateformatter class.
+
+My options seem to be:
+1) provide some basic dateformatting capabilities into the Calendar widget.
+pro: small simple
+con: makes calendar less stable if the internal dateformatter has to change.
+con: complicates Calendar with things that should not be Calendar's responsibility.
+
+2) write a dateformatter that the client can import and use. 
+pro: flexible, allows the client to use my dateformatter, or another one.
+con: decoupling the date formatting means that I have to create a separate "package" that the client will then have to include. This means an extra download over the wire.
+
+3) Don't write a dateformatter - force the client to do it. 
+pro: allows the client to format dates in any way. 
+con: makes the Calendar harder to implement
+
+I'm more inclined to option 3 at this point -- just let the client get access to the Calendar's wrapped Date. 
+What would you do?
+
+Thanks,
+
+Garrett

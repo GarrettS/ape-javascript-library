@@ -1,0 +1,309 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+	<meta name="generator" content="JsDoc Toolkit 1.0">
+	<title>JsDoc: StyleSheetAdapter.js</title>
+	<link rel=stylesheet href="default.css" type="text/css" media=screen>
+</head>
+
+<body>
+	<div class="content">
+		<div class="docs">
+		
+			<div class="sectionHead">Library: StyleSheetAdapter.js</div>
+			<div class="section overview">
+				<div class="itemTitle">
+					Overview
+				</div>
+				<div>	
+					<div class="desc"></div>
+					<div class="itemTags">
+					<ul>
+						<li>source: <a href="src_09.html">StyleSheetAdapter.js</a></li>
+					
+					</ul>
+					</div>
+				</div>
+			</div>
+			
+			<div class="sectionHead">Constructors</div>
+			
+			
+			<div class="section constructor">
+				<div class="itemTitle">
+					<a name="APE.dom.StyleSheetAdapter"></a>
+					
+					
+					
+					APE.dom.StyleSheetAdapter(<span class="signature">id</span>)
+					
+					
+				</div>
+				
+				
+					<div class="desc"></div>
+				
+				
+				
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							id
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				<div class="detailHead">methods</div>
+				
+					<ul class="details">
+						<li><a href="#APE.dom.StyleSheetAdapter.getRule">getRule</a>(selectorText)</li>
+					</ul>
+				
+					<ul class="details">
+						<li><a href="#APE.dom.StyleSheetAdapter.getRules">getRules</a>()</li>
+					</ul>
+				
+					<ul class="details">
+						<li><a href="#APE.dom.StyleSheetAdapter.addRule">addRule</a>(selectorText, cssText)</li>
+					</ul>
+				
+				
+				
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			<div class="sectionHead">Namespaces</div>
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			<div class="sectionHead">Functions</div>
+			
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.dom.StyleSheetAdapter.getRule"></a>
+					
+					
+						<i><a href="#APE.dom.StyleSheetAdapter" class="type">APE.dom.StyleSheetAdapter.</a></i>getRule(<span class="signature">selectorText</span>)
+					
+					
+					
+				</div>
+				
+				
+					<div class="desc">IE will not return the correct selector text for Element selectors in HTML. Instead, IE puts the element selector and pseudoclass selectors in upper case.  This function compares selectors, case sensitive, but case insensitive for element selector parts. Does not traverse into media blocks.</div>
+				
+
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							selectorText
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				<div class="detailHead">returns</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							CSSStyleRule
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.dom.StyleSheetAdapter.getRules"></a>
+					
+					
+						<i><a href="#APE.dom.StyleSheetAdapter" class="type">APE.dom.StyleSheetAdapter.</a></i>getRules(<span class="signature"></span>)
+					
+					
+					
+				</div>
+				
+				
+					<div class="desc"></div>
+				
+
+				
+				
+				
+				
+				
+				
+				
+				<div class="detailHead">returns</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							CSSRuleList
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.dom.StyleSheetAdapter.addRule"></a>
+					
+					
+						<i><a href="#APE.dom.StyleSheetAdapter" class="type">APE.dom.StyleSheetAdapter.</a></i>addRule(<span class="signature">selectorText, cssText</span>)
+					
+					
+					
+				</div>
+				
+				
+					<div class="desc">Adds a rule to the styleSheet</div>
+				
+
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							selectorText
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							cssText
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				<div class="detailHead">returns</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							CSSRule
+						</td>
+						<td>
+							cssRule that was added.
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="sectionHead">Objects</div>
+			
+			
+			
+			
+			
+			
+			
+			
+			
+		</div>
+	</div>
+	<div class="finePrint">
+	Generated by <a href="http://jsdoctoolkit.org/" target="_blank">JsDoc Toolkit</a> 1.4.0 on Fri, 01 Feb 2008 20:53:32 GMT.
+	</div>
+</body>
+</html>

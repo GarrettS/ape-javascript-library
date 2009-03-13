@@ -1,0 +1,1369 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+	"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+	<title>JsDoc: APE.drag.Draggable</title>
+	<link rel="stylesheet" href="default.css" type="text/css" media="screen">
+</head>
+
+<body>
+
+<table style="width: 100%" class="navbar">
+<tr>
+<td class="NavBar" valign="top"><font size="-2">SUMMARY:&nbsp;<a href="#field_summary">FIELD</a>&nbsp;|&nbsp;<a href="#constructor_summary">CONSTR</a>&nbsp;|&nbsp;<a href="#method_summary">METHOD</a></font></td>
+<td class="NavBar" valign="top"><font size="-2">DETAIL:&nbsp;<a href="#field_detail">FIELD</a>&nbsp;|&nbsp;<a href="#constructor_detail">CONSTR</a>&nbsp;|&nbsp;<a href="#method_detail">METHOD</a></font></td>
+</tr>
+</table>
+
+<h2>Static Class APE.drag.Draggable</h2>
+
+
+<i>Defined in <a href="Draggable.src.html">Draggable.js</a></i>
+
+<p>
+</p>
+
+
+
+	<li><strong>author: </strong> Garrett Smith, � 2008</li>
+
+	<li><strong>version: </strong> 1</li>
+
+	<li><strong>fileoverview:: </strong> contains: APE.drag.Draggable, DragHandlers, APE.drag.DropTarget</li>
+
+	<li><strong>requires: </strong> APE.EventPublisher, APE.domclassNames:<ul>  <li>activeDragClassName</li>  <li>focusClassName</li>  <li>selectedClassName</li>  <li>dragOverClassName (for dropTarget)</li>  <li>focusClassName (focused drag object)</li></ul>APE.drag.Draggable Features:<ul>  <li>dragCopy</li>  <li>dragMultiple</li>  <li>setHandle(handle, useTree)</li></ul></li>
+
+	<li><strong>example: </strong> Create a Draggable:<pre>var Draggable = APE.drag.Draggable,    el = document.getElementById(<var>"box"</var>),    box = Draggable.getByNode( el );box.keepInContainer = true;box.activeDragClassName = "boxDragging";box.focusClassName = "boxFocused";var bigBx = box.addDropTarget( document.getElementById("biggerBox") );bigBx.dragOverClassName = "boxDragOver";</pre></li>
+
+
+
+
+
+<hr>
+
+<!-- =========== FIELD SUMMARY =========== -->
+
+<a name="field_summary"> </a> 
+<table border="1" cellpadding="3" cellspacing="0" width="100%">
+	<tr class="TableHeadingColor">
+		<td colspan=2>
+			<b>Field Summary</b>
+		</td>
+	</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>object</code></font>
+			</td>
+			<td>
+				<code><b><a href="#_dragOverTargets">_dragOverTargets</a></b></code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A subset of dropTargets that have ondragover or ondragout.
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>String</code></font>
+			</td>
+			<td>
+				<code><b><a href="#activeDragClassName">activeDragClassName</a></b></code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;className to add before being dragged.
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>Number</code></font>
+			</td>
+			<td>
+				<code><b><a href="#constraint">constraint</a></b></code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default: APE.drag.Draggable.constraints.NONE
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>object</code></font>
+			</td>
+			<td>
+				<code><b><a href="#constraints">constraints</a></b></code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>boolean</code></font>
+			</td>
+			<td>
+				<code><b><a href="#dragCopy">dragCopy</a></b></code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;set to true to make a temporary "ghost" copy dragged.
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>Object</code></font>
+			</td>
+			<td>
+				<code><b><a href="#draggableList">draggableList</a></b></code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Internal map of draggables
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>boolean</code></font>
+			</td>
+			<td>
+				<code><b><a href="#dragMultiple">dragMultiple</a></b></code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;set to true to allow this to be dragged as a group.
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>String</code></font>
+			</td>
+			<td>
+				<code><b><a href="#focusClassName">focusClassName</a></b></code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;className to add when focused.
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>Number</code></font>
+			</td>
+			<td>
+				<code><b><a href="#grabX">grabX</a></b></code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;where draggable was grabbed from
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>Number</code></font>
+			</td>
+			<td>
+				<code><b><a href="#grabY">grabY</a></b></code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;where draggable was grabbed from
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>Number</code></font>
+			</td>
+			<td>
+				<code><b><a href="#highestZIndex">highestZIndex</a></b></code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;a higher z-index is assigned beforedragstart.
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>boolean</code></font>
+			</td>
+			<td>
+				<code><b><a href="#isDragEnabled">isDragEnabled</a></b></code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;drag object can be disabled by setting to this to false
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>boolean</code></font>
+			</td>
+			<td>
+				<code><b><a href="#keepInContainer">keepInContainer</a></b></code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;drag object can be dragged outside of its container
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>Number</code></font>
+			</td>
+			<td>
+				<code><b><a href="#newX">newX</a></b></code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Where it will move to next.
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>Number</code></font>
+			</td>
+			<td>
+				<code><b><a href="#newY">newY</a></b></code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Where it will move to next.
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>Number</code></font>
+			</td>
+			<td>
+				<code><b><a href="#origX">origX</a></b></code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;where drag started from
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>Number</code></font>
+			</td>
+			<td>
+				<code><b><a href="#origY">origY</a></b></code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;where drag started from
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>String</code></font>
+			</td>
+			<td>
+				<code><b><a href="#selectedClassName">selectedClassName</a></b></code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;className to add when selected.
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>Number</code></font>
+			</td>
+			<td>
+				<code><b><a href="#x">x</a></b></code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;current x position
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>Number</code></font>
+			</td>
+			<td>
+				<code><b><a href="#y">y</a></b></code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;current y position
+			</td>
+		</tr>
+	
+</table>
+&nbsp;
+
+<!-- =========== END FIELD SUMMARY =========== -->
+
+
+
+<!-- ========== METHOD SUMMARY =========== -->
+
+<a name="method_summary"> </a> 
+<table border="1" cellpadding="3" cellspacing="0" width="100%">
+	<tr class="TableHeadingColor">
+		<th colspan=2>
+			Method Summary
+		</th>
+	</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>
+				&nbsp;DropTarget
+				</code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#addDropTarget">addDropTarget</a></b>(dropTarget) </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Adds a drop target.
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code></code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#animateBack">animateBack</a></b>(x, y) </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Starts gliding the draggable back to its original x,y coords.
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code></code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#dragDone">dragDone</a></b>(e) </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>&lt;static&gt; 
+				&nbsp;APE.drag.Draggable
+				</code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#getByNode">getByNode</a></b>(el, constraint) </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Use Draggable.getByNode, <em>not</em> new.
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code></code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#grab">grab</a></b>(e, xOffset, xOffset) </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Grabs the draggable, centering it under the cursor.
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code></code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#init">init</a></b>() </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; undocumented
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code></code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#instanceDestructor">instanceDestructor</a></b>() </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; undocumented
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code></code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#release">release</a></b>(e) </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; releases the draggable, as if the mouse had been released.
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>
+				&nbsp;HTMLElement
+				</code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#removeDropTarget">removeDropTarget</a></b>(element) </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Removes a drop target.
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code></code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#select">select</a></b>(isSelect) </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Selects the draggable, adding selectedClassName
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code></code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#setContainer">setContainer</a></b>(el) </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A dragObj does not check search for containing block each time its grabbed/dragged.
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code></code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#setFocus">setFocus</a></b>(isFocus, e) </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; undocumented
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code></code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#setHandle">setHandle</a></b>(el, setHandleTree) </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Sets a handle on a draggable
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code></code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#toString">toString</a></b>() </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; undocumented
+ 
+			</td>
+		</tr>
+	
+</table>
+&nbsp;
+
+
+<!-- ========== EVENT SUMMARY =========== -->
+
+
+<a name="event_summary"> </a> 
+<table border="1" cellpadding="3" cellspacing="0" width="100%">
+	<tr class="TableHeadingColor">
+		<th colspan=2>
+			Event Summary
+		</th>
+	</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>
+                
+                
+                
+                  void
+				</code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#onbeforedrag">onbeforedrag</a></b>() </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Is about to move.
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>
+                
+                
+                
+                  void
+				</code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#onbeforedragstart">onbeforedragstart</a></b>() </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Has been grabbed.
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>
+                
+                
+                
+                  void
+				</code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#onblur">onblur</a></b>() </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Has been blurred.
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>
+                
+                
+                
+                  void
+				</code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#ondrag">ondrag</a></b>(e) </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Being dragged
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>
+                
+                
+                
+                  void
+				</code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#ondragend">ondragend</a></b>() </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Dragging completed (as a result of mouseup).
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>
+                
+                
+                
+                  void
+				</code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#ondragstart">ondragstart</a></b>(e) </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>
+                
+                
+                
+                  void
+				</code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#ondragstop">ondragstop</a></b>() </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Dragging stopped before it escaped its container.
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>
+                
+                
+                
+                  void
+				</code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#onfocus">onfocus</a></b>() </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Has been grabbed.
+ 
+			</td>
+		</tr>
+	
+</table>
+&nbsp;
+
+
+
+<!-- ========== INHERITED METHODS SUMMARY =========== -->
+
+<br/>
+
+<!-- ========== END INHERITED METHODS SUMMARY =========== -->
+
+<!-- ============ FIELD DETAIL START ========= -->
+
+<a name="field_detail"> </a> 
+<table border="1" cellpadding="3" cellspacing="0" width="100%">
+	<tr class="TableHeadingColor">
+		<th colspan=1>
+			Field Detail
+		</th>
+	</tr>
+</table>
+
+
+	<!-- One single method detail entry -->
+	<a name="_dragOverTargets">
+	<!-- -->
+	</a> <h3>_dragOverTargets</h3>
+		<pre>object <b>_dragOverTargets</b></pre> 
+	<ul>
+		
+		A subset of dropTargets that have ondragover or ondragout. created onmousedown, to help boost performance by reducing count for ondragover
+		
+	</ul>
+
+
+	<!-- One single method detail entry -->
+	<a name="activeDragClassName">
+	<!-- -->
+	</a> <h3>activeDragClassName</h3>
+		<pre>String <b>activeDragClassName</b></pre> 
+	<ul>
+		
+		className to add before being dragged.
+		
+	</ul>
+
+
+	<!-- One single method detail entry -->
+	<a name="constraint">
+	<!-- -->
+	</a> <h3>constraint</h3>
+		<pre>Number <b>constraint</b></pre> 
+	<ul>
+		
+		default: APE.drag.Draggable.constraints.NONE
+		
+	</ul>
+
+
+	<!-- One single method detail entry -->
+	<a name="constraints">
+	<!-- -->
+	</a> <h3>constraints</h3>
+		<pre>object <b>constraints</b></pre> 
+	<ul>
+		
+		
+		
+	</ul>
+
+
+	<!-- One single method detail entry -->
+	<a name="dragCopy">
+	<!-- -->
+	</a> <h3>dragCopy</h3>
+		<pre>boolean <b>dragCopy</b></pre> 
+	<ul>
+		
+		set to true to make a temporary "ghost" copy dragged.
+		
+	</ul>
+
+
+	<!-- One single method detail entry -->
+	<a name="draggableList">
+	<!-- -->
+	</a> <h3>draggableList</h3>
+		<pre><a href="Object.html">Object</a> <b>draggableList</b></pre> 
+	<ul>
+		
+		Internal map of draggables
+		
+	</ul>
+
+
+	<!-- One single method detail entry -->
+	<a name="dragMultiple">
+	<!-- -->
+	</a> <h3>dragMultiple</h3>
+		<pre>boolean <b>dragMultiple</b></pre> 
+	<ul>
+		
+		set to true to allow this to be dragged as a group.
+		
+	</ul>
+
+
+	<!-- One single method detail entry -->
+	<a name="focusClassName">
+	<!-- -->
+	</a> <h3>focusClassName</h3>
+		<pre>String <b>focusClassName</b></pre> 
+	<ul>
+		
+		className to add when focused.
+		
+	</ul>
+
+
+	<!-- One single method detail entry -->
+	<a name="grabX">
+	<!-- -->
+	</a> <h3>grabX</h3>
+		<pre>Number <b>grabX</b></pre> 
+	<ul>
+		
+		where draggable was grabbed from
+		
+	</ul>
+
+
+	<!-- One single method detail entry -->
+	<a name="grabY">
+	<!-- -->
+	</a> <h3>grabY</h3>
+		<pre>Number <b>grabY</b></pre> 
+	<ul>
+		
+		where draggable was grabbed from
+		
+	</ul>
+
+
+	<!-- One single method detail entry -->
+	<a name="highestZIndex">
+	<!-- -->
+	</a> <h3>highestZIndex</h3>
+		<pre>Number <b>highestZIndex</b></pre> 
+	<ul>
+		
+		a higher z-index is assigned beforedragstart.
+		
+	</ul>
+
+
+	<!-- One single method detail entry -->
+	<a name="isDragEnabled">
+	<!-- -->
+	</a> <h3>isDragEnabled</h3>
+		<pre>boolean <b>isDragEnabled</b></pre> 
+	<ul>
+		
+		drag object can be disabled by setting to this to false
+		
+	</ul>
+
+
+	<!-- One single method detail entry -->
+	<a name="keepInContainer">
+	<!-- -->
+	</a> <h3>keepInContainer</h3>
+		<pre>boolean <b>keepInContainer</b></pre> 
+	<ul>
+		
+		drag object can be dragged outside of its container
+		
+	</ul>
+
+
+	<!-- One single method detail entry -->
+	<a name="newX">
+	<!-- -->
+	</a> <h3>newX</h3>
+		<pre>Number <b>newX</b></pre> 
+	<ul>
+		
+		Where it will move to next. onbeforedrag
+		
+	</ul>
+
+
+	<!-- One single method detail entry -->
+	<a name="newY">
+	<!-- -->
+	</a> <h3>newY</h3>
+		<pre>Number <b>newY</b></pre> 
+	<ul>
+		
+		Where it will move to next. onbeforedrag
+		
+	</ul>
+
+
+	<!-- One single method detail entry -->
+	<a name="origX">
+	<!-- -->
+	</a> <h3>origX</h3>
+		<pre>Number <b>origX</b></pre> 
+	<ul>
+		
+		where drag started from
+		
+	</ul>
+
+
+	<!-- One single method detail entry -->
+	<a name="origY">
+	<!-- -->
+	</a> <h3>origY</h3>
+		<pre>Number <b>origY</b></pre> 
+	<ul>
+		
+		where drag started from
+		
+	</ul>
+
+
+	<!-- One single method detail entry -->
+	<a name="selectedClassName">
+	<!-- -->
+	</a> <h3>selectedClassName</h3>
+		<pre>String <b>selectedClassName</b></pre> 
+	<ul>
+		
+		className to add when selected.
+		
+	</ul>
+
+
+	<!-- One single method detail entry -->
+	<a name="x">
+	<!-- -->
+	</a> <h3>x</h3>
+		<pre>Number <b>x</b></pre> 
+	<ul>
+		
+		current x position
+		
+	</ul>
+
+
+	<!-- One single method detail entry -->
+	<a name="y">
+	<!-- -->
+	</a> <h3>y</h3>
+		<pre>Number <b>y</b></pre> 
+	<ul>
+		
+		current y position
+		
+	</ul>
+
+
+
+<!-- ============ FIELD DETAIL END ========== -->
+
+
+
+<!-- ============ METHOD DETAIL START ======= -->
+
+<a name="method_detail"> </a> 
+<table border="1" cellpadding="3" cellspacing="0" width="100%">
+	<tr class="TableHeadingColor">
+		<th colspan=1>
+			Method Detail
+		</th>
+	</tr>
+</table>
+
+
+	<a name="addDropTarget"> </a> <h3>addDropTarget</h3>
+		<pre>DropTarget&nbsp;<b>addDropTarget</b>(dropTarget)</pre> 
+	<ul>
+		
+		Adds a drop target.
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	<ul>
+		<b>Parameters:</b>
+		<ul>
+			<code><i>HTMLElement, APE.drag.DropTarget</i>&nbsp;dropTarget</code> - either an element or a DropTarget. 
+		</ul>
+	</ul>
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	<ul>
+		<b>Returns:</b>
+		<ul>
+			<code><i>DropTarget</i>&nbsp;</code>The drop target that was added. 
+		</ul>
+	</ul>
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="animateBack"> </a> <h3>animateBack</h3>
+		<pre><b>animateBack</b>(x, y)</pre> 
+	<ul>
+		
+		Starts gliding the draggable back to its original x,y coords.
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	<ul>
+		<b>Parameters:</b>
+		<ul>
+			<code><i>Number</i>&nbsp;x</code><a title="optional parameter" class="optional">?</a> - x coordinate to start gliding from. 
+		</ul>
+		<ul>
+			<code><i>Number</i>&nbsp;y</code><a title="optional parameter" class="optional">?</a> - y coordinate to start gliding from. 
+		</ul>
+	</ul>
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="dragDone"> </a> <h3>dragDone</h3>
+		<pre><b>dragDone</b>(e)</pre> 
+	<ul>
+		
+		
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	<ul>
+		<b>Parameters:</b>
+		<ul>
+			<code>e</code> 
+		</ul>
+	</ul>
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="getByNode"> </a> <h3>getByNode</h3>
+		<pre>&lt;static&gt;&nbsp;<a href="APE.drag.Draggable.html">APE.drag.Draggable</a>&nbsp;<b>getByNode</b>(el, constraint)</pre> 
+	<ul>
+		
+		Use Draggable.getByNode, <em>not</em> new.
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	<ul>
+		<b>Parameters:</b>
+		<ul>
+			<code><i>HTMLElement</i>&nbsp;el</code> 
+		</ul>
+		<ul>
+			<code><i>uint</i>&nbsp;constraint</code><a title="optional parameter" class="optional">?</a> - (0 | 1 | 2) default is 0. 
+		</ul>
+	</ul>
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	<ul>
+		<b>Returns:</b>
+		<ul>
+			<code><i><a href="APE.drag.Draggable.html">APE.drag.Draggable</a></i>&nbsp;</code> 
+		</ul>
+	</ul>
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="grab"> </a> <h3>grab</h3>
+		<pre><b>grab</b>(e, xOffset, xOffset)</pre> 
+	<ul>
+		
+		Grabs the draggable, centering it under the cursor.
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	<ul>
+		<b>Parameters:</b>
+		<ul>
+			<code><i>Event</i>&nbsp;e</code> - the event to grab the element from. 
+		</ul>
+		<ul>
+			<code><i>int</i>&nbsp;xOffset</code><a title="optional parameter" class="optional">?</a> - amount of horizontal adjustment to apply. 
+		</ul>
+		<ul>
+			<code><i>int</i>&nbsp;xOffset</code><a title="optional parameter" class="optional">?</a> - amount of vertical adjustment to apply. 
+		</ul>
+	</ul>
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="init"> </a> <h3>init</h3>
+		<pre><b>init</b>()</pre> 
+	<ul>
+		
+		undocumented
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="instanceDestructor"> </a> <h3>instanceDestructor</h3>
+		<pre><b>instanceDestructor</b>()</pre> 
+	<ul>
+		
+		undocumented
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="release"> </a> <h3>release</h3>
+		<pre><b>release</b>(e)</pre> 
+	<ul>
+		
+		releases the draggable, as if the mouse had been released.
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	<ul>
+		<b>Parameters:</b>
+		<ul>
+			<code><i>Event</i>&nbsp;e</code><a title="optional parameter" class="optional">?</a> - the event that triggered release 
+		</ul>
+	</ul>
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="removeDropTarget"> </a> <h3>removeDropTarget</h3>
+		<pre>HTMLElement&nbsp;<b>removeDropTarget</b>(element)</pre> 
+	<ul>
+		
+		Removes a drop target.
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	<ul>
+		<b>Parameters:</b>
+		<ul>
+			<code><i>HTMLElement, DropTarget</i>&nbsp;element</code> - or DropTarget to remove. 
+		</ul>
+	</ul>
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	<ul>
+		<b>Returns:</b>
+		<ul>
+			<code><i>HTMLElement</i>&nbsp;</code>the removed dropTarget element. 
+		</ul>
+	</ul>
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="select"> </a> <h3>select</h3>
+		<pre><b>select</b>(isSelect)</pre> 
+	<ul>
+		
+		Selects the draggable, adding selectedClassName
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	<ul>
+		<b>Parameters:</b>
+		<ul>
+			<code><i>boolean</i>&nbsp;isSelect</code> - if false, deselects. 
+		</ul>
+	</ul>
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="setContainer"> </a> <h3>setContainer</h3>
+		<pre><b>setContainer</b>(el)</pre> 
+	<ul>
+		
+		A dragObj does not check search for containing block each time its grabbed/dragged.Instead, it reuses the container. If the container must change, this must be done manually, via dragObj.setContainer(newEl);
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	<ul>
+		<b>Parameters:</b>
+		<ul>
+			<code>el</code> 
+		</ul>
+	</ul>
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="setFocus"> </a> <h3>setFocus</h3>
+		<pre><b>setFocus</b>(isFocus, e)</pre> 
+	<ul>
+		
+		undocumented
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	<ul>
+		<b>Parameters:</b>
+		<ul>
+			<code>isFocus</code> 
+		</ul>
+		<ul>
+			<code>e</code> 
+		</ul>
+	</ul>
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="setHandle"> </a> <h3>setHandle</h3>
+		<pre><b>setHandle</b>(el, setHandleTree)</pre> 
+	<ul>
+		
+		Sets a handle on a draggable
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	<ul>
+		<b>Parameters:</b>
+		<ul>
+			<code><i>HTMLElement</i>&nbsp;el</code> - the element to use as a handle.By default, the handle is the draggable. 
+		</ul>
+		<ul>
+			<code><i>boolean</i>&nbsp;setHandleTree</code><a title="optional parameter" class="optional">?</a> - if true, the draggable can use anything in the handle's subtree for dragging. 
+		</ul>
+	</ul>
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="toString"> </a> <h3>toString</h3>
+		<pre><b>toString</b>()</pre> 
+	<ul>
+		
+		undocumented
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+
+<!-- ============ METHOD DETAIL END ========== -->
+
+<!-- ============ EVENT DETAIL START ======= -->
+
+
+<a name="method_detail"> </a> 
+<table border="1" cellpadding="3" cellspacing="0" width="100%">
+	<tr class="TableHeadingColor">
+		<th colspan=1>
+			Event Detail
+		</th>
+	</tr>
+</table>
+
+
+	<a name="onbeforedrag"> </a> <h3>onbeforedrag</h3>
+		<pre><b>onbeforedrag</b>()</pre> 
+	<ul>
+		
+		Is about to move.
+		
+	</ul>
+	<!-- EVENT PARAMETERS START -->
+	
+	<!-- EVENT PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="onbeforedragstart"> </a> <h3>onbeforedragstart</h3>
+		<pre><b>onbeforedragstart</b>()</pre> 
+	<ul>
+		
+		Has been grabbed.
+		
+	</ul>
+	<!-- EVENT PARAMETERS START -->
+	
+	<!-- EVENT PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="onblur"> </a> <h3>onblur</h3>
+		<pre><b>onblur</b>()</pre> 
+	<ul>
+		
+		Has been blurred.
+		
+	</ul>
+	<!-- EVENT PARAMETERS START -->
+	
+	<!-- EVENT PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="ondrag"> </a> <h3>ondrag</h3>
+		<pre><b>ondrag</b>(e)</pre> 
+	<ul>
+		
+		Being dragged
+		
+	</ul>
+	<!-- EVENT PARAMETERS START -->
+	<ul>
+		<b>Parameters:</b>
+		<ul>
+			<code><i>Event</i>&nbsp;e</code> - dom event. 
+		</ul>
+	</ul>
+	<!-- EVENT PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="ondragend"> </a> <h3>ondragend</h3>
+		<pre><b>ondragend</b>()</pre> 
+	<ul>
+		
+		Dragging completed (as a result of mouseup).
+		
+	</ul>
+	<!-- EVENT PARAMETERS START -->
+	
+	<!-- EVENT PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="ondragstart"> </a> <h3>ondragstart</h3>
+		<pre><b>ondragstart</b>(e)</pre> 
+	<ul>
+		
+		
+		
+	</ul>
+	<!-- EVENT PARAMETERS START -->
+	<ul>
+		<b>Parameters:</b>
+		<ul>
+			<code><i>Event</i>&nbsp;e</code> - dom event.Mouse has moved. 
+		</ul>
+	</ul>
+	<!-- EVENT PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="ondragstop"> </a> <h3>ondragstop</h3>
+		<pre><b>ondragstop</b>()</pre> 
+	<ul>
+		
+		Dragging stopped before it escaped its container.
+		
+	</ul>
+	<!-- EVENT PARAMETERS START -->
+	
+	<!-- EVENT PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="onfocus"> </a> <h3>onfocus</h3>
+		<pre><b>onfocus</b>()</pre> 
+	<ul>
+		
+		Has been grabbed.
+		
+	</ul>
+	<!-- EVENT PARAMETERS START -->
+	
+	<!-- EVENT PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+
+
+<!-- ============ EVENT DETAIL END ========== -->
+<div class="jsdoc_ctime">Documentation generated by <a href="http://jsdoctoolkit.org/" target="_parent">JsDoc Toolkit</a> 1.4.0 on Sun Aug 17 2008 17:08:28 GMT-0700 (PDT)</div>
+</body>
+</html>

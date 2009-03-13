@@ -1,0 +1,63 @@
+.ape-slider-track {
+	position: relative;
+ 	height: 1px;
+	border: 1px inset #444;
+	background: ape-slider;
+	z-index: 10;
+}
+
+.ape-slider-track-active {
+	border-color: #333;
+	background: #ccc;
+}
+
+.ape-slider-handle {
+    height: 17px;
+    width: 17px;
+	position: absolute;
+}
+
+label.ape-slider-label {
+	font: caption;
+}
+
+label.ape-slider-label, input {
+	font: caption;
+	text-align: right;
+}
+
+.ape-slider-h-track {
+	width: 300px;
+	margin-left: 50px;
+ 	margin-top: 16px;
+	border-left-width: 0;
+}
+
+.ape-slider-h-handle {
+    height: 20px;
+    background: url('../../resources/drag/img/slider_osx.gif') no-repeat;
+	top: -5px;
+}
+
+.ape-slider-h-handle-focus {
+    background: url('../../resources/drag/img/slider_osx-focus.gif') no-repeat;
+}
+
+.ape-slider-v-track {
+	top: 40px;
+	left: 14px;
+	width: 1px;
+	border-bottom-width: 0;
+	position: absolute;
+	height: 100px;
+}
+
+.ape-slider-v-handle {
+    background: url('../../resources/drag/img/slider_osx-v.gif') no-repeat;
+    width: 20px;
+	top: 83px;
+	left: -4px;
+}
+.ape-slider-v-handle-focus {
+    background: url('./../resources/drag/img/slider_osx-v-focus.gif') no-repeat;
+}

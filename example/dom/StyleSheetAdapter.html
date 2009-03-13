@@ -1,0 +1,66 @@
+ <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+    <title>StyleSheetAdapter Test</title>
+<link type="text/css" rel="stylesheet" href="../test.css"/>
+
+<script type="text/javascript" src="../../build/APE.js"></script>
+<script type="text/javascript" src="../../build/dom/StyleSheetAdapter.js"></script>
+<style id="AnimationStyles">
+button.button { 
+    position: absolute;
+    left: 0;
+}
+b {
+    position: absolute;
+}
+
+b, b.start {
+    background-color: #eee;
+    color: #000;
+    position: absolute;
+    display: block;
+}
+
+a b.end s#foo {
+    background-color: #eee;
+    color: #00f;
+    left: 400px;
+}
+</style>
+
+</head>
+<body>
+<script style="display:block;white-space:pre;font-family:monospace">
+
+function testSuccess() {
+    var styleSheetAdapter = APE.dom.StyleSheetAdapter.getById( "AnimationStyles" );
+try{
+    var start = styleSheetAdapter.getRule( "b.start" );
+    if( start.style.display != "block" ) throw Error("fail: start");
+
+    var end = styleSheetAdapter.getRule( "a b.end s#foo" );
+
+    if( end.style.left != "400px" ) throw Error("fail: end");
+
+    var middle = styleSheetAdapter.addRule( "b.animating", "color: pink" );
+    
+    if(middle.style.color != "pink") throw Error('middle was not pink ' + middle.style.color);
+    
+    }catch(e) { alert(e.message); }
+};
+
+</script>
+
+<button id='success' onclick="eval(this.textContent||this.innerText)">testSuccess();</button>
+
+<b>T</b>
+<b>E</b>
+<a><b class="end"><s id="foo">S</s></b></a>
+<b>T</b>
+
+
+</body>
+</html>

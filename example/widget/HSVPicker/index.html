@@ -1,0 +1,59 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US">
+<head>
+	<title>ColorPicker</title>
+
+
+<link rel="stylesheet" type="text/css" href="../../../build/widget/HSVPicker/css/HSVPicker.css" />
+
+
+</head>
+<body>
+	<div id="hsv" class="ape-hsv">
+		<fieldset>
+			<legend>Color Selector</legend>
+			<div class="ape-hsv-color-col">
+				<!-- Select Saturation and Brightness -->
+				<div class="ape-hsv-saturation-value-frame-container">
+					<div class="saturation-value-frame-border"></div>
+					<div class="ape-hsv-saturation-value-frame">
+						<div id="hsv-transparentSb" class="ape-hsv-saturation-value ape-hsv-transparent-sv"></div
+						><div class="ape-hsv-saturation-value" id="hsv-saturation-value">
+							<div style="z-index: 1001; left: 7px; top: 6px;" 
+								class="ape-hsv-saturation-value-selector"
+								id="hsv-saturation-value-selector"></div>
+						</div>
+					</div>
+				</div>
+				<div class="ape-hsv-color-preview" id="hsv-color-preview"></div>
+			</div>
+			<div class="ape-hsv-color-col ape-hsv-hue-col" id="hsv-hue-col">
+				<!-- Hue Selection -->
+				<div id="hsv-hue" class="ape-hsv-hue">
+					<div class="ape-hsv-hue-slider" id="hsv-hue-slider">
+						<div class="ape-hsv-slider-arrow"></div>
+					</div>
+				</div>
+			</div>
+			<input id="hsv-color-input" class="ape-hsv-color-input" size="7" maxlength="7" type="text" />
+            <label for="hsv-transparent-checkbox" id="hsv-transparent-checkbox-label" class="ape-hsv-transparent-checkbox-label">
+            <input class="transparent-checkbox" 
+                id="hsv-transparent-checkbox" name="hsv-transparent-checkbox" 
+                type="checkbox" />
+                transparent
+                </label>
+		</fieldset>
+	</div>
+
+<script src="../../../build/ape-ep-dom.js" type="text/javascript"></script>
+<script src="../../../build/drag/Draggable.js" type="text/javascript"></script>
+<script src="../../../build/color/ColorRGB.js" type="text/javascript"></script>
+
+<script src="../../../build/widget/HSVPicker/HSVPicker.js" type="text/javascript"></script>
+<script type="text/javascript">
+APE.widget.HsvPicker.getById('hsv').init();
+</script>
+
+</body>
+</html>

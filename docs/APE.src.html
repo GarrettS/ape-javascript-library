@@ -1,0 +1,227 @@
+<html><head><meta http-equiv="content-type" content="text/html; charset=utf-8"> <style>
+	.KEYW {color: #933;}
+	.COMM {color: #bbb; font-style: italic;}
+	.NUMB {color: #393;}
+	.STRN {color: #393;}
+	.REGX {color: #339;}
+	.linenumber {border-right: 1px dotted #666; color: #666; font-style: normal;}
+	</style></head><body><pre><span class='linenumber'>  1</span> <span class="COMM">/**
+<span class='linenumber'>  2</span>  * @fileoverview
+<span class='linenumber'>  3</span>  * &lt;code>APE&lt;/code> provides core features, including namespacing and object creational aspects.
+<span class='linenumber'>  4</span>  * 
+<span class='linenumber'>  5</span>  * &lt;h3>APE JavaScript Library&lt;/h3>
+<span class='linenumber'>  6</span>  * &lt;p>
+<span class='linenumber'>  7</span>  * Released under Academic Free Licence 3.0.
+<span class='linenumber'>  8</span>  * &lt;/p>
+<span class='linenumber'>  9</span>  * 
+<span class='linenumber'> 10</span>  * @author Garrett Smith 
+<span class='linenumber'> 11</span>  */</span><span class="WHIT">
+<span class='linenumber'> 12</span> 
+<span class='linenumber'> 13</span> </span><span class="COMM">/** @name APE
+<span class='linenumber'> 14</span>  * @namespace */</span><span class="WHIT">
+<span class='linenumber'> 15</span> </span><span class="KEYW">if</span><span class="PUNC">(</span><span class="NAME">APE</span><span class="WHIT"> </span><span class="PUNC">!==</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="NAME">Error</span><span class="PUNC">(</span><span class="STRN">"APE is already defined."</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'> 16</span> </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">APE</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'> 17</span> </span><span class="WHIT">    </span><span class="WHIT">
+<span class='linenumber'> 18</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='linenumber'> 19</span>      * @memberOf APE
+<span class='linenumber'> 20</span>      * @description Prototype inheritance.
+<span class='linenumber'> 21</span>      * @param {Object} subclass 
+<span class='linenumber'> 22</span>      * @param {Object} superclass
+<span class='linenumber'> 23</span>      * @param {Object} mixin If present, &lt;var>mixin&lt;/var>'s own properties are copied to receiver 
+<span class='linenumber'> 24</span>      * using APE.mixin(subclass.prototoype, superclass.prototype).
+<span class='linenumber'> 25</span>      */</span><span class="WHIT">
+<span class='linenumber'> 26</span> </span><span class="WHIT">    </span><span class="NAME">extend</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">subclass</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">superclass</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">mixin</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'> 27</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="PUNC">(</span><span class="NAME">arguments.length</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="KEYW">return</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'> 28</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">f</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">arguments.callee</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">subp</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'> 29</span> </span><span class="WHIT">        </span><span class="NAME">f.prototype</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">superclass.prototype</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'> 30</span> </span><span class="WHIT">        </span><span class="NAME">subclass.prototype</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">subp</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">f</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'> 31</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="PUNC">(</span><span class="KEYW">typeof</span><span class="WHIT"> </span><span class="NAME">mixin</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="STRN">"object"</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="WHIT">
+<span class='linenumber'> 32</span> </span><span class="WHIT">            </span><span class="NAME">APE.mixin</span><span class="PUNC">(</span><span class="NAME">subp</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">mixin</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'> 33</span> </span><span class="WHIT">        </span><span class="NAME">subp.constructor</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">subclass</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'> 34</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">subclass</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'> 35</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='linenumber'> 36</span> 
+<span class='linenumber'> 37</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='linenumber'> 38</span>      * Shallow copy of properties; does not look up prototype chain. 
+<span class='linenumber'> 39</span>      * Copies all properties in s to r, using hasOwnProperty.
+<span class='linenumber'> 40</span>      * @param {Object} r the receiver of properties.
+<span class='linenumber'> 41</span>      * @param {Object} s the supplier of properties.
+<span class='linenumber'> 42</span>      * Accounts for JScript DontEnum bug for valueOf and toString.
+<span class='linenumber'> 43</span>      * @return {Object} r the receiver.
+<span class='linenumber'> 44</span>      */</span><span class="WHIT">
+<span class='linenumber'> 45</span> </span><span class="WHIT">    </span><span class="NAME">mixin</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">r</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">s</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'> 46</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">jscriptSkips</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="STRN">'toString'</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="STRN">'valueOf'</span><span class="PUNC">]</span><span class="PUNC">,</span><span class="WHIT">
+<span class='linenumber'> 47</span> </span><span class="WHIT">            </span><span class="NAME">prop</span><span class="PUNC">,</span><span class="WHIT">
+<span class='linenumber'> 48</span> </span><span class="WHIT">            </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">,</span><span class="WHIT">
+<span class='linenumber'> 49</span> </span><span class="WHIT">            </span><span class="NAME">skipped</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'> 50</span> </span><span class="WHIT">        </span><span class="KEYW">for</span><span class="PUNC">(</span><span class="NAME">prop</span><span class="WHIT"> </span><span class="KEYW">in</span><span class="WHIT"> </span><span class="NAME">s</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'> 51</span> </span><span class="WHIT">            </span><span class="KEYW">if</span><span class="PUNC">(</span><span class="NAME">s.hasOwnProperty</span><span class="PUNC">(</span><span class="NAME">prop</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="WHIT">
+<span class='linenumber'> 52</span> </span><span class="WHIT">                </span><span class="NAME">r</span><span class="PUNC">[</span><span class="NAME">prop</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">s</span><span class="PUNC">[</span><span class="NAME">prop</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'> 53</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='linenumber'> 54</span> </span><span class="WHIT">        </span><span class="COMM">// JScript DontEnum bug.</span><span class="WHIT">
+<span class='linenumber'> 55</span> </span><span class="WHIT">        </span><span class="KEYW">for</span><span class="PUNC">(</span><span class="WHIT"> </span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NAME">jscriptSkips.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">++</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'> 56</span> </span><span class="WHIT">            </span><span class="NAME">skipped</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">jscriptSkips</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'> 57</span> </span><span class="WHIT">            </span><span class="KEYW">if</span><span class="PUNC">(</span><span class="NAME">s.hasOwnProperty</span><span class="PUNC">(</span><span class="NAME">skipped</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="WHIT">
+<span class='linenumber'> 58</span> </span><span class="WHIT">                </span><span class="NAME">r</span><span class="PUNC">[</span><span class="NAME">skipped</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">s</span><span class="PUNC">[</span><span class="NAME">skipped</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'> 59</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='linenumber'> 60</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">r</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'> 61</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='linenumber'> 62</span> 
+<span class='linenumber'> 63</span> </span><span class="WHIT">    </span><span class="NAME">toString</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT"> </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="STRN">"[APE JavaScript Library]"</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='linenumber'> 64</span> 
+<span class='linenumber'> 65</span> </span><span class="WHIT">    </span><span class="COMM">/** Creational method meant for being cross-cut.
+<span class='linenumber'> 66</span>      * Uses APE.newApply to create 
+<span class='linenumber'> 67</span>      * @param {HTMLElement} el An element. If el does not have 
+<span class='linenumber'> 68</span>      * an ID, then an ID will be automatically generated, based on the 
+<span class='linenumber'> 69</span>      * constructor's (this) identifier, or, If this is anonymous, "APE".
+<span class='linenumber'> 70</span>      * @requires {Object} an object to be attached to as a property.
+<span class='linenumber'> 71</span>      * @aspect 
+<span class='linenumber'> 72</span>      * @scope {Function} that accepts an HTMLElement for 
+<span class='linenumber'> 73</span>      * its first argument. 
+<span class='linenumber'> 74</span>      * APE.getByNode is intended to be bouund to a constructor function.
+<span class='linenumber'> 75</span>      * @return &lt;code>{new this(el [,args...])}&lt;/code>
+<span class='linenumber'> 76</span>      */</span><span class="WHIT">
+<span class='linenumber'> 77</span> </span><span class="WHIT">    </span><span class="NAME">getByNode</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">el</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'> 78</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">id</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">el.id</span><span class="PUNC">,</span><span class="WHIT">
+<span class='linenumber'> 79</span> </span><span class="WHIT">            </span><span class="NAME">fName</span><span class="PUNC">;</span><span class="WHIT">        </span><span class="WHIT">
+<span class='linenumber'> 80</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">id</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'> 81</span> </span><span class="WHIT">            </span><span class="KEYW">if</span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">APE.getByNode._i</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="NAME">APE.getByNode._i</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'> 82</span> </span><span class="WHIT">            </span><span class="NAME">fName</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">APE.getFunctionName</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'> 83</span> </span><span class="WHIT">            </span><span class="KEYW">if</span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">fName</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="NAME">fName</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">"APE"</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'> 84</span> </span><span class="WHIT">            </span><span class="NAME">id</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">el.id</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">fName</span><span class="PUNC">+</span><span class="STRN">"_"</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">APE.getByNode._i</span><span class="PUNC">++</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'> 85</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='linenumber'> 86</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">this.hasOwnProperty</span><span class="PUNC">(</span><span class="STRN">"instances"</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="NAME">this.instances</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'> 87</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.instances</span><span class="PUNC">[</span><span class="NAME">id</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.instances</span><span class="PUNC">[</span><span class="NAME">id</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">APE.newApply</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">arguments</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">       </span><span class="WHIT">
+<span class='linenumber'> 88</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='linenumber'> 89</span> 
+<span class='linenumber'> 90</span> </span><span class="WHIT">    </span><span class="COMM">/** Tries to get a name of a function object, returns "" if anonymous. 
+<span class='linenumber'> 91</span>      */</span><span class="WHIT">
+<span class='linenumber'> 92</span> </span><span class="WHIT">    </span><span class="NAME">getFunctionName</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">fun</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'> 93</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="PUNC">(</span><span class="KEYW">typeof</span><span class="WHIT"> </span><span class="NAME">fun.name</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="STRN">"string"</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">fun.name</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'> 94</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">name</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">Function.prototype.toString.call</span><span class="PUNC">(</span><span class="NAME">fun</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">match</span><span class="PUNC">(</span><span class="REGX">/\s([a-z]+)\(/i</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'> 95</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">name</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">name</span><span class="PUNC">[</span><span class="NUMB">1</span><span class="PUNC">]</span><span class="PUNC">||</span><span class="STRN">""</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'> 96</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='linenumber'> 97</span> 
+<span class='linenumber'> 98</span> </span><span class="WHIT">    </span><span class="COMM">/** Creational method meant for being cross-cut.
+<span class='linenumber'> 99</span>      * @param {HTMLElement} el An element that has an id.
+<span class='linenumber'>100</span>      * @requires {Object} an object to bind to.
+<span class='linenumber'>101</span>      * @aspect 
+<span class='linenumber'>102</span>      * @description &lt;code>getById&lt;/code> must be assigned to a function constructor
+<span class='linenumber'>103</span>      * that accepts an HTMLElement's &lt;code>id&lt;/code> for 
+<span class='linenumber'>104</span>      * its first argument. 
+<span class='linenumber'>105</span>      * @example &lt;pre>
+<span class='linenumber'>106</span>      * function Slider(el, config){ }
+<span class='linenumber'>107</span>      * Slider.getById = APE.getById;
+<span class='linenumber'>108</span>      * &lt;/pre>
+<span class='linenumber'>109</span>      * This allows for implementations to use a factory method with the constructor.
+<span class='linenumber'>110</span>      * &lt;pre>
+<span class='linenumber'>111</span>      * Slider.getById( "weight", 1 );
+<span class='linenumber'>112</span>      * &lt;/pre>
+<span class='linenumber'>113</span>      * Subsequent calls to:
+<span class='linenumber'>114</span>      * &lt;pre>
+<span class='linenumber'>115</span>      * Slider.getById( "weight" );
+<span class='linenumber'>116</span>      * &lt;/pre>
+<span class='linenumber'>117</span>      * will return the same Slider instance.
+<span class='linenumber'>118</span>      * An &lt;code>instances&lt;/code> property is added to the constructor object
+<span class='linenumber'>119</span>      * that &lt;code>getById&lt;/code> is assigned to.
+<span class='linenumber'>120</span>      * @return &lt;pre>new this(id [,args...])&lt;/pre>
+<span class='linenumber'>121</span>      */</span><span class="WHIT">
+<span class='linenumber'>122</span> </span><span class="WHIT">    </span><span class="NAME">getById</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">id</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'>123</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">this.hasOwnProperty</span><span class="PUNC">(</span><span class="STRN">"instances"</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="NAME">this.instances</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>124</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.instances</span><span class="PUNC">[</span><span class="NAME">id</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.instances</span><span class="PUNC">[</span><span class="NAME">id</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">APE.newApply</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">arguments</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">       </span><span class="WHIT">
+<span class='linenumber'>125</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='linenumber'>126</span> </span><span class="WHIT">    </span><span class="WHIT">
+<span class='linenumber'>127</span> </span><span class="WHIT">    </span><span class="COMM">/** 
+<span class='linenumber'>128</span>      * @param {Function} fun constructor to be invoked.
+<span class='linenumber'>129</span>      * @param {Array} args arguments to pass to the constructor.
+<span class='linenumber'>130</span>      * Instantiates a constructor and uses apply().
+<span class='linenumber'>131</span>      */</span><span class="WHIT">
+<span class='linenumber'>132</span> </span><span class="WHIT">    </span><span class="NAME">newApply</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">fun</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">args</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'>133</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="PUNC">(</span><span class="NAME">arguments.length</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="KEYW">return</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>134</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">f</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">arguments.callee</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>135</span> 
+<span class='linenumber'>136</span> </span><span class="WHIT">        </span><span class="NAME">f.prototype</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">fun.prototype</span><span class="PUNC">;</span><span class="COMM">// Copy prototype.</span><span class="WHIT">
+<span class='linenumber'>137</span> </span><span class="WHIT">        </span><span class="NAME">f.prototype.constructor</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">fun</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>138</span> 
+<span class='linenumber'>139</span> </span><span class="WHIT">        </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">f</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>140</span> </span><span class="WHIT">        </span><span class="NAME">fun.apply</span><span class="PUNC">(</span><span class="NAME">i</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">args</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="COMM">// Apply the original constructor.</span><span class="WHIT">
+<span class='linenumber'>141</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>142</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='linenumber'>143</span> 
+<span class='linenumber'>144</span> </span><span class="WHIT">    </span><span class="COMM">/** Throws the error in a setTimeout 1ms.
+<span class='linenumber'>145</span>      *  Deferred errors are useful for Event Notification systems,
+<span class='linenumber'>146</span>      * Animation, and testing.
+<span class='linenumber'>147</span>      * @param {Error} error that occurred.
+<span class='linenumber'>148</span>      */</span><span class="WHIT">
+<span class='linenumber'>149</span> </span><span class="WHIT">    </span><span class="NAME">deferError</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">error</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">        </span><span class="WHIT">
+<span class='linenumber'>150</span> </span><span class="WHIT">        </span><span class="NAME">setTimeout</span><span class="PUNC">(</span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="NAME">error</span><span class="PUNC">;</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="NUMB">1</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>151</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='linenumber'>152</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>153</span> 
+<span class='linenumber'>154</span> </span><span class="PUNC">(</span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'>155</span> 
+<span class='linenumber'>156</span> </span><span class="WHIT">    </span><span class="NAME">APE.namespace</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">namespace</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>157</span> 
+<span class='linenumber'>158</span> </span><span class="WHIT">    </span><span class="COMM">/** 
+<span class='linenumber'>159</span>      * @memberOf APE
+<span class='linenumber'>160</span>      * @description creates a namespace split on "."
+<span class='linenumber'>161</span>      * does &lt;em>not&lt;/em> automatically add APE to the front of the chain, as YUI does.
+<span class='linenumber'>162</span>      * @param {String} s the namespace. "foo.bar" would create a namespace foo.bar, but only
+<span class='linenumber'>163</span>      * if that namespace did not exist.
+<span class='linenumber'>164</span>      * @return {Package} the namespace.
+<span class='linenumber'>165</span>      */</span><span class="WHIT">
+<span class='linenumber'>166</span> </span><span class="WHIT">    </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="NAME">namespace</span><span class="PUNC">(</span><span class="NAME">s</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'>167</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">packages</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">s.split</span><span class="PUNC">(</span><span class="STRN">"."</span><span class="PUNC">)</span><span class="PUNC">,</span><span class="WHIT">
+<span class='linenumber'>168</span> </span><span class="WHIT">            </span><span class="NAME">pkg</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">window</span><span class="PUNC">,</span><span class="WHIT">
+<span class='linenumber'>169</span> </span><span class="WHIT">            </span><span class="NAME">hasOwnProperty</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">Object.prototype.hasOwnProperty</span><span class="PUNC">,</span><span class="WHIT">
+<span class='linenumber'>170</span> </span><span class="WHIT">            </span><span class="NAME">qName</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">pkg.qualifiedName</span><span class="PUNC">,</span><span class="WHIT">
+<span class='linenumber'>171</span> </span><span class="WHIT">            </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">,</span><span class="WHIT">
+<span class='linenumber'>172</span> </span><span class="WHIT">            </span><span class="NAME">len</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">packages.length</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>173</span> </span><span class="WHIT">            </span><span class="NAME">name</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>174</span> </span><span class="WHIT">        </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NAME">len</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">++</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'>175</span> </span><span class="WHIT">            </span><span class="NAME">name</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">packages</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>176</span> 
+<span class='linenumber'>177</span> </span><span class="WHIT">            </span><span class="COMM">// Internet Explorer does not support </span><span class="WHIT">
+<span class='linenumber'>178</span> </span><span class="WHIT">            </span><span class="COMM">// hasOwnProperty on things like window, so call Object.prototype.hasOwnProperty.</span><span class="WHIT">
+<span class='linenumber'>179</span> </span><span class="WHIT">            </span><span class="COMM">// Opera does not support the global object or [[Put]] properly (see below)</span><span class="WHIT">
+<span class='linenumber'>180</span> </span><span class="WHIT">            </span><span class="KEYW">if</span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">hasOwnProperty.call</span><span class="PUNC">(</span><span class="NAME">pkg</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">name</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'>181</span> </span><span class="WHIT">                </span><span class="NAME">pkg</span><span class="PUNC">[</span><span class="NAME">name</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Package</span><span class="PUNC">(</span><span class="PUNC">(</span><span class="NAME">qName</span><span class="PUNC">||</span><span class="STRN">"APE"</span><span class="PUNC">)</span><span class="PUNC">+</span><span class="STRN">"."</span><span class="PUNC">+</span><span class="NAME">name</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>182</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="WHIT">
+<span class='linenumber'>183</span> </span><span class="WHIT">            </span><span class="NAME">pkg</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">pkg</span><span class="PUNC">[</span><span class="NAME">name</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>184</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='linenumber'>185</span> 
+<span class='linenumber'>186</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">pkg</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>187</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='linenumber'>188</span> 
+<span class='linenumber'>189</span> </span><span class="WHIT">    </span><span class="NAME">Package.prototype.toString</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'>190</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="STRN">"["</span><span class="PUNC">+</span><span class="NAME">this.qualifiedName</span><span class="PUNC">+</span><span class="STRN">"]"</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>191</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>192</span> </span><span class="WHIT">    </span><span class="WHIT">
+<span class='linenumber'>193</span> </span><span class="WHIT">    </span><span class="COMM">/* constructor Package
+<span class='linenumber'>194</span>      */</span><span class="WHIT">
+<span class='linenumber'>195</span> </span><span class="WHIT">    </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="NAME">Package</span><span class="PUNC">(</span><span class="NAME">qualifiedName</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'>196</span> </span><span class="WHIT">        </span><span class="NAME">this.qualifiedName</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">qualifiedName</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>197</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='linenumber'>198</span> </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>199</span> 
+<span class='linenumber'>200</span> </span><span class="PUNC">(</span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'>201</span> </span><span class="COMM">/**@class 
+<span class='linenumber'>202</span>  * A safe patch to the Object object. This patch addresses a bug that only affects Opera.
+<span class='linenumber'>203</span>  * &lt;strong>It does &lt;em>not&lt;/em> affect any for-in loops in any browser&lt;/strong> (see tests). 
+<span class='linenumber'>204</span>  */</span><span class="WHIT">
+<span class='linenumber'>205</span> </span><span class="NAME">Object</span><span class="PUNC">=</span><span class="NAME">window.Object</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>206</span> 
+<span class='linenumber'>207</span> </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">O</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">Object.prototype</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">hasOwnProperty</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">O.hasOwnProperty</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>208</span> </span><span class="KEYW">if</span><span class="PUNC">(</span><span class="KEYW">typeof</span><span class="WHIT"> </span><span class="NAME">window</span><span class="WHIT"> </span><span class="PUNC">!=</span><span class="WHIT"> </span><span class="STRN">"undefined"</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">hasOwnProperty</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="PUNC">!</span><span class="NAME">hasOwnProperty.call</span><span class="PUNC">(</span><span class="NAME">window</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="STRN">"Object"</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'>209</span> </span><span class="COMM">/** 
+<span class='linenumber'>210</span>  * @overrides Object.prototype.hasOwnProperty
+<span class='linenumber'>211</span>  * @method
+<span class='linenumber'>212</span>  * This is a conditional patch that affects some versions of Opera.
+<span class='linenumber'>213</span>  * It is perfectly safe to do this and does not affect enumeration.
+<span class='linenumber'>214</span>  */</span><span class="WHIT">
+<span class='linenumber'>215</span> </span><span class="WHIT">    </span><span class="NAME">Object.prototype.hasOwnProperty</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">p</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'>216</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="NAME">window</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">p</span><span class="WHIT"> </span><span class="KEYW">in</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">O</span><span class="PUNC">[</span><span class="NAME">p</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">!==</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">[</span><span class="NAME">p</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>217</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">hasOwnProperty.call</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">p</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>218</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>219</span> </span><span class="PUNC">}</span><span class="WHIT">
+<span class='linenumber'>220</span> </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span></pre></body></html>

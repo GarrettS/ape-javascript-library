@@ -1,0 +1,225 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+    <title>Animation Test</title>
+
+    <link rel="stylesheet" type="text/css" href="../../yui-test/build/logger/assets/logger.css" />
+    <link rel="stylesheet" type="text/css" href="../../yui-test/build/yuitest/assets/yuitest.css" />
+    <link rel="stylesheet" type="text/css" href="../../yui-test/assets/testlogger.css" />
+
+    <script type="text/javascript" src="../../yui-test/build/yahoo-dom-event/yahoo-dom-event.js"></script>
+    <script type="text/javascript" src="../../yui-test/build/logger/logger.js"></script>
+    <script type="text/javascript" src="../../yui-test/build/yuitest/yuitest-beta.js"></script>
+
+    <script type="text/javascript" src="../../../build/APE.js"></script>
+    <script type="text/javascript" src="../../../build/dom/style-f.js"></script>
+    <script type="text/javascript" src="../../../build/anim/Animation.js"></script>
+    <script type="text/javascript" src="../../../build/anim/StyleTransition.js"></script>
+    <script type="text/javascript" src="../../../build/color/ColorRGB.js"></script>
+
+</head>
+<body>
+<div id="testLogger"></div>
+<div id="c"></div>
+
+<script type="text/javascript">
+setTimeout(function(){
+
+var c = document.getElementById("c");
+
+var util = YAHOO.util,
+    Assert = util.Assert,
+    ArrayAssert = util.ArrayAssert,
+    dom = APE.dom,
+    StyleTransition = APE.anim.StyleTransition;
+
+/*
+Adapters = {
+    PositiveLengthTransitionAdapter : PositiveLengthTransitionAdapter,
+    ColorTransitionAdapter : ColorTransitionAdapter,
+    LengthTransitionAdapter : LengthTransitionAdapter,
+    FilterTransitionAdapter : FilterTransitionAdapter,
+    OpacityTransitionAdapter : OpacityTransitionAdapter,
+    FontWeightTransitionAdapter : FontWeightTransitionAdapter,
+    ThresholdTransitionAdapter : ThresholdTransitionAdapter,
+    ImmediateThresholdTransitionAdapter : ImmediateThresholdTransitionAdapter,
+    ClipTransitionAdapter : ClipTransitionAdapter
+};
+*/
+
+var styleTransitionTestCase = new YAHOO.tool.TestCase({
+
+    name : "Style Transition Tests",
+
+    tearDown : function () {
+        c.style.cssText = "";
+    },
+
+    testWidth : function() {
+        var css = { width: "100px" };
+
+        var st = new StyleTransition(c, css, .2);
+        st.start();
+        this.wait(function(){
+            Assert.areEqual("100px", c.style.width);
+        }, 300);
+    },
+    
+    testColor : function() {
+        var css = { color: "#ff0" };
+
+        var st = new StyleTransition(c, css, .2);
+        st.start();
+        this.wait(function(){
+            ArrayAssert.contains(c.style.color, ["#ffff00", "#FFFF00", "rgb(255, 255, 0)", "rgb(255,255,0)"]);
+        }, 300);
+    },
+
+    testMargin : function() {
+        var css = { margin: "-100px" };
+
+        var st = new StyleTransition(c, css, .2);
+        st.start();
+        this.wait(function(){
+
+            // Some browsers return shorthand value, others (Mozilla) return 
+            // a full value, even when the shorthand value is assigned.
+            ArrayAssert.contains(c.style.margin, ["-100px", "-100px -100px -100px -100px"]);
+        }, 300);
+    },
+
+    testOpacity : function() {
+        var css = { opacity: ".95" },
+            st = new StyleTransition(c, css, .2);
+        st.start();
+
+        this.wait(function(){
+
+            // Some browsers return shorthand value, others (Mozilla) return 
+            // a full value, even when the shorthand value is assigned.
+            var opacity = c.style.opacity;
+            if("filters"in c)
+                opacity = dom.getFilterOpacity(c);
+
+            Assert.areEqual(0.95, parseFloat(opacity));
+        }, 300);
+    },
+
+    testFontWeight: function() {
+        var css = { fontWeight : 100 },
+            st = new StyleTransition(c, css, .2);
+        st.start();
+
+        this.wait(function(){
+
+            // Some browsers return shorthand value, others (Mozilla) return 
+            // a full value, even when the shorthand value is assigned.
+            var fw = c.style.fontWeight;
+
+            Assert.areEqual(100, (fw));
+        }, 300);
+    },
+
+    testFontWeight: function() {
+        var css = { fontWeight : 100 },
+            st = new StyleTransition(c, css, .2);
+        st.start();
+
+        this.wait(function(){
+
+            // Some browsers return shorthand value, others (Mozilla) return 
+            // a full value, even when the shorthand value is assigned.
+            var fw = c.style.fontWeight;
+
+            Assert.areEqual(100, parseInt(fw));
+        }, 300);
+    },
+
+    testTextDecoration : function() {
+        var css = { textDecoration : "underline" },
+            st = new StyleTransition(c, css, .2);
+        st.start();
+
+        this.wait(function(){
+
+            // Some browsers return shorthand value, others (Mozilla) return 
+            // a full value, even when the shorthand value is assigned.
+            var textDecoration = c.style.textDecoration;
+
+            Assert.areEqual("underline", textDecoration);
+        }, 300);
+    },
+
+    testVisibility : function() {
+//ImmediateThresholdTransitionAdapter
+
+        // Hiding c will guarantee that we get an
+        // ImmediateThresholdTransitionAdapter.
+        c.style.visibility = "hidden";
+        
+        var css = { visibility : "inherit", display: "block" },
+            st = new StyleTransition(c, css, .2);
+        st.start();
+
+    // only wait for a little longer than the interval (default is around 17ms).
+    // The effect should appear immediately, because it is an 
+    // ImmediateThresholdTransitionAdapter.
+
+        this.wait(function(){
+
+            // Some browsers return shorthand value, others (Mozilla) return 
+            // a full value, even when the shorthand value is assigned.
+            var visibility = c.style.visibility,
+                display = c.style.display;
+
+            Assert.areEqual("inherit", visibility);
+            Assert.areEqual("block", display);
+        }, 30);
+    },
+
+    testClip : function() {
+    
+        var cs = c.style;
+        cs.position = "relative";
+        cs.height = "30px";
+        cs.width = "40px";
+
+        var css = { clip : "rect(10px 20px 20px -2px)" },
+            st = new StyleTransition(c, css, .2);
+
+        st.start();
+
+        this.wait(function(){
+
+            // Some browsers return shorthand value, others (Mozilla) return 
+            // a full value, even when the shorthand value is assigned.
+            var clip = c.style.clip;
+
+            ArrayAssert.contains(clip, ["rect(10px 20px 20px -2px)", "rect(10px, 20px, 20px, -2px)"]);
+        }, 300);
+    },
+
+    testToString : function() {
+        var css = { clip : "rect(10px 20px 20px -2px)" },
+            st = new StyleTransition(c, css, .2);
+
+        Assert.isTypeOf("string", st.toString());
+    }
+});
+
+//create the logger.
+var logger = new YAHOO.tool.TestLogger("testLogger");
+YAHOO.tool.TestRunner.add( styleTransitionTestCase );
+
+// run the tests, or put them in the TestRunner.
+if (parent && parent != window) {
+    YAHOO.tool.TestManager.load();
+} else {
+    YAHOO.tool.TestRunner.run();
+}
+}, 100);
+
+</script>
+</body>

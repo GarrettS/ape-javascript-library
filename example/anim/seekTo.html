@@ -1,0 +1,112 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+    <title>Animation Transitions: seekTo</title>
+<link type="text/css" rel="stylesheet" href="../resources/example.css"/>
+
+<style>
+div.anim-div button {
+    position: absolute; left: 0;
+    top: 2px; opacity: .8; 
+    width: 8em /* for IE */; 
+    display: block;
+    font: 12px sans-serif;
+    letter-spacing: 0;
+    text-align: left;
+    background-color: #eee;
+    border-style: outset;
+    color: #9fa;
+}
+
+div.anim-div {
+    background: #ddd; width: 90%; border: 1px solid #ccc;height: 40px;position: relative;
+    text-transform:small-caps;font-size:30px;letter-spacing: .5em; color: #ccc;text-align: center;
+    margin: 2px;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+}
+
+body {
+    background: #eee;
+}
+html {
+    border: 1px solid #ddd;
+}
+</style>
+
+</head>
+<body>
+
+<h1>Animation Transitions Example</h1>
+<div class='anim-div'>
+    seekTo &nbsp;example
+    <button id='linear' style="width: 10em;background-color: #131;border: 1px solid #030" 
+        onclick="seekToPosition()">seekToPosition();</button>
+</div>
+
+        <b style="display: block;margin: 4px 0;letter-spacing: 0;font-size: 12px;">position: 
+        <input type="text" value=".6" id="seekTo" style="padding:0" size="2" 
+        onblur="if(isFinite(this.value)) seekToPosition();"
+        onkeypress="if(event.keyCode === 13) seekToPosition();"/></b>
+
+<div class='anim-div'>
+    pause/resume <button id='pause' style="width: 10em;background-color: #131;border: 1px solid #030" 
+        onclick="pause()">pause();</button>
+</div>
+
+<script type="text/javascript" src="../../build/APE.js"></script>
+<script type="text/javascript" src="../../build/anim/Animation.js"></script>
+<script type="text/javascript" src="../../build/color/ColorRGB.js"></script>
+<script type="text/javascript" src="../../build/dom/style-f.js"></script>
+<script type="text/javascript" src="../../build/anim/StyleTransition.js"></script>
+
+<script type="text/javascript">
+setTimeout(function(){
+
+window.seekToPosition = seekToPosition;
+window.pause = pause;
+
+
+var newStyle = {
+    color: "#002",
+    backgroundColor: "#bfc",
+    width: "60em",
+    opacity: .4, // StyleAdapter takes care of opacity for IE.
+    borderWidth: "5px", // Shorthand values will not transition smoothly.
+    borderColor: "#36c", // keywords won't transition.
+    letterSpacing: "3em"
+};
+
+function Button(id) {
+    this.id = id;
+    this.anim = new APE.anim.StyleTransition(id, newStyle, 4, APE.anim.Transitions.accel);
+
+    // Helpful debugging info.
+    if(console && console.log)
+        console.log(this.anim);
+}
+Button.getById = APE.getById;
+
+function seekToPosition( ) {
+    var position = parseFloat(document.getElementById("seekTo").value, 10);
+    Button.getById( 'linear' ).anim.seekTo(position);
+};
+
+function pause() {
+    var button = Button.getById( 'linear' );
+    if(button.anim.paused) {
+        button.anim.resume( );
+        document.getElementById("pause").innerHTML = "pause";
+    }
+    else {
+        button.anim.pause( );
+        document.getElementById("pause").innerHTML = "resume";
+    }
+}
+}, 10);
+</script>
+</body>
+</html>

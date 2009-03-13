@@ -1,0 +1,848 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+	<meta name="generator" content="JsDoc Toolkit 1.0">
+	<title>JsDoc: </title>
+	<link rel=stylesheet href="default.css" type="text/css" media=screen>
+</head>
+
+<body>
+	<div class="content">
+		<div class="docs">
+		
+			<div class="sectionHead">Library: ColorRGB.js</div>
+			<div class="section overview">
+				<div class="itemTitle">
+					Overview
+				</div>
+				<div>	
+					<div class="desc">ColorRGB, ColorHSVFor color conversion and parsing of color strings to colors. Released under Academic Free Licence 3.0.</div>
+					<div class="itemTags">
+					<ul>
+						<li>source: <a href="src_07.html">ColorRGB.js</a></li>
+					
+						<li>author: Garrett Smith</li>
+					
+					</ul>
+					</div>
+				</div>
+			</div>
+			
+			<div class="sectionHead">Constructors</div>
+			
+			
+			<div class="section constructor">
+				<div class="itemTitle">
+					<a name="APE.color.ColorRGB"></a>
+					
+					
+					
+					APE.color.ColorRGB(<span class="signature">r</span>)
+					
+					
+				</div>
+				
+				
+					<div class="desc">ColorRGB</div>
+				
+				
+				
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							r
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				<div class="detailHead">methods</div>
+				
+					<ul class="details">
+						<li><a href="#APE.color.ColorRGB.toHSV">toHSV</a>()</li>
+					</ul>
+				
+					<ul class="details">
+						<li><a href="#APE.color.ColorRGB.toString">toString</a>()</li>
+					</ul>
+				
+					<ul class="details">
+						<li><a href="#APE.color.ColorRGB.toHexString">toHexString</a>()</li>
+					</ul>
+				
+					<ul class="details">
+						<li><a href="#APE.color.ColorRGB.equals">equals</a>(c)</li>
+					</ul>
+				
+					<ul class="details">
+						<li><a href="#APE.color.ColorRGB.isValid">isValid</a>()</li>
+					</ul>
+				
+					<ul class="details">
+						<li><a href="#APE.color.ColorRGB.valueOf">valueOf</a>()</li>
+					</ul>
+				
+				
+				
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			<div class="sectionHead">Namespaces</div>
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			<div class="sectionHead">Functions</div>
+			
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.color.ColorRGB.fromNumber"></a>
+					
+					
+					
+					APE.color.ColorRGB.fromNumber(<span class="signature">number</span>)
+					
+					
+				</div>
+				
+				
+					<div class="desc">Returns a ColorRGB based on a number.</div>
+				
+
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							uint
+						</td>
+						<td>
+							number
+						</td>
+						<td>
+							from 0 - 0xFFFFFF
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.color.ColorRGB.fromHexString"></a>
+					
+					
+					
+					APE.color.ColorRGB.fromHexString(<span class="signature">hex</span>)
+					
+					
+				</div>
+				
+				
+					<div class="desc">Returns a ColorRGB based on a hex string: #FFFFFF or #FFF</div>
+				
+
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							hex
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.color.ColorRGB.fromString"></a>
+					
+					
+					
+					APE.color.ColorRGB.fromString(<span class="signature">inp</span>)
+					
+					
+				</div>
+				
+				
+
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							inp
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.color.ColorRGB.fromRgbString"></a>
+					
+					
+					
+					APE.color.ColorRGB.fromRgbString(<span class="signature">rgbString</span>)
+					
+					
+				</div>
+				
+				
+					<div class="desc"></div>
+				
+
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							String
+						</td>
+						<td>
+							rgbString
+						</td>
+						<td>
+							- if invalid,  a null ColorRGB object is returned;
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.color.ColorRGB.blend"></a>
+					
+					
+					
+					APE.color.ColorRGB.blend(<span class="signature">rationalValue, mixedColor</span>)
+					
+					
+				</div>
+				
+				
+					<div class="desc">Takes a midpoint color between two colors. Useful for animation.</div>
+				
+
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							rationalValue
+						</td>
+						<td>
+							ratio [0..1] of endColor:startColor color for result.
+						</td> 
+					</tr>
+				
+					<tr>
+						<td class="type">
+							ColorRGB
+						</td>
+						<td>
+							mixedColor
+						</td>
+						<td>
+							- a color can be passed in for reuse (this is useful foranimation, to avoid creation of many objects).
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				<div class="detailHead">returns</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							APE.color.ColorRGB new color that is a blend ofrationalValue/1 new color and 1-rationalValue startColor.
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.color.ColorRGB.toHSV"></a>
+					
+					
+						<i><a href="#APE.color.ColorRGB" class="type">APE.color.ColorRGB.</a></i>toHSV(<span class="signature"></span>)
+					
+					
+					
+				</div>
+				
+				
+					<div class="desc"></div>
+				
+
+				
+				
+				
+				
+				
+				
+				
+				<div class="detailHead">returns</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							ColorHSV
+						</td>
+						<td>
+							color object.
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.color.ColorRGB.toString"></a>
+					
+					
+						<i><a href="#APE.color.ColorRGB" class="type">APE.color.ColorRGB.</a></i>toString(<span class="signature"></span>)
+					
+					
+					
+				</div>
+				
+				
+
+				
+				
+				
+				
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.color.ColorRGB.toHexString"></a>
+					
+					
+						<i><a href="#APE.color.ColorRGB" class="type">APE.color.ColorRGB.</a></i>toHexString(<span class="signature"></span>)
+					
+					
+					
+				</div>
+				
+				
+
+				
+				
+				
+				
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.color.ColorRGB.equals"></a>
+					
+					
+						<i><a href="#APE.color.ColorRGB" class="type">APE.color.ColorRGB.</a></i>equals(<span class="signature">c</span>)
+					
+					
+					
+				</div>
+				
+				
+
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							c
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.color.ColorRGB.isValid"></a>
+					
+					
+						<i><a href="#APE.color.ColorRGB" class="type">APE.color.ColorRGB.</a></i>isValid(<span class="signature"></span>)
+					
+					
+					
+				</div>
+				
+				
+
+				
+				
+				
+				
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.color.ColorRGB.valueOf"></a>
+					
+					
+						<i><a href="#APE.color.ColorRGB" class="type">APE.color.ColorRGB.</a></i>valueOf(<span class="signature"></span>)
+					
+					
+					
+				</div>
+				
+				
+
+				
+				
+				
+				
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.color.ColorHSV"></a>
+					
+					
+					
+					APE.color.ColorHSV(<span class="signature">h</span>)
+					
+					
+				</div>
+				
+				
+					<div class="desc"></div>
+				
+
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							uint
+						</td>
+						<td>
+							h
+						</td>
+						<td>
+							hue: 0-360 S: 0-1 V: 0-1
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.color.ColorHSV.rgbForHue"></a>
+					
+					
+					
+					APE.color.ColorHSV.rgbForHue(<span class="signature">hue</span>)
+					
+					
+				</div>
+				
+				
+					<div class="desc"></div>
+				
+
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							hue
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				<div class="detailHead">returns</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							ColorRGB
+						</td>
+						<td>
+							a fully saturated, bright-as-possible color for the hue;
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.color.ColorHSV.toRGB"></a>
+					
+					
+						<i><a href="#APE.color.ColorHSV" class="type">APE.color.ColorHSV.</a></i>toRGB(<span class="signature"></span>)
+					
+					
+					
+				</div>
+				
+				
+
+				
+				
+				
+				
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.color.ColorHSV.toString"></a>
+					
+					
+						<i><a href="#APE.color.ColorHSV" class="type">APE.color.ColorHSV.</a></i>toString(<span class="signature"></span>)
+					
+					
+					
+				</div>
+				
+				
+
+				
+				
+				
+				
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="sectionHead">Objects</div>
+			
+			
+			
+			
+			
+			
+			
+			
+			<div class="section object">
+				<div class="itemTitle">
+					<a name="APE.color.ColorRGB.hexPattern"></a>
+					
+					
+					
+					
+						APE.color.ColorRGB.hexPattern
+					
+					
+				</div>
+				
+				
+					<div class="desc">Color.RGB.rgbToHex rgbPatternthis pattern matches a String that looks like this: rgb( + int + "," + int + "," +int + ")"rgbPattern is used by rgbToHex, declared outside the function for performance -- compiled once by the engine.</div>
+				
+				
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+		</div>
+	</div>
+	<div class="finePrint">
+	Generated by <a href="http://jsdoctoolkit.org/" target="_blank">JsDoc Toolkit</a> 1.4.0 on Fri, 01 Feb 2008 20:53:32 GMT.
+	</div>
+</body>
+</html>

@@ -1,0 +1,298 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+        "http://www.w3.org/TR/2000/REC-xhtml1-20000126/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+	<title>drag demo</title>
+	<style type="text/css" media="Screen">
+/* <![CDATA[ */
+
+html { height: 100%; }
+
+body {
+	margin: 0;
+	padding: 0;
+	height: 100%;
+	background: #5f667f;
+ 	position: relative;
+}
+
+.label {
+	position: absolute;
+    width: auto;
+    min-width: 150%;
+	bottom: -1.4em;
+	margin: auto;
+	display: block;
+	font-size: 9px;
+ 	margin-left: -25%;
+	white-space: nowrap;
+	border-radius: 6px;
+	-moz-border-radius: 6px;
+	-webkit-border-radius: 6px;
+    background-color: #fff;
+}
+
+.folder-style {
+	position: relative;
+	text-align: center;
+ 	height: 48px;
+ 	width: 53px;
+	background: url(f_yellow.png) no-repeat center center;
+	font: caption;
+	color: #222;
+	cursor: default;
+	top: 20px;
+	left: 14px;
+	border-radius: 10px;
+	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
+}
+
+.cool-folder {
+	background-image: url(f_blue.png);
+}
+
+.mood-folder {
+	background-image: url(f_purple.png);
+}
+
+.interest-folder {
+	background-image: url(f_green.png);
+}
+
+* > html  .folder-style { /* for  mac  ie */
+	width: 70px;
+}
+
+/** 
+ * The activeDragClassName property of each folder.  
+ * Opera 9, Firefox, and Webkit all support :active, so this is purely a workaround for IE7
+ */
+.folder-style-active-drag {
+	background: #ffb;
+	color: #000;
+	border-color: #dcb;
+	opacity: .85;
+	filter: alpha(opacity=85);
+}
+
+.folder-focus  {
+	border: 1px solid #bbd0e6;
+}
+
+.folder-focus .label {
+	background: #fff;
+	color: #123;
+	border: 1px outset #bbd0e6;
+}
+
+.folder-selected {
+	border: 0;
+	background-color: #bbd0e6;
+}
+
+.folder-drag {
+	background-color: #D0E3F6;
+	opacity: .8;
+}
+
+
+.trash-style {
+	position: absolute;
+	left: 40px;
+	height: 82px;
+	width: 82px;
+	bottom: 0;
+	font: caption;
+	text-align: center;
+	cursor: default;
+	/** Icon courtesy of http://proenca.deviantart.com/ */
+	background: url(trash-empty.png) no-repeat 1px 1px;
+}
+
+* > html  .trash-style { /* for  mac  ie */
+	width: 36px;
+}
+
+.trash-full {
+	border-color: #222;
+	/** Icon courtesy of http://proenca.deviantart.com/ */
+	background: transparent url(trash.png) no-repeat !important;
+}
+
+.icon-drop-target-over {
+	border: 1px dotted #116;
+	background-position: 0 0;
+}
+
+#desktop {
+	position: relative;
+	top: 10px;
+	left: 40px; 
+	width: 400px;
+	height: 400px;
+	background: #fff;
+	padding: 10px;
+
+	/** This border will cause calculation problems in Opera.
+    Opera includes parentNode's border-width in offsetLeft/Top */
+	border: 12px solid #4f5c71;
+	border-radius: 12px;
+	-moz-border-radius: 12px;
+	-webkit-border-radius: 12px;
+}
+
+#sticky {
+	font-size: 10px;
+	position: absolute;
+	left: 500px;
+	top: 20px;
+	background-color: #f3f3f3;
+	padding: 4px;
+	border: 1px solid #4f5c71;
+	border-radius: 3px;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+}
+#sticky:hover {
+    border-color: #6f7799;
+}
+
+/** IE7 does not support :active. Opera 9, Firefox, and Webkit do. */
+#sticky:active{
+    background: #FFC;
+    opacity: .9;
+}
+
+/** This is different than :active, because the desktop might not be dragEnabled */
+.desktop-drag {
+    opacity: .985;
+    border-color: #859CBF!important;
+}
+
+#desktopToggle {
+    position: relative;
+    top: 12px;
+    background: #98A3CB;
+    -moz-user-select: none;
+}
+
+/* ]]> */
+</style>
+
+<script type="text/javascript">
+onload = function() {
+
+//-----------------------------------------------------------------------------
+// The only drop-target element (Trash). We'll make this draggable, too, later.
+
+	var trashEl = document.getElementById("trash");
+	var trashDropTarget = APE.drag.DropTarget.getByNode(trashEl);
+	trashDropTarget.dragOverClassName = "icon-drop-target-over";
+	
+	// event handlers for trash :ondrop, ondragover, ondragout. 
+	// When an object is dropped here and that object has trash as a dropTarget, the trash is notified.
+	trashDropTarget.ondrop = function(dropEvent) {
+		APE.dom.addClass(this.el, "trash-full");
+        //console.log(dropEvent);
+		dropEvent.dragObj.el.style.display = "none";
+        dropEvent.dragObj.select(false);
+	};
+
+//-----------------------------------------------------------------------------
+	
+
+/** These are the "folders" within the desktop. 
+ * Each instance has-a dragObj, so it's draggable.
+ * each instance: 
+ *   stays in the container (keepInContainer = true), 
+ *   can drag a copy (dragCopy = true), 
+ *   can be dragged with other objects in the same container (dragMultiple = true)
+ *   has trashDropTarget (addDropTarget(trashDropTarget))
+ */
+ 	Directory = function(el) {
+ 		
+ 		this.dragObj = APE.drag.Draggable.getByNode(el);
+ 		this.dragObj.keepInContainer = true; 
+ 		this.dragObj.dragCopy = true;
+ 		this.dragObj.dragMultiple = true;
+ 		
+		this.dragObj.addDropTarget(trashDropTarget);
+		
+		// Event handlers for onfocus, ondragstart,onblur et c.
+ 		this.dragObj.activeDragClassName = "folder-drag";
+ 		this.dragObj.focusClassName = "folder-focus";
+ 		this.dragObj.selectedClassName = "folder-selected";
+        //this.dragObj.setHandle(el.getElementsByTagName('span')[0]);
+	};
+	
+	// Let's instantiate some Directories.
+	new Directory(document.getElementById("UntitledFolder"));
+	new Directory(document.getElementById("UntitledFolder2"));
+	new Directory(document.getElementById("MusicFolder"));
+	new Directory(document.getElementById("PicturesFolder"));
+	new Directory(document.getElementById("MP3Folder"));
+
+    new Directory(trashEl);
+	
+    trashEl.ondblclick = function(){if(prompt("enter password", "********"))alert("permission denied");};
+
+    var desktop = APE.drag.Draggable.getByNode(document.getElementById("desktop"));
+    desktop.constraint = APE.drag.Draggable.constraints.HORZ;
+    APE.EventPublisher.get(desktop, "onfocus").addBefore(function(){return false;});
+    desktop.activeDragClassName = "desktop-drag";
+    desktop.keepInContainer = true;
+    desktop.isDragEnabled = false;
+
+    var t = document.getElementById('desktopToggle').firstChild;
+    t.checked = false;
+    t.onclick = function(){ desktop.isDragEnabled = !desktop.isDragEnabled; };
+	
+    var sticky = APE.drag.Draggable.getByNode(document.getElementById("sticky"));
+    sticky.keepInContainer = true;	
+};
+</script>
+</head>
+<body>
+	<pre id="sticky">
+ctrl + click.....select/deselect multiple objects
+Mac: cmd + click.....select/deselect multiple objects
+esc..............cancel dragging
+</pre>
+	
+<div id="desktop" tabindex="0">
+
+	<div id='MusicFolder' class="folder-style mood-folder" tabindex="1">
+		<span class='label'>Music</span>
+	</div>
+
+	<div id='PicturesFolder' class="folder-style cool-folder" style="left: 100px;" tabindex="2">
+		<span class='label'>Pictures</span>
+	</div>
+
+
+	<div id='UntitledFolder' class="folder-style" style="top: 90px;" tabindex="3">
+		<span class='label'>Something Boring</span>
+	</div>
+
+	<div id='UntitledFolder2' class="folder-style interest-folder" style="left: 100px; top: 90px;" tabindex="4">
+		<span class='label'>Documents</span>
+	</div>
+
+	<div id='MP3Folder' class="folder-style interest-folder" style="left: 190px; top: 90px;" tabindex="5">
+		<span class='label'>MP3</span>
+	</div>
+<div id='trash' class="trash-style" tabindex="6"></div>
+</div>
+
+<label id='desktopToggle'><input type='checkbox' />drag desktop horizontally</label>
+
+<p style='position: absolute; bottom: 12px; background: #fff;font: 10px arial, sans-serif;'>
+	Trash icons courtesy of <a href="http://proenca.deviantart.com/">Proenca</a>.
+</p>
+
+<script src="../../../build/ape-ep-dom.js" type="text/javascript"></script>
+<script src="../../../build/drag/Draggable.js" type="text/javascript"></script>
+</body>
+</html>

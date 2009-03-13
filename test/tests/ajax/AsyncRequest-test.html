@@ -1,0 +1,278 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+    <title>ajax.AsyncRequest Test</title>
+
+    <link rel="stylesheet" type="text/css" href="../../yui-test/build/logger/assets/logger.css" />
+    <link rel="stylesheet" type="text/css" href="../../yui-test/build/yuitest/assets/yuitest.css" />
+    <link rel="stylesheet" type="text/css" href="../../yui-test/assets/testlogger.css" />
+
+    <script type="text/javascript" src="../../yui-test/build/yahoo-dom-event/yahoo-dom-event.js"></script>
+    <script type="text/javascript" src="../../yui-test/build/logger/logger.js"></script>
+    <script type="text/javascript" src="../../yui-test/build/yuitest/yuitest-beta.js"></script>
+
+    <script type="text/javascript" src="../../../build/APE.js"></script>
+    <script type="text/javascript" src="../../../build/ajax/AsyncRequest.js"></script>
+
+</head>
+<body>
+<div id="testLogger"></div>
+<script type="text/javascript">
+(function(){
+var Assert = YAHOO.util.Assert,
+    AsyncRequest = APE.ajax.AsyncRequest;
+
+    // hrefStart = location.protocol + "//" + location.hostname + "/";
+
+    var asyncTestCase = new YAHOO.tool.TestCase({
+
+    name : "AsyncRequest Tests",
+
+    setUp : function () {
+        AsyncRequest.instances = {};
+    },
+
+    //---------------------------------------------------------------------
+    // Test methods - names must begin with "test"
+    //---------------------------------------------------------------------
+
+    // make sure that oncomplete fires {successful: true}
+    testDone : function() {
+        var req = AsyncRequest.getById("", {action:"data.json.txt", method:"GET"} ),
+            completed = false,
+            succeeded = false;
+
+        // When the request is done, resume the test.
+        req.oncomplete = function(e) {
+            completed = true;
+        };
+
+        req.onsucceed = function(e) {
+            succeeded = true;
+            Assert.isTrue(completed, "completed");
+            Assert.isTrue(succeeded, "succeeded");
+
+        };
+
+        // send the request.
+        req.send();
+        this.wait(function(){
+            Assert.isTrue(completed, "completed");
+            Assert.isTrue(succeeded, "succeeded");
+        }, 2000);
+    },
+
+    // make sure that oncomplete fires with successful:false
+    // with a bad uri.
+    testDoneFailure : function(){
+        var completed = false;
+
+        var req = AsyncRequest.getById("", {action: "/invalid: does - not - exist", method:"GET"} );
+
+        // When the request is done, resume the test.
+        req.oncomplete = function(doneEvent) {
+            Assert.isFalse(doneEvent.successful);
+            completed = true;
+        };
+
+        // send the request.
+        req.send();
+
+        function didNotComplete() {
+            if(!completed)
+                Assert.fail("xhr did not complete. (this may be a server issue)");
+        }
+        this.wait(didNotComplete, 2000);
+    },
+
+    // make sure that onsucceed fires when it should.
+    testSuccess : function(){
+        var req = AsyncRequest.getById("", {action:"data.json.txt", method:"GET"} );
+
+        var succeeded = false;
+
+        // When the request is done, resume the test.
+        req.onsucceed = function(actualRequest) {
+            var data = eval("("+actualRequest.responseText +")");
+            Assert.areEqual( data.name, "Garrett" );
+            succeeded = true;
+        };
+
+        req.onabort = function(){
+            Assert.fail("onabort() was called, but should not have been");
+        };
+
+        req.onfail = function() {
+            Assert.fail("onfail() was called, but should not have been");
+        };
+
+        // send the request.
+        req.send(null, 2400);
+
+        function didNotComplete() {
+            if(!succeeded)
+                Assert.fail("xhr did not complete.");
+        }
+        this.wait(didNotComplete, 2500);
+    },
+
+    // onsucceed should not fire with a bad URI.
+    testFailSuccess : function(){
+        var fired = false;
+        var req = AsyncRequest.getById("", {action: "/invalid: no - such - file", method:"GET"} );
+
+        // When the request is done, resume the test.
+        req.onsucceed = function(actualRequest) {
+            fired = true;
+        };
+
+        // send the request.
+        req.send();
+
+        // We only care to test that onsucceed did not fire.
+        function resume() {
+            Assert.isFalse(fired, "onsucceed fired, but should not have.");
+        }
+        this.wait(resume, 2400);
+    },
+
+    // make sure that onfail fires when it should.
+    testPassFail : function(){
+        var status = null;
+
+        var req = AsyncRequest.getById("", {action: "/invalid: no - such - file", method:"GET"} );
+
+        // When the request is done, resume the test.
+        req.onfail = function properFailure(actualRequest) {
+            status = actualRequest.status;
+        };
+
+        // send the request.
+        req.send();
+
+        // The request should have failed; it is an error if it didn't.
+        function didNotFail() {
+            Assert.isNotNull(200, "xhr did not fail, but should have.");
+            Assert.areNotEqual(200, status);
+        }
+        this.wait(didNotFail, 2400);
+    },
+
+    // Can we post data properly?
+    testPostData : function() {
+        var data = "first=Garrett&last=Smith";
+        var responseText = null;
+        var req = AsyncRequest.getById("", {action:"process.jsp", method:"POST"} );
+        req.onsucceed = function( xhr ) {
+            responseText = xhr.responseText;
+        };
+        req.send( data );
+        this.wait(function() {
+            Assert.areEqual("Smith, Garrett", responseText);
+        }, 2000);
+    },
+
+    // test timeout
+    testTimeout : function() {
+        var req = AsyncRequest.getById("", {action:"data.json.txt", method:"GET"} );
+        var timedOut = false;
+        var succeeded = false;
+        var completed = false;
+        var failed = false;
+
+        req.onsucceed = function succeed(xhr) {
+            succeeded = true;
+        };
+        req.onfail = function() {
+            Assert.fail("should not have failed.");
+        };
+        req.ontimeout = function() {
+            timedOut = true;
+        };
+        req.oncomplete = function() {
+            completed = true;
+        }
+        req.send(null, 1); // timeout immediately. Note: setting 0 will have no effect.
+        function didNotTimeout() {
+            Assert.isFalse(succeeded, "onsucceed should not have fired.");
+            Assert.isFalse(failed, "onfail should not have fired.");
+            Assert.isTrue(timedOut, "ontimeout should have fired, but did not.");
+            Assert.isTrue(completed, "completed should have fired, but did not.");
+        }
+        this.wait(didNotTimeout, 500);
+    },
+
+    testAbort : function() {
+        var req = AsyncRequest.getById("", {action:"data.json.txt", method:"POST"} ),
+            data = null,
+            failed = false,
+            completed = false,
+            aborted = false;
+
+        req.onsucceed = function( response ) {
+            data = eval("("+response.responseText +")");
+        };
+        req.oncomplete = function( doneEvent ) {
+            completed = true;
+        };
+
+        req.onfail = function( response ) {
+            failed = true;
+        };
+
+        req.onabort = function( req ) {
+            // can't get response text in IE:
+            // "the data necessary to complete this operation is not yet available"
+            //('responseText'in response ? response.responseText : null);
+            aborted = true;
+        };
+
+        req.send();
+        req.abort();
+        this.wait(function(){
+            Assert.isTrue(completed, "completed");
+            Assert.isTrue(aborted, "aborted");
+            Assert.isFalse(failed, "failed");
+            Assert.isNull(data, "data");
+        }, 100);
+    },
+
+    testConstructorToString : function() {
+        Assert.isTypeOf("string", APE.ajax.AsyncRequest.toString());
+    },
+
+    testToString : function() {
+        var req = AsyncRequest.getById("", {action:"data.json.txt", method:"POST" });
+        Assert.isTypeOf("string", req.toString());
+    },
+
+    testConfigData : function() {
+        var config = {action:"data.json.txt", method:"POST", id : 12 };
+        var req = AsyncRequest.getById("", config );
+        Assert.areSame(12, req.config.id, "config data missing.");
+    },
+
+    testGetById : function() {
+        var config = {action:"data.json.txt", method:"POST"  };
+        var req = AsyncRequest.getById("12", config );
+        var req2 = AsyncRequest.getById("12", config );
+        Assert.areSame(req, req2);
+    }
+});
+
+//create the logger
+new YAHOO.tool.TestLogger("testLogger");
+YAHOO.tool.TestRunner.add(asyncTestCase );
+
+// run the tests, or put them in the TestRunner.
+if (parent && parent != window) {
+    YAHOO.tool.TestManager.load();
+} else {
+    YAHOO.tool.TestRunner.run();
+}
+})();</script>
+</body>
+
+</html>

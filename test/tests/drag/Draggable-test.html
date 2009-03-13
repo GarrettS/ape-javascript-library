@@ -1,0 +1,700 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+    <title>Drag Test</title>
+
+    <link rel="stylesheet" type="text/css" href="../../yui-test/build/logger/assets/logger.css" />
+    <link rel="stylesheet" type="text/css" href="../../yui-test/build/yuitest/assets/yuitest.css" />
+    <link rel="stylesheet" type="text/css" href="../../yui-test/assets/testlogger.css" />
+
+    <script type="text/javascript" src="../../yui-test/build/yahoo-dom-event/yahoo-dom-event.js"></script>
+    <script type="text/javascript" src="../../yui-test/build/logger/logger.js"></script>
+    <script type="text/javascript" src="../../yui-test/build/yuitest/yuitest-beta.js"></script>
+
+    <script type="text/javascript" src="../../../build/ape-ep-dom.js"></script>
+    <script type="text/javascript" src="../../../build/drag/Draggable.js"></script>
+
+</head>
+<body style="position:relative;">
+<div id="testLogger"></div>
+<div id="template" style="height: 100%; width: 100%;">
+    <div id="testNode" style="position: relative; width: 200px" tabIndex="0">drag me.</div>
+    <div id="testNode2" style="position: relative; width: 200px" tabIndex="0">drag me.</div>
+    <div id="testNode3" style="position: relative; width: 200px" tabIndex="0">drag me.</div>
+</div>
+<script type="text/javascript">
+setTimeout(function(){
+
+// window.focus() seems to fix false failures 
+// with testNode.focus() not taking effect.
+self.focus();
+
+// fix for broken pageX in initMouseEvent
+document.body.style.margin= "0";
+
+
+var Assert = YAHOO.util.Assert,
+    StringAssert = YAHOO.util.StringAssert,
+    ArrayAssert = YAHOO.util.ArrayAssert,
+    dom = APE.dom,
+    Action = YAHOO.util.UserAction,
+    EventPublisher = APE.EventPublisher,
+    TestRunner = YAHOO.tool.TestRunner,
+    Draggable = APE.drag.Draggable,
+    fClass = "f",
+    sClass = "s",
+    aClass = "a",
+    testNode = document.getElementById('testNode'),
+    testNode2 = document.getElementById('testNode2'),
+    template = document.getElementById('template'),
+    templateHTML = template.innerHTML,
+    oldBodyCssText = document.body.style.cssText;
+
+var draggableTestCase = new YAHOO.tool.TestCase({
+
+    name : "Draggable Test Case",
+
+    // pageX broken, so all tests test target from 0, 0.
+
+    tearDown : function() {
+        Draggable.instanceDestructor();
+        Draggable.instanceDestructor.call(APE.drag.DropTarget);
+        testNode.className = "";
+        template.innerHTML = templateHTML;
+        document.body.style.cssText = oldBodyCssText;
+        testNode = document.getElementById('testNode');
+        testNode2 = document.getElementById('testNode2');
+    },
+
+    testFocusBlur : function() {
+        
+        testNode.className = "orig";
+        
+        var d = Draggable.getByNode( testNode ),
+            gotFocus = gotMousedown = false;
+
+        d.activeDragClassName = aClass;
+        d.selectedClassName = sClass;
+        d.focusClassName = fClass;
+
+        EventPublisher.add( testNode, "onfocus", function(){
+            gotFocus = true;
+        });
+        EventPublisher.add( testNode, "onmousedown", function(){
+            gotMousedown = true;
+        });
+
+        testNode.focus();
+        Action.mousedown( testNode );
+        Action.mouseup( testNode );
+
+        this.wait(function(){
+            
+            Assert.isTrue( gotMousedown, "didn't get mousedown" );
+            if( !gotFocus )
+                YAHOO.log( "this didn't get native focus with onfocus()", "warn", "TestRunner" );
+
+            // in case focus was somehow lost.
+            if(testNode.focus) testNode.focus()
+            StringAssert.contains( fClass, testNode.className );
+            StringAssert.contains( sClass, testNode.className );
+            StringAssert.doesNotContain( aClass, testNode.className, 
+            "Please keep your mouse offscreen and don't move it." );
+
+            this.wait(function(){
+                Action.mousedown( document );
+
+                this.wait(function(){
+                    if(testNode.blur)
+                        testNode.blur();
+                    Action.mouseup( document );
+                    this.wait(function(){
+                        Assert.areEqual( "orig", testNode.className );
+                    }, 10);
+                }, 10);
+            }, 10);
+        }, 10);
+
+    },
+    
+    testDragStart : function() {
+        
+        var d = Draggable.getByNode( testNode ),
+            ds = false,
+            bds = false;
+
+        d.activeDragClassName = aClass;
+        d.ondragstart = function() {
+            ds = true;
+        };
+
+        d.onbeforedragstart = function() {
+            bds = true;
+        };
+        if(testNode.focus)
+            testNode.focus();
+
+        Assert.isFalse( ds, "drag start should not have fired." );
+        Action.mousedown( testNode );
+        Assert.isTrue( bds, "onbeforedrag start should not have fired." );
+
+        Assert.isFalse( ds, "drag start <em>still</em> should not have fired." );
+
+        //screenX, screenY, clientX, clientY, altKey, ctrlKey, shiftKey, metaKey
+        Action.mousemove( document );
+        Action.mousemove( document, {clientX:101} );
+
+        Assert.isTrue( ds, "now drag start should have fired." );
+        StringAssert.contains( aClass, testNode.className );
+        Action.mouseup(document);
+    },
+
+    testDragClone : function() {
+        var d = Draggable.getByNode( testNode ),
+            ds = false,
+            bds = false,
+            left = testNode.style.left,
+            top = testNode.style.top;
+
+        d.activeDragClassName = aClass;
+        d.dragCopy = true;
+
+        if(testNode.focus)
+            testNode.focus();
+
+        Action.mousedown( testNode );
+
+        Action.mousemove( document );
+        Action.mousemove( document, {clientX:101} );
+
+        Assert.areEqual(left, testNode.style.left);
+        Assert.areEqual(top, testNode.style.top);
+        StringAssert.doesNotContain( aClass, testNode.className );        
+        StringAssert.contains( aClass, d.el.className );        
+        Action.mouseup(document);
+    },
+
+    testDisable : function() {
+        var d = Draggable.getByNode( testNode ),
+            ds = false,
+            bds = false,
+            left = testNode.style.left,
+            top = testNode.style.top;
+
+        d.isDragEnabled = false;
+
+        if(testNode.focus)
+            testNode.focus();
+
+        Action.mousedown( testNode );
+        
+        Action.mousemove( document );
+        Action.mousemove( document, {clientX:101} );
+
+        Assert.areEqual(left, testNode.style.left);
+        Assert.areEqual(top, testNode.style.top);
+        StringAssert.doesNotContain( aClass, testNode.className );        
+        Action.mouseup(document);
+    },
+
+
+    testToString : function() {
+        var d = Draggable.getByNode( testNode );
+        Assert.isString(d.toString());
+    },
+
+    testConstraintHorz : function() {
+
+        var d = Draggable.getByNode( testNode, Draggable.constraints.HORZ );
+        var coords = dom.getOffsetCoords( testNode );
+        
+        if(testNode.focus)
+            testNode.focus();
+        Action.mousedown( testNode, {clientX: 0, clientY: 0} );
+        Action.mousemove( document );
+        Action.mousemove( document, {clientX:83, clientY:111} );
+        var coords2 = dom.getOffsetCoords( testNode );
+    
+        Assert.areEqual( 83, coords2.x );
+        Assert.areEqual( coords.y, coords2.y, "y pos should not have changed." );
+    },
+
+    testConstraintVert : function() {
+
+        document.body.style.height="300px";
+        var d = Draggable.getByNode( testNode, Draggable.constraints.VERT );
+        var coords = dom.getOffsetCoords( testNode );
+        
+        testNode.focus();
+        Action.mousedown( testNode, {clientX: 0, clientY: 0} );
+        Action.mousemove( document );
+        Action.mousemove( document, {clientX:221, clientY:111} );
+        var coords2 = dom.getOffsetCoords( testNode );
+    
+        Assert.areEqual( 111, coords2.y );
+        Assert.areEqual( coords.x, coords2.x, "x pos should not have changed." );
+    },
+
+    testFromBottom : function() {
+
+        document.body.style.height="300px";
+
+        testNode.style.bottom = testNode.style.right = "0";
+        testNode.style.position = "absolute";
+        testNode.style.width = "120px";
+
+        var d = Draggable.getByNode( testNode, Draggable.constraints.VERT );
+
+        var coords = dom.getOffsetCoords( testNode ),
+            expectedTop = 300 - testNode.offsetHeight,
+            expectedLeft = document.body.offsetWidth - testNode.offsetWidth;
+
+        // Make sure the coords are correct.
+        Assert.areEqual( expectedTop, coords.y, 'coords y was wrong' );
+        Assert.areEqual( expectedLeft, coords.x, 'coords x was wrong' );
+
+        d._setIeTopLeft();
+
+        var dv = document.defaultView,
+            el = testNode,
+            s = el.style,
+            cs = el.currentStyle || 
+            (dv.getComputedStyle && dv.getComputedStyle(el,"")),
+
+            // If this throws an error in IE, it means failure of _setIeTopLeft();
+            top = testNode.style.top || cs.top,
+            left = testNode.style.left || cs.left;
+
+        Assert.areEqual( expectedTop, parseInt(top), 'style.top was wrong' );
+        Assert.areEqual( expectedLeft, parseInt(left), 'style.left was wrong' );
+    },
+
+    testSetHandle : function() {
+        
+        var handle = document.createElement("div");
+        
+        testNode.appendChild( handle );
+
+        var ts = testNode.style;
+        ts.width = ts.height = "440px";
+        ts.left = ts.top = '0';
+
+        document.body.style.width = "900px";
+        document.body.style.height = "900px";
+        
+        handle.style.height = "20px";
+        handle.id = "handle";
+
+        var d = Draggable.getByNode( testNode );
+        
+        d.setHandle( handle );
+
+        Action.mousedown(handle);
+
+        if(testNode.focus)
+            testNode.focus();
+        Action.mousemove(document);
+        Action.mousemove( document, {clientX: 33, clientY: 55} );
+
+        Assert.areEqual( d, APE.drag.DragHandlers.dO );
+
+        Assert.areEqual( 33, parseInt(testNode.style.left), "left was wrong");
+        Assert.areEqual( 55, parseInt(testNode.style.top), "top was wrong");
+    },
+
+    testSetHandleFail : function() {
+        
+        var handle = document.createElement("div");
+        
+        testNode.appendChild( handle );
+
+        var ts = testNode.style;
+        ts.width = ts.height = "440px";
+        ts.left = ts.top = '0';
+
+        document.body.style.width = "900px";
+        document.body.style.height = "900px";
+        
+        handle.style.height = "20px";
+        handle.style.top = "20px";
+
+        var d = Draggable.getByNode( testNode );
+        
+        d.setHandle( handle );
+
+        Action.mousedown(testNode);
+        Action.mousemove(document);
+        Action.mousemove( document, {clientX: 33, clientY: 55} );
+
+        Assert.areEqual( 0, parseInt(testNode.style.left), "left was not 0");
+        Assert.areEqual( 0, parseInt(testNode.style.top), "top was not 0");
+    },
+
+    testAutomaticDeselection : function() {
+        var d = Draggable.getByNode( testNode ),
+        d2 = Draggable.getByNode( testNode2 );
+
+        d.selectedClassName = d2.selectedClassName = sClass;
+
+        Action.mousedown( testNode );
+
+        Assert.areEqual( sClass, testNode.className, 'testNode class should be "' + sClass +'"' );
+        Action.mouseup( testNode );
+
+        this.wait(function(){
+            Action.mousedown( testNode2 );
+            StringAssert.isEmpty( testNode.className, 'testNode class should be empty' );
+        }, 10);
+    },
+
+    testAutomaticBlur : function() {
+        var d = Draggable.getByNode( testNode ),
+        d2 = Draggable.getByNode( testNode2 );
+
+        d.focusClassName = d2.focusClassName = fClass;
+        
+        if(testNode.focus) testNode.focus();
+        Action.mousedown( testNode );
+
+        Assert.areEqual( fClass, testNode.className, 'testNode class should have only "' + fClass +'"');
+
+        this.wait(function(){
+            if(testNode2.focus) testNode.focus();
+            Action.mousedown( testNode2 );
+            StringAssert.isEmpty( testNode.className, 'testNode class should be empty' );
+        }, 10);
+    },
+
+    testSelectGroupFailure : function() {
+        var d = Draggable.getByNode( testNode ),
+        d2 = Draggable.getByNode( testNode2 );
+
+        d.selectedClassName = d2.selectedClassName = sClass;
+        d.focusClassName = d2.focusClassName = fClass;
+
+        if(testNode.focus)
+            testNode.focus();
+        Action.mousedown( testNode );
+
+        var testNodeClass = testNode.className.split(' ');
+
+        this.wait(function(){
+            ArrayAssert.containsItems( [sClass, fClass], testNodeClass, 'testNode class incomplete' );
+    
+            // Try to select multiple items. This attempt should fail, 
+            // because dragMultiple is false!
+            Action.mousedown( testNode2, {ctrlKey : true, metaKey : true} );
+            
+            Action.mouseup( document );
+            this.wait(function(){
+                testNodeClass = testNode.className.split(' ');
+                ArrayAssert.containsItems( [sClass, fClass], testNodeClass, 'testNode class incomplete' );
+                
+                // c2 should contain nothing, because dragMultiple is false and 
+                // focus was prevented by user attempting the impossible.
+                StringAssert.isEmpty( testNode2.className );
+
+                
+                if(document.documentElement.focus) document.documentElement.focus();
+                Action.mousedown( document.documentElement, {clientX: 200, clientY : 430} );
+                Action.mouseup( document );
+                
+                this.wait(function(){
+                    StringAssert.isEmpty( testNode.className, 'testNode' );
+                    StringAssert.isEmpty( testNode2.className,'testNode2' );
+                }, 10);
+            }, 10);
+        }, 10);
+    },
+
+    testSelectGroup : function() {
+        var d = Draggable.getByNode( testNode ),
+        d2 = Draggable.getByNode( testNode2 );
+
+        d.selectedClassName = d2.selectedClassName = sClass;
+        d.focusClassName = d2.focusClassName = fClass;
+
+        d.dragMultiple = d2.dragMultiple = true;
+
+        if(testNode.focus)
+            testNode.focus();
+        Action.mousedown( testNode );
+
+        var testNodeClass = testNode.className.split(' ');
+
+        this.wait(function(){
+            Action.mouseup(document);
+            ArrayAssert.containsItems( [sClass, fClass], testNodeClass, 'testNode class incomplete' );
+    
+            // Try to select multiple items. This should succeed - dragMultiple = true.
+            Action.mousedown( testNode2, {ctrlKey : true, metaKey : true} );
+            
+            Action.mouseup( document );
+            this.wait(function(){
+
+                testNodeClass = testNode.className.split(' ');
+                var testNode2Class = testNode2.className.split(' ');
+                ArrayAssert.containsItems( [sClass], testNodeClass, 'testNode class incomplete' );
+                ArrayAssert.containsItems( [sClass, fClass], testNode2Class, 'testNode2 class incomplete' );
+                                
+                if(document.documentElement.focus) document.documentElement.focus();
+                Action.mousedown( document.documentElement, {clientX: 200, clientY : 430} );
+                Action.mouseup( document.documentElement );
+                
+                this.wait(function(){
+                    StringAssert.isEmpty( testNode.className, 'testNode' );
+                    StringAssert.isEmpty( testNode2.className,'testNode2' );
+                }, 10);
+            }, 10);
+        }, 10);
+    },
+   
+    testCarryGroup : function() {
+
+        // because it is in-flow, offset by it's prev sibling (testNode).
+        testNode2.style.top = "-20px";
+        testNode.style.height = "20px";
+
+        document.body.style.height = "900px"
+
+        var d = Draggable.getByNode( testNode ),
+            d2 = Draggable.getByNode( testNode2 );
+
+        d.dragMultiple = d2.dragMultiple = true;
+
+        Action.mousedown( testNode );
+        Action.mouseup( document );
+        Action.mousedown( testNode2, {ctrlKey:true, metaKey:true} );
+
+        Action.mousemove( document, {clientX: 10, clientY: 40});
+
+        Assert.areEqual("10px", testNode.style.left);
+        Assert.areEqual("20px", testNode2.style.top);
+    },
+
+    testReleaseGroup : function() {
+
+        var ESC = 27;
+
+        // because it is in-flow, offset by it's prev sibling (testNode).
+        testNode2.style.top = "-20px";
+        testNode.style.height = "20px";
+
+        document.body.style.height = "900px"
+
+        var d = Draggable.getByNode( testNode ),
+            d2 = Draggable.getByNode( testNode2 ),
+            glided = false,
+            glidended = false,
+            testNode3 = document.getElementById("testNode3");
+
+        d.dragMultiple = d2.dragMultiple = true;
+
+        var dt = d2.addDropTarget(testNode3);
+
+        dt.dragOverClassName = "DOC";
+
+        testNode3.style.left = "9px";
+        testNode3.style.top = "-1px";
+
+        d2.onglide = function() {
+            glided = true;
+        };
+
+        d.onglideend = function() {
+            glidended = true;
+        };
+
+
+        Action.mousedown( testNode );
+
+        Action.mouseup( document );
+        Action.mousedown( testNode2, {ctrlKey:true, metaKey:true} );
+
+        Action.mousemove( document, {clientX: 10, clientY: 40});
+        Assert.areEqual("10px", testNode.style.left);
+        Assert.areEqual("20px", testNode2.style.top);
+
+        StringAssert.contains("DOC", dt.el.className);
+        Action.keypress( document, {keyCode:ESC} );
+
+        this.wait(function(){
+            Assert.areEqual("0px", testNode.style.left);
+            Assert.areEqual("-20px", testNode2.style.top);
+            Assert.isTrue(glided, "d2 did not glide");
+            Assert.isTrue(glidended, "d did not fire onglideend");
+            StringAssert.doesNotContain("DOC", dt.el.className);
+        }, 200);
+    },
+
+    testKeepInContainerFail : function() {
+
+        var container = document.createElement('container'),
+            cstyle = container.style,
+            body = document.body;
+
+        document.body.appendChild( container );
+        
+        cstyle.width = cstyle.height = "100px";
+        cstyle.position = "relative";
+
+        testNode.style.width = "48px";
+        testNode.style.height = "18px";
+        testNode.style.border = "1px solid"; // 50 x 20.
+
+        var d = Draggable.getByNode( testNode );
+
+        d.container = body;
+        body.style.height = body.style.width = "200px";
+
+        Action.mousedown( testNode );
+        Action.mousemove( document, {clientX : 300, clientY : 300});
+
+    // We should be able to move an element outside its 
+    // container when keepInContainer is false (default)
+        Assert.areEqual( "300px", testNode.style.top, "testNode.style.top wrong");
+        Assert.areEqual( "300px", testNode.style.left, "testNode.style.left wrong");
+
+        Action.mouseup( document );
+    },
+
+    testKeepInContainer : function() {
+
+        var container = document.createElement('div'),
+            cstyle = container.style,
+            body = document.body;
+
+        document.body.appendChild( container );
+        
+        cstyle.width = cstyle.height = "100px";
+        cstyle.position = "relative";
+
+        testNode.style.width = "48px";
+        testNode.style.height = "18px";
+        testNode.style.border = "1px solid"; // 50 x 20.
+
+        var d = Draggable.getByNode( testNode );
+
+        d.container = body;
+        d.keepInContainer = true;
+        body.style.height = body.style.width = "200px";
+
+        Action.mousedown( testNode );
+        Action.mousemove( document, {clientX : 300, clientY : 300});
+
+        Assert.areEqual( "180px", testNode.style.top, "testNode.style.top wrong");
+        Assert.areEqual( "150px", testNode.style.left, "testNode.style.left wrong");
+
+        Action.mouseup( document );
+    },
+
+    testDropGroup : function() {
+        var d = Draggable.getByNode( testNode ),
+        d2 = Draggable.getByNode( testNode2 ),
+        testNode3 = document.getElementById('testNode3'),
+        gotDrop = false;
+
+        d.selectedClassName = d2.selectedClassName = sClass;
+        d.focusClassName = d2.focusClassName = fClass;
+
+
+        testNode3.style.position = "absolute";
+        testNode3.style.top = "100px";
+        testNode3.style.height = "20px";
+
+        var dt = d2.addDropTarget( testNode3 );
+        dt.ondrop = function(e) {
+            if(e.dragObj.id === testNode2.id) gotDrop = true;
+        };
+
+        d.dragMultiple = d2.dragMultiple = true;
+
+        if(testNode.focus)
+            testNode.focus();
+        Action.mousedown( testNode );
+
+        this.wait(function(){
+            Action.mouseup(document);
+            Assert.isTrue( d.isSelected, 'd was not selected' );
+    
+            // Try to select multiple items. This should succeed - dragMultiple = true.
+            Action.mousedown( testNode2, {ctrlKey : true, metaKey : true} );
+            Action.mousemove( document, {clientX : 120, clientY : 120 } );
+
+            this.wait(function(){
+                Assert.isTrue( d.isSelected, 'd was not selected' );
+                Assert.isTrue( d2.isSelected, 'd was not selected' );
+
+                // Mouseup occurs right on the bottom edge of testNode3.
+                Action.mouseup( document , {clientX : 120, clientY : 120} );
+                this.wait(function(){
+                    Assert.isTrue(gotDrop, "testNode2 did not get drop event");
+                }, 10);
+            }, 10);
+        }, 10);
+    },
+
+    testDragOver : function() {
+
+        var d = Draggable.getByNode( testNode ),
+        testNode3 = document.getElementById('testNode3'),
+        gotDragOver = gotDragOut = false;
+
+        d.selectedClassName = sClass;
+        d.focusClassName = fClass;
+
+        testNode3.style.position = "absolute";
+        testNode3.style.top = "100px";
+        testNode3.style.height = "20px";
+
+        var dt = d.addDropTarget( testNode3 );
+
+        dt.dragOverClassName = "dragOver";
+        dt.ondragover = function(e) {
+            gotDragOver = (e.dragObj.id === testNode.id);
+        };
+        dt.ondragout = function(e) {
+            gotDragOut = (e.dragObj.id === testNode.id);
+        };
+
+        if(testNode.focus)
+            testNode.focus();
+        Action.mousedown( testNode );
+        Action.mousemove( document, {clientX : 120, clientY : 120 } );
+        this.wait(function(){
+            Assert.areEqual('dragOver', dt.dragOverClassName, "drag over className didn't happen.");
+            Assert.isTrue( gotDragOver, "didn't get dragover.");
+            Action.mouseup( document );
+        }, 10);
+    },
+
+    testRemoveDropTarget : function() {
+        var d = Draggable.getByNode( testNode ),
+        testNode3 = document.getElementById('testNode3'),
+        gotDrop = false;
+
+        testNode3.style.position = "absolute";
+        testNode3.style.top = "100px";
+        testNode3.style.height = "20px";
+
+        var dt = d.addDropTarget( testNode3 );
+        d.removeDropTarget( dt );
+    }
+
+});
+
+// Set the TestRunner's logger by invoking a constructor
+new YAHOO.tool.TestLogger("testLogger");
+TestRunner.add( draggableTestCase );
+
+if (parent && parent != window) {
+    YAHOO.tool.TestManager.load();
+} else {
+    YAHOO.tool.TestRunner.run();
+}
+
+}, 100);</script>
+</body>
+</html>

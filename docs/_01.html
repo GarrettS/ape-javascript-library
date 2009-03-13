@@ -1,0 +1,1023 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+	<meta name="generator" content="JsDoc Toolkit 1.0">
+	<title>JsDoc: </title>
+	<link rel=stylesheet href="default.css" type="text/css" media=screen>
+</head>
+
+<body>
+	<div class="content">
+		<div class="docs">
+		
+			<div class="sectionHead">Library: APE.js</div>
+			<div class="section overview">
+				<div class="itemTitle">
+					Overview
+				</div>
+				<div>	
+					<div class="desc"><h3>APE JavaScript Library</h3></div>
+					<div class="itemTags">
+					<ul>
+						<li>source: <a href="src_01.html">APE.js</a></li>
+					
+						<li>author: Garrett Smith <p>Released under Academic Free Licence 3.0.The general idea: high degree of abstraction and modularity withminimal architecture and framework bloat. </p><p>Files under the DOM package, for example, deal with all sorts of various browser differences, but these are categorized into groups of activity-related objects.</p><h4>-f.js:</h4> <p>Files that are in lower-case and end in "-f" example: "classname-f.js" containfunctions that are added to the package of the folder they're contained in. This is keeps the global namespace clean, but doesn't add an extra object. By not adding an extra object, the overhead of an extra runtime lookup is avoided.</p><p><h4>-a.js</h4>Aspect files. These files are meant for cross-cutting (borrowing methods).</p><p>Files with an UpperCase name can be thought of as Modules or Classes. These files contain an object with the name of the file, and usually nothing else, unless something else is very tightly coupled to it.</p></li>
+					
+					</ul>
+					</div>
+				</div>
+			</div>
+			
+			<div class="sectionHead">Constructors</div>
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			<div class="sectionHead">Namespaces</div>
+			
+			
+			<div class="section object">
+				<div class="itemTitle">
+					<a name="APE"></a>
+					
+					
+					
+					APE
+					
+					
+				</div>
+				
+				
+					<div class="desc"></div>
+				
+				
+					<div class="desc">APE</div>
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				<div class="detailHead">methods</div>
+				
+					<ul class="details">
+						<li><a href="#APE.namespace">namespace</a>(s)</li>
+					</ul>
+				
+					<ul class="details">
+						<li><a href="#APE.extend">extend</a>(subclass, superclass, mixin)</li>
+					</ul>
+				
+					<ul class="details">
+						<li><a href="#APE.mixin">mixin</a>(r, s)</li>
+					</ul>
+				
+					<ul class="details">
+						<li><a href="#APE.crossCut">crossCut</a>(receiver, supplier, strings)</li>
+					</ul>
+				
+					<ul class="details">
+						<li><a href="#APE.toString">toString</a>()</li>
+					</ul>
+				
+					<ul class="details">
+						<li><a href="#APE.getByNode">getByNode</a>(el)</li>
+					</ul>
+				
+					<ul class="details">
+						<li><a href="#APE.getById">getById</a>(el)</li>
+					</ul>
+				
+					<ul class="details">
+						<li><a href="#APE.getFunctionName">getFunctionName</a>()</li>
+					</ul>
+				
+					<ul class="details">
+						<li><a href="#APE.addBefore">addBefore</a>(o, funcName, advice)</li>
+					</ul>
+				
+					<ul class="details">
+						<li><a href="#APE.addAfter">addAfter</a>(o, funcName, advice)</li>
+					</ul>
+				
+					<ul class="details">
+						<li><a href="#APE.isArray">isArray</a>(o)</li>
+					</ul>
+				
+					<ul class="details">
+						<li><a href="#APE.deferError">deferError</a>(error)</li>
+					</ul>
+				
+				
+				
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			<div class="sectionHead">Functions</div>
+			
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.namespace"></a>
+					
+					
+						<i><a href="#APE" class="type">APE.</a></i>namespace(<span class="signature">s</span>)
+					
+					
+					
+				</div>
+				
+				
+					<div class="desc">creates a namespace split on "."does <em>not</em> automatically add APE to the front of the chain, as YUI does.</div>
+				
+
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							String
+						</td>
+						<td>
+							s
+						</td>
+						<td>
+							the namespace. "foo.bar" would create a namespace foo.bar, but onlyif that namespace did not exists.
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.extend"></a>
+					
+					
+						<i><a href="#APE" class="type">APE.</a></i>extend(<span class="signature">subclass, superclass, mixin</span>)
+					
+					
+					
+				</div>
+				
+				
+					<div class="desc">Prototype inheritance</div>
+				
+
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							Object
+						</td>
+						<td>
+							subclass
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+					<tr>
+						<td class="type">
+							Object
+						</td>
+						<td>
+							superclass
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+					<tr>
+						<td class="type">
+							Object
+						</td>
+						<td>
+							mixin
+						</td>
+						<td>
+							If present, <var>mixin</var>'s own properties are copied to receiver using APE.mixin(subclass.prototoype, superclass.prototype).
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.mixin"></a>
+					
+					
+						<i><a href="#APE" class="type">APE.</a></i>mixin(<span class="signature">r, s</span>)
+					
+					
+					
+				</div>
+				
+				
+					<div class="desc">Shallow copy of properties; does not look up prototype chain.Copies all properties in s to r, using hasOwnProperty.</div>
+				
+
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							Object
+						</td>
+						<td>
+							r
+						</td>
+						<td>
+							the receiver of properties.
+						</td> 
+					</tr>
+				
+					<tr>
+						<td class="type">
+							Object
+						</td>
+						<td>
+							s
+						</td>
+						<td>
+							the supplier of properties.
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.crossCut"></a>
+					
+					
+						<i><a href="#APE" class="type">APE.</a></i>crossCut(<span class="signature">receiver, supplier, strings</span>)
+					
+					
+					
+				</div>
+				
+				
+					<div class="desc">explicit intertype declarations.</div>
+				
+
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							Object
+						</td>
+						<td>
+							receiver
+						</td>
+						<td>
+							this object recieves properties
+						</td> 
+					</tr>
+				
+					<tr>
+						<td class="type">
+							Object
+						</td>
+						<td>
+							supplier
+						</td>
+						<td>
+							supplies properties
+						</td> 
+					</tr>
+				
+					<tr>
+						<td class="type">
+							Array
+						</td>
+						<td>
+							strings
+						</td>
+						<td>
+							of property names to look for in supplier
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				
+				
+				<div class="detailHead">exceptions</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							Error
+						</td>
+						<td>
+							Error if any property in propsArray is not found in the supplier.
+						</td> 
+					</tr>
+				
+				</table>
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.toString"></a>
+					
+					
+						<i><a href="#APE" class="type">APE.</a></i>toString(<span class="signature"></span>)
+					
+					
+					
+				</div>
+				
+				
+
+				
+				
+				
+				
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.getByNode"></a>
+					
+					
+						<i><a href="#APE" class="type">APE.</a></i>getByNode(<span class="signature">el</span>)
+					
+					
+					
+				</div>
+				
+				
+					<div class="desc">Creational method meant for being cross-cut.We really need a new.apply()/construct.apply() method, but ES doesn't have it.</div>
+				
+
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							HTMLElement
+						</td>
+						<td>
+							el
+						</td>
+						<td>
+							An element that has an id.
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				<div class="detailHead">returns</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							new this(el)
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.getById"></a>
+					
+					
+						<i><a href="#APE" class="type">APE.</a></i>getById(<span class="signature">el</span>)
+					
+					
+					
+				</div>
+				
+				
+					<div class="desc">Creational method meant for being cross-cut.</div>
+				
+
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							HTMLElement
+						</td>
+						<td>
+							el
+						</td>
+						<td>
+							An element that has an id.
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				<div class="detailHead">returns</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							new this(el)
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.getFunctionName"></a>
+					
+					
+						<i><a href="#APE" class="type">APE.</a></i>getFunctionName(<span class="signature"></span>)
+					
+					
+					
+				</div>
+				
+				
+
+				
+				
+				
+				
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.addBefore"></a>
+					
+					
+						<i><a href="#APE" class="type">APE.</a></i>addBefore(<span class="signature">o, funcName, advice</span>)
+					
+					
+					
+				</div>
+				
+				
+					<div class="desc">Wraps o's method with advice.If the advice returns false, o's method won't fire.</div>
+				
+
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							Object
+						</td>
+						<td>
+							o
+						</td>
+						<td>
+							the object that has the method.
+						</td> 
+					</tr>
+				
+					<tr>
+						<td class="type">
+							string
+						</td>
+						<td>
+							funcName
+						</td>
+						<td>
+							o's named method.
+						</td> 
+					</tr>
+				
+					<tr>
+						<td class="type">
+							Function
+						</td>
+						<td>
+							advice
+						</td>
+						<td>
+							to wrap.If returning false, o's method won't fire;If returning an array, the array is passed to apply to o's method call.Otherwise, just call o with the original arguments it was called with (default).
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.addAfter"></a>
+					
+					
+						<i><a href="#APE" class="type">APE.</a></i>addAfter(<span class="signature">o, funcName, advice</span>)
+					
+					
+					
+				</div>
+				
+				
+					<div class="desc"></div>
+				
+
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							Object
+						</td>
+						<td>
+							o
+						</td>
+						<td>
+							The object whose method is to be advised.
+						</td> 
+					</tr>
+				
+					<tr>
+						<td class="type">
+							string
+						</td>
+						<td>
+							funcName
+						</td>
+						<td>
+							o's named method.
+						</td> 
+					</tr>
+				
+					<tr>
+						<td class="type">
+							Function
+						</td>
+						<td>
+							advice
+						</td>
+						<td>
+							to call after o[funcName] is called.
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				<div class="detailHead">returns</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							the returnValue of the main function for argument [0],plus the arguments to the original function.
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.isArray"></a>
+					
+					
+						<i><a href="#APE" class="type">APE.</a></i>isArray(<span class="signature">o</span>)
+					
+					
+					
+				</div>
+				
+				
+					<div class="desc">Can't rely on the constructor property across frames.</div>
+				
+
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							o
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.deferError"></a>
+					
+					
+						<i><a href="#APE" class="type">APE.</a></i>deferError(<span class="signature">error</span>)
+					
+					
+					
+				</div>
+				
+				
+
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							error
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="Object.hasOwnProperty"></a>
+					
+					
+						<i><a href="#Object" class="type">Object.</a></i>hasOwnProperty(<span class="signature">p</span>)
+					
+					
+					
+				</div>
+				
+				
+
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							p
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="String.trim"></a>
+					
+					
+						<i><a href="#String" class="type">String.</a></i>trim(<span class="signature"></span>)
+					
+					
+					
+				</div>
+				
+				
+					<div class="desc"></div>
+				
+
+				
+				
+				
+				
+				
+				
+				
+				<div class="detailHead">returns</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							String
+						</td>
+						<td>
+							trimmed copy of this string's whitespace (removes leading and trailing whitespace).
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="String.normalize"></a>
+					
+					
+						<i><a href="#String" class="type">String.</a></i>normalize(<span class="signature"></span>)
+					
+					
+					
+				</div>
+				
+				
+					<div class="desc"></div>
+				
+
+				
+				
+				
+				
+				
+				
+				
+				<div class="detailHead">returns</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							String
+						</td>
+						<td>
+							normalized, trimmed copy of this string's whitespace.
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="sectionHead">Objects</div>
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+		</div>
+	</div>
+	<div class="finePrint">
+	Generated by <a href="http://jsdoctoolkit.org/" target="_blank">JsDoc Toolkit</a> 1.4.0 on Sat, 02 Feb 2008 11:50:03 GMT.
+	</div>
+</body>
+</html>

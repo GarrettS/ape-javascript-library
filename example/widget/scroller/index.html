@@ -1,0 +1,91 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+    <title>Scroller</title>
+    <style type="text/css">
+    .scroller {
+      list-style: none;
+      width: 5000px;
+      position: relative;
+      margin: 0;
+      padding: 0;
+    }
+    
+    .scrollerFrame {
+      overflow: hidden;
+      float: left;
+      margin-left: 2px;
+    }
+    
+    .scroller li {
+      float: left;
+      border: 1px solid #eee;
+      margin: 0;
+      text-align: center;
+      padding: 1px;
+    }
+    
+    .scroller li div {
+      margin: 1px;
+      background: #f3f3f3;
+      width: 3em;
+      font-size: 14px;
+      padding: 12px;
+    }
+    #s1Frame { 
+      width: 216px;
+      border: 3px double #69b;
+    }
+    
+    .scrollerButton { 
+      float: left;
+      color: #00c;
+      cursor: default;
+      margin-top: 8px;
+      font-size: 26px;
+      user-select: none;
+      -moz-user-select: none;
+      -webkit-user-select: none;
+    }
+    .scrollerButtonNext {
+      float: right;
+    }
+    #s1Container {
+      width: 254px;
+    }
+    
+    .scrollerButton-disabled {
+      opacity: .4;
+    }
+    </style>
+</head>
+<body>
+<div class="scrollerContainer" id="s1Container">
+<div id="s1Prev" class="scrollerButton scrollerButton-disabled">&laquo;</div>
+<div id="s1Frame" class="scrollerFrame">
+    <ul id="s1" class="scroller">
+    <li><div>item 0</div></li>
+    <li><div>item 1</div></li>
+    <li><div>item 2</div></li>
+    <li><div>item 3</div></li>
+    <li><div>item 4</div></li>
+    <li><div>item 5</div></li>
+    <li><div>item 6</div></li>
+    <li><div>item 7</div></li>
+    <li><div>item 8</div></li>
+    <li><div>item 9</div></li>
+    </ul>
+</div>
+<div id="s1Next" class="scrollerButton scrollerButtonNext">&raquo;</div>
+</div>
+<script type="text/javascript" src="../../../build/APE.js"></script>
+<script type="text/javascript" src="../../../build/dom/Event.js"></script>
+<script type="text/javascript" src="../../../build/dom/classname-f.js"></script>
+<script type="text/javascript" src="../../../build/widget/scroller/Scroller.js"></script>
+<script type="text/javascript">
+  var s1 = document.getElementById('s1');
+  var scroller = APE.widget.Scroller.getById('s1', 1000);
+</script>
+</body>
+</html>

@@ -1,0 +1,123 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+    <title>Event Notification Test</title>
+<link type="text/css" rel="stylesheet" href="test.css"/>
+
+<script type="text/javascript" src="../build/APE.js"></script>
+<script type="text/javascript" src="../build/EventPublisher.js"></script>
+</head>
+<body>
+<h1>Event Notification Error Test</h1>
+<table border="1">
+    <thead>
+        <tr>
+            <th>Expected</th>
+            <th>Result</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td id='s'>ok</td><td id='s-result'>test</td>
+        </tr>
+        <tr>
+            <td id='sBefore'>ok-before</td><td id='sBefore-result'>test</td>
+        </tr>
+        <tr>
+            <td id='sAfter'>ok-after</td><td id='sAfter-result'>test</td>
+        </tr>
+    </tbody>
+</table>
+<h2>Instructions</h2>
+<p>Click the button once to run tests</p>
+<p>You should see exactly three javascript errors (expected 1 for each). There should be no red in the table above.</p>
+
+<p>
+    <button id="testButton">test</button>
+</p>
+
+<script type="text/javascript">
+
+errorcount=0;
+onerror = function(){ 
+    errorcount++;
+}
+
+var bodyClick = APE.EventPublisher.get( document.getElementById("testButton"), "onclick" );
+bodyClick.add( function() { setTimeout('showTestResult( "s" )', 500); } );
+bodyClick.add( function() { throw Error("bad (expected error)"); } );
+bodyClick.add( function() { setResult('s'); } );
+
+bodyClick.addBefore( function() { setTimeout('showTestResult( "sBefore" )', 500); } );
+bodyClick.addBefore( function() { throw Error("bad before (expected error)"); } );
+bodyClick.addBefore( function() { setResult('sBefore'); } );
+
+bodyClick.addAfter( function() { setTimeout('showTestResult( "sAfter" )', 500); } );
+bodyClick.addAfter( function() { throw Error("bad after (expected error)"); } );
+bodyClick.addAfter( function(){ setResult("sAfter"); } );
+bodyClick.addAfter( function(){ testCleanUp(); } );
+
+function setResult(expectedId) { 
+    document.getElementById(expectedId + '-result').firstChild.data = 
+    document.getElementById(expectedId).firstChild.data;
+}
+
+function showTestResult(id, errMsg) {
+    var expectedEl = document.getElementById(id);
+    var resultEl = document.getElementById(id+'-result');
+    if( expectedEl.firstChild.data == resultEl.firstChild.data ) {
+        resultEl.className = "passed";
+    }
+    else {
+        resultEl.className = "failed";
+        resultEl.firstChild.data = errMsg;
+    }
+}
+
+/** Check that all listeners were removed onunload. 
+ *  
+ **/
+function testCleanUp() {
+    
+    var regItems = [];
+    // populate the array.
+    iteratePublishers( populateArray );
+
+    // make sure Registry is not empty.
+    if(regItems.length == 0) {
+        throw Error("Registry was empty, but should have some document click handlers.");
+    }
+
+    // unregister all callbacks.
+    APE.EventPublisher.cleanUp();
+    
+    iteratePublishers( assertCallbacksRemoved );
+    
+    function assertCallbacksRemoved(publisher) {
+        if(!(publisher.type in publisher.src)) {
+            throw Error("src not found:" + publisher);
+        }
+        if(publisher.src[ publisher.type ] != null) {
+            throw Error("event handler callback was not removed, but should have been: " + 
+            publisher.src);
+        }
+    }
+
+    function populateArray(publisher) { regItems.push( publisher ); };
+}
+
+function iteratePublishers(command) {
+    for(var type in APE.EventPublisher.Registry) {
+        var publisherList = APE.EventPublisher.Registry[type];
+        for(var i = 0, len = publisherList.length; i < len; i++) {
+            command(publisherList[i]);
+        }
+    }
+}
+
+</script>
+
+</body>
+</html>

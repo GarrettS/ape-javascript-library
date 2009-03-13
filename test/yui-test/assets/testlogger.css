@@ -1,0 +1,74 @@
+/*
+Copyright (c) 2007, Yahoo! Inc. All rights reserved.
+Code licensed under the BSD License:
+http://developer.yahoo.net/yui/license.txt
+version: 2.4.0
+*/
+html {
+	background: #efc;
+}
+
+div.yui-log {
+	padding: 23px 4px 6px 4px;
+	background: #eee;
+	margin-left: 200px;
+	position: absolute;
+	margin-left: 200px;
+	border: 1px outset #cec;
+	right: 0;
+	margin-left:auto;
+	left: auto;
+}
+
+.yui-log pre {
+	white-space: normal;
+}
+
+.yui-log-categoryfilters {
+	position: relative;
+	top: -5px;
+}
+
+.yui-log label {
+	font-weight:800;
+	padding:0pt 4px;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+}
+
+.yui-log input {
+	margin:0pt 2px 0pt 5px;
+	position:relative;
+	vertical-align: top;
+}
+
+div.yui-log .yui-log-filtergrp {
+	padding: 0pt 1px;
+}
+
+/*
+.yui-log-container {position:relative;width:60em}
+.yui-log .yui-log-bd {height:auto; overflow:visible;}
+*/
+.yui-log-container {width:56em}
+.yui-log .yui-log-bd {height:60em}
+.yui-log .yui-log-btns {display:none;}
+.yui-log .yui-log-ft .yui-log-sourcefilters {visibility:hidden;}
+.yui-log .yui-log-hd {display:none;}
+.yui-log .yui-log-ft {position:absolute;top:0em;}
+
+.pass {
+    background-color: green;
+    font-weight: bold;
+    color: white;
+}
+.fail {
+    background-color: red;
+    font-weight: bold;
+    color: white;
+}
+.ignore {
+    background-color: #666;
+    font-weight: bold;
+    color: white;
+}

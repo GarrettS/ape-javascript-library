@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+    <title>DOM positioning Test</title>
+
+    <style type='text/css'>
+        #container {
+            position: absolute;
+            font-size: 0;
+        }
+
+        #c1 {
+            position: absolute;
+            height: 6px;
+            background: #00c;
+        }
+
+        #target {
+            position: absolute;
+            display: block;
+            height: 1px;
+            background:#FF0;
+        }
+    </style>
+</head>
+<body style="position: relative;margin:0;padding:0;">
+
+<!-- In IE, a relatively positioned descendant gets position offset by font-size -->
+<div id="container">
+    <div id="c1" style="">
+        <a id="target">a</a>
+    </div>
+</div>
+
+<script type='text/javascript'>(function(){
+var target = document.getElementById("target"),
+    container = document.getElementById("container"),
+    c1 = document.getElementById("c1");
+
+  // Any larger and Opera will fail.
+  var fontSize = 77,
+      emSize = 1.18;
+
+// Every element gets the same font size.
+  document.documentElement.style.fontSize = 
+    document.body.style.fontSize = 
+    c1.style.fontSize = 
+    container.style.fontSize = 
+    target.style.fontSize = fontSize + "px";
+
+// Assign borders.
+  container.style.borderLeft = 
+  c1.style.borderLeft = emSize + "em solid red";
+
+try {
+
+  var expectedBorderWidth = (fontSize * emSize),
+      borderLeftWidth = parseFloat(getComputedStyle(c1,'').borderLeftWidth );
+
+  alert(["expectedBorderWidth = " + expectedBorderWidth,
+        "borderLeftWidth = " + borderLeftWidth])
+
+  target.style.marginLeft = emSize + "em";
+  target.style.left = 0;
+
+  var expectedMargin = fontSize * emSize,
+      actualMargin = getComputedStyle(target,'').marginLeft;
+  alert(["expectedMargin: " + expectedMargin,
+        "actualMargin: " + actualMargin]);
+
+  var expected = Math.round(expectedBorderWidth * 3),
+      actual = target.getBoundingClientRect();
+
+  alert([expected, actual.left, 
+    expected == actual.left ? "PASS" : 
+    "getting computed coords from EM values failed."]);
+  } catch(ex) { alert(ex); }
+})();
+</script>
+</body>
+</html>

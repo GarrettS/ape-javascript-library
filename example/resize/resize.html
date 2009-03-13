@@ -1,0 +1,30 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+        "http://www.w3.org/TR/2000/REC-xhtml1-20000126/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+    <link rel="stylesheet" type="text/css" href="../../src/resize/css/resize.css" />
+
+    <title>resize demo</title>
+	<style type="text/css" media="Screen">
+        #example {
+            background: #CCAA00;
+        }
+	</style>
+</head>
+<body>
+
+    <div id="example">resize me</div>
+    <script type="text/javascript" src="../../src/ape-ep-dom.js"></script>
+    <script type="text/javascript" src="../../src/MouseTracker.js"></script>
+    <script type="text/javascript" src="../../src/resize/Resizable.js"></script>
+    <script type="text/javascript">
+setTimeout(function(){
+    var example = document.getElementById('example'),
+        Resizable = APE.resize.Resizable;
+
+    Resizable.getById('example');
+}, 10);
+    </script>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+<head>
+<title>APE Library Master Test Suite</title>
+    <link rel="stylesheet" type="text/css" href="../yui-test/build/logger/assets/logger.css" />
+    <link rel="stylesheet" type="text/css" href="../yui-test/build/yuitest/assets/yuitest.css" />
+    <link rel="stylesheet" type="text/css" href="../yui-test/assets/testlogger.css" />
+
+    <script type="text/javascript" src="../yui-test/build/yahoo-dom-event/yahoo-dom-event.js"></script>
+    <script type="text/javascript" src="../yui-test/build/logger/logger.js"></script>
+    <script type="text/javascript" src="../yui-test/build/yuitest/yuitest-beta.js"></script>
+
+</head>
+<body class="yui-skin-sam">
+<h1>APE Library Master Test Suite</h1>
+
+<div id="suite-results">
+    <button onclick="YAHOO.tool.TestManager.start();">Start Suite</button>
+    <button onclick="YAHOO.tool.TestManager.stop();">Stop Suite</button>
+    <div id="out"></div>
+</div>
+
+<script type="text/javascript">
+
+(function() {
+
+    function log(msg) {
+        var d=document, b=d.getElementById("out"), n=d.createElement("div");
+        if (b) {
+            n.appendChild(d.createTextNode(msg));
+            b.appendChild(n);
+        }
+    }
+
+    var TM = YAHOO.tool.TestManager;
+
+         TM.setPages([
+            "APE-test.html",
+            "EventPublisher-test.html",
+            "ajax/AsyncRequest-test.html", 
+            "color/ColorRGB-test.html", 
+            "dom/position-f-test.html",
+            "dom/style-f-test.html",
+            "dom/classname-f-test.html",
+            "dom/traversal-f-test.html",
+            "dom/viewport-f-test.html",
+            "dom/Event-test.html",
+            "dom/StyleSheetAdapter-test.html",
+            "form/Form-test.html",
+            "timing/Lock-a-test.html",
+            "anim/Animation-test.html",
+            "anim/StyleTransition-test.html",
+            "drag/Draggable-test.html",
+            "drag/Slider-test.html",
+             "widget/Calendar-test.html"
+        ]);
+
+        
+
+        TM.subscribe(TM.TEST_MANAGER_COMPLETE_EVENT, function testCompleted(o) {
+        log("# of pages passed: " + o.pages_passed);
+        log("# of pages failed: " + o.pages_failed + ": " + o.failed.join(", "));
+        log("# of tests passed: " + o.tests_passed);
+        log("# of tests failed: " + o.tests_failed);
+
+        // would like to have a tree for (o.page_results);
+        // log("Passed: " + o.passed.join(", "));
+        // log("Failed: " + o.failed.join(", "));
+    });
+
+
+})();
+
+</script>
+</body>
+</html>

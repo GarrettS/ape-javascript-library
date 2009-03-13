@@ -1,0 +1,217 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+	"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+	<title>JsDoc: String</title>
+	<link rel="stylesheet" href="default.css" type="text/css" media="screen">
+</head>
+
+<body>
+
+<table style="width: 100%" class="navbar">
+<tr>
+<td class="NavBar" valign="top"><font size="-2">SUMMARY:&nbsp;<a href="#field_summary">FIELD</a>&nbsp;|&nbsp;<a href="#constructor_summary">CONSTR</a>&nbsp;|&nbsp;<a href="#method_summary">METHOD</a></font></td>
+<td class="NavBar" valign="top"><font size="-2">DETAIL:&nbsp;<a href="#field_detail">FIELD</a>&nbsp;|&nbsp;<a href="#constructor_detail">CONSTR</a>&nbsp;|&nbsp;<a href="#method_detail">METHOD</a></font></td>
+</tr>
+</table>
+
+<h2>Class String</h2>
+
+
+<i>Defined in <a href="APE.src.html">APE.js</a></i>
+
+<p>
+Some simple additions to the String object.</p>
+
+
+
+	<li>author: Garrett Smith <p>Released under Academic Free Licence 3.0.The general idea: high degree of abstraction and modularity withminimal architecture and framework bloat. </p><p>The APE.dom package, for example, deals with all sorts of various browser implementationdifferences, but these are categorized into groups of activity-related objects.</p><h4>-f.js:</h4> <p>Files that are in lower-case and end in "-f" example: "classname-f.js" containfunctions that are added to the package of the folder they're contained in. This is keeps the global namespace clean, but doesn't add an extra object. By not adding an extra object, the overhead of an extra runtime lookup is avoided.Functions are first-class objects in JavaScript, there really is no need for an extra object to holdfunctions as "static methods" in a package.</p><p><h4>-a.js</h4>Aspect files. These files are meant for cross-cutting (borrowing methods).</p><p>Files with an UpperCase name can be thought of as Modules or Classes. These files contain an object with the name of the file, and usually nothing else, unless something else is very tightly coupled to it.</p></li>
+
+
+
+
+<hr>
+
+<!-- =========== FIELD SUMMARY =========== -->
+
+<!-- =========== END FIELD SUMMARY =========== -->
+
+
+<!-- ======== CONSTRUCTOR SUMMARY ======== -->
+<a name="constructor_summary"> </a>
+<table border="1" cellpadding="3" cellspacing="0" width="100%">
+<tr class="TableHeadingColor">
+	<th colspan=2>Constructor Summary</th>
+</tr>
+
+	<tr bgcolor="white" class="TableRowColor">
+	   <td>
+	
+		<code>
+		<b><a href="#String">String</a></b>()
+		</code>
+		  <br>
+		  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		  
+		  </td>
+	</tr>
+
+</table>
+&nbsp;
+<!-- ======== END CONSTRUCTOR SUMMARY ======== -->
+
+
+<!-- ========== METHOD SUMMARY =========== -->
+
+<a name="method_summary"> </a> 
+<table border="1" cellpadding="3" cellspacing="0" width="100%">
+	<tr class="TableHeadingColor">
+		<th colspan=2>
+			Method Summary
+		</th>
+	</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>
+				&nbsp;String
+				</code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#normalize">normalize</a></b>() </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>
+				&nbsp;String
+				</code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#trim">trim</a></b>() </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+ 
+			</td>
+		</tr>
+	
+</table>
+&nbsp;
+
+
+<!-- ========== EVENT SUMMARY =========== -->
+
+
+
+
+<!-- ========== INHERITED METHODS SUMMARY =========== -->
+
+<br/>
+
+<!-- ========== END INHERITED METHODS SUMMARY =========== -->
+
+<!-- ============ FIELD DETAIL START ========= -->
+
+<!-- ============ FIELD DETAIL END ========== -->
+
+
+<!-- ========= CONSTRUCTOR DETAIL START ======== -->
+<a name="constructor_detail"> </a>
+<table border="1" cellpadding="3" cellspacing="0" width="100%">
+   <tr class="TableHeadingColor">
+      <th colspan=1>
+	Constructor Detail
+      </th>
+   </tr>
+
+</table>
+
+<a name="String"> </a>
+<h3>String</h3>
+
+	<pre><b>String</b>()</pre>
+	<ul>
+		
+		
+	</ul>
+	
+	<!-- PARAMETERS START -->
+	
+	<!-- PARAMETERS END -->
+
+<hr/>
+<!-- END ADDITIONAL ATTRIBUTES  -->
+<!-- ========= CONSTRUCTOR DETAIL END ======== -->
+
+
+<!-- ============ METHOD DETAIL START ======= -->
+
+<a name="method_detail"> </a> 
+<table border="1" cellpadding="3" cellspacing="0" width="100%">
+	<tr class="TableHeadingColor">
+		<th colspan=1>
+			Method Detail
+		</th>
+	</tr>
+</table>
+
+
+	<a name="normalize"> </a> <h3>normalize</h3>
+		<pre><a href="String.html">String</a>&nbsp;<b>normalize</b>()</pre> 
+	<ul>
+		
+		
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	<ul>
+		<b>Returns:</b>
+		<ul>
+			<code><i><a href="String.html">String</a></i>&nbsp;</code>normalized, trimmed copy of this string's whitespace. 
+		</ul>
+	</ul>
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="trim"> </a> <h3>trim</h3>
+		<pre><a href="String.html">String</a>&nbsp;<b>trim</b>()</pre> 
+	<ul>
+		
+		
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	<ul>
+		<b>Returns:</b>
+		<ul>
+			<code><i><a href="String.html">String</a></i>&nbsp;</code>trimmed copy of this string's whitespace (removes leading and trailing whitespace). 
+		</ul>
+	</ul>
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+
+<!-- ============ METHOD DETAIL END ========== -->
+
+<!-- ============ EVENT DETAIL START ======= -->
+
+
+
+<!-- ============ EVENT DETAIL END ========== -->
+<div class="jsdoc_ctime">Documentation generated by <a href="http://jsdoctoolkit.org/" target="_parent">JsDoc Toolkit</a> 1.4.0 on Wed Feb 06 2008 02:16:30 GMT-0800 (PST)</div>
+</body>
+</html>

@@ -1,0 +1,143 @@
+ <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+    <title>Animation Test</title>
+    <link type="text/css" rel="stylesheet" href="../resources/example.css"/>
+
+<script type="text/javascript" src="../../build/APE.js"></script>
+<script type="text/javascript" src="../../build/anim/Animation.js"></script>
+<script type="text/javascript" src="../../build/dom/StyleSheetAdapter.js"></script>
+<style id="AnimationStyles">
+#blindsDiv {
+    margin: 0;
+    padding: 0;
+    width: 500px;
+    height: 500px;
+    position: absolute;
+}
+
+.blinds {
+    border-spacing: 0;
+    border: 0;
+    border-collapse: collapse;
+    width: 500px;
+    height: 500px;
+    background: pink;
+    table-layout: fixed;
+}
+
+.blinds tbody  {
+    height: 100%;
+}
+
+.blinds td {
+    position: relative;
+    padding: 0;
+    vertical-align: 0;
+    background: yellow;
+    vertical-align: middle;
+    height: 25px;
+    font-size:0;
+    width: 25px;
+}
+
+.blind {
+    position: relative;
+    padding: 0;
+    background: #ffD651;
+    display: block;
+    margin: auto;
+    height: 25px;
+}
+
+</style>
+
+</head>
+<body>
+<h1>Animation Test</h1>
+
+<script style="white-space:pre;font-family:monospace">
+
+var anim = new APE.anim.Animation(.5);
+
+function setUp() { 
+     
+    if(setUp.done) return;
+    setUp.done=true;
+
+    // A 20x20 grid. 
+    // Animate 400 blocks in .5 seconds?
+    var cellsPerRow = 20;
+    var numRows = 20;
+    var blindsDiv = document.getElementById("blindsDiv");
+    makeBlinds(blindsDiv, numRows, cellsPerRow);
+
+    var styleSheetAdapter = new APE.dom.StyleSheetAdapter( "AnimationStyles" );
+
+    var blindRowsRule = styleSheetAdapter.addRule("tr", 
+        "height: " + Math.round(blindsDiv.clientHeight/numRows) + "px");
+
+    // Create a rule to effect.
+    var blindTransition = styleSheetAdapter.addRule(".blind");
+
+    anim.onstart = function() {
+        
+    };
+
+    var T = APE.anim.Transitions; 
+
+    // Horizontal blinds.
+    var maxWidth = ( blindsDiv.clientWidth / cellsPerRow  );
+
+    // Vertical blinds.
+    var maxHeight = ( blindsDiv.clientHeight / numRows );
+
+    // Main loop for Animation. 
+    // set values on the newRule, based upon a blend of 
+    // start and end, using rationalValue.
+    anim.run = function(rationalValue) {
+        var newValue;
+        if(!!this.atStart) {
+            rationalValue = 1-rationalValue;
+            newValue = T.accel(rationalValue)
+        } else {
+            newValue = T.decel(rationalValue);
+        }
+         // Apply a transition.
+
+        var bs = blindTransition.style;
+
+        // Horizontal blinds
+        bs.width = Math.ceil(newValue * maxWidth ) + "px";
+
+        // Vertical blinds.
+        bs.height = Math.ceil(newValue * maxHeight) + "px";
+    };
+
+    anim.onend = function() {
+        // start again.
+        var pause = this.atStart ? 2 : .3;
+        setTimeout(function(){anim.start();}, pause * 1000);
+        this.atStart = !this.atStart;
+   };
+
+    function makeBlinds(blindsDiv, numRows, numCols) {
+        var s = "<table class='blinds'><tbody>\n";
+        var e = "</tbody></table>";
+        var join = Array.prototype.join;
+        var td = join.call({length:numCols+1}, "<td><b class='blind'></b></td>");
+        var trs = join.call({length:(numRows||0)+1}, "<tr>"+td+"</tr>\n")        
+        var html = s + trs + e;
+        blindsDiv.innerHTML = html;
+    }
+};
+
+</script>
+<button id='success' onclick="setUp();anim.start()">start();</button>
+<button id='success' onclick="anim[anim.paused ? 'resume' : 'pause']()">pause/resume</button>
+
+<div id="blindsDiv"></div>
+</body>
+</html>

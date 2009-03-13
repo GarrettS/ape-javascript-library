@@ -1,0 +1,168 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+    <title>APE Core Test</title>
+    <link rel="stylesheet" type="text/css" href="../../yui-test/build/logger/assets/logger.css" />
+    <link rel="stylesheet" type="text/css" href="../../yui-test/build/yuitest/assets/yuitest.css" />
+    <link rel="stylesheet" type="text/css" href="../../yui-test/assets/testlogger.css" />
+
+    <script type="text/javascript" src="../../yui-test/build/yahoo-dom-event/yahoo-dom-event.js"></script>
+    <script type="text/javascript" src="../../yui-test/build/logger/logger.js"></script>
+    <script type="text/javascript" src="../../yui-test/build/yuitest/yuitest-beta.js"></script>
+
+    <script type="text/javascript" src="../../../build/APE.js"></script>
+    <script type="text/javascript" src="../../../build/aop/Advice.js"></script>
+</head>
+<body>
+<div id="testLogger"></div>
+<script type="text/javascript">
+(function() {
+var Assert = YAHOO.util.Assert;
+var Advice = APE.aop.Advice;
+
+var adviceTest = new YAHOO.tool.TestCase({
+
+    name : "APE advice test",
+
+    // Gets called before each test.
+    setUp : function() {
+        var o = {
+            a : null,
+            b : 10,
+            setA : function(a) {
+                this.a = a;
+            },
+
+            // we need this method to test afterAdvice.
+            getAPlusOther : function(other) {
+                return this.a + other; 
+            }
+        };
+        this.testObject = o;
+    },
+
+    testAddBeforeDontProceed : function() {
+
+	/** addBefore(o, funcName, advice);
+     *
+	 * Wraps o's method with advice.
+	 * If the advice returns false, o's method won't fire.
+	 *
+	 * @param {Object} o the object that has the method.
+	 * @param {string} funcName o's named method.
+	 * @param {Function} advice to wrap.
+	 * If returning false, o's method won't fire;
+	 * If returning an array, the array is passed to apply to o's method call.
+	 */
+
+        Advice.addBefore(this.testObject, "setA", setBDontProceed);
+            
+        function setBDontProceed(a) { 
+            this.b = a; // b should now be the value of a.
+
+            // don't proceed;
+            return false; // Don't set a.
+        }
+
+        this.testObject.setA(12);
+        
+        Assert.isNull(this.testObject.a);
+        Assert.areEqual(12, this.testObject.b);
+    },
+
+    // It is important that host methods can be advised, too.
+    testBeforeHostMethod : function() {
+
+        window.scrollTo(0, 0);
+        var y;
+        Advice.addBefore(window, 'scrollTo', getCoords);
+        window.scrollTo(2, 7);
+
+        function getCoords() {
+            YAHOO.log(arguments[0]+'', 'info', "TestRunner");
+            y = arguments[1];
+        }
+
+        Assert.areEqual(7, y);
+    },
+
+
+    testAddBeforeProceedWithAdvice : function() {
+
+	/** addBefore(o, funcName, advice);
+     *
+	 * Wraps o's method with advice.
+	 * If the advice returns false, o's method won't fire.
+	 *
+	 * @param {Object} o the object that has the method.
+	 * @param {string} funcName o's named method.
+	 * @param {Function} advice to wrap.
+	 * If returning false, o's method won't fire;
+	 * If returning an array, the array is passed to apply to o's method call.
+	 */
+
+        Advice.addBefore(this.testObject, "setA", setBProceedWithAdvice);
+            
+
+        // We want to proceed with an array to 
+        // pass to apply
+        function setBProceedWithAdvice(a) { 
+            this.b = a; // b should now be the value of a.
+            var newValue = a + a;
+            return [newValue]; // Pass the argument through.
+        }
+
+        this.testObject.setA(1);
+        
+        Assert.areEqual(1, this.testObject.b); // b should be take the param.
+        Assert.areEqual(2, this.testObject.a); // a should be the param doubled.
+    },
+
+    testAddAfter : function() {
+        var input, output;
+
+        // This advice just checks the arguments to verify 
+        // that the first argument is the input to getAPlusOther and the second
+        // argument is the return of setAPlusOther.
+        function afterAdvice(returnValue, a) { 
+            input = a, output = returnValue;
+        }
+        // attach the advice. 
+        Advice.addAfter(this.testObject, "getAPlusOther", afterAdvice);
+
+        this.testObject.a = 1;
+        // call the method. 
+        var r = this.testObject.getAPlusOther(1);
+        
+        Assert.areEqual(1, input);
+        Assert.areEqual(2, output);
+    },
+   
+    testIsArray : function() {
+        Assert.isTrue(Advice.isArray( [] ));
+
+        // Opera bug: Opera actually converts arguments 
+        // to an array, but only when you pass |arguments| to
+        // another function.
+        // Assert.isFalse(Advice.isArray( arguments ));
+
+        Assert.isFalse(Advice.isArray( {length:1} ));
+    }
+});
+
+var logger = new YAHOO.tool.TestLogger("testLogger");
+
+YAHOO.tool.TestRunner.add( adviceTest );
+ //run the tests
+if (parent && parent != window) {
+    YAHOO.tool.TestManager.load();
+} else {
+    YAHOO.tool.TestRunner.run();
+}
+})();
+ </script>
+</body>
+
+</html>

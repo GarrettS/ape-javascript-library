@@ -1,0 +1,518 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+	<meta name="generator" content="JsDoc Toolkit 1.0">
+	<title>JsDoc: AsyncRequest.js</title>
+	<link rel=stylesheet href="default.css" type="text/css" media=screen>
+</head>
+
+<body>
+	<div class="content">
+		<div class="docs">
+		
+			<div class="sectionHead">Library: AsyncRequest.js</div>
+			<div class="section overview">
+				<div class="itemTitle">
+					Overview
+				</div>
+				<div>	
+					<div class="desc"></div>
+					<div class="itemTags">
+					<ul>
+						<li>source: <a href="src_03.html">AsyncRequest.js</a></li>
+					
+					</ul>
+					</div>
+				</div>
+			</div>
+			
+			<div class="sectionHead">Constructors</div>
+			
+			
+			<div class="section constructor">
+				<div class="itemTitle">
+					<a name="APE.ajax.AsyncRequest"></a>
+					
+					
+					
+					APE.ajax.AsyncRequest(<span class="signature">uri, httpMethod</span>)
+					
+					
+				</div>
+				
+				
+					<div class="desc"></div>
+				
+				
+				
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							uri
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							httpMethod
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				<div class="detailHead">methods</div>
+				
+					<ul class="details">
+						<li><a href="#APE.ajax.AsyncRequest.onabort">onabort</a>()</li>
+					</ul>
+				
+					<ul class="details">
+						<li><a href="#APE.ajax.AsyncRequest.oncomplete">oncomplete</a>()</li>
+					</ul>
+				
+					<ul class="details">
+						<li><a href="#APE.ajax.AsyncRequest.onsucceed">onsucceed</a>()</li>
+					</ul>
+				
+					<ul class="details">
+						<li><a href="#APE.ajax.AsyncRequest.onfail">onfail</a>()</li>
+					</ul>
+				
+					<ul class="details">
+						<li><a href="#APE.ajax.AsyncRequest.ontimeout">ontimeout</a>()</li>
+					</ul>
+				
+					<ul class="details">
+						<li><a href="#APE.ajax.AsyncRequest.send">send</a>(data)</li>
+					</ul>
+				
+					<ul class="details">
+						<li><a href="#APE.ajax.AsyncRequest.abort">abort</a>()</li>
+					</ul>
+				
+					<ul class="details">
+						<li><a href="#APE.ajax.AsyncRequest.toString">toString</a>()</li>
+					</ul>
+				
+					<ul class="details">
+						<li><a href="#APE.ajax.AsyncRequest._setUpReadyStateChangeHandler">_setUpReadyStateChangeHandler</a>()</li>
+					</ul>
+				
+				
+				
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			<div class="sectionHead">Namespaces</div>
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			<div class="sectionHead">Functions</div>
+			
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.ajax.AsyncRequest.toString"></a>
+					
+					
+					
+					APE.ajax.AsyncRequest.toString(<span class="signature"></span>)
+					
+					
+				</div>
+				
+				
+
+				
+				
+				
+				
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.ajax.AsyncRequest.onabort"></a>
+					
+					
+						<i><a href="#APE.ajax.AsyncRequest" class="type">APE.ajax.AsyncRequest.</a></i>onabort(<span class="signature"></span>)
+					
+					
+					
+				</div>
+				
+				
+					<div class="desc">onabort fires before oncomplete()</div>
+				
+
+				
+				
+				
+				
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.ajax.AsyncRequest.oncomplete"></a>
+					
+					
+						<i><a href="#APE.ajax.AsyncRequest" class="type">APE.ajax.AsyncRequest.</a></i>oncomplete(<span class="signature"></span>)
+					
+					
+					
+				</div>
+				
+				
+
+				
+				
+				
+				
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.ajax.AsyncRequest.onsucceed"></a>
+					
+					
+						<i><a href="#APE.ajax.AsyncRequest" class="type">APE.ajax.AsyncRequest.</a></i>onsucceed(<span class="signature"></span>)
+					
+					
+					
+				</div>
+				
+				
+					<div class="desc">oncomplete fires before onsucceed()</div>
+				
+
+				
+				
+				
+				
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.ajax.AsyncRequest.onfail"></a>
+					
+					
+						<i><a href="#APE.ajax.AsyncRequest" class="type">APE.ajax.AsyncRequest.</a></i>onfail(<span class="signature"></span>)
+					
+					
+					
+				</div>
+				
+				
+					<div class="desc">oncomplete fires before onfail()</div>
+				
+
+				
+				
+				
+				
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.ajax.AsyncRequest.ontimeout"></a>
+					
+					
+						<i><a href="#APE.ajax.AsyncRequest" class="type">APE.ajax.AsyncRequest.</a></i>ontimeout(<span class="signature"></span>)
+					
+					
+					
+				</div>
+				
+				
+
+				
+				
+				
+				
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.ajax.AsyncRequest.send"></a>
+					
+					
+						<i><a href="#APE.ajax.AsyncRequest" class="type">APE.ajax.AsyncRequest.</a></i>send(<span class="signature">data</span>)
+					
+					
+					
+				</div>
+				
+				
+					<div class="desc">Sends the call.</div>
+				
+
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							data
+						</td>
+						<td>
+							(optional) post data.
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				<div class="detailHead">returns</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							ajax.AsyncRequest, Error
+						</td>
+						<td>
+							if an error occured when trying to send,the error is returned. Otherwise, the AsyncRequest is returned.
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.ajax.AsyncRequest.abort"></a>
+					
+					
+						<i><a href="#APE.ajax.AsyncRequest" class="type">APE.ajax.AsyncRequest.</a></i>abort(<span class="signature"></span>)
+					
+					
+					
+				</div>
+				
+				
+					<div class="desc">Aborts call. Fires "onabort", passing the request,then fires "oncomplete" with {successful : false}</div>
+				
+
+				
+				
+				
+				
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.ajax.AsyncRequest.toString"></a>
+					
+					
+						<i><a href="#APE.ajax.AsyncRequest" class="type">APE.ajax.AsyncRequest.</a></i>toString(<span class="signature"></span>)
+					
+					
+					
+				</div>
+				
+				
+
+				
+				
+				
+				
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.ajax.AsyncRequest._setUpReadyStateChangeHandler"></a>
+					
+					
+						<i><a href="#APE.ajax.AsyncRequest" class="type">APE.ajax.AsyncRequest.</a></i>_setUpReadyStateChangeHandler(<span class="signature"></span>)
+					
+					
+					
+				</div>
+				
+				
+					<div class="desc">sets up poll for readyState change.fires 'oncomplete', followed by either 'onsucceed' or 'onfail'.onsucceed passes the request,onfail passes the request.</div>
+				
+
+				
+				
+				
+				
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="sectionHead">Objects</div>
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+		</div>
+	</div>
+	<div class="finePrint">
+	Generated by <a href="http://jsdoctoolkit.org/" target="_blank">JsDoc Toolkit</a> 1.4.0 on Fri, 01 Feb 2008 20:53:32 GMT.
+	</div>
+</body>
+</html>

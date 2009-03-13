@@ -1,0 +1,71 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+    <title>DOM document.getElementById Test</title>
+
+    <link rel="stylesheet" type="text/css" href="../../yui-test/build/logger/assets/logger.css" />
+    <link rel="stylesheet" type="text/css" href="../../yui-test/build/yuitest/assets/yuitest.css" />
+    <link rel="stylesheet" type="text/css" href="../../yui-test/assets/testlogger.css" />
+
+    <script type="text/javascript" src="../../yui-test/build/yahoo-dom-event/yahoo-dom-event.js"></script>
+    <script type="text/javascript" src="../../yui-test/build/logger/logger.js"></script>
+    <script type="text/javascript" src="../../yui-test/build/yuitest/yuitest-beta.js"></script>
+
+    <script type="text/javascript" src="../../../build/APE.js"></script>
+    <script type="text/javascript" src="../../../build/dom/gebi-f.js"></script>
+ 
+</head>
+<body style="position:relative;top: 10px">
+<div id="testNode"></div>
+
+<div id="testLogger"></div>
+
+<!-- from 
+ http://www.gtalbot.org/BrowserBugsSection/MSIE6Bugs/IdVersusName.html
+ -->
+<p><input name="one" id="two"></p>
+<div id="one">&nbsp;</div>
+
+
+
+<script type="text/javascript">
+setTimeout(function(){ 
+
+var dom = APE.dom,
+    Assert = YAHOO.util.Assert,
+    Action = YAHOO.util.UserAction,
+    documentElement = document.documentElement,
+    body = document.body;
+    
+var getElementByIdTestCase = new YAHOO.tool.TestCase({
+    name : "Event Test Case",
+
+    setUp : function() {
+    },
+
+    tearDown : function() {
+    },
+
+    testGetElementById : function() {
+        var a = document.getElementById('one'),
+            b = document.getElementById('two');
+
+        Assert.areEqual("one", a.id);
+        Assert.areEqual("two", b.id);
+    }
+});
+
+var logger = new YAHOO.tool.TestLogger("testLogger");
+YAHOO.tool.TestRunner.add( getElementByIdTestCase );
+
+// run the tests, or put them in the TestRunner.
+if (parent && parent != window) {
+    YAHOO.tool.TestManager.load();
+} else {
+    YAHOO.tool.TestRunner.run();
+}
+}, 100);</script>
+</body>
+</html>

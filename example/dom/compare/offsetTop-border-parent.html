@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head><title>offsetTop border parent</title>
+<style type="text/css">
+#a {
+    border: 1px outset #933;
+    position:relative;
+    background:#FFc;
+    font: 12px sans serif;
+}
+#expected {
+    background: #0f0;
+    height: 5px;
+    width: 5px;
+    position: absolute;
+    top: 30px;
+    left: 30px
+}
+</style>
+</head>
+
+<body style="border: 10px solid;margin:10px;padding: 10px;height: 600px;">
+<div id='a'>&nbsp;I am at 30, 30 in Iframe doc.</div>
+
+<div id='expected'></div>
+</body>
+</html>

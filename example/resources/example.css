@@ -1,0 +1,21 @@
+body {
+	font: 13px sans-serif;
+}
+
+.passed {
+	background-color: #3f3;
+}
+
+.failed {
+	background-color: #f33;
+}
+
+table {
+	border-spacing: 1px;
+
+}
+
+td {
+	padding: 2px;
+	font-family: courier new, monospace;
+}

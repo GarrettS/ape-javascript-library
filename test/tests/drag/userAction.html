@@ -1,0 +1,64 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+    <title>Drag Test</title>
+
+    <link rel="stylesheet" type="text/css" href="../../yui-test/build/logger/assets/logger.css" />
+    <link rel="stylesheet" type="text/css" href="../../yui-test/build/yuitest/assets/yuitest.css" />
+    <link rel="stylesheet" type="text/css" href="../../yui-test/assets/testlogger.css" />
+
+    <script type="text/javascript" src="../../yui-test/build/yahoo-dom-event/yahoo-dom-event.js"></script>
+    <script type="text/javascript" src="../../yui-test/build/logger/logger.js"></script>
+    <script type="text/javascript" src="../../yui-test/build/yuitest/yuitest-beta.js"></script>
+
+</head>
+<body style="position:relative;">
+<div id="testLogger"></div>
+<div id="template" style="height: 100%; width: 100%;">
+    <div id="testNode" style="position: relative; width: 200px" tabIndex="0">drag me.</div>
+    <div id="testNode2" style="position: relative; width: 200px" tabIndex="0">drag me.</div>
+</div>
+<script type="text/javascript">
+setTimeout(function(){
+
+// fix for broken pageX in initMouseEvent
+document.body.style.margin= "0";
+
+var Assert = YAHOO.util.Assert,
+    StringAssert = YAHOO.util.StringAssert,
+    Action = YAHOO.util.UserAction,
+    TestRunner = YAHOO.tool.TestRunner,
+    testNode = document.getElementById('testNode'),
+    template = document.getElementById('template'),
+    templateHTML = template.innerHTML,
+    oldBodyCssText = document.body.style.cssText;
+
+var userActionTestCase = new YAHOO.tool.TestCase({
+
+    name : "Testing UserAction",
+
+    // pageX broken, so all tests test target from 0, 0.
+
+    tearDown : function() {
+        testNode.className = "";
+        template.innerHTML = templateHTML;
+        document.body.style.cssText = oldBodyCssText;
+        testNode = document.getElementById('testNode');
+    },
+    
+    testDragStart : function() {        
+        Action.mousemove( document );
+    }
+
+});
+
+// Set the TestRunner's logger by invoking a constructor
+new YAHOO.tool.TestLogger("testLogger");
+TestRunner.add( userActionTestCase );
+YAHOO.tool.TestRunner.run();
+
+}, 100);</script>
+</body>
+</html>

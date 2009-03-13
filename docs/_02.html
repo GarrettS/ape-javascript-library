@@ -1,0 +1,851 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+	<meta name="generator" content="JsDoc Toolkit 1.0">
+	<title>JsDoc: </title>
+	<link rel=stylesheet href="default.css" type="text/css" media=screen>
+</head>
+
+<body>
+	<div class="content">
+		<div class="docs">
+		
+			<div class="sectionHead">Library: EventPublisher.js</div>
+			<div class="section overview">
+				<div class="itemTitle">
+					Overview
+				</div>
+				<div>	
+					<div class="desc">EventPublisherReleased under Academic Free Licence 3.0.</div>
+					<div class="itemTags">
+					<ul>
+						<li>source: <a href="src_02.html">EventPublisher.js</a></li>
+					
+						<li>author: Garrett Smith</li>
+					
+					</ul>
+					</div>
+				</div>
+			</div>
+			
+			<div class="sectionHead">Constructors</div>
+			
+			
+			<div class="section constructor">
+				<div class="itemTitle">
+					<a name="APE.EventPublisher"></a>
+					
+					
+					
+					APE.EventPublisher(<span class="signature">src, type</span>)
+					
+					
+				</div>
+				
+				
+					<div class="desc"></div>
+				
+				
+				
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							src
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							type
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				<div class="detailHead">methods</div>
+				
+					<ul class="details">
+						<li><a href="#APE.EventPublisher.add">add</a>(fp, thisArg)</li>
+					</ul>
+				
+					<ul class="details">
+						<li><a href="#APE.EventPublisher.addBefore">addBefore</a>(f, thisArg)</li>
+					</ul>
+				
+					<ul class="details">
+						<li><a href="#APE.EventPublisher.addAfter">addAfter</a>(f, thisArg)</li>
+					</ul>
+				
+					<ul class="details">
+						<li><a href="#APE.EventPublisher.getEvent">getEvent</a>(type)</li>
+					</ul>
+				
+					<ul class="details">
+						<li><a href="#APE.EventPublisher.remove">remove</a>(fp, thisArg)</li>
+					</ul>
+				
+					<ul class="details">
+						<li><a href="#APE.EventPublisher.removeBefore">removeBefore</a>(fp, thisArg)</li>
+					</ul>
+				
+					<ul class="details">
+						<li><a href="#APE.EventPublisher.removeAfter">removeAfter</a>(fp, thisArg)</li>
+					</ul>
+				
+					<ul class="details">
+						<li><a href="#APE.EventPublisher.toString">toString</a>()</li>
+					</ul>
+				
+				
+				
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			<div class="sectionHead">Namespaces</div>
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			<div class="sectionHead">Functions</div>
+			
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.EventPublisher.add"></a>
+					
+					
+						<i><a href="#APE.EventPublisher" class="type">APE.EventPublisher.</a></i>add(<span class="signature">fp, thisArg</span>)
+					
+					
+					
+				</div>
+				
+				
+					<div class="desc"></div>
+				
+
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							Function
+						</td>
+						<td>
+							fp
+						</td>
+						<td>
+							the callback function that gets called when src[sEvent] is called.
+						</td> 
+					</tr>
+				
+					<tr>
+						<td class="type">
+							Object
+						</td>
+						<td>
+							thisArg
+						</td>
+						<td>
+							the context that the function executes in.
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.EventPublisher.addBefore"></a>
+					
+					
+						<i><a href="#APE.EventPublisher" class="type">APE.EventPublisher.</a></i>addBefore(<span class="signature">f, thisArg</span>)
+					
+					
+					
+				</div>
+				
+				
+
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							f
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							thisArg
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.EventPublisher.addAfter"></a>
+					
+					
+						<i><a href="#APE.EventPublisher" class="type">APE.EventPublisher.</a></i>addAfter(<span class="signature">f, thisArg</span>)
+					
+					
+					
+				</div>
+				
+				
+
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							f
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							thisArg
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.EventPublisher.getEvent"></a>
+					
+					
+						<i><a href="#APE.EventPublisher" class="type">APE.EventPublisher.</a></i>getEvent(<span class="signature">type</span>)
+					
+					
+					
+				</div>
+				
+				
+
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							type
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.EventPublisher.remove"></a>
+					
+					
+						<i><a href="#APE.EventPublisher" class="type">APE.EventPublisher.</a></i>remove(<span class="signature">fp, thisArg</span>)
+					
+					
+					
+				</div>
+				
+				
+
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							fp
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							thisArg
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.EventPublisher.removeBefore"></a>
+					
+					
+						<i><a href="#APE.EventPublisher" class="type">APE.EventPublisher.</a></i>removeBefore(<span class="signature">fp, thisArg</span>)
+					
+					
+					
+				</div>
+				
+				
+
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							fp
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							thisArg
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.EventPublisher.removeAfter"></a>
+					
+					
+						<i><a href="#APE.EventPublisher" class="type">APE.EventPublisher.</a></i>removeAfter(<span class="signature">fp, thisArg</span>)
+					
+					
+					
+				</div>
+				
+				
+
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							fp
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							thisArg
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.EventPublisher.toString"></a>
+					
+					
+						<i><a href="#APE.EventPublisher" class="type">APE.EventPublisher.</a></i>toString(<span class="signature"></span>)
+					
+					
+					
+				</div>
+				
+				
+
+				
+				
+				
+				
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.EventPublisher.add"></a>
+					
+					
+					
+					APE.EventPublisher.add(<span class="signature">src, sEvent, fp, thisArg</span>)
+					
+					
+				</div>
+				
+				
+					<div class="desc"></div>
+				
+
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							Object
+						</td>
+						<td>
+							src
+						</td>
+						<td>
+							the object which calls the function
+						</td> 
+					</tr>
+				
+					<tr>
+						<td class="type">
+							String
+						</td>
+						<td>
+							sEvent
+						</td>
+						<td>
+							the function that gets called.
+						</td> 
+					</tr>
+				
+					<tr>
+						<td class="type">
+							Function
+						</td>
+						<td>
+							fp
+						</td>
+						<td>
+							the callback function that gets called when src[sEvent] is called.
+						</td> 
+					</tr>
+				
+					<tr>
+						<td class="type">
+							Object
+						</td>
+						<td>
+							thisArg
+						</td>
+						<td>
+							the context that the function executes in.
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.EventPublisher.fire"></a>
+					
+					
+					
+					APE.EventPublisher.fire(<span class="signature">publisher</span>)
+					
+					
+				</div>
+				
+				
+					<div class="desc"></div>
+				
+
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							publisher
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				<div class="detailHead">returns</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							boolean
+						</td>
+						<td>
+							false if any one of callStack's methods return false.
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.EventPublisher.get"></a>
+					
+					
+					
+					APE.EventPublisher.get(<span class="signature">src, sEvent</span>)
+					
+					
+				</div>
+				
+				
+					<div class="desc"></div>
+				
+
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							Object
+						</td>
+						<td>
+							src
+						</td>
+						<td>
+							the object which calls the function
+						</td> 
+					</tr>
+				
+					<tr>
+						<td class="type">
+							String
+						</td>
+						<td>
+							sEvent
+						</td>
+						<td>
+							the function that gets called.Looks for an APE.EventPublisher in the Registry.If none found, creates and adds one to the Registry.
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.EventPublisher.cleanUp"></a>
+					
+					
+					
+					APE.EventPublisher.cleanUp(<span class="signature"></span>)
+					
+					
+				</div>
+				
+				
+					<div class="desc"></div>
+				
+
+				
+				
+				
+				
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="sectionHead">Objects</div>
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+		</div>
+	</div>
+	<div class="finePrint">
+	Generated by <a href="http://jsdoctoolkit.org/" target="_blank">JsDoc Toolkit</a> 1.4.0 on Fri, 01 Feb 2008 20:53:32 GMT.
+	</div>
+</body>
+</html>

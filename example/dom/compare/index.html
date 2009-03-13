@@ -1,0 +1,573 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+    "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Position Comparison</title>
+
+<script src="lib/prototype-1.6.0.2.js" type="text/javascript"></script>
+<script src="lib/ape-ep-dom.js" type="text/javascript"></script>
+<script src="lib/dojo.js.uncompressed.js" type="text/javascript"></script>
+<script src="lib/yahoo-dom-event.js" type="text/javascript"></script>
+<script src="lib/jquery-1.2.6.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+
+    function frameLoaded(e, resultId) { 
+        try{
+				// FF2 needs currentTarget; e.target is null.
+			var target = e.target||e.currentTarget||e.srcElement;
+
+			var topFrame, frames = top.document.getElementsByTagName("iframe");
+			
+			if(target.location && !target.document && target.location.href) {
+			// XXX Safari 2: document.location is "file:/" not "file:///"
+			    var href = target.location.href;
+			    href = href.substring(href.indexOf('/'));
+			    href = href.replace(/^\/\//,'');
+				for(var i = 0; i < frames.length; i++) {
+					var src = frames[i].src;
+					src = src.substring(src.indexOf('/')).replace(/^\/\//,'');
+					if(href == src) {
+						target.parentWindow = target;// Safari 2 lacks.
+						target = frames[i];
+					}
+				}
+			}
+			var global = target.contentWindow;
+			var doc = global.document;
+			target.__loaded = true;
+		} catch(ex){ return; }
+		
+        var el = doc.getElementById('a');
+
+        setTimeout( function() {
+
+            var results = calculateAbsPos.call(global, el);
+            for(var i = 0; i < results.length; i++) {
+                var result = results[i], lib = result[0];
+                if(resultId) {
+                    top.document.getElementById(resultId + "-" +lib).innerHTML = result[1] + "," + result[2];
+                    top.document.getElementById(resultId + "-time-" + lib).innerHTML = result[3];
+                }
+            }
+            if(!resultId) alert(results.join('\n'));
+            // try to avoid dojo memory leak problem.
+            el = global = null;
+            
+        }, 100);
+    }
+
+    // Calls each library's position method, passing the iframe's 
+    // contentWindow as the thisArg.
+    function calculateAbsPos(el) {
+        var results = [], 
+            lib,
+            result,
+            global = this,
+            now = new Date;
+
+        for(var m in Methods) {
+            lib = Methods[m];
+
+            now = new Date;
+            for(var i = 0; i < 200; i++) {
+                result = lib.method.call(global, el);
+            }
+            result = [m, result[lib.left], result[lib.top], (new Date-now)];
+            results.push(result);
+        }
+        return results;
+    }
+
+
+    var Methods = {
+        APE : {
+            "method" : APE.dom.getOffsetCoords,
+            left : "x",
+            top : "y"
+        },
+        Dojo : { 
+            "method" : dojo.coords,
+            left : "x",
+            top : "y"
+        },
+        jQuery : {
+            "method" : function(el) { return jQuery(el).offset(); },
+            left : "left",
+            top : "top"
+        },
+        Prototype : {
+            "method" : Element.Methods.cumulativeOffset,
+            left : "0",
+            top : "1"
+        },
+        YUI : {
+            "method" : YAHOO.util.Dom.getXY,
+            left : "0",
+            top : "1"
+        }
+    };
+</script>
+
+
+<style type="text/css">
+
+    body {
+        font-family: sans-serif;
+        margin:10px;
+    }
+    table {
+        font-family: Verdana;
+    }
+    .testframes {
+        vertical-align: bottom;
+        text-align: center;
+    }
+
+    .testframes th {
+        padding: 2px 12px;
+        font-size: small;
+    }
+
+        
+    table {
+        background: #FFFFFF;
+        border: 2px solid #EEEEEE;
+    }
+     .results th {
+        text-align: left;
+    }
+
+    .results td {
+        padding: 0 12px;
+        white-space: nowrap;
+        font-size: small;
+        border-left: 5px solid #fff;
+    }
+
+    .expected {
+        background: #6f6;
+    }
+    .error {
+        background: #f97;
+    }
+
+    td.ti {
+        border-right: 1px solid #F3F3F3;
+        border-left: 0;
+    }
+
+    
+    tr.odd td, tr.odd th {
+        border-bottom: 1px dotted #ccc;
+        border-top: 1px dotted #ccc
+    }
+
+    iframe {
+        height: 66px;
+        width: 140px;
+        border: 1px solid #090;
+    }
+
+    colgroup {
+        border-right: 2px dashed #F9f9f9;
+    }
+
+    .time-col {
+        background: #fcfcfc;
+        border-left: 0;
+    }
+
+    .testcase { width: 95%; }
+
+    .testcase caption {
+        border-top: 1px solid #333;
+    }
+
+    #speed-legend {
+        float: right;
+        margin-bottom: 12px;
+    }
+    #speed-legend td {
+        font-size: small;
+        padding: 2px 9px;
+    }
+    .s {
+      font-weight: 200;
+      background: #FFFFE9;  
+    }
+    .ss {
+      font-weight: 300;
+      background: #FFc;  
+    }
+    .sss {
+        font-weight: 400;
+        background: #FFa;
+    }
+    .ssss {
+        font-weight: 500;
+        background: #FF8;
+    }
+    .sssss {
+        font-weight: 600;
+        background: #FF6;
+    }
+    .ssssss {
+        font-weight: 700;
+        background: #FF4;
+    }
+    .sssssss {
+        font-weight: 800;
+        background: #FFF32C;
+    }
+
+    .ssssssss {
+        font-weight: 900;
+        background: #FFE416;
+        font-style: italic;
+    }
+    .s9 {
+        font-weight: 900;
+        font-style: italic;
+        background: #FFDC09;
+    }
+    .s10 {
+        font-weight: 900;
+        font-style: italic;
+        background: #Fc0;
+        border: 1px solid #F90;
+    }
+
+</style>
+<link type="text/css" rel="stylesheet" href="../../../resources/ape.css">
+
+</head>
+
+<body>
+
+    <h1>Library Comparison</h1>
+    <p> Find Element Position </p>
+    <p>
+        Most libraries try provide some functionality for finding an element's position, 
+        but fail in all but the simplest cases.
+    </p>
+
+    <p>
+        This page provides two visual "tests" to demonstrate the libraries'
+        results of finding an element's position and the time it takes for them to succeed or fail.
+    </p>
+
+    <p>Green means PASS, red means FAIL</p>
+
+    <table id="speed-legend" style="margin-bottom: 12px;">
+        <caption>Speed Legend</caption>   
+        <tbody>
+            <tr>
+                <td title="0 - 16ms">Excellent</td>
+                <td class="s" title="17ms - 32ms">Very Good</td>
+                <td class="ss" title="33ms - 72ms">Good</td>
+                <td class="sss" title="73ms - 110ms">Fair</td>
+                <td class="ssss" title="110ms - 180ms">A little slow</td>
+                <td class="sssss" title="181ms - 300ms">Slow</td>
+                <td class="ssssss" title="301ms - 560ms">Very Slow</td>
+                <td class="sssssss" title="561ms - 999ms">Extremely slow</td>
+                <td class="ssssssss" title="1ms - 1.5s">Slower than Extremely slow</td>
+                <td class="s9" title="1.6s - 2s">Comatose</td>
+                <td class="s10" title="over 2s">Nearly Dead</td>
+            </tr>
+        </tbody>
+    </table>
+<div style="clear: both"></div>
+
+    <table class="testcase">
+        <caption>Simple Tree with Margin, Padding, and Border on BODY</caption>
+        <colgroup style="border:0"><col></colgroup>
+        <colgroup style="border-left: 0">
+            <col>
+            <col class='time-col'>
+        </colgroup>
+
+        <colgroup>
+            <col>
+            <col class='time-col'>
+        </colgroup>
+        <colgroup>
+            <col>
+            <col class='time-col'>
+        </colgroup>
+        <colgroup>
+            <col>
+            <col class='time-col'>
+        </colgroup>
+        <colgroup>
+            <col>
+            <col class='time-col'>
+        </colgroup>
+        <thead>
+            <tr class="testframes">
+                <td><iframe id="f2" src="offsetTop-border-parent.html#a" frameborder="0" scrolling="no"
+                onload="frameLoaded(event, 'result1');"></iframe></td>
+                <th colspan="2">Your Browser</th>
+                <th colspan="2">Firefox 3</th>
+                <th colspan="2">Firefox 2</th>
+                <th colspan="2">IE 8</th>
+                <th colspan="2">IE 7</th>
+                <th colspan="2">Safari 3</th>
+                <th colspan="2">Opera 9</th>
+            </tr>
+            <tr>
+                <td></td>
+                <th>Result</th>
+                <th class="time">Time 200</th>
+                <th>Result</th>
+                <th class="time">Time 200</th>
+                <th>Result</th>
+                <th class="time">Time 200</th>
+                <th>Result</th>
+                <th class="time">Time 200</th>
+                <th>Result</th>
+                <th class="time">Time 200</th>
+                <th>Result</th>
+                <th class="time">Time 200</th>
+
+            </tr>
+        </thead>
+        <tfoot>
+            <tr>
+                <td colspan="15">
+                    <h4>Simple Tree Results</h4>
+
+                    <p><strong>APE and jQuery passed in all browsers. APE outperformed jQuery</strong></p>
+
+                    <p>APE: Passes this test in all browsers. Good performance</p>
+                    <p>Dojo: Passes in Opera (but a little slow). 
+                    Leaving IE running will cause slower results, 
+                    over time (only dojo's results get slower). Restarting IE does not help. Restarting the computer does.</p>
+                    <p>jQuery: Passed all browsers. Performance was a little slow.</p>
+                    <p>Yui: passed in all browsers but Safari. Fair performance</p>
+                    <p>Prototype: Excellent performance on simple tree. Passes in Opera only.</p>
+                    </td>
+            </tr>   
+        </tfoot>
+        <tbody class="results">
+            <tr class="odd">
+                <th>APE</th> 
+                <td id="result1-APE"></td> <td id="result1-time-APE"></td>
+                <td class="expected">30, 30</td> <td class="ti">12ms</td> 
+                <td class="expected">30, 30</td> <td class="ti sssss">343ms</td> 
+
+                <td class="expected">30, 30</td> <td class="ti">16ms</td>
+                <td class="expected">30, 30</td> <td class="ti">16ms</td>
+                 <td class="expected">30, 30</td> <td class="ti s">31ms</td>
+                 <td class="expected">30, 30</td> <td class="ti s">31ms</td>
+            </tr>
+            <tr>
+                <th>Dojo</th> 
+                <td id="result1-Dojo"></td> <td id="result1-time-Dojo"></td>
+                <td class="error">30, 0</td> <td class="ti ss">64ms</td> 
+                <td class="error">30, 1</td> <td class="ti ssssssss">1314ms</td> 
+
+                <td class="error">28, -2</td> <td class="ti s9">1797ms</td>
+                <td class="error">28, -2</td> <td class="ti s10">3062ms</td> 
+                 <td class="error">30, 0</td> <td class="ti sss">78ms</td>
+                 <td class="expected">30, 30</td> <td class="ti sss">110ms</td>
+            </tr>
+            <tr class="odd">
+                <th>jQuery</th>
+                <td id="result1-jQuery"></td> <td id="result1-time-jQuery"></td>
+                <td class="expected">30, 30</td> <td class="ti ss">69ms</td> 
+                <td class="expected">30, 30</td> <td class="ti ssssssss">1303ms</td>
+                
+                <td class="expected">30, 30</td> <td class="ti ss">62ms</td>
+                <td class="expected">30, 30</td> <td class="ti ss">46ms</td> 
+                 <td class="expected">30, 30</td> <td class="ti sss">78ms</td>
+                 <td class="expected">30, 30</td> <td class="ti sss">110ms</td>
+            </tr>
+            <tr>
+                <th>Prototype</th>
+                <td id="result1-Prototype"></td> <td id="result1-time-Prototype"></td>
+                <td class="error">10, 10</td> <td class="ti">8ms</td> 
+                <td class="error">10, 10</td> <td class="ti sss">93ms</td> 
+
+                <td class="error">55, 25</td> <td class="ti s">31ms</td>
+                <td class="error">54, 24</td> <td class="ti s">31ms</td>
+                 <td class="error">20, 20</td>  <td class="ti">0ms</td>
+                 <td class="expected">30, 30</td> <td class="ti">16ms</td>
+            </tr>
+            <tr class="odd">
+                <th>YUI</th>
+                <td id="result1-YUI"></td> <td id="result1-time-YUI"></td>
+                <td class="expected">30, 30</td> <td class="ti s">39ms</td> 
+                <td class="expected">30, 30</td> <td class="ti ssssss">445ms</td> 
+
+                <td class="expected">30, 30</td> <td class="ti ss">47ms</td>
+                <td class="expected">30, 30</td> <td class="ti ss">46ms</td>
+                 <td class="error">20, 20</td> <td class="ti ss">47ms</td>
+                 <td class="expected">30, 30</td> <td class="ti s">47ms</td>
+            </tr>
+
+        </tbody>
+    </table>
+
+
+    <table class="testcase">
+        <caption>Position Relative on BODY</caption>
+        <colgroup style="border:0"><col></colgroup>
+        <colgroup>
+            <col>
+            <col class='time-col'>
+        </colgroup>
+        <colgroup>
+            <col>
+            <col class='time-col'>
+        </colgroup>
+        <colgroup>
+            <col>
+            <col class='time-col'>
+        </colgroup>
+        <colgroup>
+            <col>
+            <col class='time-col'>
+        </colgroup>
+
+        <thead>
+            <tr class="testframes">
+                <td><iframe src="offsetTop-border-parent-2.html" frameborder="0" scrolling="no"
+                onload="frameLoaded(event, 'result2');"></iframe></td>
+                <th colspan="2">Your Browser</th>
+                <th colspan="2">Firefox 3</th>
+                <th colspan="2">Firefox 2</th>
+                <th colspan="2">IE 8</th>
+                <th colspan="2">IE 7</th>
+                <th colspan="2">Safari 3</th>
+                <th colspan="2">Opera 9</th>
+            </tr>
+            <tr>
+                <td></td>
+                <th>Result</th>
+                <th class="time">Time 200</th>
+                <th>Result</th>
+                <th class="time">Time 200</th>
+                <th>Result</th>
+                <th class="time">Time 200</th>
+                <th>Result</th>
+                <th class="time">Time 200</th>
+                <th>Result</th>
+                <th class="time">Time 200</th>
+                <th>Result</th>
+                <th class="time">Time 200</th>
+
+            </tr>
+        </thead>
+        <tfoot>
+            <tr>
+                <td colspan="15">
+                    <h4>Position: relative on BODY Results</h4>
+
+                    <p><strong>Only APE passed in all browsers and with better peformance 
+                    than the other libraries (except Prototype on a few cases, but 
+                    Prototype failed in all but Opera).</strong></p>
+
+                    <p>Firefox 2 (on a powerbook) is <strong class="sssssss">Extremely slow</strong>. 
+                    Disabling extensions helped somewhat.
+                    </p>
+
+                    <p>APE: Passes this test in all browsers. Fair performance, but a little slow in Opera.</p>
+                    <p>Dojo: Passes in Firefox3 with fair performance. </p>
+                    <p>jQuery: Passed all browsers except Firefox 2 and Safari. Performance was slow, especially in Firefox 2, 
+                    at over three seconds for 200 iterations. That's 16ms per call. 
+                    </p>
+                    
+                    <p>Prototype: Fair/Good performance. Passes in Opera only.</p>
+                    <p>Yui: passed in all browsers but Safari and Firefox2. Performance was slow.</p>
+                    </td>
+            </tr>
+        </tfoot>
+        <tbody class="results">
+            <tr class="odd">
+                <th>APE</th>
+                <td id="result2-APE"></td> <td id="result2-time-APE"></td>
+                <td class="expected">55, 40</td> <td class="ti">15ms</td> 
+                <td class="expected">55, 40</td> <td class="ti sssssss">901ms</td> 
+
+                <td class="expected">55, 40</td> <td class="ti ss">47ms</td>
+                <td class="expected">55, 40</td> <td class="ti ss">47ms</td>
+                 <td class="expected">55, 40</td> <td class="ti s">31ms</td>
+                 <td class="expected">55, 40</td> <td class="ti sss">94ms</td>
+            </tr>
+            <tr>
+                <th>Dojo</th> 
+                <td id="result2-Dojo"></td> <td id="result2-time-Dojo"></td>
+                <td class="expected">55, 40</td> <td class="ti sss">81ms</td> 
+                <td class="error">56, 41</td> <td class="ti s9">1808ms</td> 
+
+                <td class="error">53, 38</td> <td class="ti ssssssss">1266</td>
+                <td class="error">58, 38</td> <td class="ti sssssss">594ms</td>
+                 <td class="error">40, 40</td> <td class="ti ss">47ms</td>
+                 <td class="error">55, -762</td> <td class="ti ssss">157ms</td>
+            </tr>
+            <tr class="odd">
+                <th>jQuery</th> 
+                <td id="result2-jQuery"></td> <td id="result2-time-jQuery"></td>
+                <td class="expected">55, 40</td> <td class="ti ss">70ms</td> 
+                <td class="error">40, 40</td> <td class="ti s10">3266ms</td> 
+
+                <td class="expected">55, 40</td> <td class="ti ssss">125ms</td>
+                <td class="expected">55, 40</td> <td class="ti ss">62ms</td>
+                 <td class="error">40, 40</td> <td class="ti ssss">141ms</td>
+                 <td class="expected">55, 40</td> <td class="ti sssssss">578ms</td>
+            </tr>
+            <tr>
+                <th>Prototype</th> 
+                <td id="result2-Prototype"></td> <td id="result2-time-Prototype"></td>
+                <td class="error">30, 30</td> <td class="ti">16ms</td> 
+                <td class="error">30, 30</td> <td class="ti ssss">140ms</td> 
+
+                <td class="error">77, 167</td> <td class="ti ssss">125ms</td>
+                <td class="error">82, 564</td> <td class="ti ss">62ms</td>
+                <td class="error">35, 35</td>  <td class="ti">0ms</td>
+                <td class="expected">55, 40</td> <td class="ti ss">47ms</td>
+            </tr>
+            <tr class="odd">
+                <th>YUI</th> 
+                <td id="result2-YUI"></td> <td id="result2-time-YUI"></td>
+                <td class="expected">55, 40</td><td class="ti ss">42ms</td> 
+                <td class="error">30, 30</td> <td class="ti ssssssss">1208ms</td> 
+
+                <td class="expected">55, 40</td> <td class="ti sss">94ms</td>
+                <td class="expected">55, 40</td> <td class="ti ss">47ms</td>
+                 <td class="error">35, 35</td> <td class="ti ss">47ms</td>
+                 <td class="expected">55, 40</td> <td class="ti ssss">141ms</td>
+            </tr>
+
+        </tbody>
+    </table>
+
+    <h3>Conclusion</h3>
+    <p>
+        There are many cases of having position, border, margin, on BODY, that can cause problems with 
+        finding an element's position. There are complications with padding, border on HTML root element
+        but that CSS is broken in IE8b 
+        (<a href="https://connect.microsoft.com/IE/feedback/ViewFeedback.aspx?FeedbackID=354453">connect id 354453</a>),
+        so the rules are not rendered in IE and the element's position can't be tested.
+        APE guards against all of these problems by having a 
+        <a href="/ape/test/tests/dom/position-f.test.html">test case</a> that is 
+        mostly devoted to testing this function with combinations of these cases. 
+    </p>
+
+    <p>
+        Prototype and Dojo have the most problems with finding an element's position. 
+        Dojo is very slow and has mostly inaccurate results. Prototype at least fails quickly. 
+        Prototype throws an error, on page load: <code>element.dispatchEvent is not a function</code>. 
+        Looking at the code for the libraries can reveal the mistakes that cause these results. In the case 
+        of PrototypeJS, the error is caused by making assumptions about 
+        <a href="/?category=/JavaScript/&amp;date=2008/06/17/&amp;=Prototype-js-A-Review">augmenting Host objects' prototypes</a> (the cause of the problem).
+    </p>
+
+    <p>
+        APE passed both tests in all browsers. There are many 
+        other tests in the 
+        <a href="/ape/test/tests/dom/position-f.test.html">test case</a> (not shown here). 
+    </p>
+</body>
+</html>

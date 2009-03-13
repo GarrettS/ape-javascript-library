@@ -1,0 +1,146 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+    <title>Form Test</title>
+
+    <link rel="stylesheet" type="text/css" href="../../yui-test/build/logger/assets/logger.css" />
+    <link rel="stylesheet" type="text/css" href="../../yui-test/build/yuitest/assets/yuitest.css" />
+    <link rel="stylesheet" type="text/css" href="../../yui-test/assets/testlogger.css" />
+
+    <script type="text/javascript" src="../../yui-test/build/yahoo-dom-event/yahoo-dom-event.js"></script>
+    <script type="text/javascript" src="../../yui-test/build/logger/logger.js"></script>
+    <script type="text/javascript" src="../../yui-test/build/yuitest/yuitest-beta.js"></script>
+
+    <script type="text/javascript" src="../../../build/APE.js"></script>
+
+</head>
+<body>
+<form id="formNode" method="get" action="test.gs">
+<fieldset id="f1">
+    <input type="text" name="text" id="text"/>
+    <input type="password" name="password" id="pw"/>
+
+    <input type="checkbox" name="cb" id="cb1" value="c1"/>
+    <input type="checkbox" name="cb" id="cb2" checked="checked" value="c2"/>
+    <input type="checkbox" name="cb" id="cb3" checked="checked" value="c3"/>
+
+    <input type="radio" name="r" id="r1" value="r1"/>
+    <input type="radio" name="r" id="r2" checked="checked" value="r2"/>
+
+    <select name="s1">
+        <option disabled="disabled">select one disabled</option>
+        <option selected="selected">text selected</option>
+    </select>
+
+    <select multiple="multiple" name="s2">
+        <option>value</option>
+        <option>value</option>
+    </select>
+
+    <textarea name="t1">uno textarea</textarea>
+    
+    <button type="submit" value="sb">submit button</button>
+    <input type="submit" value="input submit">
+    
+    <button type="button" name="bb" value="bb1">button button</button>
+    <input type="image" value="ib" style="height: 30px;padding:0" id="sbImg" src="../../../resources/leaf.jpg" name="sbImg" alt="[sbImg]"/>
+
+</fieldset>
+
+    text=&password=&cb=c2&cb=c3&r=r2&s1=value&t1=uno+textarea
+<!-- these should not be serialized! -->
+<fieldset id="f2">
+    <input type="text" id="Ntext" value="N text"/>
+    <input type="password" id="Npw"/>
+
+    <input type="checkbox" id="Ncb1"/>
+    <input type="checkbox" id="Ncb2" checked="checked"/>
+
+    <input type="radio" id="Nr1"/>
+    <input type="radio" id="Nr2" checked="checked"/>
+
+    <select>
+        <option disabled="disabled">select one</option>
+        <option value="Nv">value</option>
+    </select>
+
+    <select multiple="multiple" id="Ns2">
+        <option>value</option>
+        <option>value</option>
+    </select>
+
+    <textarea id="t1">lorem textarea</textarea>
+
+</fieldset>
+
+</form>
+
+<form id="form2">
+<select name="back" multiple="multiple">
+<option selected='selected'>1</option>
+<option selected='selected'>2</option>
+<option selected='selected' value="3"></option>
+</select>
+</form>
+<div id="testNode"></div>
+
+<div id="testLogger"></div>
+
+<script type="text/javascript">
+setTimeout(function(){
+
+var util = YAHOO.util,
+    Assert = util.Assert,
+    formNode;
+
+var formTestCase = new YAHOO.tool.TestCase({
+    name : "Clone Form Test Case",
+
+    setUp : function() {
+        formNode = document.getElementById('formNode');
+        formNode.onsubmit = null;
+    },
+
+    testClone : function() {
+        var form = document.getElementById('formNode'),
+            elements = form.elements;
+        for(var i = 0; i < elements.length; i++) {
+            if('selectedIndex' in elements[i])
+                elements[i].selectedIndex = 0;
+            else if('checked'in elements[i]) {
+                elements[i].checked = true;
+            }
+            else
+                elements[i].value = 'copy';
+        }
+
+        var clone = form.cloneNode(true);
+        var cloneElements = clone.elements;
+
+        for(var i = 0; i < elements.length; i++) {
+            if('value'in elements[i])
+                cloneElements
+            Assert.areEqual(elements[i].value, cloneElements[i].value, 'value: ' + elements[i].name);
+            if('checked'in elements[i]) {
+                Assert.areEqual(elements[i].checked, cloneElements[i].checked, 'checked ' + elements[i].checked);
+            }
+        }
+
+    }
+
+});
+
+var logger = new YAHOO.tool.TestLogger("testLogger");
+YAHOO.tool.TestRunner.add( formTestCase );
+
+// run the tests, or put them in the TestRunner.
+if (parent && parent != window) {
+    YAHOO.tool.TestManager.load();
+} else {
+    YAHOO.tool.TestRunner.run();
+}
+}, 100);</script>
+</body>
+</html>

@@ -1,0 +1,885 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+	"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+	<title>JsDoc: APE.drag</title>
+	<link rel="stylesheet" href="default.css" type="text/css" media="screen">
+</head>
+
+<body>
+
+<table style="width: 100%" class="navbar">
+<tr>
+<td class="NavBar" valign="top"><font size="-2">SUMMARY:&nbsp;<a href="#field_summary">FIELD</a>&nbsp;|&nbsp;<a href="#constructor_summary">CONSTR</a>&nbsp;|&nbsp;<a href="#method_summary">METHOD</a></font></td>
+<td class="NavBar" valign="top"><font size="-2">DETAIL:&nbsp;<a href="#field_detail">FIELD</a>&nbsp;|&nbsp;<a href="#constructor_detail">CONSTR</a>&nbsp;|&nbsp;<a href="#method_detail">METHOD</a></font></td>
+</tr>
+</table>
+
+<h2>Static Class APE.drag</h2>
+
+
+<i>Defined in <a href="Draggable.src.html">Draggable.js</a></i>
+
+<p>
+</p>
+
+
+
+	<li><strong>author: </strong> Garrett Smith, � 2008</li>
+
+	<li><strong>version: </strong> 1</li>
+
+	<li><strong>fileoverview:: </strong> contains: APE.drag.Draggable, DragHandlers, APE.drag.DropTarget</li>
+
+	<li><strong>requires: </strong> APE.EventPublisher, APE.domclassNames:<ul>  <li>activeClassName</li>  <li>focusClassName</li>  <li>selectedClassName</li>  <li>dragOverClassName (for dropTarget)</li>  <li>focusClassName (focused drag object)</li></ul>APE.drag.Draggable Features:<ul>  <li>dragCopy</li>  <li>dragMultiple</li>  <li>setHandle(handle, useTree)</li></ul></li>
+
+
+
+
+
+<hr>
+
+<!-- =========== FIELD SUMMARY =========== -->
+
+<a name="field_summary"> </a> 
+<table border="1" cellpadding="3" cellspacing="0" width="100%">
+	<tr class="TableHeadingColor">
+		<td colspan=2>
+			<b>Field Summary</b>
+		</td>
+	</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>Object</code></font>
+			</td>
+			<td>
+				<code><b><a href="#Draggable.draggableList">Draggable.draggableList</a></b></code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Internal map of draggables
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>Number</code></font>
+			</td>
+			<td>
+				<code><b><a href="#Draggable.highestZIndex">Draggable.highestZIndex</a></b></code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;a higher z-index is assigned beforedragstart.
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>HTMLElement</code></font>
+			</td>
+			<td>
+				<code><b><a href="#DragHandlers.dO">DragHandlers.dO</a></b></code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;the element being actively dragged.
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>HTMLElement</code></font>
+			</td>
+			<td>
+				<code><b><a href="#DragHandlers.focusedDO">DragHandlers.focusedDO</a></b></code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;the element that has focus.
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>object</code></font>
+			</td>
+			<td>
+				<code><b><a href="#instanceDestructor">instanceDestructor</a></b></code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			</td>
+		</tr>
+	
+</table>
+&nbsp;
+
+<!-- =========== END FIELD SUMMARY =========== -->
+
+
+
+<!-- ========== METHOD SUMMARY =========== -->
+
+<a name="method_summary"> </a> 
+<table border="1" cellpadding="3" cellspacing="0" width="100%">
+	<tr class="TableHeadingColor">
+		<th colspan=2>
+			Method Summary
+		</th>
+	</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code></code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#Draggable">Draggable</a></b>(el, constraint) </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; undocumented
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code></code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#Draggable.blurred">Draggable.blurred</a></b>(e) </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Callback handler for a draggable's intrinsic focus event.
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code></code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#Draggable.focused">Draggable.focused</a></b>(e) </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Callback handler for a draggable's intrinsic focus event.
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code></code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#Draggable.instanceDestructor">Draggable.instanceDestructor</a></b>() </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; undocumented
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code></code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#DragHandlers.carryGroup">DragHandlers.carryGroup</a></b>(distX, distY) </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; called on mousemove
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code></code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#DragHandlers.dragObjGrabbed">DragHandlers.dragObjGrabbed</a></b>(e, dO) </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Called from grab() and from mousemove, when first started.
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code></code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#DragHandlers.dragObjReleased">DragHandlers.dragObjReleased</a></b>(e, the) </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; When a draggable has been released (by ESC), it calls dragout from the relevant droptargets and resets any active over droptargets.
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code></code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#DragHandlers.getEventCoords">DragHandlers.getEventCoords</a></b>() </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code></code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#DragHandlers.hasGroupSelection">DragHandlers.hasGroupSelection</a></b>() </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; returns true if there are any selected items.
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code></code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#DragHandlers.init">DragHandlers.init</a></b>() </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Initializes event handlers for dragging.
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>
+				&nbsp;
+				</code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#DragHandlers.isInDrag">DragHandlers.isInDrag</a></b>() </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code></code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#DragHandlers.keyPressed">DragHandlers.keyPressed</a></b>(e) </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Key event callback handler.
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code></code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#DragHandlers.mouseDown">DragHandlers.mouseDown</a></b>(e) </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Called on mousedown.
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code></code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#DragHandlers.mouseMove">DragHandlers.mouseMove</a></b>(e) </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; mousemove callback handler.
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code></code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#DragHandlers.mouseUp">DragHandlers.mouseUp</a></b>(e) </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; mouseup callback handler.
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code></code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#DragHandlers.preventUserSelection">DragHandlers.preventUserSelection</a></b>() </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Prevents selection while user is dragging.
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code></code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#DragHandlers.removeGroupSelection">DragHandlers.removeGroupSelection</a></b>() </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; undocumented
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code></code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#DragHandlers.setGroupSelection">DragHandlers.setGroupSelection</a></b>(dO, hasMetaKey) </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; undocumented
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code></code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#DragHandlers.setUpCoords">DragHandlers.setUpCoords</a></b>(e, dO) </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Called from dragStart.
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code></code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#DragHandlers.toString">DragHandlers.toString</a></b>() </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; undocumented
+ 
+			</td>
+		</tr>
+	
+</table>
+&nbsp;
+
+
+<!-- ========== EVENT SUMMARY =========== -->
+
+
+
+
+<!-- ========== INHERITED METHODS SUMMARY =========== -->
+
+<br/>
+
+<!-- ========== END INHERITED METHODS SUMMARY =========== -->
+
+<!-- ============ FIELD DETAIL START ========= -->
+
+<a name="field_detail"> </a> 
+<table border="1" cellpadding="3" cellspacing="0" width="100%">
+	<tr class="TableHeadingColor">
+		<th colspan=1>
+			Field Detail
+		</th>
+	</tr>
+</table>
+
+
+	<!-- One single method detail entry -->
+	<a name="Draggable.draggableList">
+	<!-- -->
+	</a> <h3>Draggable.draggableList</h3>
+		<pre><a href="Object.html">Object</a> <b>Draggable.draggableList</b></pre> 
+	<ul>
+		
+		Internal map of draggables
+		
+	</ul>
+
+
+	<!-- One single method detail entry -->
+	<a name="Draggable.highestZIndex">
+	<!-- -->
+	</a> <h3>Draggable.highestZIndex</h3>
+		<pre>Number <b>Draggable.highestZIndex</b></pre> 
+	<ul>
+		
+		a higher z-index is assigned beforedragstart.
+		
+	</ul>
+
+
+	<!-- One single method detail entry -->
+	<a name="DragHandlers.dO">
+	<!-- -->
+	</a> <h3>DragHandlers.dO</h3>
+		<pre>HTMLElement <b>DragHandlers.dO</b></pre> 
+	<ul>
+		
+		the element being actively dragged.
+		
+	</ul>
+
+
+	<!-- One single method detail entry -->
+	<a name="DragHandlers.focusedDO">
+	<!-- -->
+	</a> <h3>DragHandlers.focusedDO</h3>
+		<pre>HTMLElement <b>DragHandlers.focusedDO</b></pre> 
+	<ul>
+		
+		the element that has focus.
+		
+	</ul>
+
+
+	<!-- One single method detail entry -->
+	<a name="instanceDestructor">
+	<!-- -->
+	</a> <h3>instanceDestructor</h3>
+		<pre>object <b>instanceDestructor</b></pre> 
+	<ul>
+		
+		
+		
+	</ul>
+
+
+
+<!-- ============ FIELD DETAIL END ========== -->
+
+
+
+<!-- ============ METHOD DETAIL START ======= -->
+
+<a name="method_detail"> </a> 
+<table border="1" cellpadding="3" cellspacing="0" width="100%">
+	<tr class="TableHeadingColor">
+		<th colspan=1>
+			Method Detail
+		</th>
+	</tr>
+</table>
+
+
+	<a name="Draggable"> </a> <h3>Draggable</h3>
+		<pre><b>Draggable</b>(el, constraint)</pre> 
+	<ul>
+		
+		undocumented
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	<ul>
+		<b>Parameters:</b>
+		<ul>
+			<code>el</code> 
+		</ul>
+		<ul>
+			<code>constraint</code> 
+		</ul>
+	</ul>
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="Draggable.blurred"> </a> <h3>Draggable.blurred</h3>
+		<pre><b>Draggable.blurred</b>(e)</pre> 
+	<ul>
+		
+		Callback handler for a draggable's intrinsic focus event.
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	<ul>
+		<b>Parameters:</b>
+		<ul>
+			<code>e</code> 
+		</ul>
+	</ul>
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="Draggable.focused"> </a> <h3>Draggable.focused</h3>
+		<pre><b>Draggable.focused</b>(e)</pre> 
+	<ul>
+		
+		Callback handler for a draggable's intrinsic focus event.
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	<ul>
+		<b>Parameters:</b>
+		<ul>
+			<code>e</code> 
+		</ul>
+	</ul>
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="Draggable.instanceDestructor"> </a> <h3>Draggable.instanceDestructor</h3>
+		<pre><b>Draggable.instanceDestructor</b>()</pre> 
+	<ul>
+		
+		undocumented
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="DragHandlers.carryGroup"> </a> <h3>DragHandlers.carryGroup</h3>
+		<pre><b>DragHandlers.carryGroup</b>(distX, distY)</pre> 
+	<ul>
+		
+		called on mousemove
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	<ul>
+		<b>Parameters:</b>
+		<ul>
+			<code>distX</code> 
+		</ul>
+		<ul>
+			<code>distY</code> 
+		</ul>
+	</ul>
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="DragHandlers.dragObjGrabbed"> </a> <h3>DragHandlers.dragObjGrabbed</h3>
+		<pre><b>DragHandlers.dragObjGrabbed</b>(e, dO)</pre> 
+	<ul>
+		
+		Called from grab() and from mousemove, when first started.
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	<ul>
+		<b>Parameters:</b>
+		<ul>
+			<code>e</code> 
+		</ul>
+		<ul>
+			<code>dO</code> 
+		</ul>
+	</ul>
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="DragHandlers.dragObjReleased"> </a> <h3>DragHandlers.dragObjReleased</h3>
+		<pre><b>DragHandlers.dragObjReleased</b>(e, the)</pre> 
+	<ul>
+		
+		When a draggable has been released (by ESC), it calls dragout from the relevant droptargets and resets any active over droptargets.
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	<ul>
+		<b>Parameters:</b>
+		<ul>
+			<code><i>Event</i>&nbsp;e</code> - the event that triggered the release. This gets passed back to ondragout. 
+		</ul>
+		<ul>
+			<code><i>Draggable</i>&nbsp;the</code> - draggable object that was released. 
+		</ul>
+	</ul>
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="DragHandlers.getEventCoords"> </a> <h3>DragHandlers.getEventCoords</h3>
+		<pre><b>DragHandlers.getEventCoords</b>()</pre> 
+	<ul>
+		
+		
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="DragHandlers.hasGroupSelection"> </a> <h3>DragHandlers.hasGroupSelection</h3>
+		<pre><b>DragHandlers.hasGroupSelection</b>()</pre> 
+	<ul>
+		
+		returns true if there are any selected items.
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="DragHandlers.init"> </a> <h3>DragHandlers.init</h3>
+		<pre><b>DragHandlers.init</b>()</pre> 
+	<ul>
+		
+		Initializes event handlers for dragging.this is called once when the first dragObj is created.
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="DragHandlers.isInDrag"> </a> <h3>DragHandlers.isInDrag</h3>
+		<pre>&nbsp;<b>DragHandlers.isInDrag</b>()</pre> 
+	<ul>
+		
+		
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	<ul>
+		<b>Returns:</b>
+		<ul>
+			<code></code>true, if there is a draggable object.we could have a focusedDO that has been released. In that case, it may still beisBeingDragged = true; isBeingDragged is set to false in dragDone. This occurs after glideEnd. 
+		</ul>
+	</ul>
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="DragHandlers.keyPressed"> </a> <h3>DragHandlers.keyPressed</h3>
+		<pre><b>DragHandlers.keyPressed</b>(e)</pre> 
+	<ul>
+		
+		Key event callback handler. When ESC key is pressed, draggables are released.
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	<ul>
+		<b>Parameters:</b>
+		<ul>
+			<code>e</code> 
+		</ul>
+	</ul>
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="DragHandlers.mouseDown"> </a> <h3>DragHandlers.mouseDown</h3>
+		<pre><b>DragHandlers.mouseDown</b>(e)</pre> 
+	<ul>
+		
+		Called on mousedown.
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	<ul>
+		<b>Parameters:</b>
+		<ul>
+			<code>e</code> 
+		</ul>
+	</ul>
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="DragHandlers.mouseMove"> </a> <h3>DragHandlers.mouseMove</h3>
+		<pre><b>DragHandlers.mouseMove</b>(e)</pre> 
+	<ul>
+		
+		mousemove callback handler.
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	<ul>
+		<b>Parameters:</b>
+		<ul>
+			<code>e</code> 
+		</ul>
+	</ul>
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="DragHandlers.mouseUp"> </a> <h3>DragHandlers.mouseUp</h3>
+		<pre><b>DragHandlers.mouseUp</b>(e)</pre> 
+	<ul>
+		
+		mouseup callback handler.
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	<ul>
+		<b>Parameters:</b>
+		<ul>
+			<code>e</code> 
+		</ul>
+	</ul>
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="DragHandlers.preventUserSelection"> </a> <h3>DragHandlers.preventUserSelection</h3>
+		<pre><b>DragHandlers.preventUserSelection</b>()</pre> 
+	<ul>
+		
+		Prevents selection while user is dragging.
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="DragHandlers.removeGroupSelection"> </a> <h3>DragHandlers.removeGroupSelection</h3>
+		<pre><b>DragHandlers.removeGroupSelection</b>()</pre> 
+	<ul>
+		
+		undocumented
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="DragHandlers.setGroupSelection"> </a> <h3>DragHandlers.setGroupSelection</h3>
+		<pre><b>DragHandlers.setGroupSelection</b>(dO, hasMetaKey)</pre> 
+	<ul>
+		
+		undocumented
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	<ul>
+		<b>Parameters:</b>
+		<ul>
+			<code>dO</code> 
+		</ul>
+		<ul>
+			<code>hasMetaKey</code> 
+		</ul>
+	</ul>
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="DragHandlers.setUpCoords"> </a> <h3>DragHandlers.setUpCoords</h3>
+		<pre><b>DragHandlers.setUpCoords</b>(e, dO)</pre> 
+	<ul>
+		
+		Called from dragStart. Sets initial x/y position values.
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	<ul>
+		<b>Parameters:</b>
+		<ul>
+			<code>e</code> 
+		</ul>
+		<ul>
+			<code>dO</code> 
+		</ul>
+	</ul>
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="DragHandlers.toString"> </a> <h3>DragHandlers.toString</h3>
+		<pre><b>DragHandlers.toString</b>()</pre> 
+	<ul>
+		
+		undocumented
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+
+<!-- ============ METHOD DETAIL END ========== -->
+
+<!-- ============ EVENT DETAIL START ======= -->
+
+
+
+<!-- ============ EVENT DETAIL END ========== -->
+<div class="jsdoc_ctime">Documentation generated by <a href="http://jsdoctoolkit.org/" target="_parent">JsDoc Toolkit</a> 1.4.0 on Mon Feb 25 2008 19:21:30 GMT-0800 (PST)</div>
+</body>
+</html>

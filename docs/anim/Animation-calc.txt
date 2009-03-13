@@ -1,0 +1,47 @@
+
+
+    +-----------------------<< DISTANCE >>-----------------------+
+    |                                                            |
+    |           .2    .3                 .6    .7    .8    .9    |
+    0           !                 .5     !                       1
+    |%%%%%%%%%%%!~~~~~~~~~~~~~~~~~~~~~~~~!%%%%%%%%%%%%%%%%%%%%%%%|
+    |%%%%%%%%%%%!~~~~~~~~~~~~~~~~~~~~~~~~!%%%%%%%%%%%%%%%%%%%%%%%|
+    |%%%%%%%%%%%!~~~~~~~~~~~~~~~~~~~~~~~~!%%%%%%%%%%%%%%%%%%%%%%%|
+    |%%%%%%%%%%%!~~~~~~~~~~~~~~~~~~~~~~~~!%%%%%%%%%%%%%%%%%%%%%%%|
+    |%%%%%%%%%%%!~~~~~~~~~~~~~~~~~~~~~~~~!%%%%%%%%%%%%%%%%%%%%%%%|
+    +---------[ A ]--[ B ]-------------[ C ]---------------------+
+
+
+ DURATION: 4000ms
+
+ startOffset ___ .2
+ endOffset _____ .6
+ distance ______ Abs(endOffset - startOffset)
+ timeLimit _____ DURATION * distance
+ position ______ startOffset - (elapsed / timeLimit)
+
+ Animated object travels from point A to point C (startOffset to endOffset).
+ Animatated object normally takes 4000ms (DURATION) to run from 0-1.
+ 
+ 1. How long does it take to move from A to C? (solve for timeLimit)
+   A:  (distance * DURATION)
+       distance is .4, DURATION is 4000, so the answer is: (.4 * 4000)
+
+ 2. How long does it take to move from A to B? 
+   A:  (distance * DURATION)
+       .1 * 4000 
+   
+ 3. Animated object travels from A to C. How far is that? (solve for distance)
+   A: distance = Abs(.6 - .4)
+ 
+ 4. Animated object started at [A], going towards [C]. 200ms have elapsed. Where is it now? (solve for position)
+   A: .2 + (200ms/4000ms) 
+
+ 5. Point A to point C takes 1600 (see 1). Object started at A, 1600ms have elapsed. Is it at point C? Prove 1.
+   A: .2 + (1600/4000) 
+      .2 + (.4) = .6. True!
+
+ 6. Animated object started at [C], moving in reverse, 200ms have elapsed. Where is it now? (solve for position).
+   A: distance = Abs(.6 - .4)
+      .6 - Abs(200/4000)
+ 

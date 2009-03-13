@@ -1,0 +1,42 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+  <title>Form Serialize</title>
+</head>
+<body>
+<form method="post" 
+  enctype="multipart/form-data" 
+  id='form' action="process.jsp">	<input type="file" name="file" id="file"/>
+
+  <input type="text" name="name" value="a"/>
+  <button type="button" 
+    onclick="sendXHR(event);return false;">Send</button>
+</form>
+
+<xmp id="result"></xmp>
+
+<script>
+function sendXHR(e) {try{
+  var req = new XMLHttpRequest();
+  req.onreadystatechange = showData;
+  req.open("post", "process.jsp", true);
+  req.setRequestHeader('Content-Type', 
+    "multipart/form-data; boundary=DATA1215979532633");
+  req.send('--DATA1215979532633\r\n'
+    +'Content-Disposition: form-data; name="name";\r\n\r\n'
+    +'a\r\n'
+    +'--DATA1215979532633\r\n'
+    +'Content-Disposition: form-data; name="name"; filename="file"\r\n\r\n'
+    + document.getElementById('file').files[0].getAsBinary()+'\r\n'
+    +'--DATA1215979532633--');
+    }catch(ex){alert(ex);}
+}
+
+
+function showData() {
+  var data = this.responseText;
+  document.getElementById('result').innerHTML = data;
+}
+</script>
+</body>
+</html>

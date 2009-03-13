@@ -1,0 +1,67 @@
+Keep Stack Information
+
+Spidermonkey provides Error.stack as a property (linear_b includes a stack in err.message string). 
+
+A stack trace is vital debugging information. YUI Test discards it when throwing UnexpectedError.
+
+YUI Test should definitely keep the stack information and not discard it. I'd like to have the stack available 
+just like Firebug provides it, in an expand/collapse toggle.
+
+--------------------------------------
+Unexpected Error: [+] "dps" is undefined
+--------------------------------------
+
+Clicking the "+" would provide a stack.
+
+I modified the code a little to get the stack in the message string. It's not perfect, but it helped me find a few errors more 
+quickly.
+
+
+YAHOO.util.UnexpectedError = function (cause /*:Object*/){
+
+    //call superclass
+    arguments.callee.superclass.constructor.call(this, "Unexpected error: " + cause.message);
+    
+    /**
+     * The unexpected error that occurred.
+     * @type Error
+     * @property cause
+     */
+    this.cause /*:Error*/ = cause;
+    
+	this.stack = cause.stack || (function() {
+		var stack = [ ];
+		try {
+			var toString = Function.prototype.toString;
+			for(var fn = arguments.callee.caller.caller.caller; (fn = fn.caller) != null; ) {
+				var source = toString.call( fn );
+				source = source.substring(0, source.indexOf('{'));
+				stack.push(source);
+			}
+		} catch(ex) {
+		} finally {
+			return stack.join('\n ');
+		}
+	})();
+
+    /**
+     * The name of the error that occurred.
+     * @type String
+     * @property name
+     */    
+};
+
+//inherit methods
+YAHOO.lang.extend(YAHOO.util.UnexpectedError, YAHOO.util.AssertionError, {
+	name /*:String*/ : "UnexpectedError",
+	getMessage : function() {
+		return this.message + '\nstack trace:\n ' + this.stack;
+	}
+});
+
+
+It would be a good idea to add a different UI. A UI that would enable pause/resume and failure of tests as objects. Logger is not sufficient for this.
+
+
+Logger does not maintain state. When you reload, the checkboxes do not keep their state. I have hacked this up in m own testby checking locaction.search.
+Tetst are not represented as objects, to find failure, you search through the log. That's fine, but if the test is long, it's not so easy.

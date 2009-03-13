@@ -1,0 +1,1180 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+	<meta name="generator" content="JsDoc Toolkit 1.0">
+	<title>JsDoc: </title>
+	<link rel=stylesheet href="default.css" type="text/css" media=screen>
+</head>
+
+<body>
+	<div class="content">
+		<div class="docs">
+		
+			<div class="sectionHead">Library: StyleTransition.js</div>
+			<div class="section overview">
+				<div class="itemTitle">
+					Overview
+				</div>
+				<div>	
+					<div class="desc">StyleTransition<p>For morphing an objects styles across a space-time-continuum.</p>Released under Academic Free Licence 3.0.</div>
+					<div class="itemTags">
+					<ul>
+						<li>source: <a href="src_05.html">StyleTransition.js</a></li>
+					
+						<li>author: Garrett Smith</li>
+					
+						<li>requires: APE.anim.Animation</li>
+					
+						<li>requires: APE.color</li>
+					
+						<li>requires: APE.dom.position-style-f</li>
+					
+					</ul>
+					</div>
+				</div>
+			</div>
+			
+			<div class="sectionHead">Constructors</div>
+			
+			
+			<div class="section constructor">
+				<div class="itemTitle">
+					<a name="APE.anim.StyleTransition"></a>
+					
+					
+					
+					APE.anim.StyleTransition(<span class="signature">id, styleObject, duration, transition</span>)
+					
+					
+				</div>
+				
+				
+					<div class="desc"></div>
+				
+				
+					<div class="desc"></div>
+				
+				
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							String
+						</td>
+						<td>
+							id
+						</td>
+						<td>
+							of the element
+						</td> 
+					</tr>
+				
+					<tr>
+						<td class="type">
+							Object
+						</td>
+						<td>
+							styleObject
+						</td>
+						<td>
+							in the form of {color: "#030", fontSize : "12px"}
+						</td> 
+					</tr>
+				
+					<tr>
+						<td class="type">
+							ufloat
+						</td>
+						<td>
+							duration<a title="optional parameter" class="optional">?</a>
+						</td>
+						<td>
+							optional number of seconds.
+						</td> 
+					</tr>
+				
+					<tr>
+						<td class="type">
+							Function
+						</td>
+						<td>
+							transition<a title="optional parameter" class="optional">?</a>
+						</td>
+						<td>
+							optional funtion that takes a float [0-1] and returns a float [0-1]
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				
+				
+				
+				
+					<div class="detailHead">inherits</div>
+					
+						<div>onabort(<span class="signature">ex</span>) from APE.anim.Animation</div>
+					
+						<div>run(<span class="signature">position</span>) from APE.anim.Animation</div>
+					
+						<div>start(<span class="signature"></span>) from APE.anim.Animation</div>
+					
+						<div>seekTo(<span class="signature">pos</span>) from APE.anim.Animation</div>
+					
+						<div>reset(<span class="signature"></span>) from APE.anim.Animation</div>
+					
+						<div>pause(<span class="signature"></span>) from APE.anim.Animation</div>
+					
+						<div>resume(<span class="signature"></span>) from APE.anim.Animation</div>
+					
+						<div>toString(<span class="signature"></span>) from APE.anim.Animation</div>
+					
+						<div>stop(<span class="signature">ended</span>) from APE.anim.Animation</div>
+					
+						<div>abort(<span class="signature">ex</span>) from APE.anim.Animation</div>
+					
+				
+				
+				
+			</div>
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			<div class="sectionHead">Namespaces</div>
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			<div class="sectionHead">Functions</div>
+			
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.anim.StyleTransition.this.init.run"></a>
+					
+					
+						<i><a href="#APE.anim.StyleTransition.this.init" class="type">APE.anim.StyleTransition.this.init.</a></i>run(<span class="signature">rationalValue</span>)
+					
+					
+					
+				</div>
+				
+				
+					<div class="desc">Runs the animation, getting the correct value  from each ITransitionAdapter.This run() method gets called by Animation.</div>
+				
+
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							rationalValue
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="this.toggleDirection"></a>
+					
+					
+					
+					this.toggleDirection(<span class="signature"></span>)
+					
+					
+				</div>
+				
+				
+
+				
+				
+				
+				
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="TransitionAdapter.fromValues"></a>
+					
+					
+					
+					TransitionAdapter.fromValues(<span class="signature">prop, fromValue, toValue</span>)
+					
+					
+				</div>
+				
+				
+
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							prop
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							fromValue
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							toValue
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="ColorTransitionAdapter"></a>
+					
+					
+					
+					ColorTransitionAdapter(<span class="signature">prop, fromValue, toValue</span>)
+					
+					
+				</div>
+				
+				
+
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							prop
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							fromValue
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							toValue
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="ColorTransitionAdapter.blendTo"></a>
+					
+					
+						<i><a href="#ColorTransitionAdapter" class="type">ColorTransitionAdapter.</a></i>blendTo(<span class="signature">rationalValue</span>)
+					
+					
+					
+				</div>
+				
+				
+
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							rationalValue
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="ColorTransitionAdapter.toString"></a>
+					
+					
+						<i><a href="#ColorTransitionAdapter" class="type">ColorTransitionAdapter.</a></i>toString(<span class="signature"></span>)
+					
+					
+					
+				</div>
+				
+				
+
+				
+				
+				
+				
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="LengthTransitionAdapter"></a>
+					
+					
+					
+					LengthTransitionAdapter(<span class="signature">prop, fromValue, toValue</span>)
+					
+					
+				</div>
+				
+				
+
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							prop
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							fromValue
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							toValue
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="LengthTransitionAdapter.blendTo"></a>
+					
+					
+						<i><a href="#LengthTransitionAdapter" class="type">LengthTransitionAdapter.</a></i>blendTo(<span class="signature">rationalValue</span>)
+					
+					
+					
+				</div>
+				
+				
+
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							rationalValue
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="LengthTransitionAdapter.toString"></a>
+					
+					
+						<i><a href="#LengthTransitionAdapter" class="type">LengthTransitionAdapter.</a></i>toString(<span class="signature"></span>)
+					
+					
+					
+				</div>
+				
+				
+
+				
+				
+				
+				
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="PositiveLengthTransitionAdapter"></a>
+					
+					
+					
+					PositiveLengthTransitionAdapter(<span class="signature"></span>)
+					
+					
+				</div>
+				
+				
+
+				
+				
+				
+				
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="PositiveLengthTransitionAdapter.blendTo"></a>
+					
+					
+						<i><a href="#PositiveLengthTransitionAdapter" class="type">PositiveLengthTransitionAdapter.</a></i>blendTo(<span class="signature">rationalValue</span>)
+					
+					
+					
+				</div>
+				
+				
+
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							rationalValue
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="OpacityTransitionAdapter"></a>
+					
+					
+					
+					OpacityTransitionAdapter(<span class="signature">prop, fromValue, toValue</span>)
+					
+					
+				</div>
+				
+				
+
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							prop
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							fromValue
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							toValue
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="OpacityTransitionAdapter.blendTo"></a>
+					
+					
+						<i><a href="#OpacityTransitionAdapter" class="type">OpacityTransitionAdapter.</a></i>blendTo(<span class="signature">rationalValue</span>)
+					
+					
+					
+				</div>
+				
+				
+
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							rationalValue
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="OpacityTransitionAdapter.toString"></a>
+					
+					
+						<i><a href="#OpacityTransitionAdapter" class="type">OpacityTransitionAdapter.</a></i>toString(<span class="signature"></span>)
+					
+					
+					
+				</div>
+				
+				
+
+				
+				
+				
+				
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="FilterTransitionAdapter"></a>
+					
+					
+					
+					FilterTransitionAdapter(<span class="signature">prop, fromValue, toValue</span>)
+					
+					
+				</div>
+				
+				
+
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							prop
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							fromValue
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							toValue
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="FilterTransitionAdapter.blendTo"></a>
+					
+					
+						<i><a href="#FilterTransitionAdapter" class="type">FilterTransitionAdapter.</a></i>blendTo(<span class="signature">rationalValue</span>)
+					
+					
+					
+				</div>
+				
+				
+
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							rationalValue
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="FilterTransitionAdapter.toString"></a>
+					
+					
+						<i><a href="#FilterTransitionAdapter" class="type">FilterTransitionAdapter.</a></i>toString(<span class="signature"></span>)
+					
+					
+					
+				</div>
+				
+				
+
+				
+				
+				
+				
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="NullTransitionAdapter"></a>
+					
+					
+					
+					NullTransitionAdapter(<span class="signature">prop, fromValue, toValue</span>)
+					
+					
+				</div>
+				
+				
+
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							prop
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							fromValue
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							toValue
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="NullTransitionAdapter.blendTo"></a>
+					
+					
+						<i><a href="#NullTransitionAdapter" class="type">NullTransitionAdapter.</a></i>blendTo(<span class="signature">rationalValue</span>)
+					
+					
+					
+				</div>
+				
+				
+
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							rationalValue
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="NullTransitionAdapter.toString"></a>
+					
+					
+						<i><a href="#NullTransitionAdapter" class="type">NullTransitionAdapter.</a></i>toString(<span class="signature"></span>)
+					
+					
+					
+				</div>
+				
+				
+
+				
+				
+				
+				
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="sectionHead">Objects</div>
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+		</div>
+	</div>
+	<div class="finePrint">
+	Generated by <a href="http://jsdoctoolkit.org/" target="_blank">JsDoc Toolkit</a> 1.4.0 on Fri, 01 Feb 2008 20:53:32 GMT.
+	</div>
+</body>
+</html>

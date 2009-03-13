@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head><title>offsetTop border parent</title>
+<style type="text/css">
+#a {
+    border: 1px outset #933;
+    position: absolute;
+    background:#FFc;
+    top: 10px;
+    left: 10px;
+    font: 12px sans serif;
+    height: 46px;
+    width: 90px;
+}
+
+#expected {
+    background: #0f0;
+    height: 5px;
+    width: 5px;
+    position: absolute;
+    top: 35px;
+    left: 35px
+}
+
+#c {
+    height: 40px;
+    width: 100%
+    overflow: auto;
+    position: relative;
+}
+</style>
+</head>
+
+<body style="border: 5px solid; margin:0 15px; font-size:0;position:relative; height: 600px; padding: 10px;" id="b"><!-- 5 + 10 -->
+<div style="background: #ff0;position: relative;width: 100px;height:12px;top:0" id="o" >
+    <div style="border: 15px solid;width: 100px;" id='asdf'
+        ><div id="c">
+            <div id='a'>&nbsp;I am at 55, 40 in Iframe doc.</div><!-- 10 -->
+        </div>
+    </div>
+</div>
+
+<div id='expected'></div>
+</body>
+</html>

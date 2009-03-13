@@ -1,0 +1,421 @@
+<html><head><meta http-equiv="content-type" content="text/html; charset=utf-8"> <style>
+	.KEYW {color: #933;}
+	.COMM {color: #bbb; font-style: italic;}
+	.NUMB {color: #393;}
+	.STRN {color: #393;}
+	.REGX {color: #339;}
+	.linenumber {border-right: 1px dotted #666; color: #666; font-style: normal;}
+	</style></head><body><pre><span class='linenumber'>  1</span> <span class="COMM">/** 
+<span class='linenumber'>  2</span>  * @fileoverview
+<span class='linenumber'>  3</span>  * anim package
+<span class='linenumber'>  4</span>  * Animation, Manager
+<span class='linenumber'>  5</span>  *
+<span class='linenumber'>  6</span>  * Released under Academic Free Licence 3.0.
+<span class='linenumber'>  7</span>  *
+<span class='linenumber'>  8</span>  * @author Garrett Smith
+<span class='linenumber'>  9</span>  * 
+<span class='linenumber'> 10</span>  * &lt;p>
+<span class='linenumber'> 11</span>  * Animation is purely a timing framework that passes a position to the run() method.
+<span class='linenumber'> 12</span>  * It has nothing to do with HTML elements, CSS, et c.
+<span class='linenumber'> 13</span>  * &lt;/p> &lt;p>
+<span class='linenumber'> 14</span>  * &lt;code>anim.Manager&lt;/code> manges running animations in two threads. This can be changed by setting 
+<span class='linenumber'> 15</span>  * &lt;code>APE.anim.Manager.isDoubleThreaded = false;&lt;/code>
+<span class='linenumber'> 16</span>  * &lt;/p>
+<span class='linenumber'> 17</span>  * &lt;p>
+<span class='linenumber'> 18</span>  * &lt;code>anim.Transitions&lt;/code> contains effects for speed/timing, such as acceleration and easing.
+<span class='linenumber'> 19</span>  * &lt;/p> &lt;pre> 
+<span class='linenumber'> 20</span>  * b = new APE.anim.Animation( "blah" );
+<span class='linenumber'> 21</span>  * b.run = function(position) { // &lt;-- you implement run.
+<span class='linenumber'> 22</span>  * 
+<span class='linenumber'> 23</span>  * }
+<span class='linenumber'> 24</span>  * b.start() // &lt;-- then call start.
+<span class='linenumber'> 25</span>  * &lt;/pre> &lt;p>
+<span class='linenumber'> 26</span>  * anim.Transition
+<span class='linenumber'> 27</span>  * &lt;/p> &lt;p>
+<span class='linenumber'> 28</span>  * All functions work with a position (0-1).
+<span class='linenumber'> 29</span>  * &lt;/p>
+<span class='linenumber'> 30</span>  */</span><span class="WHIT">
+<span class='linenumber'> 31</span> 
+<span class='linenumber'> 32</span> </span><span class="COMM">/** 
+<span class='linenumber'> 33</span>  * @class 
+<span class='linenumber'> 34</span>  * @namespace APE.anim
+<span class='linenumber'> 35</span>  */</span><span class="WHIT">
+<span class='linenumber'> 36</span> 
+<span class='linenumber'> 37</span> </span><span class="NAME">APE.namespace</span><span class="PUNC">(</span><span class="STRN">"APE.anim"</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'> 38</span> 
+<span class='linenumber'> 39</span> </span><span class="COMM">/**  
+<span class='linenumber'> 40</span>  * @constructor Animation
+<span class='linenumber'> 41</span>  * @param {ufloat} [duration] Number of seconds to run the animation (default is 1).
+<span class='linenumber'> 42</span>  */</span><span class="WHIT">
+<span class='linenumber'> 43</span> </span><span class="NAME">APE.anim.Animation</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="WHIT"> </span><span class="NAME">duration</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'> 44</span> </span><span class="WHIT">	</span><span class="KEYW">if</span><span class="PUNC">(</span><span class="KEYW">typeof</span><span class="WHIT"> </span><span class="NAME">duration</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="STRN">"number"</span><span class="PUNC">)</span><span class="WHIT">
+<span class='linenumber'> 45</span> </span><span class="WHIT">		</span><span class="NAME">this.duration</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">duration</span><span class="WHIT"> </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NUMB">1000</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="COMM">// default 1 sec.</span><span class="WHIT">
+<span class='linenumber'> 46</span> </span><span class="WHIT">	</span><span class="NAME">this.timeLimit</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.duration</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="COMM">// for SeekTo()</span><span class="WHIT">
+<span class='linenumber'> 47</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'> 48</span> 
+<span class='linenumber'> 49</span> </span><span class="COMM">/** 
+<span class='linenumber'> 50</span>  * Calculates the distance between two points.
+<span class='linenumber'> 51</span>  * @param {x:int, y:int} start coords
+<span class='linenumber'> 52</span>  * @param {x:int, y:int} end coords
+<span class='linenumber'> 53</span>  * @static
+<span class='linenumber'> 54</span>  */</span><span class="WHIT">
+<span class='linenumber'> 55</span> </span><span class="NAME">APE.anim.calculateHypoteneuse</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">start</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">end</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'> 56</span> </span><span class="WHIT">	</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">Math.ceil</span><span class="PUNC">(</span><span class="NAME">Math.sqrt</span><span class="PUNC">(</span><span class="NAME">Math.pow</span><span class="PUNC">(</span><span class="NAME">start.x</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NAME">end.x</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NUMB">2</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">Math.pow</span><span class="PUNC">(</span><span class="NAME">start.y</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NAME">end.y</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NUMB">2</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'> 57</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'> 58</span> 
+<span class='linenumber'> 59</span> </span><span class="COMM">/** 
+<span class='linenumber'> 60</span>  * blendValue is useful for transitioning between two numeric values.
+<span class='linenumber'> 61</span>  * @param v1 the first value 
+<span class='linenumber'> 62</span>  * @param v2 other value to mix in
+<span class='linenumber'> 63</span>  * @param position - ratio blend of v2:v1
+<span class='linenumber'> 64</span>  * @static
+<span class='linenumber'> 65</span>  */</span><span class="WHIT">
+<span class='linenumber'> 66</span> </span><span class="NAME">APE.anim.Animation.blendValue</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">v1</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">v2</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">position</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'> 67</span> </span><span class="WHIT">	</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">inverse</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NAME">position</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'> 68</span> </span><span class="WHIT">	</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">v1</span><span class="WHIT"> </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NAME">inverse</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">v2</span><span class="WHIT"> </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NAME">position</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'> 69</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'> 70</span> 
+<span class='linenumber'> 71</span> </span><span class="NAME">APE.anim.Animation.prototype</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'> 72</span> </span><span class="WHIT">	</span><span class="WHIT">
+<span class='linenumber'> 73</span> </span><span class="WHIT">	</span><span class="NAME">paused</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">,</span><span class="WHIT">
+<span class='linenumber'> 74</span> 
+<span class='linenumber'> 75</span> </span><span class="WHIT">	</span><span class="COMM">/** {Number} duration of how long the animation will run (milliseconds). */</span><span class="WHIT">
+<span class='linenumber'> 76</span> </span><span class="WHIT">	</span><span class="NAME">duration</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">1000</span><span class="PUNC">,</span><span class="WHIT">
+<span class='linenumber'> 77</span> 
+<span class='linenumber'> 78</span> </span><span class="WHIT">	</span><span class="COMM">/** {Number} duration of how long the animation will run.
+<span class='linenumber'> 79</span> 	 * Used internally for seekTo().
+<span class='linenumber'> 80</span> 	 */</span><span class="WHIT">
+<span class='linenumber'> 81</span> </span><span class="WHIT">	</span><span class="NAME">timeLimit</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">1000</span><span class="PUNC">,</span><span class="WHIT">
+<span class='linenumber'> 82</span> 
+<span class='linenumber'> 83</span> </span><span class="WHIT">	</span><span class="NAME">isReversed</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">,</span><span class="WHIT">
+<span class='linenumber'> 84</span> 
+<span class='linenumber'> 85</span> </span><span class="WHIT">	</span><span class="NAME">startOffset</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">,</span><span class="WHIT">
+<span class='linenumber'> 86</span> </span><span class="WHIT">	</span><span class="NAME">endOffset</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">,</span><span class="WHIT">
+<span class='linenumber'> 87</span> 
+<span class='linenumber'> 88</span> </span><span class="WHIT">	</span><span class="NAME">position</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">,</span><span class="WHIT">
+<span class='linenumber'> 89</span> 
+<span class='linenumber'> 90</span> </span><span class="WHIT">	</span><span class="COMM">/** @event */</span><span class="WHIT">
+<span class='linenumber'> 91</span> </span><span class="WHIT">	</span><span class="NAME">onstart</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='linenumber'> 92</span> </span><span class="WHIT">	</span><span class="COMM">/** @event */</span><span class="WHIT">
+<span class='linenumber'> 93</span> </span><span class="WHIT">	</span><span class="NAME">onend</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='linenumber'> 94</span> </span><span class="WHIT">	</span><span class="WHIT">
+<span class='linenumber'> 95</span> </span><span class="WHIT">	</span><span class="COMM">/** if an error occurred, onabort throws the error.
+<span class='linenumber'> 96</span> 	 * this can be overridden (shadowed) by adding 
+<span class='linenumber'> 97</span> 	 * an onabort() to the Animation instance.
+<span class='linenumber'> 98</span> 	 * e.g. APE.EventRegistry.add( myAnim, "onabort", myErrorHandler );
+<span class='linenumber'> 99</span> 	 * @param {Error} ex the error that occured.
+<span class='linenumber'>100</span> 	 */</span><span class="WHIT">
+<span class='linenumber'>101</span> </span><span class="WHIT">	</span><span class="NAME">onabort</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">ex</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'>102</span> </span><span class="WHIT">		</span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="NAME">ex</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>103</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='linenumber'>104</span> 
+<span class='linenumber'>105</span> </span><span class="WHIT">	</span><span class="COMM">/** Run must be implemented by user.
+<span class='linenumber'>106</span> 	 * @param position {Number} 0-1
+<span class='linenumber'>107</span> 	 * 
+<span class='linenumber'>108</span> 	 * Implementation generally looks something like:&lt;pre>
+<span class='linenumber'>109</span> 	 * anim.run = function( position ) {
+<span class='linenumber'>110</span> 	 *   document.body.style.borderWidth = ( 12 * position ) + "px"
+<span class='linenumber'>111</span> 	 * };&lt;/pre>
+<span class='linenumber'>112</span> 	 */</span><span class="WHIT">
+<span class='linenumber'>113</span> </span><span class="WHIT">	</span><span class="NAME">run</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT"> </span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="NAME">Error</span><span class="PUNC">(</span><span class="STRN">"APE.anim: "</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">this.id</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">" run() not implemented."</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='linenumber'>114</span> 
+<span class='linenumber'>115</span> </span><span class="WHIT">	</span><span class="COMM">/** 
+<span class='linenumber'>116</span> 	 * Call this method to start the anim.
+<span class='linenumber'>117</span> 	 */</span><span class="WHIT">
+<span class='linenumber'>118</span> </span><span class="WHIT">	</span><span class="NAME">start</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'>119</span> </span><span class="WHIT">		</span><span class="KEYW">if</span><span class="PUNC">(</span><span class="NAME">this.paused</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="KEYW">return</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>120</span> </span><span class="WHIT">		</span><span class="NAME">this.playing</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">true</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>121</span> </span><span class="WHIT">		</span><span class="NAME">this.timeLimit</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.duration</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>122</span> </span><span class="WHIT">		</span><span class="NAME">this._start</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>123</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='linenumber'>124</span> 
+<span class='linenumber'>125</span> </span><span class="WHIT">	</span><span class="COMM">/**
+<span class='linenumber'>126</span> 	 *  timeLimit is not calculated here.
+<span class='linenumber'>127</span> 	 * @private
+<span class='linenumber'>128</span> 	 */</span><span class="WHIT">
+<span class='linenumber'>129</span> </span><span class="WHIT">	</span><span class="NAME">_start</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'>130</span> </span><span class="WHIT">		</span><span class="COMM">// Unregister the animation before setting startTime.</span><span class="WHIT">
+<span class='linenumber'>131</span> </span><span class="WHIT">		</span><span class="NAME">APE.anim.Manager.unregister</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>132</span> </span><span class="WHIT">		</span><span class="NAME">this._startTime</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Date</span><span class="PUNC">-</span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>133</span> </span><span class="WHIT">		</span><span class="NAME">this.onstart</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>134</span> </span><span class="WHIT">		</span><span class="NAME">APE.anim.Manager.register</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>135</span> </span><span class="WHIT">		</span><span class="NAME">this.started</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">true</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>136</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='linenumber'>137</span> 
+<span class='linenumber'>138</span> </span><span class="WHIT">	</span><span class="COMM">/** 
+<span class='linenumber'>139</span> 	 * Seeks to a certain position along the
+<span class='linenumber'>140</span> 	 * duration timeline. 
+<span class='linenumber'>141</span> 	 * @param pos {ufloat} [0-1]. 
+<span class='linenumber'>142</span> 	 */</span><span class="WHIT">
+<span class='linenumber'>143</span> </span><span class="WHIT">	</span><span class="NAME">seekTo</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">pos</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'>144</span> 
+<span class='linenumber'>145</span> </span><span class="WHIT">		</span><span class="COMM">// The new distance is the difference between the </span><span class="WHIT">
+<span class='linenumber'>146</span> </span><span class="WHIT">		</span><span class="COMM">// desired position (pos) and the currentPosition (position).</span><span class="WHIT">
+<span class='linenumber'>147</span> </span><span class="WHIT">		</span><span class="NAME">this.startOffset</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.position</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>148</span> </span><span class="WHIT">		</span><span class="NAME">this.endOffset</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">pos</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>149</span> </span><span class="WHIT">		</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">distance</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">Math.abs</span><span class="PUNC">(</span><span class="NAME">pos</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NAME">this.startOffset</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>150</span> 
+<span class='linenumber'>151</span> </span><span class="WHIT">		</span><span class="COMM">// The new timeLimit is a percentage of the the full duration.</span><span class="WHIT">
+<span class='linenumber'>152</span> </span><span class="WHIT">		</span><span class="NAME">this.timeLimit</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.duration</span><span class="WHIT"> </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NAME">distance</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>153</span> 
+<span class='linenumber'>154</span> </span><span class="WHIT">		</span><span class="NAME">this._startTime</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Date</span><span class="PUNC">-</span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>155</span> </span><span class="WHIT">		</span><span class="NAME">this.onstart</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>156</span> 
+<span class='linenumber'>157</span> </span><span class="WHIT">		</span><span class="NAME">APE.anim.Manager.unregister</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>158</span> </span><span class="WHIT">		</span><span class="NAME">this._start</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>159</span> </span><span class="WHIT">		</span><span class="KEYW">if</span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">this.started</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT"> </span><span class="WHIT">
+<span class='linenumber'>160</span> </span><span class="WHIT">			</span><span class="NAME">this.start</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>161</span> </span><span class="WHIT">			</span><span class="NAME">this.isReversed</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>162</span> </span><span class="WHIT">			</span><span class="KEYW">return</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>163</span> </span><span class="WHIT">		</span><span class="PUNC">}</span><span class="WHIT">
+<span class='linenumber'>164</span> </span><span class="WHIT">		</span><span class="NAME">this.isReversed</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">pos</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NAME">this.position</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>165</span> </span><span class="WHIT">			</span><span class="WHIT">
+<span class='linenumber'>166</span> </span><span class="WHIT">		</span><span class="NAME">APE.anim.Manager.register</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>167</span> </span><span class="WHIT">		</span><span class="NAME">this.started</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">true</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>168</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='linenumber'>169</span> </span><span class="WHIT">	</span><span class="WHIT">
+<span class='linenumber'>170</span> </span><span class="WHIT">	</span><span class="COMM">/** 
+<span class='linenumber'>171</span> 	 * resets the animation to position 0.
+<span class='linenumber'>172</span> 	 */</span><span class="WHIT">
+<span class='linenumber'>173</span> </span><span class="WHIT">	</span><span class="NAME">reset</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'>174</span> </span><span class="WHIT">		</span><span class="NAME">this.position</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>175</span> </span><span class="WHIT">		</span><span class="NAME">this.timeLimit</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.duration</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>176</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='linenumber'>177</span> </span><span class="WHIT">	</span><span class="WHIT">
+<span class='linenumber'>178</span> </span><span class="WHIT">	</span><span class="COMM">/** 
+<span class='linenumber'>179</span> 	 * pauses the animation.
+<span class='linenumber'>180</span> 	 */</span><span class="WHIT">
+<span class='linenumber'>181</span> </span><span class="WHIT">	</span><span class="NAME">pause</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'>182</span> </span><span class="WHIT">		</span><span class="NAME">this.paused</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">true</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>183</span> </span><span class="WHIT">		</span><span class="NAME">this.elapsedTime</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Date</span><span class="PUNC">-</span><span class="NAME">this._startTime</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>184</span> </span><span class="WHIT">		</span><span class="NAME">APE.anim.Manager.unregister</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>185</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='linenumber'>186</span> </span><span class="WHIT">	</span><span class="WHIT">
+<span class='linenumber'>187</span> </span><span class="WHIT">	</span><span class="COMM">/** 
+<span class='linenumber'>188</span> 	 * unpauses the animation.
+<span class='linenumber'>189</span> 	 */</span><span class="WHIT">
+<span class='linenumber'>190</span> </span><span class="WHIT">	</span><span class="NAME">resume</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'>191</span> </span><span class="WHIT">		</span><span class="NAME">this.paused</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>192</span> </span><span class="WHIT">		</span><span class="COMM">// Pick up from last time frame.</span><span class="WHIT">
+<span class='linenumber'>193</span> </span><span class="WHIT">		</span><span class="NAME">this._startTime</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Date</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NAME">this.elapsedTime</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>194</span> </span><span class="WHIT">		</span><span class="NAME">APE.anim.Manager.register</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>195</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='linenumber'>196</span> </span><span class="WHIT">	</span><span class="WHIT">
+<span class='linenumber'>197</span> </span><span class="WHIT">	</span><span class="COMM">/** 
+<span class='linenumber'>198</span> 	 * Called by the anim.Manager
+<span class='linenumber'>199</span> 	 * @private
+<span class='linenumber'>200</span> 	 */</span><span class="WHIT">
+<span class='linenumber'>201</span> </span><span class="WHIT">	</span><span class="NAME">_playFrame</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'>202</span> 
+<span class='linenumber'>203</span> </span><span class="WHIT">		</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">elapsed</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Date</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NAME">this._startTime</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>204</span> </span><span class="WHIT">		</span><span class="KEYW">if</span><span class="PUNC">(</span><span class="NAME">elapsed</span><span class="WHIT"> </span><span class="PUNC">>=</span><span class="WHIT"> </span><span class="NAME">this.timeLimit</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'>205</span> </span><span class="WHIT">			</span><span class="NAME">this.run</span><span class="PUNC">(</span><span class="NAME">this.endOffset</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>206</span> </span><span class="WHIT">			</span><span class="NAME">this._end</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>207</span> </span><span class="WHIT">			</span><span class="KEYW">return</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>208</span> </span><span class="WHIT">		</span><span class="PUNC">}</span><span class="WHIT">
+<span class='linenumber'>209</span> </span><span class="WHIT">		</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">distanceTraveled</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">elapsed</span><span class="WHIT"> </span><span class="REGX">/ this.duration);
+<span class='linenumber'>210</span> 		if(this.isReversed) {
+<span class='linenumber'>211</span> 			distanceTraveled = -distanceTraveled;
+<span class='linenumber'>212</span> 		}
+<span class='linenumber'>213</span> 		this.position = this.startOffset + distanceTraveled;
+<span class='linenumber'>214</span> 		/</span><span class="REGX">/ If an error occurs, cancel the APE.anim and throw the error.
+<span class='linenumber'>215</span> 		try {
+<span class='linenumber'>216</span> 			this.run( this.position );
+<span class='linenumber'>217</span> 		} 
+<span class='linenumber'>218</span> 		catch(ex) {
+<span class='linenumber'>219</span> 			/</span><span class="REGX">/ If an error occurs, abort the anim.
+<span class='linenumber'>220</span> 			this.abort(ex);
+<span class='linenumber'>221</span> 			this._end(false);
+<span class='linenumber'>222</span> 		}
+<span class='linenumber'>223</span> 	},
+<span class='linenumber'>224</span> 
+<span class='linenumber'>225</span> 	toString : function() {
+<span class='linenumber'>226</span> 		return"Animation {duration millis: " + this.duration + 
+<span class='linenumber'>227</span> 			", position:" + this.position+"}";
+<span class='linenumber'>228</span> 	},
+<span class='linenumber'>229</span> 
+<span class='linenumber'>230</span> 	/</span><span class="PUNC">*</span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NAME">Ends</span><span class="WHIT"> </span><span class="NAME">the</span><span class="WHIT"> </span><span class="NAME">anim.</span><span class="WHIT">
+<span class='linenumber'>231</span> </span><span class="WHIT">	 </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="TOKN">@</span><span class="NAME">param</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="NAME">boolean</span><span class="PUNC">}</span><span class="WHIT"> </span><span class="NAME">ended</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="KEYW">true</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">calls</span><span class="WHIT"> </span><span class="NAME">onend</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="WHIT">
+<span class='linenumber'>232</span> </span><span class="WHIT">	 </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NAME">Note</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="WHIT"> </span><span class="NAME">is</span><span class="WHIT"> </span><span class="NAME">not</span><span class="WHIT"> </span><span class="NAME">a</span><span class="WHIT"> </span><span class="NAME">pause</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="NAME">method.</span><span class="WHIT">
+<span class='linenumber'>233</span> </span><span class="WHIT">	 </span><span class="PUNC">*</span><span class="REGX">/
+<span class='linenumber'>234</span> 	stop : function(ended) {
+<span class='linenumber'>235</span> 		this._end(ended);
+<span class='linenumber'>236</span> 	},
+<span class='linenumber'>237</span> 
+<span class='linenumber'>238</span> 	/</span><span class="PUNC">*</span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NAME">Cancels</span><span class="WHIT"> </span><span class="NAME">the</span><span class="WHIT"> </span><span class="NAME">anim</span><span class="WHIT"> </span><span class="NAME">where</span><span class="WHIT"> </span><span class="NAME">it</span><span class="WHIT"> </span><span class="NAME">is</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">does</span><span class="WHIT"> </span><span class="NAME">not</span><span class="WHIT"> </span><span class="NAME">call</span><span class="WHIT"> </span><span class="NAME">onend</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT">
+<span class='linenumber'>239</span> </span><span class="WHIT">	 </span><span class="PUNC">*</span><span class="REGX">/
+<span class='linenumber'>240</span> 	abort : function(ex) {
+<span class='linenumber'>241</span> 		this._end(false);
+<span class='linenumber'>242</span> 		this.onabort(ex||{});
+<span class='linenumber'>243</span> 	},
+<span class='linenumber'>244</span> 	
+<span class='linenumber'>245</span> 	_end : function(complete) {
+<span class='linenumber'>246</span> 		APE.anim.Manager.unregister(this);
+<span class='linenumber'>247</span> 		if(complete !== false) {
+<span class='linenumber'>248</span> 			this.onend();
+<span class='linenumber'>249</span> 		}
+<span class='linenumber'>250</span> 	}
+<span class='linenumber'>251</span> };
+<span class='linenumber'>252</span> 
+<span class='linenumber'>253</span> 
+<span class='linenumber'>254</span> /</span><span class="PUNC">*</span><span class="PUNC">*</span><span class="WHIT"> </span><span class="WHIT">
+<span class='linenumber'>255</span> </span><span class="WHIT"> </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="TOKN">@</span><span class="NAME">class</span><span class="WHIT"> </span><span class="WHIT">
+<span class='linenumber'>256</span> </span><span class="WHIT"> </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="TOKN">@</span><span class="NAME">protected</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="NAME">internal</span><span class="WHIT"> </span><span class="NAME">use.</span><span class="WHIT">
+<span class='linenumber'>257</span> </span><span class="WHIT"> </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NAME">Calls</span><span class="WHIT"> </span><span class="NAME">_playFrame</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="NAME">on</span><span class="WHIT"> </span><span class="NAME">each</span><span class="WHIT"> </span><span class="NAME">anim.</span><span class="WHIT">
+<span class='linenumber'>258</span> </span><span class="WHIT"> </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NAME">This</span><span class="WHIT"> </span><span class="NAME">object</span><span class="WHIT"> </span><span class="NAME">is</span><span class="WHIT"> </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="NAME">internal</span><span class="WHIT"> </span><span class="NAME">use</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">tightly</span><span class="WHIT"> </span><span class="NAME">coupled</span><span class="WHIT"> </span><span class="NAME">to</span><span class="WHIT"> </span><span class="NAME">Animation.</span><span class="WHIT">
+<span class='linenumber'>259</span> </span><span class="WHIT"> </span><span class="PUNC">*</span><span class="REGX">/
+<span class='linenumber'>260</span> APE.anim.Manager = new function() {
+<span class='linenumber'>261</span> 	
+<span class='linenumber'>262</span> 	/</span><span class="PUNC">*</span><span class="PUNC">*</span><span class="WHIT"> </span><span class="WHIT">
+<span class='linenumber'>263</span> </span><span class="WHIT">	 </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NAME">doubleThreaded</span><span class="WHIT"> </span><span class="NAME">animations</span><span class="WHIT"> </span><span class="NAME">exhibit</span><span class="WHIT"> </span><span class="NAME">varying</span><span class="WHIT"> </span><span class="WHIT">
+<span class='linenumber'>264</span> </span><span class="WHIT">	 </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NAME">degrees</span><span class="WHIT"> </span><span class="NAME">of</span><span class="WHIT"> </span><span class="NAME">improvement</span><span class="WHIT"> </span><span class="NAME">on</span><span class="WHIT"> </span><span class="NAME">performance</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">depending</span><span class="WHIT"> </span><span class="NAME">on</span><span class="WHIT"> </span><span class="NAME">the</span><span class="WHIT"> </span><span class="NAME">browser.</span><span class="WHIT">
+<span class='linenumber'>265</span> </span><span class="WHIT">	 </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NAME">Particularly</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">any</span><span class="WHIT"> </span><span class="NAME">version</span><span class="WHIT"> </span><span class="NAME">of</span><span class="WHIT"> </span><span class="NAME">Safari</span><span class="WHIT"> </span><span class="NAME">on</span><span class="WHIT"> </span><span class="NAME">Mac</span><span class="WHIT"> </span><span class="NAME">or</span><span class="WHIT"> </span><span class="NAME">Windows</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">and</span><span class="WHIT"> </span><span class="WHIT">
+<span class='linenumber'>266</span> </span><span class="WHIT">	 </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NAME">Internet</span><span class="WHIT"> </span><span class="NAME">Explorer</span><span class="WHIT"> </span><span class="NAME">on</span><span class="WHIT"> </span><span class="NAME">Win9.x</span><span class="WHIT">
+<span class='linenumber'>267</span> </span><span class="WHIT">	 </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NAME">Set</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="WHIT"> </span><span class="NAME">flag</span><span class="WHIT"> </span><span class="NAME">to</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="WHIT"> </span><span class="NAME">to</span><span class="WHIT"> </span><span class="NAME">reduce</span><span class="WHIT"> </span><span class="NAME">CPU</span><span class="WHIT"> </span><span class="NAME">hogging.</span><span class="WHIT">
+<span class='linenumber'>268</span> </span><span class="WHIT">	 </span><span class="PUNC">*</span><span class="REGX">/
+<span class='linenumber'>269</span> 	this.isDoubleThreaded = true;
+<span class='linenumber'>270</span> 
+<span class='linenumber'>271</span> 	/</span><span class="PUNC">*</span><span class="PUNC">*</span><span class="WHIT"> </span><span class="WHIT">
+<span class='linenumber'>272</span> </span><span class="WHIT">	 </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="TOKN">@</span><span class="NAME">private</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NAME">keeps</span><span class="WHIT"> </span><span class="NAME">track</span><span class="WHIT"> </span><span class="NAME">of</span><span class="WHIT"> </span><span class="NAME">activeAnimations</span><span class="WHIT"> </span><span class="KEYW">in</span><span class="WHIT"> </span><span class="NAME">main</span><span class="WHIT"> </span><span class="NAME">loop.</span><span class="WHIT">
+<span class='linenumber'>273</span> </span><span class="WHIT">	 </span><span class="PUNC">*</span><span class="REGX">/
+<span class='linenumber'>274</span> 	var activeAnimations = [];
+<span class='linenumber'>275</span> 
+<span class='linenumber'>276</span> 	/</span><span class="PUNC">*</span><span class="PUNC">*</span><span class="WHIT"> </span><span class="WHIT">
+<span class='linenumber'>277</span> </span><span class="WHIT">	 </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="TOKN">@</span><span class="NAME">private</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NAME">thread</span><span class="WHIT"> </span><span class="NAME">timers.</span><span class="WHIT">
+<span class='linenumber'>278</span> </span><span class="WHIT">	 </span><span class="PUNC">*</span><span class="REGX">/
+<span class='linenumber'>279</span> 	var intervalId, intervalId2;
+<span class='linenumber'>280</span> 
+<span class='linenumber'>281</span>    /</span><span class="PUNC">*</span><span class="PUNC">*</span><span class="WHIT"> </span><span class="WHIT">
+<span class='linenumber'>282</span> </span><span class="WHIT">    </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NAME">Registers</span><span class="WHIT"> </span><span class="NAME">the</span><span class="WHIT"> </span><span class="NAME">animation</span><span class="WHIT"> </span><span class="KEYW">in</span><span class="WHIT"> </span><span class="NAME">the</span><span class="WHIT"> </span><span class="NAME">thread</span><span class="WHIT"> </span><span class="NAME">pool</span><span class="WHIT"> </span><span class="NAME">once.</span><span class="WHIT">
+<span class='linenumber'>283</span> </span><span class="WHIT">	</span><span class="PUNC">*</span><span class="WHIT"> </span><span class="TOKN">@</span><span class="NAME">param</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="NAME">Animation</span><span class="PUNC">}</span><span class="WHIT"> </span><span class="NAME">anim</span><span class="WHIT"> </span><span class="NAME">the</span><span class="WHIT"> </span><span class="NAME">animation</span><span class="WHIT"> </span><span class="NAME">to</span><span class="WHIT"> </span><span class="NAME">register.</span><span class="WHIT">
+<span class='linenumber'>284</span> </span><span class="WHIT">	</span><span class="PUNC">*</span><span class="REGX">/
+<span class='linenumber'>285</span> 	this.register = function(anim) {
+<span class='linenumber'>286</span> 		if(activeAnimations.length === 0)
+<span class='linenumber'>287</span> 			start();
+<span class='linenumber'>288</span> 		for(var i = 0; i &lt; activeAnimations.length; i++) {
+<span class='linenumber'>289</span> 			if(activeAnimations[i] === anim) {
+<span class='linenumber'>290</span> 				return;
+<span class='linenumber'>291</span> 			}
+<span class='linenumber'>292</span> 		}
+<span class='linenumber'>293</span> 		activeAnimations.push(anim);
+<span class='linenumber'>294</span> 	};
+<span class='linenumber'>295</span> 	
+<span class='linenumber'>296</span>    /</span><span class="PUNC">*</span><span class="PUNC">*</span><span class="WHIT"> </span><span class="WHIT">
+<span class='linenumber'>297</span> </span><span class="WHIT">    </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NAME">Registers</span><span class="WHIT"> </span><span class="NAME">the</span><span class="WHIT"> </span><span class="NAME">animation</span><span class="WHIT"> </span><span class="KEYW">in</span><span class="WHIT"> </span><span class="NAME">the</span><span class="WHIT"> </span><span class="NAME">thread</span><span class="WHIT"> </span><span class="NAME">pool</span><span class="WHIT"> </span><span class="NAME">once.</span><span class="WHIT">
+<span class='linenumber'>298</span> </span><span class="WHIT">	</span><span class="PUNC">*</span><span class="WHIT"> </span><span class="TOKN">@</span><span class="NAME">param</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="NAME">Animation</span><span class="PUNC">}</span><span class="WHIT"> </span><span class="NAME">anim</span><span class="WHIT"> </span><span class="NAME">the</span><span class="WHIT"> </span><span class="NAME">animation</span><span class="WHIT"> </span><span class="NAME">to</span><span class="WHIT"> </span><span class="NAME">register.</span><span class="WHIT">
+<span class='linenumber'>299</span> </span><span class="WHIT">	</span><span class="PUNC">*</span><span class="REGX">/
+<span class='linenumber'>300</span> 	this.unregister = function(anim) {
+<span class='linenumber'>301</span> 		for(var i = 0; i &lt; activeAnimations.length; i++) {
+<span class='linenumber'>302</span> 			if(activeAnimations[i] === anim) {
+<span class='linenumber'>303</span> 
+<span class='linenumber'>304</span> 				activeAnimations.splice(i, 1);
+<span class='linenumber'>305</span> 			}
+<span class='linenumber'>306</span> 		}
+<span class='linenumber'>307</span> 		if(activeAnimations.length == 0) {
+<span class='linenumber'>308</span> 			activeAnimations = [];
+<span class='linenumber'>309</span> 			stop();
+<span class='linenumber'>310</span> 		}
+<span class='linenumber'>311</span> 	};
+<span class='linenumber'>312</span> 
+<span class='linenumber'>313</span> 	this.toString = function() {
+<span class='linenumber'>314</span> 		return"APE anim.Manager";
+<span class='linenumber'>315</span> 	};
+<span class='linenumber'>316</span> 	
+<span class='linenumber'>317</span> 	/</span><span class="PUNC">*</span><span class="PUNC">*</span><span class="WHIT"> </span><span class="WHIT">
+<span class='linenumber'>318</span> </span><span class="WHIT">	 </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NAME">starts</span><span class="WHIT"> </span><span class="NAME">run</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>319</span> </span><span class="WHIT">	 </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="TOKN">@</span><span class="NAME">private</span><span class="WHIT">
+<span class='linenumber'>320</span> </span><span class="WHIT">	 </span><span class="PUNC">*</span><span class="REGX">/
+<span class='linenumber'>321</span> 	function start() {
+<span class='linenumber'>322</span> 		/</span><span class="REGX">/ Double threaded.
+<span class='linenumber'>323</span> 		intervalId = window.setInterval(run, 20);
+<span class='linenumber'>324</span> 		if(this.isDoubleThreaded)
+<span class='linenumber'>325</span> 			this.intervalId2 = window.setInterval(run, 45);
+<span class='linenumber'>326</span>  	}
+<span class='linenumber'>327</span> 
+<span class='linenumber'>328</span> 	/</span><span class="PUNC">*</span><span class="PUNC">*</span><span class="WHIT"> </span><span class="WHIT">
+<span class='linenumber'>329</span> </span><span class="WHIT">	 </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NAME">Plays</span><span class="WHIT"> </span><span class="NAME">the</span><span class="WHIT"> </span><span class="NAME">frame</span><span class="WHIT"> </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="NAME">each</span><span class="WHIT"> </span><span class="NAME">animation.</span><span class="WHIT">
+<span class='linenumber'>330</span> </span><span class="WHIT">	 </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="TOKN">@</span><span class="NAME">private</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NAME">starts</span><span class="WHIT"> </span><span class="NAME">run</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="WHIT">
+<span class='linenumber'>331</span> </span><span class="WHIT">	 </span><span class="PUNC">*</span><span class="REGX">/
+<span class='linenumber'>332</span> 	function run() {
+<span class='linenumber'>333</span> 		/</span><span class="REGX">/ Check animations.legth each iteration. Some animations 
+<span class='linenumber'>334</span> 		/</span><span class="REGX">/ finish before others and must be unregistered.
+<span class='linenumber'>335</span> 		for(var i = 0; i &lt; activeAnimations.length; i++)
+<span class='linenumber'>336</span> 			activeAnimations[i]._playFrame();
+<span class='linenumber'>337</span> 	}
+<span class='linenumber'>338</span> 
+<span class='linenumber'>339</span> 	/</span><span class="PUNC">*</span><span class="PUNC">*</span><span class="WHIT"> </span><span class="WHIT">
+<span class='linenumber'>340</span> </span><span class="WHIT">	 </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NAME">Called</span><span class="WHIT"> </span><span class="NAME">automatically</span><span class="WHIT"> </span><span class="NAME">when</span><span class="WHIT"> </span><span class="NAME">there</span><span class="WHIT"> </span><span class="NAME">are</span><span class="WHIT"> </span><span class="NAME">no</span><span class="WHIT"> </span><span class="NAME">more</span><span class="WHIT"> </span><span class="NAME">activeAnimations</span><span class="WHIT"> </span><span class="NAME">to</span><span class="WHIT"> </span><span class="NAME">run.</span><span class="WHIT">
+<span class='linenumber'>341</span> </span><span class="WHIT">	 </span><span class="PUNC">*</span><span class="REGX">/
+<span class='linenumber'>342</span> 	function stop() {
+<span class='linenumber'>343</span> 		window.clearInterval(intervalId);
+<span class='linenumber'>344</span> 		window.clearInterval(intervalId2);
+<span class='linenumber'>345</span> 	}
+<span class='linenumber'>346</span> };
+<span class='linenumber'>347</span> 
+<span class='linenumber'>348</span> /</span><span class="PUNC">*</span><span class="PUNC">*</span><span class="WHIT"> </span><span class="WHIT">
+<span class='linenumber'>349</span> </span><span class="WHIT"> </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="TOKN">@</span><span class="NAME">class</span><span class="WHIT"> </span><span class="WHIT">
+<span class='linenumber'>350</span> </span><span class="WHIT"> </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NAME">Easing</span><span class="WHIT"> </span><span class="NAME">functions.</span><span class="WHIT">
+<span class='linenumber'>351</span> </span><span class="WHIT"> </span><span class="PUNC">*</span><span class="REGX">/
+<span class='linenumber'>352</span> APE.anim.Transitions = {
+<span class='linenumber'>353</span> 
+<span class='linenumber'>354</span> 	accel: function (pos) {
+<span class='linenumber'>355</span>     	return pos*pos*pos;
+<span class='linenumber'>356</span>     },
+<span class='linenumber'>357</span> 
+<span class='linenumber'>358</span> 	decel : function(pos) {
+<span class='linenumber'>359</span> 		pos = 1-pos;
+<span class='linenumber'>360</span>     	return 1-(pos*pos*pos);
+<span class='linenumber'>361</span> 	},
+<span class='linenumber'>362</span> 	
+<span class='linenumber'>363</span> 	/</span><span class="PUNC">*</span><span class="PUNC">*</span><span class="WHIT">
+<span class='linenumber'>364</span> </span><span class="WHIT">	 </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NAME">For</span><span class="WHIT"> </span><span class="NAME">better</span><span class="WHIT"> </span><span class="NAME">performance</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">use</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NUMB">1</span><span class="PUNC">-</span><span class="NAME">position</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="NAME">instead.</span><span class="WHIT">
+<span class='linenumber'>365</span> </span><span class="WHIT">	 </span><span class="PUNC">*</span><span class="REGX">/
+<span class='linenumber'>366</span>     reverse: function(pos) {
+<span class='linenumber'>367</span> 		return 1-pos;
+<span class='linenumber'>368</span>     },
+<span class='linenumber'>369</span> 
+<span class='linenumber'>370</span> 	/</span><span class="REGX">/ need pulse and throb... 
+<span class='linenumber'>371</span> 	/</span><span class="REGX">/ pulse(pos, times) -> accel, then drop quickly to 0, n times
+<span class='linenumber'>372</span> 	/</span><span class="REGX">/ throb(pos, times) -> jump quickly to 1, then decel to 0, n times.
+<span class='linenumber'>373</span> 	/</span><span class="REGX">/ Type of parameterized sinoidal effect (pos, accelTo, delelFrom);
+<span class='linenumber'>374</span> 
+<span class='linenumber'>375</span>     /</span><span class="PUNC">*</span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NAME">Plays</span><span class="WHIT"> </span><span class="NAME">the</span><span class="WHIT"> </span><span class="NAME">APE.anim</span><span class="WHIT"> </span><span class="NAME">forwards</span><span class="WHIT"> </span><span class="NAME">and</span><span class="WHIT"> </span><span class="NAME">backwards</span><span class="WHIT"> </span><span class="WHIT">
+<span class='linenumber'>376</span> </span><span class="WHIT">	 </span><span class="PUNC">*</span><span class="WHIT">  </span><span class="KEYW">in</span><span class="WHIT"> </span><span class="NAME">the</span><span class="WHIT"> </span><span class="NAME">same</span><span class="WHIT"> </span><span class="NAME">duration.</span><span class="WHIT">
+<span class='linenumber'>377</span> </span><span class="WHIT">	 </span><span class="PUNC">*</span><span class="REGX">/
+<span class='linenumber'>378</span> 	loop : function(pos) {
+<span class='linenumber'>379</span> 		/</span><span class="REGX">/ If almost at 1/</span><span class="NUMB">2</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">move</span><span class="WHIT"> </span><span class="NAME">to</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="NAME">move</span><span class="WHIT"> </span><span class="NAME">back.</span><span class="WHIT">
+<span class='linenumber'>380</span> </span><span class="WHIT">		</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">pos</span><span class="WHIT"> </span><span class="PUNC">&lt;=</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">/</span><span class="NUMB">2</span><span class="WHIT"> </span><span class="PUNC">?</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">pos</span><span class="WHIT"> </span><span class="PUNC">></span><span class="WHIT"> </span><span class="NUMB">3</span><span class="PUNC">/</span><span class="NUMB">7</span><span class="WHIT"> </span><span class="PUNC">?</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">2</span><span class="WHIT"> </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NAME">pos</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NUMB">2</span><span class="WHIT"> </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="PUNC">(</span><span class="PUNC">(</span><span class="NUMB">1</span><span class="PUNC">/</span><span class="NUMB">2</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NAME">pos</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>381</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='linenumber'>382</span> 
+<span class='linenumber'>383</span> </span><span class="WHIT">	</span><span class="COMM">/**
+<span class='linenumber'>384</span> 	 * sinoidal and spring come from Scriptaculous.
+<span class='linenumber'>385</span> 	 */</span><span class="WHIT">
+<span class='linenumber'>386</span> </span><span class="WHIT">    </span><span class="NAME">sinoidal</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">pos</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'>387</span> </span><span class="WHIT">		</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">-</span><span class="NAME">Math.cos</span><span class="PUNC">(</span><span class="NAME">pos</span><span class="PUNC">*</span><span class="NAME">Math.PI</span><span class="PUNC">)</span><span class="PUNC">/</span><span class="NUMB">2</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NUMB">0.5</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>388</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='linenumber'>389</span> 
+<span class='linenumber'>390</span> </span><span class="WHIT">    </span><span class="NAME">spring</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">pos</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT"> </span><span class="WHIT">
+<span class='linenumber'>391</span> </span><span class="WHIT">		</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">Math.cos</span><span class="PUNC">(</span><span class="NAME">pos</span><span class="WHIT"> </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NUMB">4.5</span><span class="WHIT"> </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NAME">Math.PI</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NAME">Math.exp</span><span class="PUNC">(</span><span class="PUNC">-</span><span class="NAME">pos</span><span class="WHIT"> </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NUMB">6</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="WHIT">
+<span class='linenumber'>392</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='linenumber'>393</span> </span><span class="WHIT">	</span><span class="WHIT">
+<span class='linenumber'>394</span> </span><span class="WHIT">	</span><span class="COMM">/**
+<span class='linenumber'>395</span> 	 * Based on Easing Equations v2.0 
+<span class='linenumber'>396</span> 	 * (c) 2003 Robert Penner, all rights reserved. 
+<span class='linenumber'>397</span> 	 * This work is subject to the terms in http://www.robertpenner.com/easing_terms_of_use.html
+<span class='linenumber'>398</span> 	 * Adapted for Scriptaculous by Ken Snyder (kendsnyder ~at~ gmail ~dot~ com) June 2006 
+<span class='linenumber'>399</span> 	 */</span><span class="WHIT">
+<span class='linenumber'>400</span> </span><span class="WHIT">	</span><span class="NAME">swingTo</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">pos</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT"> </span><span class="WHIT">
+<span class='linenumber'>401</span> </span><span class="WHIT">		</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">s</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">1.70158</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="WHIT">
+<span class='linenumber'>402</span> </span><span class="WHIT">		</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">pos</span><span class="PUNC">-</span><span class="PUNC">=</span><span class="NUMB">1</span><span class="PUNC">)</span><span class="PUNC">*</span><span class="NAME">pos</span><span class="PUNC">*</span><span class="PUNC">(</span><span class="PUNC">(</span><span class="NAME">s</span><span class="PUNC">+</span><span class="NUMB">1</span><span class="PUNC">)</span><span class="PUNC">*</span><span class="NAME">pos</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">s</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>403</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='linenumber'>404</span> 
+<span class='linenumber'>405</span> </span><span class="WHIT">	</span><span class="NAME">swingToFrom</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">pos</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'>406</span> </span><span class="WHIT">		</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">s</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">1.70158</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="WHIT">
+<span class='linenumber'>407</span> </span><span class="WHIT">		</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">(</span><span class="NAME">pos</span><span class="PUNC">/</span><span class="PUNC">=</span><span class="NUMB">0.5</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NUMB">0.5</span><span class="PUNC">*</span><span class="PUNC">(</span><span class="NAME">pos</span><span class="PUNC">*</span><span class="NAME">pos</span><span class="PUNC">*</span><span class="PUNC">(</span><span class="PUNC">(</span><span class="PUNC">(</span><span class="NAME">s</span><span class="PUNC">*</span><span class="PUNC">=</span><span class="PUNC">(</span><span class="NUMB">1.525</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">+</span><span class="NUMB">1</span><span class="PUNC">)</span><span class="PUNC">*</span><span class="NAME">pos</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NAME">s</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="WHIT">
+<span class='linenumber'>408</span> </span><span class="WHIT">		</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NUMB">0.5</span><span class="PUNC">*</span><span class="PUNC">(</span><span class="PUNC">(</span><span class="NAME">pos</span><span class="PUNC">-</span><span class="PUNC">=</span><span class="NUMB">2</span><span class="PUNC">)</span><span class="PUNC">*</span><span class="NAME">pos</span><span class="PUNC">*</span><span class="PUNC">(</span><span class="PUNC">(</span><span class="PUNC">(</span><span class="NAME">s</span><span class="PUNC">*</span><span class="PUNC">=</span><span class="PUNC">(</span><span class="NUMB">1.525</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">+</span><span class="NUMB">1</span><span class="PUNC">)</span><span class="PUNC">*</span><span class="NAME">pos</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">s</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NUMB">2</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="WHIT">
+<span class='linenumber'>409</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='linenumber'>410</span> 
+<span class='linenumber'>411</span> </span><span class="WHIT">	</span><span class="NAME">toString</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'>412</span> </span><span class="WHIT">		</span><span class="KEYW">return</span><span class="STRN">"APE anim Transitions"</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>413</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
+<span class='linenumber'>414</span> </span><span class="PUNC">}</span><span class="PUNC">;</span></pre></body></html>

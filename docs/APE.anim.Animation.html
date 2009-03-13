@@ -1,0 +1,731 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+	"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+	<title>JsDoc: APE.anim.Animation</title>
+	<link rel="stylesheet" href="default.css" type="text/css" media="screen">
+</head>
+
+<body>
+
+<table style="width: 100%" class="navbar">
+<tr>
+<td class="NavBar" valign="top"><font size="-2">SUMMARY:&nbsp;<a href="#field_summary">FIELD</a>&nbsp;|&nbsp;<a href="#constructor_summary">CONSTR</a>&nbsp;|&nbsp;<a href="#method_summary">METHOD</a></font></td>
+<td class="NavBar" valign="top"><font size="-2">DETAIL:&nbsp;<a href="#field_detail">FIELD</a>&nbsp;|&nbsp;<a href="#constructor_detail">CONSTR</a>&nbsp;|&nbsp;<a href="#method_detail">METHOD</a></font></td>
+</tr>
+</table>
+
+<h2>Class APE.anim.Animation</h2>
+
+
+<i>Defined in <a href="Animation.src.html">Animation.js</a></i>
+
+
+
+
+
+	<li><strong>author: </strong> Garrett Smith<p>Sigmoid functions based upon work by Emmanuel Pietriga.wobble and spring come from, or are loosely based on Scriptaculous.</p><p>Animation is a Template that passes a position to its <code>run( pos )</code> method. (you implement run).</p> <p><code>anim.Transitions</code> contains effects for speed/timing, such as acceleration and easing.</p></li>
+
+	<li><strong>example: </strong> <pre> b = new APE.anim.Animation( "blah" );b.run = function(position) { // <-- you implement run.};b.start(); // <-- then call start.</pre> <p></p></li>
+
+
+
+
+
+<hr>
+
+<!-- =========== FIELD SUMMARY =========== -->
+
+<a name="field_summary"> </a> 
+<table border="1" cellpadding="3" cellspacing="0" width="100%">
+	<tr class="TableHeadingColor">
+		<td colspan=2>
+			<b>Field Summary</b>
+		</td>
+	</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>Number</code></font>
+			</td>
+			<td>
+				<code><b><a href="#duration">duration</a></b></code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>Number</code></font>
+			</td>
+			<td>
+				<code><b><a href="#timeLimit">timeLimit</a></b></code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			</td>
+		</tr>
+	
+</table>
+&nbsp;
+
+<!-- =========== END FIELD SUMMARY =========== -->
+
+
+<!-- ======== CONSTRUCTOR SUMMARY ======== -->
+<a name="constructor_summary"> </a>
+<table border="1" cellpadding="3" cellspacing="0" width="100%">
+<tr class="TableHeadingColor">
+	<th colspan=2>Constructor Summary</th>
+</tr>
+
+	<tr bgcolor="white" class="TableRowColor">
+	   <td>
+	
+		<code>
+		<b><a href="#APE.anim.Animation">APE.anim.Animation</a></b>(duration)
+		</code>
+		  <br>
+		  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		  
+		  </td>
+	</tr>
+
+	<tr bgcolor="white" class="TableRowColor">
+	   <td>
+	
+		<code>
+		<b><a href="#APE.anim.Animation">APE.anim.Animation</a></b>(duration)
+		</code>
+		  <br>
+		  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		  
+		  </td>
+	</tr>
+
+</table>
+&nbsp;
+<!-- ======== END CONSTRUCTOR SUMMARY ======== -->
+
+
+<!-- ========== METHOD SUMMARY =========== -->
+
+<a name="method_summary"> </a> 
+<table border="1" cellpadding="3" cellspacing="0" width="100%">
+	<tr class="TableHeadingColor">
+		<th colspan=2>
+			Method Summary
+		</th>
+	</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code></code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#abort">abort</a></b>(ex) </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Cancels the anim where it is; does not call onend()
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code></code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#pause">pause</a></b>() </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; pauses the animation.
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code></code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#reset">reset</a></b>() </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; resets the animation to position 0.
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code></code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#resume">resume</a></b>() </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; unpauses the animation.
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code></code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#run">run</a></b>(position) </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Run must be implemented by user.
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code></code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#seekTo">seekTo</a></b>(pos, transitionBackwards) </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Seeks to a certain position along the duration timeline.
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code></code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#start">start</a></b>() </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Call this method to start the anim.
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code></code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#stop">stop</a></b>(ended) </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Ends the anim.
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code></code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#toggleDirection">toggleDirection</a></b>() </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; undocumented
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code></code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#toString">toString</a></b>() </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; undocumented
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>
+				&nbsp;Number
+				</code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#transition">transition</a></b>(p) </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+ 
+			</td>
+		</tr>
+	
+</table>
+&nbsp;
+
+
+<!-- ========== EVENT SUMMARY =========== -->
+
+
+<a name="event_summary"> </a> 
+<table border="1" cellpadding="3" cellspacing="0" width="100%">
+	<tr class="TableHeadingColor">
+		<th colspan=2>
+			Event Summary
+		</th>
+	</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>
+                
+                
+                
+                  void
+				</code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#onabort">onabort</a></b>(ex) </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If an error occurred, onabort throws the error.
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>
+                
+                
+                
+                  void
+				</code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#onend">onend</a></b>() </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; fires when stop() is called or the Animation successfully completes.
+ 
+			</td>
+		</tr>
+	
+		<tr bgcolor="white" class="TableRowColor">
+			<td align="right" valign="top" width="1%">
+				<font size="-1"><code>
+                
+                
+                
+                  void
+				</code></font> 
+			</td>
+			<td>
+				<code> <b> <a href="#onstart">onstart</a></b>() </code> 
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; fires when the Animation starts, when seekTo is called.
+ 
+			</td>
+		</tr>
+	
+</table>
+&nbsp;
+
+
+
+<!-- ========== INHERITED METHODS SUMMARY =========== -->
+
+<br/>
+
+<!-- ========== END INHERITED METHODS SUMMARY =========== -->
+
+<!-- ============ FIELD DETAIL START ========= -->
+
+<a name="field_detail"> </a> 
+<table border="1" cellpadding="3" cellspacing="0" width="100%">
+	<tr class="TableHeadingColor">
+		<th colspan=1>
+			Field Detail
+		</th>
+	</tr>
+</table>
+
+
+	<!-- One single method detail entry -->
+	<a name="duration">
+	<!-- -->
+	</a> <h3>duration</h3>
+		<pre>Number <b>duration</b></pre> 
+	<ul>
+		
+		
+		
+	</ul>
+
+
+	<!-- One single method detail entry -->
+	<a name="timeLimit">
+	<!-- -->
+	</a> <h3>timeLimit</h3>
+		<pre>Number <b>timeLimit</b></pre> 
+	<ul>
+		
+		
+		
+	</ul>
+
+
+
+<!-- ============ FIELD DETAIL END ========== -->
+
+
+<!-- ========= CONSTRUCTOR DETAIL START ======== -->
+<a name="constructor_detail"> </a>
+<table border="1" cellpadding="3" cellspacing="0" width="100%">
+   <tr class="TableHeadingColor">
+      <th colspan=1>
+	Constructor Detail
+      </th>
+   </tr>
+
+</table>
+
+<a name="APE.anim.Animation"> </a>
+<h3>APE.anim.Animation</h3>
+
+	<pre><b>APE.anim.Animation</b>(duration)</pre>
+	<ul>
+		
+		
+	</ul>
+	
+	<!-- PARAMETERS START -->
+	
+	<ul>
+		<b>Parameters:</b>
+		
+		<ul>
+			<code><i>ufloat</i>&nbsp;duration</code><a title="optional parameter" class="optional">?</a> - Number of seconds to run the animation (default is 1). 
+		</ul>
+		
+	</ul>
+	
+	<!-- PARAMETERS END -->
+
+	<pre><b>APE.anim.Animation</b>(duration)</pre>
+	<ul>
+		
+		
+	</ul>
+	
+	<!-- PARAMETERS START -->
+	
+	<ul>
+		<b>Parameters:</b>
+		
+		<ul>
+			<code><i>ufloat</i>&nbsp;duration</code><a title="optional parameter" class="optional">?</a> - Number of seconds to run the animation (default is 1). 
+		</ul>
+		
+	</ul>
+	
+	<!-- PARAMETERS END -->
+
+<hr/>
+<!-- END ADDITIONAL ATTRIBUTES  -->
+<!-- ========= CONSTRUCTOR DETAIL END ======== -->
+
+
+<!-- ============ METHOD DETAIL START ======= -->
+
+<a name="method_detail"> </a> 
+<table border="1" cellpadding="3" cellspacing="0" width="100%">
+	<tr class="TableHeadingColor">
+		<th colspan=1>
+			Method Detail
+		</th>
+	</tr>
+</table>
+
+
+	<a name="abort"> </a> <h3>abort</h3>
+		<pre><b>abort</b>(ex)</pre> 
+	<ul>
+		
+		Cancels the anim where it is; does not call onend()
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	<ul>
+		<b>Parameters:</b>
+		<ul>
+			<code>ex</code> 
+		</ul>
+	</ul>
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="pause"> </a> <h3>pause</h3>
+		<pre><b>pause</b>()</pre> 
+	<ul>
+		
+		pauses the animation.
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="reset"> </a> <h3>reset</h3>
+		<pre><b>reset</b>()</pre> 
+	<ul>
+		
+		resets the animation to position 0.
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="resume"> </a> <h3>resume</h3>
+		<pre><b>resume</b>()</pre> 
+	<ul>
+		
+		unpauses the animation.
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="run"> </a> <h3>run</h3>
+		<pre><b>run</b>(position)</pre> 
+	<ul>
+		
+		Run must be implemented by user.
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	<ul>
+		<b>Parameters:</b>
+		<ul>
+			<code><i>Number</i>&nbsp;position</code> - 0-1Implementation generally looks something like:<pre>anim.run = function( position ) {  document.body.style.borderWidth = ( 12 * position ) + "px"};</pre> 
+		</ul>
+	</ul>
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="seekTo"> </a> <h3>seekTo</h3>
+		<pre><b>seekTo</b>(pos, transitionBackwards)</pre> 
+	<ul>
+		
+		Seeks to a certain position along the duration timeline.If seeking backwards, the transitions is played on a mirrored timeline.This is done to make the animation "turn around", rather than "rewind".
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	<ul>
+		<b>Parameters:</b>
+		<ul>
+			<code><i>float</i>&nbsp;pos</code> - Normally [0-1], but can be less than 0 or greater than 1. 
+		</ul>
+		<ul>
+			<code><i>boolean</i>&nbsp;transitionBackwards</code><a title="optional parameter" class="optional">?</a> - If true, plays an inverse of the transition when the animation is reversed (only applies when <code>pos &lt; this.rationalValue</code>. 
+		</ul>
+	</ul>
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="start"> </a> <h3>start</h3>
+		<pre><b>start</b>()</pre> 
+	<ul>
+		
+		Call this method to start the anim.
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="stop"> </a> <h3>stop</h3>
+		<pre><b>stop</b>(ended)</pre> 
+	<ul>
+		
+		Ends the anim.
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	<ul>
+		<b>Parameters:</b>
+		<ul>
+			<code><i>boolean</i>&nbsp;ended</code> 
+		</ul>
+	</ul>
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="toggleDirection"> </a> <h3>toggleDirection</h3>
+		<pre><b>toggleDirection</b>()</pre> 
+	<ul>
+		
+		undocumented
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="toString"> </a> <h3>toString</h3>
+		<pre><b>toString</b>()</pre> 
+	<ul>
+		
+		undocumented
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="transition"> </a> <h3>transition</h3>
+		<pre>Number&nbsp;<b>transition</b>(p)</pre> 
+	<ul>
+		
+		
+		
+	</ul>
+	<!-- METHOD PARAMETERS START -->
+	<ul>
+		<b>Parameters:</b>
+		<ul>
+			<code>p</code> 
+		</ul>
+	</ul>
+	<!-- METHOD PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	<ul>
+		<b>Returns:</b>
+		<ul>
+			<code><i>Number</i>&nbsp;</code>position value, typically betweeen [0-1]. 
+		</ul>
+	</ul>
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+
+<!-- ============ METHOD DETAIL END ========== -->
+
+<!-- ============ EVENT DETAIL START ======= -->
+
+
+<a name="method_detail"> </a> 
+<table border="1" cellpadding="3" cellspacing="0" width="100%">
+	<tr class="TableHeadingColor">
+		<th colspan=1>
+			Event Detail
+		</th>
+	</tr>
+</table>
+
+
+	<a name="onabort"> </a> <h3>onabort</h3>
+		<pre><b>onabort</b>(ex)</pre> 
+	<ul>
+		
+		If an error occurred, onabort throws the error.this can be overridden (shadowed) by adding an onabort() to the Animation instance.
+		
+	</ul>
+	<!-- EVENT PARAMETERS START -->
+	<ul>
+		<b>Parameters:</b>
+		<ul>
+			<code><i>Error</i>&nbsp;ex</code> - the error that occured. 
+		</ul>
+	</ul>
+	<!-- EVENT PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	
+	<ul>
+		<b>Throws:</b>
+		<ul>
+			<code>Error</code> the error that occured. 
+		</ul>
+	</ul>
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="onend"> </a> <h3>onend</h3>
+		<pre><b>onend</b>()</pre> 
+	<ul>
+		
+		fires when stop() is called or the Animation successfully completes.
+		
+	</ul>
+	<!-- EVENT PARAMETERS START -->
+	
+	<!-- EVENT PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+	<a name="onstart"> </a> <h3>onstart</h3>
+		<pre><b>onstart</b>()</pre> 
+	<ul>
+		
+		fires when the Animation starts, when seekTo is called.
+		
+	</ul>
+	<!-- EVENT PARAMETERS START -->
+	
+	<!-- EVENT PARAMETERS END -->
+	<!-- ADDITIONAL ATTRIBUTES START -->
+	
+	
+	<!-- ADDITIONAL ATTRIBUTES  END -->
+	<hr>
+
+
+
+<!-- ============ EVENT DETAIL END ========== -->
+<div class="jsdoc_ctime">Documentation generated by <a href="http://jsdoctoolkit.org/" target="_parent">JsDoc Toolkit</a> 1.4.0 on Sun Aug 17 2008 17:08:27 GMT-0700 (PDT)</div>
+</body>
+</html>

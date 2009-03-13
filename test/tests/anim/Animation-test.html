@@ -1,0 +1,413 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+    <title>Animation Test</title>
+
+    <link rel="stylesheet" type="text/css" href="../../yui-test/build/logger/assets/logger.css" />
+    <link rel="stylesheet" type="text/css" href="../../yui-test/build/yuitest/assets/yuitest.css" />
+    <link rel="stylesheet" type="text/css" href="../../yui-test/assets/testlogger.css" />
+
+    <script type="text/javascript" src="../../yui-test/build/yahoo-dom-event/yahoo-dom-event.js"></script>
+    <script type="text/javascript" src="../../yui-test/build/logger/logger.js"></script>
+    <script type="text/javascript" src="../../yui-test/build/yuitest/yuitest-beta.js"></script>
+
+    <script type="text/javascript" src="../../../build/APE.js"></script>
+    <script type="text/javascript" src="../../../build/anim/Animation.js"></script>
+    <script type="text/javascript" src="../../../build/anim/StyleTransition.js"></script>
+
+</head>
+<body>
+<div id="testLogger"></div>
+<div id="container">
+
+</div>
+<script type="text/javascript">
+setTimeout(function(){
+
+var container = document.getElementById("container"),
+    template = container.innerHTML;
+
+var Assert = YAHOO.util.Assert;
+
+var Animation = APE.anim.Animation;
+
+var animationTestCase = new YAHOO.tool.TestCase({
+
+    name : "Animation Tests",
+
+    tearDown : function () {
+        container.innerHTML = template;
+    },      
+    
+    testDuration : function() {
+        var a = new Animation( .8 );
+        a.run = function(){};
+
+        a.start();
+        function isDone(){
+            Assert.areEqual( 1, a.position, "animation was not completed." );
+        }
+        this.wait( isDone, 900, "Animation did not complete with an additional 100ms");
+    },
+
+    // This is a test of two things.
+    // (1) run throws an error.
+    // (2) Manager unregisters it.
+    testAbort : function() {
+        var abortMsg = "",
+            endedSuccessfully = false;
+
+        var a = new Animation();
+        a.run = function(){ throw Error("run error"); };
+        a.onabort = function(ex) {
+            abortMsg = ex.message;
+        };
+        a.onend = function() {
+            endedSuccessfully = true;
+        };
+        a.start();
+        this.wait(function(){
+            YAHOO.util.StringAssert.contains( "run", abortMsg, "error was not caught." );
+            Assert.isFalse( endedSuccessfully, "animation ended successfully, but should not have." );
+        }, 90); // wait for run() to be called.
+    },
+
+    testSeekTo : function() {
+        var a = new Animation( .5 );
+        a.seekTo(.4);
+        this.wait(function(){       
+            Assert.areEqual(.4, a.position);
+            a.seekTo(.1);
+            this.wait(function(){
+                Assert.areEqual(.1, a.position);
+                a.seekTo(-.1);
+                this.wait(function(){
+                    Assert.areEqual(-.1, a.position);                
+                    a.seekTo(.2);
+                    this.wait(function(){
+                        Assert.areEqual(.2, a.position);
+                    }, 350);
+                }, 250);
+            }, 200);
+        }, 220);
+    },
+
+    // Just to make sure there is no Error in toString.
+    testToString : function() {
+        var a = new Animation();
+        var s = a.toString();
+        Assert.isTypeOf("string", a.toString());
+    },
+
+    testPauseResume : function() {
+        var a = new Animation( .4 ),
+            pp;
+        setTimeout(function(){a.pause();}, 100);
+        a.start();
+        this.wait(function(){
+            YAHOO.log("a.position: " + a.position, "info", "TestRunner");
+            pp = a.position;
+            this.wait(function(){
+                Assert.areEqual(pp, a.position, "pause is broken.");
+                a.resume();
+                this.wait(function(){
+                    YAHOO.log("a.position: " + a.position, "info", "TestRunner");
+                    Assert.areEqual(1, a.position, "Wasn't resumed.");
+                }, 300);
+            }, 90);
+        }, 130);
+    },
+
+    // THis animation plays tothe end,
+    // then plays back. 
+    // We need to make sure onend fires each time an 
+    // animation ends.
+    testToggleDirection : function() {
+        var a = new Animation();
+        var numFrames = 0;
+        var endcount = 0;
+        a.onplay = function(pos) {
+            ++numFrames;
+        };
+        a.onend = function() {
+            if(++endcount == 1)
+                this.toggleDirection();
+        };
+        a.toggleDirection();
+        this.wait( function(){
+            YAHOO.log("numframes: " + numFrames, "info", "TestRunner");
+            Assert.areEqual(2, endcount, "onend() should have fired twice.");
+            Assert.areEqual(0, a.position, "Wasn't reversed back to 0");
+        }, 2100);        
+    },
+
+    testStop : function() {
+        var a = new Animation();
+        a.start();
+        a.stop();
+        this.wait(function(){
+            YAHOO.log("a.position: " + a.position, "info", "TestRunner");
+            Assert.isTrue(a.position == 0 );
+            var ended = false;
+            a.onend = function() {
+                ended = true;
+            };
+            a.start();
+            setTimeout(function(){a.stop();}, 100);
+            this.wait(function(){
+                Assert.isTrue(ended, "did not end.");
+                YAHOO.log("a.position: " + a.position, "info", "TestRunner");
+            }, 120);
+        }, 200);
+    }
+
+});
+
+var transitionTestCase = new YAHOO.tool.TestCase({
+
+    name : "APE.anim.Transitions",
+
+    testAccel : function() {
+        var a = new Animation(.1);
+        a.transition = APE.anim.Transitions.accel;
+        a.start();
+        this.wait(
+            function() {
+                Assert.areEqual(1, a.position, "position was not 1.");
+            }, 150);
+    },
+
+    testAccel : function() {
+        var a = new Animation(.1);
+        a.transition = APE.anim.Transitions.accel;
+        a.start();
+        this.wait(
+            function() {
+                Assert.areEqual(1, a.position, "position was not 1.");
+            }, 150);
+    },
+
+    testAccel : function() {
+        var a = new Animation(.1);
+        a.transition = APE.anim.Transitions.accel;
+        a.start();
+        this.wait(
+            function() {
+                Assert.areEqual(1, a.position, "position was not 1.");
+            }, 150);
+    },
+
+    testAccel : function() {
+        var a = new Animation(.1);
+        a.transition = APE.anim.Transitions.accel;
+        a.start();
+        this.wait(
+            function() {
+                Assert.areEqual(1, a.position, "position was not 1.");
+            }, 150);
+    },
+
+    testAccel : function() {
+        var a = new Animation(.1);
+        a.transition = APE.anim.Transitions.accel;
+        a.start();
+        this.wait(
+            function() {
+                Assert.areEqual(1, a.position, "position was not 1.");
+            }, 150);
+    },
+
+    testAccel : function() {
+        var a = new Animation(.1);
+        a.transition = APE.anim.Transitions.accel;
+        a.start();
+        this.wait(
+            function() {
+                Assert.areEqual(1, a.position, "position was not 1.");
+            }, 150);
+    },
+
+    testAccel : function() {
+        var a = new Animation(.1);
+        a.transition = APE.anim.Transitions.accel;
+        a.start();
+        this.wait(
+            function() {
+                Assert.areEqual(1, a.position, "position was not 1.");
+            }, 150);
+    },
+
+    testDecel : function() {
+        var a = new Animation(.1);
+        a.transition = APE.anim.Transitions.decel;
+        a.start();
+        this.wait(
+            function() {
+                Assert.areEqual(1, a.position, "decel: position was not 1.");
+            }, 150);
+    },
+
+    testReverse : function() {
+        var a = new Animation(.1);
+        a.transition = APE.anim.Transitions.reverse;
+        a.start();
+        this.wait(
+            function() {
+                Assert.areEqual(0, a.position, "reverse: position was not 0.");
+            }, 150);
+    },
+
+    testSigmoid : function() {
+        var a = new Animation(.1);
+        a.transition = APE.anim.Transitions.sigmoid;
+        a.start();
+        this.wait(
+            function() {
+                Assert.areEqual(1, a.position, "position was not 1.");
+            }, 150);
+    },
+
+
+    testSigmoid : function() {
+        var a = new Animation(.1);
+        a.transition = APE.anim.Transitions.sigmoid;
+        a.start();
+        this.wait(
+            function() {
+                Assert.areEqual(1, a.position, "position was not 1.");
+            }, 150);
+    },
+
+    testSigmoid2 : function() {
+        var a = new Animation(.1);
+        a.transition = APE.anim.Transitions.sigmoid2;
+        a.start();
+        this.wait(
+            function() {
+                Assert.areEqual(1, a.position, "sig2: position was not 1.");
+            }, 150);
+    },
+
+    testSigmoid3 : function() {
+        var a = new Animation(.1);
+        a.transition = APE.anim.Transitions.sigmoid3;
+        a.start();
+        this.wait(
+            function() {
+                Assert.areEqual(1, a.position, "sig3: position was not 1.");
+            }, 150);
+    },
+
+    testSigmoid4 : function() {
+        var a = new Animation(.1);
+        a.transition = APE.anim.Transitions.sigmoid4;
+        a.start();
+        this.wait(
+            function() {
+                Assert.areEqual(1, a.position, "sig4: position was not 1.");
+            }, 150);
+    },
+
+    testTan : function() {
+        var a = new Animation(.1);
+        a.transition = APE.anim.Transitions.tan;
+        a.start();
+        this.wait(
+            function() {
+                Assert.areEqual(1, a.position, "tan: position was not 1.");
+            }, 150);
+    },
+
+    testReverseWarp : function() {
+        var a = new Animation(.1);
+        a.transition = APE.anim.Transitions.reverseWarp;
+        a.start();
+        this.wait(
+            function() {
+                Assert.areEqual(1, a.position, "rev warp: position was not 1.");
+            }, 190);
+    },
+
+    testEaseInEaseOut : function() {
+        var a = new Animation(.1);
+        a.transition = APE.anim.Transitions.easeInEaseOut;
+        a.start();
+        this.wait(
+            function() {
+                Assert.areEqual(1, a.position, "easeInEaseOut: position was not 1.");
+            }, 150);
+    },
+
+    testWobble : function() {
+        var a = new Animation(.1);
+        a.transition = APE.anim.Transitions.wobble;
+        a.start();
+        this.wait(
+            function() {
+                Assert.areEqual(1, a.position, "wobble: position was not 1.");
+            }, 150);
+    },
+
+    testSpring : function() {
+        var a = new Animation(.1);
+        a.transition = APE.anim.Transitions.spring;
+        a.start();
+        this.wait(
+            function() {
+                Assert.areEqual(1, a.position, "spring: position was not 1.");
+            }, 150);
+    },
+
+    testLoop : function() {
+        var a = new Animation(.1);
+        a.transition = APE.anim.Transitions.loop;
+        a.start();
+        this.wait(
+            function() {
+                Assert.areEqual(0, a.position, "loop: position was not 1.");
+            }, 150);
+    },
+
+    testSwingTo:  function() {
+        var a = new Animation(.1);
+        a.transition = APE.anim.Transitions.swingTo;
+        a.start();
+        this.wait(
+            function() {
+                Assert.areEqual(1, a.position, "swingTo: position was not 1.");
+            }, 150);
+    },
+
+    testSwingToFrom : function() {
+        var a = new Animation(.1);
+        a.transition = APE.anim.Transitions.swingToFrom;
+        a.start();
+        this.wait(
+            function() {
+                Assert.areEqual(1, a.position, "swingToFrom: position was not 1.");
+            }, 150);
+    },
+
+    testToString : function() {
+        Assert.isTypeOf("string", APE.anim.Transitions.toString());
+    }
+
+});
+
+//create the logger.
+var logger = new YAHOO.tool.TestLogger("testLogger");
+YAHOO.tool.TestRunner.add( animationTestCase );
+YAHOO.tool.TestRunner.add( transitionTestCase );
+
+// run the tests, or put them in the TestRunner.
+if (parent && parent != window) {
+    YAHOO.tool.TestManager.load();
+} else {
+    YAHOO.tool.TestRunner.run();
+}
+}, 100);
+
+</script>
+</body>

@@ -1,0 +1,137 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+    <title>Inline Table Test</title>
+
+    <style>id {color: : #090; }</style>
+</head>
+
+<body style="width: 700px;margin: 4px;padding-top: 2px;font-size: 14px; border-top: thick orange groove; border-bottom: thick dotted chartreuse; background: #FFF">
+	<div style="position: absolute; top: 5px;border: 1px solid pink" id="spanPar">
+		<span style="position: relative; top: 2px" id="target">target</span>
+	</div>
+    
+    <div id="reldiv" style="position: relative;top: 0">rel div</div>
+
+        <div id="container" style="left: 100px; position: absolute; overflow: scroll; height: 100px; width: 400px">
+         <table cellpadding="0" cellspacing="0"
+            style="width: 400px;padding-top: 100px; border: 10px solid #Fc0; background: #efd;">
+            <caption>Test Caption</caption>
+            <thead>
+                <tr>
+                    <th>blah</th><th>blah</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr >
+                    <td>blah</td><td id="testcell">blah</td>
+                </tr>
+                <tr>
+                    <td>blah</td><td><span id="testspan">blah</span></td>
+                </tr>
+                <!-- (un)comment testrow css to change offsetParent to DIV in IE -->
+                <tr id="testrow" style="position: relative; left : -12px;">
+                    <td>blah</td><td id="testcell" style="position:relative"><div id="testdiv">test</div></td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+
+    <div style="margin-top:200px;"> <!-- THis DIV makes BODY expand its height -->
+        <hr><b><u>Result:</u></b>
+       
+       <div id="statDiv" style="margin: 12px">
+           <div id="statDivChild">stat div child</div>
+       </div>
+
+ <pre style=" padding: 4px; font-size: 11px; line-height: 1.1em;border: 1px dashed #ccc" id="results">
+</pre>
+</div>
+<H4>Notes:</h4>
+<pre>
+TD offsetLeft: 
+    mozilla includes the tables border-width when the TD contains block-level children. BUG.
+    Except TD is inside a TR that has position: relative AND the TD contains block-level children.
+
+TD offsetLeft:
+    Safari, offsetParent is TABLE; does not include TABLE clientWidth (must add clientWidth)
+    Opera offsetParent is TABLE's offsetParent; offsetLeft is correct
+    IE, Moz: same as Opera
+
+#spanPar offsetParent
+    Only IE gets this one right. It's the documentElement, and that is because BODY has position: static.
+
+XXX IE - Any TR position: relative affects TBODY in IE. IE moves row (or cell) with top: 12px; left: 12px;
+</pre>
+
+<p>
+    The table API is complicated and doesn't have any formal definition. It needs one.
+</p>
+<script>
+
+document.getElementById('container').scrollTop = 17;
+document.getElementById('container').scrollLeft = 17;
+
+var result = [];
+
+// Add any element you want to inspect in a call to writeUpTree( id );
+writeUpTree('reldiv');
+writeUpTree('spanPar');
+writeUpTree('target');
+writeUpTree('testdiv');
+writeUpTree('testspan');
+writeUpTree('testcell');
+//writeUpTree('statDivChild'); // causes crash.
+
+function info() {
+    result[result.length] = Array.prototype.join.call(arguments,'');
+}
+
+function writeUpTree(id) {
+    info('#'+id);
+    var headers = ["tagName", "offsetLeft", "offsetTop", "offsetParent"];
+
+    var hs = [];
+    for(var i =0; i< headers.length; i++) 
+        hs.push(headers[i], makeDots(headers[i], ' '));
+    info(hs.join(''));
+
+    var tn = document.getElementById(id);
+    for(var p = tn, op = p.offsetParent;  op; p= p.parentNode, op=p.offsetParent) {
+    try{
+        var s = p.tagName + (p.id ? "#" + p.id : "");
+        info(
+                s, makeDots(s), 
+                p.offsetLeft, makeDots( String(p.offsetLeft)), 
+                p.offsetTop, makeDots(String(p.offsetTop)),
+                op.tagName + (op.id ? "#" + op.id : "")
+                );}catch(e){alert(e.message);}
+    }
+    info(''); // XXX Opera: Must pass empty string to writeln; 
+}
+function makeDots( coll, ch ) {
+    return Array.prototype.join.call({length: 14 - coll.length+1}, ch||'.');
+}
+
+var resultsEl = document.getElementById('results');
+var sResult = result.join('\r\n');
+
+// XXX IE doesn't support whitespace with innerHTML. 
+resultsEl.innerHTML = '\n';
+
+// Use the Peter Michaux outerHTML hack.
+if(resultsEl.innerHTML !== '\n'&&'outerHTML'in resultsEl) {
+   if(resultsEl.offsetHeight) {
+        resultsEl.outerHTML = resultsEl.outerHTML.replace(/>[.*^<]?/, '>'+ sResult +'<');
+    }
+    resultsEl.innerHTML = sResult;
+} else {
+    resultsEl.innerHTML = sResult;
+}
+</script>
+
+</body>
+</html>

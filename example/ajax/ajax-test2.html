@@ -1,0 +1,141 @@
+ <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+    <title>AjaxRequest Test</title>
+<link type="text/css" rel="stylesheet" href="../resources/example.css"/>
+
+<script type="text/javascript" src="../../build/APE.js"></script>
+<script type="text/javascript" src="../../build/ajax/AsyncRequest.js"></script>
+<style type="text/css">
+    #buttons {
+        padding: 12px 4px;
+        border-bottom: 2px groove #CA9;
+        margin-bottom: 12px;
+    }
+</style>
+</head>
+<body>
+<h1>AsyncRequest Demo</h1>
+
+<div id="buttons">
+    <button id='success' onclick="AjaxDemo.testGet()">testGet();</button>
+    <button id='failure' onclick="AjaxDemo.testAbort()">testAbort();</button>
+    <button id='post' onclick="AjaxDemo.testPost()">testPost();</button>
+
+    <img id="ajax" style="visibility:hidden; height: 40px" src="ajax.jpg"/>
+</div>
+
+<div id="console">
+</div>
+<script type="text/javascript">
+
+var AjaxDemo = {};
+(function(){
+
+    APE.mixin(AjaxDemo, {
+        testGet : testGet,
+        testAbort : testAbort,
+        testPost : testPost
+        });
+
+var ajax = document.getElementById('ajax'),
+    AsyncRequest = APE.ajax.AsyncRequest;
+
+function testGet(i) {
+    var req = new AsyncRequest( "data.json?" + (i||0) );
+    consoleMessage('...');
+    showBusyMessage();
+    req.onsucceed = function( req ) {
+        consoleMessage("data received " + req.responseText);
+    };
+    req.oncomplete = function( doneEvent ) {
+        hideBusyMessage();
+    };
+    req.onfail = function( ) {
+        consoleMessage( "failure should not have occurred: " + req );
+    }
+    req.send();
+}
+
+function testAbort() {
+    var req = new AsyncRequest( "data.json", "POST" );
+    consoleMessage('...');
+    showBusyMessage();
+    req.onsucceed = function( response ) {
+        var data = eval("("+response.responseText +")");
+        consoleMessage("Got response text. data.name == 'Garrett': " + (data.name == "Garrett"));
+    };
+    req.oncomplete = function( doneEvent ) {
+        consoleMessage(doneEvent.successful == false, doneEvent);
+    };
+
+    req.onfail = function( response ) {
+        consoleMessage( "Error: failure should not have occurred: " + req );
+    };
+    req.oncomplete = function( doneEvent ) {
+        hideBusyMessage();
+    };
+
+    req.onabort = function( req ) {
+        consoleMessage('aborted: ' + null) );
+    };
+
+    req.send();
+    try {
+        req.abort();
+    } catch(ex) {alert(ex.message); }
+}
+
+function testFailure() {
+    consoleMessage('...');
+    showBusyMessage();
+    req.onfail = function( response ) {
+        consoleMessage("Error: " + eval("("+response.responseText +")") );
+    };
+    req.oncomplete = function( doneEvent ) {
+        hideBusyMessage();
+    };
+}
+
+/** 
+ * Server takes params first and last, returns "first, last".
+ */
+function testPost() {
+    consoleMessage('...');
+    var data = "first=Garrett&last=Smith",
+        req = new AsyncRequest( "process.jsp", "POST" );
+    showBusyMessage();
+    req.onsucceed = function( req ) {
+        consoleMessage("req.responseText : " + req.responseText);
+    };
+    req.oncomplete = function( doneEvent ) {
+        hideBusyMessage();
+    };
+    req.send( data );
+};
+
+function consoleMessage(s) {
+    document.getElementById('console').innerHTML = s;
+}
+
+function showBusyMessage() {
+    ajax.style.visibility = "visible";
+}
+
+function hideBusyMessage() {
+
+    // Sometimes its so fast that the user
+    // can't tell if anything happened.
+    // Call in a setTimeout to slow things down 
+    // to a perceptible level.
+    setTimeout(function(){
+        ajax.style.visibility = "hidden";
+    }, 150);
+}
+
+})();
+</script>
+</body>
+</html>

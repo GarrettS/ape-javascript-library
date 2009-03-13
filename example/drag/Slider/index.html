@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+        "http://www.w3.org/TR/2000/REC-xhtml1-20000126/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+<title>Slider Demo</title>
+
+<link type="text/css" rel="stylesheet" href="../../../build/drag/css/Slider.css" />
+
+<style type="text/css" media="screen">
+html {
+	background: #eee;
+}
+
+body {
+	margin: 0;
+	padding: 0;
+}
+
+#instructions {
+	font-size: 12px;
+	position: absolute;
+	left: 40em;
+	top: 20px;
+	background-color: #fff;
+	padding: 4px;
+	border: 1px solid #4f5c71;
+	border-radius: 3px;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+}
+
+/** For form INPUT type="text" elements */
+#lb-display {
+	position: absolute;
+	left: 360px;
+	top: 8px;
+}
+#kg-display {
+	position: absolute;
+	left: 8px;
+	top: 150px;
+}
+</style>
+
+<script src="../../../build/ape-ep-dom.js" type="text/javascript"></script>
+<script src="../../../build/drag/drag-slider.js" type="text/javascript"></script>
+
+</head>
+<body>
+<div id='weight-track' class='ape-slider-track ape-slider-h-track'>
+	<div id="weight-handle" class="ape-slider-handle ape-slider-h-handle"></div>
+</div>
+<label id='lb-display' for='weight' class="ape-slider-label">
+	lb <input id='weight' name='lb' value='' size='5' maxlength='5' 
+		onblur='slider.setValue(this.value);updateSliders(slider, slider2);'/>
+</label>
+
+<div id='weight-vertical-track' class='ape-slider-track ape-slider-v-track'>
+	<div id="weight-vertical-handle" class="ape-slider-handle ape-slider-v-handle" ></div>
+</div>
+<label id='kg-display' for='weight-vertical' class="ape-slider-label">
+	<input id='weight-vertical' name='kg' value='' size='5' maxlength='5'
+		onblur='slider2.setValue(this.value);updateSliders(slider2, slider);'/>
+
+kg </label>
+
+<div id='instructions'>
+    <pre>
+(shift +) tab  - change focus 
+esc            - cancel
+click trackbar - grab
+arrow keys to adjust
+</pre>
+
+<p>
+    slider.ticks - default is 15 tics. Press the arrow key on a <em>focused</em> slider handle and the 
+    slider will move 1/15 * tDist. <code>onslide()</code> will fire each tick.
+</p>
+</div>
+
+<script type="text/javascript">
+
+var slider, slider2;
+
+(function () {
+    var Slider = APE.drag.Slider;
+
+ 	slider = Slider.getByNode(document.getElementById("weight-handle"), Slider.direction.HORZ);
+	slider2 = Slider.getByNode(document.getElementById("weight-vertical-handle"), Slider.direction.VERT);
+ 	
+ 	slider.minValue = 0;
+ 	slider.maxValue = 1000;
+ 	
+ 	slider2.minValue = 0;
+ 	slider2.maxValue = 453.59237;
+ 	
+	slider.onslide = function () {
+		updateSliders(this, slider2);
+	};
+	
+	slider2.onslide = function (e) {
+		updateSliders(this, slider);
+	};
+	
+  	slider.setValue(0);
+  	slider.onslide();
+ 	slider2.setValue(0);
+  	slider.onslide();
+})();
+
+function updateSliders(source, target, e) {
+	target.setValue(source.rationalValue * (target.maxValue - target.minValue));
+		
+	document.getElementById("weight").value = slider.value;
+	document.getElementById("weight-vertical").value = slider2.value;
+}
+
+</script>
+</body>
+</html>

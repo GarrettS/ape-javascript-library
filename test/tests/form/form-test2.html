@@ -1,0 +1,91 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+    <title>Form Test</title>
+
+    <link rel="stylesheet" type="text/css" href="../../yui-test/build/logger/assets/logger.css" />
+    <link rel="stylesheet" type="text/css" href="../../yui-test/build/yuitest/assets/yuitest.css" />
+    <link rel="stylesheet" type="text/css" href="../../yui-test/assets/testlogger.css" />
+
+    <script type="text/javascript" src="../../yui-test/build/yahoo-dom-event/yahoo-dom-event.js"></script>
+    <script type="text/javascript" src="../../yui-test/build/logger/logger.js"></script>
+    <script type="text/javascript" src="../../yui-test/build/yuitest/yuitest-beta.js"></script>
+
+    <script type="text/javascript" src="../../../build/APE.js"></script>
+    <script type="text/javascript" src="../../../build/form/Form.js"></script>
+
+</head>
+<body style="position:relative;top: 10px">
+<input name="toString">
+<form toString="a" name="toString" id="toString" attributes="" valueOf="" elements="">
+  <input name="toString" id="toStringInput">
+  <input name="length" value="-1">
+</form>
+
+<div id="testLogger"></div>
+
+<script type="text/javascript">
+
+setTimeout(function(){
+
+var dom = APE.dom,
+    Assert = YAHOO.util.Assert,
+    documentElement = document.documentElement,
+    Action = YAHOO.util.UserAction,
+    body = document.body,
+    formNode,
+    expectedString = 
+      "text=&password=&cb=c2&cb=c3&r=r2&s1=value&t1=lorem+textarea&s1=Nv&t1=lorem+textarea";
+          
+var formTestCase = new YAHOO.tool.TestCase({
+    name : "Form Test Case",
+
+    setUp : function() {
+        formNode = document.getElementById('toString');
+    },
+
+    _should : {
+        ignore : {
+            testDocumentToString : true,
+            testDocumentForms0ToString : true
+        }
+    },
+
+    tearDown : function() {
+    },
+
+    testDocumentToString : function() {
+        Assert.areEqual(document.getElementById('toString'), document.toString);
+    },
+
+    testDocumentFormsToString : function() {
+        Assert.areEqual(document.getElementById('toString'), document.forms.toString);
+    },
+
+    testDocumentForms0ToString : function() {
+        // Assert.areEqual("a", document.forms[0].toString);
+    },
+
+    testDocumentForms0ElementsToString : function() {
+        Assert.areEqual(document.getElementById('toStringInput'), document.forms[0].elements.toString);
+    },
+
+    testFormLength: function(){
+        Assert.areEqual(2, document.forms[0].elements.length);
+    }
+});
+
+var logger = new YAHOO.tool.TestLogger("testLogger");
+YAHOO.tool.TestRunner.add( formTestCase );
+
+// run the tests, or put them in the TestRunner.
+if (parent && parent != window) {
+    YAHOO.tool.TestManager.load();
+} else {
+    YAHOO.tool.TestRunner.run();
+}
+}, 100);</script>
+</body>
+</html>

@@ -1,0 +1,1539 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+	<meta name="generator" content="JsDoc Toolkit 1.0">
+	<title>JsDoc: </title>
+	<link rel=stylesheet href="default.css" type="text/css" media=screen>
+</head>
+
+<body>
+	<div class="content">
+		<div class="docs">
+		
+			<div class="sectionHead">Library: Animation.js</div>
+			<div class="section overview">
+				<div class="itemTitle">
+					Overview
+				</div>
+				<div>	
+					<div class="desc">anim packageAnimation, ManagerReleased under Academic Free Licence 3.0.</div>
+					<div class="itemTags">
+					<ul>
+						<li>source: <a href="src_04.html">Animation.js</a></li>
+					
+						<li>author: Garrett Smith<p>Animation is purely a timing framework that passes a position to the run() method.It has nothing to do with HTML elements, CSS, et c.</p> <p><code>anim.Manager</code> manges running animations in two threads. This can be changed by setting <code>APE.anim.Manager.isDoubleThreaded = false;</code></p><p><code>anim.Transitions</code> contains effects for speed/timing, such as acceleration and easing.</p> <pre> b = new APE.anim.Animation( "blah" );b.run = function(position) { // <-- you implement run.}b.start() // <-- then call start.</pre> <p>anim.Transition</p> <p>All functions work with a position (0-1).</p></li>
+					
+					</ul>
+					</div>
+				</div>
+			</div>
+			
+			<div class="sectionHead">Constructors</div>
+			
+			
+			<div class="section constructor">
+				<div class="itemTitle">
+					<a name="APE.anim.Animation"></a>
+					
+					
+					
+					APE.anim.Animation(<span class="signature">duration</span>)
+					
+					
+				</div>
+				
+				
+					<div class="desc"></div>
+				
+				
+				
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							ufloat
+						</td>
+						<td>
+							duration<a title="optional parameter" class="optional">?</a>
+						</td>
+						<td>
+							Number of seconds to run the animation (default is 1).
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				<div class="detailHead">methods</div>
+				
+					<ul class="details">
+						<li><a href="#APE.anim.Animation.onabort">onabort</a>(ex)</li>
+					</ul>
+				
+					<ul class="details">
+						<li><a href="#APE.anim.Animation.run">run</a>(position)</li>
+					</ul>
+				
+					<ul class="details">
+						<li><a href="#APE.anim.Animation.start">start</a>()</li>
+					</ul>
+				
+					<ul class="details">
+						<li><a href="#APE.anim.Animation.seekTo">seekTo</a>(pos)</li>
+					</ul>
+				
+					<ul class="details">
+						<li><a href="#APE.anim.Animation.reset">reset</a>()</li>
+					</ul>
+				
+					<ul class="details">
+						<li><a href="#APE.anim.Animation.pause">pause</a>()</li>
+					</ul>
+				
+					<ul class="details">
+						<li><a href="#APE.anim.Animation.resume">resume</a>()</li>
+					</ul>
+				
+					<ul class="details">
+						<li><a href="#APE.anim.Animation.toString">toString</a>()</li>
+					</ul>
+				
+					<ul class="details">
+						<li><a href="#APE.anim.Animation.stop">stop</a>(ended)</li>
+					</ul>
+				
+					<ul class="details">
+						<li><a href="#APE.anim.Animation.abort">abort</a>(ex)</li>
+					</ul>
+				
+				
+				
+				
+				<div class="detailHead">properties</div>
+				
+					<ul class="details">
+						<li><a href="#APE.anim.Animation.duration">duration</a></li>
+					</ul>
+				
+					<ul class="details">
+						<li><a href="#APE.anim.Animation.timeLimit">timeLimit</a></li>
+					</ul>
+				
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			<div class="section constructor">
+				<div class="itemTitle">
+					<a name="APE.anim.Manager"></a>
+					
+					
+					
+					APE.anim.Manager(<span class="signature"></span>)
+					
+					
+				</div>
+				
+				
+					<div class="desc"></div>
+				
+				
+					<div class="desc"></div>
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				<div class="detailHead">methods</div>
+				
+					<ul class="details">
+						<li><a href="#APE.anim.Manager.register">register</a>(anim)</li>
+					</ul>
+				
+					<ul class="details">
+						<li><a href="#APE.anim.Manager.unregister">unregister</a>(anim)</li>
+					</ul>
+				
+					<ul class="details">
+						<li><a href="#APE.anim.Manager.toString">toString</a>()</li>
+					</ul>
+				
+				
+				
+				
+				<div class="detailHead">properties</div>
+				
+					<ul class="details">
+						<li><a href="#APE.anim.Manager.isDoubleThreaded">isDoubleThreaded</a></li>
+					</ul>
+				
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			<div class="section constructor">
+				<div class="itemTitle">
+					<a name="APE.anim.Transitions"></a>
+					
+					
+					
+					APE.anim.Transitions(<span class="signature"></span>)
+					
+					
+				</div>
+				
+				
+					<div class="desc"></div>
+				
+				
+					<div class="desc">Easing functions.</div>
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				<div class="detailHead">methods</div>
+				
+					<ul class="details">
+						<li><a href="#APE.anim.Transitions.accel">accel</a>(pos)</li>
+					</ul>
+				
+					<ul class="details">
+						<li><a href="#APE.anim.Transitions.decel">decel</a>(pos)</li>
+					</ul>
+				
+					<ul class="details">
+						<li><a href="#APE.anim.Transitions.reverse">reverse</a>(pos)</li>
+					</ul>
+				
+					<ul class="details">
+						<li><a href="#APE.anim.Transitions.loop">loop</a>(pos)</li>
+					</ul>
+				
+					<ul class="details">
+						<li><a href="#APE.anim.Transitions.sinoidal">sinoidal</a>(pos)</li>
+					</ul>
+				
+					<ul class="details">
+						<li><a href="#APE.anim.Transitions.spring">spring</a>(pos)</li>
+					</ul>
+				
+					<ul class="details">
+						<li><a href="#APE.anim.Transitions.swingTo">swingTo</a>(pos)</li>
+					</ul>
+				
+					<ul class="details">
+						<li><a href="#APE.anim.Transitions.swingToFrom">swingToFrom</a>(pos)</li>
+					</ul>
+				
+					<ul class="details">
+						<li><a href="#APE.anim.Transitions.toString">toString</a>()</li>
+					</ul>
+				
+				
+				
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			<div class="sectionHead">Namespaces</div>
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			<div class="sectionHead">Functions</div>
+			
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.anim.calculateHypoteneuse"></a>
+					
+					
+					
+					APE.anim.calculateHypoteneuse(<span class="signature">start, end</span>)
+					
+					
+				</div>
+				
+				
+					<div class="desc">Calculates the distance between two points.</div>
+				
+
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							x:int, y:int
+						</td>
+						<td>
+							start
+						</td>
+						<td>
+							coords
+						</td> 
+					</tr>
+				
+					<tr>
+						<td class="type">
+							x:int, y:int
+						</td>
+						<td>
+							end
+						</td>
+						<td>
+							coords
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.anim.Animation.blendValue"></a>
+					
+					
+					
+					APE.anim.Animation.blendValue(<span class="signature">v1, v2, position</span>)
+					
+					
+				</div>
+				
+				
+					<div class="desc">blendValue is useful for transitioning between two numeric values.</div>
+				
+
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							v1
+						</td>
+						<td>
+							the first value
+						</td> 
+					</tr>
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							v2
+						</td>
+						<td>
+							other value to mix in
+						</td> 
+					</tr>
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							position
+						</td>
+						<td>
+							- ratio blend of v2:v1
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.anim.Animation.onabort"></a>
+					
+					
+						<i><a href="#APE.anim.Animation" class="type">APE.anim.Animation.</a></i>onabort(<span class="signature">ex</span>)
+					
+					
+					
+				</div>
+				
+				
+					<div class="desc">if an error occurred, onabort throws the error.this can be overridden (shadowed) by adding an onabort() to the Animation instance.e.g. APE.EventRegistry.add( myAnim, "onabort", myErrorHandler );</div>
+				
+
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							Error
+						</td>
+						<td>
+							ex
+						</td>
+						<td>
+							the error that occured.
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.anim.Animation.run"></a>
+					
+					
+						<i><a href="#APE.anim.Animation" class="type">APE.anim.Animation.</a></i>run(<span class="signature">position</span>)
+					
+					
+					
+				</div>
+				
+				
+					<div class="desc">Run must be implemented by user.</div>
+				
+
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							Number
+						</td>
+						<td>
+							position
+						</td>
+						<td>
+							0-1Implementation generally looks something like:<pre>anim.run = function( position ) {  document.body.style.borderWidth = ( 12 * position ) + "px"};</pre>
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.anim.Animation.start"></a>
+					
+					
+						<i><a href="#APE.anim.Animation" class="type">APE.anim.Animation.</a></i>start(<span class="signature"></span>)
+					
+					
+					
+				</div>
+				
+				
+					<div class="desc">Call this method to start the anim.</div>
+				
+
+				
+				
+				
+				
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.anim.Animation.seekTo"></a>
+					
+					
+						<i><a href="#APE.anim.Animation" class="type">APE.anim.Animation.</a></i>seekTo(<span class="signature">pos</span>)
+					
+					
+					
+				</div>
+				
+				
+					<div class="desc">Seeks to a certain position along theduration timeline.</div>
+				
+
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							ufloat
+						</td>
+						<td>
+							pos
+						</td>
+						<td>
+							[0-1].
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.anim.Animation.reset"></a>
+					
+					
+						<i><a href="#APE.anim.Animation" class="type">APE.anim.Animation.</a></i>reset(<span class="signature"></span>)
+					
+					
+					
+				</div>
+				
+				
+					<div class="desc">resets the animation to position 0.</div>
+				
+
+				
+				
+				
+				
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.anim.Animation.pause"></a>
+					
+					
+						<i><a href="#APE.anim.Animation" class="type">APE.anim.Animation.</a></i>pause(<span class="signature"></span>)
+					
+					
+					
+				</div>
+				
+				
+					<div class="desc">pauses the animation.</div>
+				
+
+				
+				
+				
+				
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.anim.Animation.resume"></a>
+					
+					
+						<i><a href="#APE.anim.Animation" class="type">APE.anim.Animation.</a></i>resume(<span class="signature"></span>)
+					
+					
+					
+				</div>
+				
+				
+					<div class="desc">unpauses the animation.</div>
+				
+
+				
+				
+				
+				
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.anim.Animation.toString"></a>
+					
+					
+						<i><a href="#APE.anim.Animation" class="type">APE.anim.Animation.</a></i>toString(<span class="signature"></span>)
+					
+					
+					
+				</div>
+				
+				
+
+				
+				
+				
+				
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.anim.Animation.stop"></a>
+					
+					
+						<i><a href="#APE.anim.Animation" class="type">APE.anim.Animation.</a></i>stop(<span class="signature">ended</span>)
+					
+					
+					
+				</div>
+				
+				
+					<div class="desc">Ends the anim.</div>
+				
+
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							boolean
+						</td>
+						<td>
+							ended
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.anim.Animation.abort"></a>
+					
+					
+						<i><a href="#APE.anim.Animation" class="type">APE.anim.Animation.</a></i>abort(<span class="signature">ex</span>)
+					
+					
+					
+				</div>
+				
+				
+					<div class="desc">Cancels the anim where it is; does not call onend()</div>
+				
+
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							ex
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.anim.Manager.register"></a>
+					
+					
+						<i><a href="#APE.anim.Manager" class="type">APE.anim.Manager.</a></i>register(<span class="signature">anim</span>)
+					
+					
+					
+				</div>
+				
+				
+					<div class="desc">Registers the animation in the thread pool once.</div>
+				
+
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							Animation
+						</td>
+						<td>
+							anim
+						</td>
+						<td>
+							the animation to register.
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.anim.Manager.unregister"></a>
+					
+					
+						<i><a href="#APE.anim.Manager" class="type">APE.anim.Manager.</a></i>unregister(<span class="signature">anim</span>)
+					
+					
+					
+				</div>
+				
+				
+					<div class="desc">Registers the animation in the thread pool once.</div>
+				
+
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							Animation
+						</td>
+						<td>
+							anim
+						</td>
+						<td>
+							the animation to register.
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.anim.Manager.toString"></a>
+					
+					
+						<i><a href="#APE.anim.Manager" class="type">APE.anim.Manager.</a></i>toString(<span class="signature"></span>)
+					
+					
+					
+				</div>
+				
+				
+
+				
+				
+				
+				
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.anim.Transitions.accel"></a>
+					
+					
+						<i><a href="#APE.anim.Transitions" class="type">APE.anim.Transitions.</a></i>accel(<span class="signature">pos</span>)
+					
+					
+					
+				</div>
+				
+				
+
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							pos
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.anim.Transitions.decel"></a>
+					
+					
+						<i><a href="#APE.anim.Transitions" class="type">APE.anim.Transitions.</a></i>decel(<span class="signature">pos</span>)
+					
+					
+					
+				</div>
+				
+				
+
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							pos
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.anim.Transitions.reverse"></a>
+					
+					
+						<i><a href="#APE.anim.Transitions" class="type">APE.anim.Transitions.</a></i>reverse(<span class="signature">pos</span>)
+					
+					
+					
+				</div>
+				
+				
+					<div class="desc">For better performance, use (1-position) instead.</div>
+				
+
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							pos
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.anim.Transitions.loop"></a>
+					
+					
+						<i><a href="#APE.anim.Transitions" class="type">APE.anim.Transitions.</a></i>loop(<span class="signature">pos</span>)
+					
+					
+					
+				</div>
+				
+				
+					<div class="desc">Plays the APE.anim forwards and backwards  in the same duration.</div>
+				
+
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							pos
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.anim.Transitions.sinoidal"></a>
+					
+					
+						<i><a href="#APE.anim.Transitions" class="type">APE.anim.Transitions.</a></i>sinoidal(<span class="signature">pos</span>)
+					
+					
+					
+				</div>
+				
+				
+					<div class="desc">sinoidal and spring come from Scriptaculous.</div>
+				
+
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							pos
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.anim.Transitions.spring"></a>
+					
+					
+						<i><a href="#APE.anim.Transitions" class="type">APE.anim.Transitions.</a></i>spring(<span class="signature">pos</span>)
+					
+					
+					
+				</div>
+				
+				
+
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							pos
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.anim.Transitions.swingTo"></a>
+					
+					
+						<i><a href="#APE.anim.Transitions" class="type">APE.anim.Transitions.</a></i>swingTo(<span class="signature">pos</span>)
+					
+					
+					
+				</div>
+				
+				
+					<div class="desc">Based on Easing Equations v2.0 (c) 2003 Robert Penner, all rights reserved. This work is subject to the terms in http://www.robertpenner.com/easing_terms_of_use.htmlAdapted for Scriptaculous by Ken Snyder (kendsnyder ~at~ gmail ~dot~ com) June 2006</div>
+				
+
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							pos
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.anim.Transitions.swingToFrom"></a>
+					
+					
+						<i><a href="#APE.anim.Transitions" class="type">APE.anim.Transitions.</a></i>swingToFrom(<span class="signature">pos</span>)
+					
+					
+					
+				</div>
+				
+				
+
+				
+				
+				
+				
+				
+				<div class="detailHead">parameters</div>
+				<table class="params">
+				
+					<tr>
+						<td class="type">
+							
+						</td>
+						<td>
+							pos
+						</td>
+						<td>
+							
+						</td> 
+					</tr>
+				
+				</table>
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section function">
+				<div class="itemTitle">
+					<a name="APE.anim.Transitions.toString"></a>
+					
+					
+						<i><a href="#APE.anim.Transitions" class="type">APE.anim.Transitions.</a></i>toString(<span class="signature"></span>)
+					
+					
+					
+				</div>
+				
+				
+
+				
+				
+				
+				
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="sectionHead">Objects</div>
+			
+			
+			
+			
+			
+			
+			
+			
+			<div class="section object">
+				<div class="itemTitle">
+					<a name="APE.anim.Animation.duration"></a>
+					
+					
+					
+						<i><a href="#APE.anim.Animation" class="type">APE.anim.Animation.</a></i>duration
+					
+					
+					
+				</div>
+				
+				
+					<div class="desc">duration of how long the animation will run (milliseconds).</div>
+				
+				
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			<div class="section object">
+				<div class="itemTitle">
+					<a name="APE.anim.Animation.timeLimit"></a>
+					
+					
+					
+						<i><a href="#APE.anim.Animation" class="type">APE.anim.Animation.</a></i>timeLimit
+					
+					
+					
+				</div>
+				
+				
+					<div class="desc">duration of how long the animation will run.Used internally for seekTo().</div>
+				
+				
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			<div class="section object">
+				<div class="itemTitle">
+					<a name="APE.anim.Manager.isDoubleThreaded"></a>
+					
+					
+					
+						<i><a href="#APE.anim.Manager" class="type">APE.anim.Manager.</a></i>isDoubleThreaded
+					
+					
+					
+				</div>
+				
+				
+					<div class="desc">doubleThreaded animations exhibit varying degrees of improvement on performance, depending on the browser.Particularly, any version of Safari on Mac or Windows, and Internet Explorer on Win9.xSet this flag to false to reduce CPU hogging.</div>
+				
+				
+				
+				
+				
+				
+				
+			</div>
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+		</div>
+	</div>
+	<div class="finePrint">
+	Generated by <a href="http://jsdoctoolkit.org/" target="_blank">JsDoc Toolkit</a> 1.4.0 on Fri, 01 Feb 2008 20:53:32 GMT.
+	</div>
+</body>
+</html>

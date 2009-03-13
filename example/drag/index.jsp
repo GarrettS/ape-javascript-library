@@ -1,0 +1,45 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+<head>
+<title>APE Draggable</title>
+<link type="text/css" rel="stylesheet" href="../../resources/ape.css"/>
+
+</head>
+
+<body>
+
+<h1>Draggable Examples</h1>
+
+<h2>Examples</h2>
+<ul>
+    <li><a href="table/">table reorder</a></li>
+    <li><a href="droptarget/">drop target</a></li>
+    <li><a href="slider">Slider</a></li>
+</ul>
+
+<h2>Tutorial Overview</h2>
+<p>
+    First create an element in the HTML.
+</p>
+<pre>
+&lt;div id="testNode" style="position: relative;"&gt;change me&lt;/div&gt;
+</pre>
+<p>
+    (The styles do not need to be in an inline <code>style</code> attribute.)
+</p>
+
+<p>
+    Next, create a Draggable
+</p>
+
+<pre>
+&lt;script type='text/javascript&gt;
+var draggable = APE.drag.Draggable.getById( "testNode" );
+&lt;/script&gt;
+</pre>
+
+<jsp:include page="/ape/nav.jsp"/>
+
+</body>
+</html>

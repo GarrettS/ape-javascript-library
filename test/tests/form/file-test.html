@@ -1,0 +1,35 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+    <title>Form File Test</title>
+    <script type='text/javascript'>
+function getMultipartFormData(event, form) {
+    var form = new APE.form.Form(form);
+
+    if(event && event.preventDefault) event.preventDefault();
+    else if(window.event) event.returnValue = false;
+
+    var data = form.getMultipartFormData() || 'no data';
+    document.getElementById('monitor').firstChild.data = data;
+}
+
+</script>
+    <script type="text/javascript" src="../../../build/APE.js"></script>
+    <script type="text/javascript" src="../../../build/form/Form.js"></script>
+
+</head>
+<body>
+<form action="" method="multipart/form-data" id="form">
+
+<input type="file" name="result">
+
+<button onclick="getMultipartFormData(event, this.form);" 
+name="x">getMultipartFormData</button>
+<pre id="monitor">
+-&nbsp;-
+</pre>
+</form>
+</body>
+</html>

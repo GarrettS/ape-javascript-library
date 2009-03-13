@@ -1,0 +1,42 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<title> Checkbox getAttribute('checked') </title>
+<link rel="help"
+href="http://www.w3.org/TR/2000/WD-DOM-Level-1-20000929/level-one-core.html#ID-745549614"/>
+<link rel="author" title="Garrett Smith" href="mailto:dhtmlkitchen@gmail.com"/>
+<style type="text/css">
+    #pass {
+        display: none;
+        background: #0F0;
+    }
+    #fail {
+        display: none;
+        background: #F00;
+    }
+</style>
+</head>
+
+<body>
+
+<h1>Checkbox getAttribute('checked')</h1>
+
+<input type="checkbox" id='test'/>
+
+<div id="pass">PASS</div>
+<div id="fail">FAIL</div>
+
+<script type="text/javascript">(function(){
+var test = document.getElementById('test');
+
+test.checked = true;
+var actual = test.getAttribute('checked');
+
+if(actual === null)
+    document.getElementById('pass').style.display = 'inline-block';
+else
+    document.getElementById('fail').style.display = 'inline-block';
+})();
+</script>
+</body>
+</html>

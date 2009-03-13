@@ -1,0 +1,147 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+    <title>Lock Test</title>
+
+    <link rel="stylesheet" type="text/css" href="../../yui-test/build/logger/assets/logger.css" />
+    <link rel="stylesheet" type="text/css" href="../../yui-test/build/yuitest/assets/yuitest.css" />
+    <link rel="stylesheet" type="text/css" href="../../yui-test/build/button/assets//button.css" />
+
+    <script type="text/javascript" src="../../yui-test/build/yahoo-dom-event/yahoo-dom-event.js"></script>
+    <script type="text/javascript" src="../../yui-test/build/logger/logger.js"></script>
+    <script type="text/javascript" src="../../yui-test/build/yuitest/yuitest-beta.js"></script>
+
+    <script type="text/javascript" src="../../../build/APE.js"></script>
+    <script type="text/javascript" src="../../../build/timing/Lock-a.js"></script>
+    <script type="text/javascript" src="../../../build/aop/Advice.js"></script>
+
+</head>
+<body>
+<div id="testLogger"></div>
+<script type="text/javascript">
+var dataTestCase = new YAHOO.tool.TestCase({
+
+    //name of the test case - if not provided, one is auto-generated
+    name : "Data Tests",
+    
+    //---------------------------------------------------------------------
+    // setUp and tearDown methods - optional
+    //---------------------------------------------------------------------
+    
+    /*
+     * Sets up data that is needed by each test.
+     */
+    setUp : function () {
+
+        function O() { 
+            this.runsCompleted = 0;
+        };
+
+        O.prototype = {
+            // calls run() after 300ms.
+            start : function() {
+                setTimeout(this.run, 300);
+            },
+
+            run : function() {
+                ++this.runsCompleted;
+            }
+        };
+
+        O.prototype.getLock = APE.Lock.getLock;
+        O.prototype.releaseLock = APE.Lock.releaseLock;
+
+        var o = new O;
+        // After start() is called, the o object  is locked.
+        APE.aop.Advice.addBefore(o, "start", APE.Lock.getLock);
+        // After run() is completed, the o object is released.
+        APE.aop.Advice.addAfter(o, "run", APE.Lock.releaseLock);
+
+        this.data = {
+            testObject : o
+        };
+    },
+    
+    /*
+     * Cleans up everything that was created by setUp().
+     */
+    tearDown : function () {
+        delete this.data;
+    },
+    
+    //---------------------------------------------------------------------
+    // Test methods - names must begin with "test"
+    //---------------------------------------------------------------------
+    
+    testGetLockFail : function () {
+        var Assert = YAHOO.util.Assert;
+        var data = this.data;
+        var o = data.testObject;
+
+        // Call start() repeatedly.
+        // Should be locked after the first one.
+        for(var i = 0; i < 10; i++) {
+            o.start(i);
+        }
+        Assert.areEqual(0, o.runsCompleted);
+    },
+
+    testGotLock : function () {
+        var Assert = YAHOO.util.Assert;
+        var data = this.data;
+        var o = data.testObject;
+        o.runsCompleted = 0;
+
+        // Call start() repeatedly.
+        // Should be locked after the first one.
+        for(var i = 0; i < 10; i++) {
+            o.start(i);
+        }
+
+        this.wait(function() {
+            Assert.areEqual(1, o.runsCompleted);
+        }, 310 );
+    },
+    
+    // Gets the lock, then checks to see 
+    // if the lock was released after 310 ms.
+    testGotLockReleasedLock : function () {
+        var Assert = YAHOO.util.Assert;
+        var data = this.data;
+        var o = data.testObject;
+        o.runsCompleted = 0;
+
+        // Call start() repeatedly.
+        // Should be locked after the first one.
+        for(var i = 0; i < 10; i++) {
+            o.start(i);
+        }
+
+        var test = this;
+
+        this.wait(function() {
+        // start it again, this should ++runsCompleted.
+            o.start(); 
+            test.wait(function() {
+                Assert.areEqual(2, o.runsCompleted);
+            }, 310 );
+        }, 310 );
+
+    }
+});
+
+//create the logger
+new YAHOO.tool.TestLogger("testLogger");
+YAHOO.tool.TestRunner.add(dataTestCase );
+
+// run the tests, or put them in the TestRunner.
+if (parent && parent != window) {
+    YAHOO.tool.TestManager.load();
+} else {
+    YAHOO.tool.TestRunner.run();
+}</script>
+</body>
+
+</html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+    <title>MouseTracker Test</title>
+    <link rel="stylesheet" type="text/css" href="../yui-test/build/logger/assets/logger.css" />
+    <link rel="stylesheet" type="text/css" href="../yui-test/build/yuitest/assets/yuitest.css" />
+    <link rel="stylesheet" type="text/css" href="../yui-test/assets/testlogger.css" />
+
+    <script type="text/javascript" src="../yui-test/build/yahoo-dom-event/yahoo-dom-event.js"></script>
+    <script type="text/javascript" src="../yui-test/build/logger/logger.js"></script>
+    <script type="text/javascript" src="../yui-test/build/yuitest/yuitest-beta.js"></script>
+
+    <script type="text/javascript" src="../../build/ape-ep-dom.js"></script>
+    <script type="text/javascript" src="../../src/MouseTracker.js"></script>
+</head>
+<body>
+<div id="testLogger"></div>
+<script type="text/javascript">
+(function() {
+var util = YAHOO.util,
+    Assert = util.Assert,
+    ObjectAssert = util.ObjectAssert,
+    UserAction = YAHOO.util.UserAction,
+    MouseTracker = APE.MouseTracker;
+
+var mouseTrackerTest = new YAHOO.tool.TestCase({
+    
+    name : "MouseTracker Test",
+
+    setUp : function() {
+        var node = document.createElement("u");
+        node.id = "reg";
+        document.body.appendChild(node);
+
+        this.data = {
+            o : {
+                id : "reg",
+                mouseDown : function(e) {
+                        mouseTrackerTest.data.capture = e.type;
+                    },
+                mouseMove : function(e) {
+                     mouseTrackerTest.data.capture = e.type;
+                },
+
+                mouseUp : function(e) {
+                     mouseTrackerTest.data.capture = e.type;
+                }
+            }
+        };
+    },
+
+    tearDown : function() {
+        var node = document.getElementById("reg");
+        document.body.removeChild(node);
+    },
+
+    testRegister : function() {
+        
+        var successful = MouseTracker.register(this.data.o);
+        Assert.isTrue(successful);
+        this.data.o.name = 1;
+        ObjectAssert.hasProperty("reg", MouseTracker.subscribers);
+
+        // Try to add it twice - this should fail.
+        successful = MouseTracker.register(this.data.o);
+        Assert.isFalse(successful);
+        Assert.areEqual(1, MouseTracker.subscribers['reg'].length);
+        MouseTracker.unregister(this.data.o.id);
+   },
+
+   testNullSubscriber : function() {
+        Assert.isNull(MouseTracker.activeObject);
+   },
+
+   testMouseDown : function(){
+        MouseTracker.register(this.data.o);
+        UserAction.mousedown(document.getElementById("reg"));
+        Assert.areEqual("mousedown", this.data.capture);
+   },
+
+   testMouseDownFail : function(){
+        MouseTracker.register(this.data.o);
+        UserAction.mousedown(document.body);
+        Assert.isUndefined(this.data.capture);
+   },
+
+   testMouseUp : function(){
+        MouseTracker.register(this.data.o);
+        UserAction.mouseup(document.body);
+        Assert.isNull(this.data.capture);
+        Assert.isNull(MouseTracker.activeObject);
+   }
+    
+
+    
+});
+
+
+var logger = new YAHOO.tool.TestLogger("testLogger");
+
+YAHOO.tool.TestRunner.add( mouseTrackerTest );
+
+ //run the tests
+if (parent && parent != window) {
+    YAHOO.tool.TestManager.load();
+} else {
+    YAHOO.tool.TestRunner.run();
+}
+})();
+ </script>
+</body>
+
+</html>

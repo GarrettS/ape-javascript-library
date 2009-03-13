@@ -1,0 +1,35 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+        "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+	<title>Form Serialize</title>
+	<script src="../../build/APE.js"></script>
+	<script src="../../build/form/Form.js"></script>
+	<script src="../../build/ajax/AsyncRequest.js"></script>
+</head>
+<body>
+<h1>XHR FileUpload</h2>
+<form method="post" enctype="multipart/form-data" id='form' action="process.jsp">
+	<input type="file" name="file"/>
+	<input type="text" name="name"/>
+	<button type="submit" onclick="sendXHR(event);return false;">Send</button>
+</form>
+
+<div id="result"></div>
+
+<script>
+function sendXHR(e) {
+	var form = new APE.form.Form(document.getElementById('form'));
+	var xhr = new APE.ajax.AsyncRequest(form.form);
+	xhr.onsucceed = showData;
+	xhr.send(form.getMultipartFormData());
+	//console.log(xhr);
+}
+
+function showData() {
+	var data = this.req.responseText;
+	document.getElementById('result').innerHTML = data;
+}
+</script>
+</body>
+</html>

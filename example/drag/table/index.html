@@ -1,0 +1,378 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+	<title>table reorder</title>
+	<style type="text/css" media="All">
+/* <![CDATA[ */
+
+html {
+	background: background;
+	padding: 14px;
+}
+
+body {
+	margin: 0;
+	font: large black Verdana, sans-serif;
+	color: #3A3B02;
+}
+
+#contents {
+    height: 510px;
+	background: AppWorkSpace;
+	padding: 14px;
+	position: relative;
+	border: 1px solid WindowFrame;
+}
+
+tr {
+    /* This will cause Opera to recognize the TR as an offsetParent 
+       Omitting this has no adverse effect on the demo.
+    */
+    /** position: relative; */
+}
+
+th {
+	border-color: inactiveborder;
+	cursor: default;
+	text-align: left;
+    position: relative;
+}
+
+/** 
+ * The activeDragClassName property of each folder.  
+ * IE7 does not support :active
+ * Opera 9, Firefox, and Webkit all support :active, so this is purely a workaround for IE7.
+ */
+caption:hover, table.activeDrag caption {
+    background: #FFFFE1;
+}
+
+caption {
+	font: caption;
+	caption-side: bottom;
+	border: inherit;
+	background: infobackground;
+    cursor: move;
+}
+
+tr.rowHighlight {
+	background: #FFFF99;
+}
+
+.colHighlight {
+	background: #FFCC99;
+}
+tr.rowHighlight {
+	background: #FFFFFF;
+}
+
+.dropTargetHighlight, .dropTargetHighlight:hover {
+    border: 1px dashed #FFFC30;
+    background-color: #AEFE90;
+}
+
+td.intersect {
+    background-color: #FFEBD8;
+}
+
+th div {
+	border-color: tan;
+	z-index: 10;
+	cursor: default;
+	background: ButtonHighlight;
+	border: 1px solid inactiveborder;
+	font-family: "Trebuchet MS", "Lucida Grande", sans-serif;
+    height: 1.4em;
+    position: relative;
+}
+
+th div div {
+    position: absolute;
+    width: 100%;
+    font-size: 14px;
+    top: 0;
+    padding: .1em 0;
+}
+
+th div div:hover {
+    background-color: #DEFFB9;
+}
+
+#stats th div.dragActive, th div.dragActive:hover {
+	border-color: activeborder;
+    z-index: 10000;
+    position: absolute;
+    opacity: .8;
+    background-color: #DEFFB9;
+    width: 100%;
+}
+
+th div.dragFocused {
+	border-style: dotted;
+    background-color: #FFCC99;
+}
+
+tr.rowHighlight th, tr.rowHighlight th div {
+    border-color: transparent;
+}
+tr.rowHighlight div.dragFocused {
+    background: transparent;
+}
+
+td {
+    text-align: center;
+}
+
+table#stats {
+	/** Safari <= 3 will add table and td borders to element's offsetLeft/Top. */
+    /** border: 11px solid inactiveborder; */
+
+	table-layout: fixed;
+	width: 500px;
+	border-color: InactiveBorder;
+	background: ButtonFace;
+    position: relative;
+    border-spacing: 0;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+}
+
+div#statsDiv {
+	position: relative; 
+	top: 50px;
+	width: auto;
+	width: 502px;
+    /** opera needs these or it will return wrong values in getComputedStyle */
+    left: 0;
+    top: 0;
+	background: Menu;
+	margin: 0 20%;
+}
+
+#instructions {
+	position: absolute; 
+	bottom: 10px;
+    left: 10px;
+	border: 1px solid buttonshadow;
+	padding: 0 4px;
+	font: caption;
+	background: #FFFFE1;
+}
+
+/* ]]> */
+</style>
+</head>
+<body>
+<div id="contents">
+	<h1>Table Sorting</h1>
+	<div id='statsDiv'>
+	<table id='stats'>
+		<caption>Customer Demographics</caption>
+        <col/><col/><col/><col/><col/>
+        <tbody style="position:relative">
+            <tr>
+                <th id="skip_me" style='visibility: collapse;border: 0;'>IE</th> 
+                <th><div><div>Homeowner</div></div></th>
+                <th><div><div>F/T&nbsp;Worker</div></div></th> 
+                <th><div><div>Middle&nbsp;Class</div></div></th>
+                <th><div><div>Married</div></div></th>
+            </tr>
+            <tr>
+                <th><div><div>Male</div></div></th> <td></td> <td></td> <td></td> <td></td>
+            </tr>
+            <tr>
+                <th><div><div>Age&nbsp;21+</div></div></th> <td></td> <td></td> <td></td> <td></td>
+            </tr>
+            <tr>
+                <th><div><div>Income</div></div></th> <td></td> <td></td> <td></td> <td></td>
+            </tr>
+            <tr>
+                <th><div><div>Car&nbsp;Owner</div></div></th> <td></td> <td></td> <td></td> <td></td>
+            </tr>
+            <tr>
+                <th><div><div>Student</div></div></th> <td></td> <td></td> <td></td> <td></td>
+            </tr>
+        </tbody>
+	</table>
+	</div>
+	<div id='instructions'>
+		<p>
+			Drag any header onto any other header to resort the data. 
+			Data appears courtesy of Math.random().
+		</p>  	 
+		<pre style="background:#FFFFF0;font-size:smaller">
+Tab key     - select next header
+shift + tab - select previous header
+esc         - cancel drag
+        </pre>
+	</div>
+</div>
+<script src="../../../build/ape-ep-dom.js" type="text/javascript"></script>
+<script src="../../../build/drag/Draggable.js" type="text/javascript"></script>
+
+<script type="text/javascript">(function(){
+
+var table = document.getElementById("stats");
+var headers = table.getElementsByTagName("th");
+
+function Header(el) {
+    var dragObj = APE.drag.Draggable.getByNode(el);
+    dragObj.dragCopy = true;    
+	dragObj.hoverClassName = "dragHover";
+	dragObj.activeDragClassName = "dragActive";
+	dragObj.focusClassName = "dragFocused";
+	dragObj.container = table;//.tBodies[0];
+    return dragObj;
+}
+
+Header.focusedElement = null;
+Header.focusedRow = null;
+Header.headerRow = headers[0].parentNode;
+Header.focusedCol = 0;
+
+var dragObjArray = new Array();
+
+Header.init = function() {
+    for(var i = 0, c = 0, len = headers.length; i < len; i++) {
+
+        var header = headers[i];
+        if(header.id == 'skip_me') continue;
+
+        var draggableEl = headers[i].getElementsByTagName("div")[1];
+        
+        var dragObj = dragObjArray[c++] = Header(draggableEl);
+
+        // container = table.tBodies[0] won't work in safari. 
+        // Safari thinks the offsetParent of a td is null, so if the 
+        // getOffsetTop returns the td's offsetTop, but the tBody has an offsetTop, 
+        // that won't be included and the dragObj will be positioned in respect to 
+
+        dragObj.ondragstart = Header.dragStartHandler;
+        dragObj.ondragend = Header.dragEndHandler;
+        dragObj.onfocus = Header.focusHandler;
+    }
+    Header.addDropTargets();
+
+    
+    var ef = APE.drag.Draggable.getByNode(document.getElementById('statsDiv'));
+    ef.setHandle(document.getElementsByTagName("caption")[0])
+    ef.activeDragClassName = "activeDrag";
+ 
+}
+Header.dragStartHandler = function(e) {
+    this.enclosingDropTarget = null;
+    setZIndex(this.el, 10000);
+}
+Header.dragEndHandler = function(e) {
+    if(!this.enclosingDropTarget) {
+        this.animateBack();
+    }
+    setZIndex(this.el, 0);
+};
+Header.focusHandler = function(e) {
+    Header.updateHighilight(this);
+};
+Header.addDropTargets = function(){
+	for(var i = 0; i < dragObjArray.length; i++)
+		for(var j = 0; j < dragObjArray.length; j++)
+			if(i != j) {
+                var dragObj = dragObjArray[j];
+				var x = dragObjArray[i].addDropTarget( dragObj.el );
+                x.dragOverClassName = "dropTargetHighlight";
+				x.ondrop = Header.dropEventReceived;
+			}
+}
+
+function setZIndex(el, n) {
+    for(var i = 0; i < 4; i++) {
+        el.style.zIndex = n;
+        el = el.parentNode;
+    }
+}
+
+function hilightCol(table, iCol) {
+    APE.dom.addClass(table.getElementsByTagName("col")[iCol], 'colHighlight');
+}
+
+function unHilightCol(table, iCol) {
+    APE.dom.removeClass(table.getElementsByTagName("col")[iCol], 'colHighlight');
+}
+
+Header.dropEventReceived = function(dropEvent) {
+
+    var dragObject = dropEvent.dragObj,
+        dropTarget = this.el,
+        droppar = dropTarget.parentNode,
+        dopar = dragObject.el.parentNode,
+        dropTargetClone = droppar.removeChild(dropTarget);
+	
+    dragObject.enclosingDropTarget = dropTarget;
+
+	dopar.appendChild(dropTargetClone);
+	doCopy = dopar.removeChild(dragObject.el);
+	
+	droppar.appendChild(dragObject.el);
+
+    // FF 2 causes focus to be lost.
+    // Opera, Webkit don't seem to respect kbd tab key navigation.
+    if(dragObject.el.focus) {
+    	dragObject.el.focus();
+	}
+	doCopy.style.top = doCopy.style.left = 
+	dropTargetClone.style.top = dropTargetClone.style.left = 0;
+	
+	setZIndex(doCopy, 0);
+	setZIndex(dropTargetClone, 0);
+
+	APE.drag.Draggable.instances[dragObject.el.id].el = doCopy;
+
+	APE.drag.Draggable.instances[dropTarget.id].el = dropTargetClone; 
+
+	dragObject.el = doCopy;
+		// hilight the row.	
+    Header.updateHighilight(dragObject);
+};
+
+Header.updateHighilight = function(dragObject) {
+	var thisRow = APE.dom.findAncestorWithTagName(dragObject.el, "tr");
+
+    if(Header.focusedCol && Header.focusedRow) {
+        var cell = Header.focusedRow.cells[Header.focusedCol];
+        cell.innerHTML = '';
+        cell.className = "";
+     }
+
+    if(thisRow == Header.headerRow) { // header row.
+		unHilightCol(table, Header.focusedCol);
+		Header.focusedCol = 0;
+	// hilight the col's td's.
+		
+		var ths = thisRow.getElementsByTagName("th");
+		
+		for(var i = 1; i < ths.length; i++) {
+			if(APE.dom.contains(ths[i], dragObject.el)) {
+				Header.focusedCol = i;
+            }
+        }
+		hilightCol(table, Header.focusedCol);
+ 	}
+	else {
+		if(Header.focusedRow)
+			APE.dom.removeClass(Header.focusedRow, "rowHighlight");
+        Header.focusedRow = thisRow;
+        thisRow.className += ' rowHighlight';
+	}
+
+    if(Header.focusedCol && Header.focusedRow) {
+        var cell = Header.focusedRow.cells[Header.focusedCol];
+        cell.innerHTML = Math.round(Math.random() * 100);
+        cell.className = "intersect";
+    }
+};
+
+Header.init();
+})();</script>
+</body>
+</html>

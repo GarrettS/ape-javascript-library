@@ -1,0 +1,254 @@
+ <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+    <title>Animation Transitions</title>
+<link type="text/css" rel="stylesheet" href="../resources/example.css"/>
+
+<script type="text/javascript" src="../../build/APE.js"></script>
+<script type="text/javascript" src="../../build/anim/Animation.js"></script>
+<style>
+ 
+div.anim-div button {
+    position: absolute; 
+    left: 0;
+    top: 2px; opacity: .8; 
+    width: 4.5em /* for IE */; 
+    display: block;
+    font: 12px sans-serif;
+    letter-spacing: 0;
+    text-align: left;
+}
+
+div.anim-div input {
+    position: absolute;
+    left: -1.6em;
+    font-size: inherit;/*mozilla needs this to get left: *em right*/
+    top: 3px;
+    height: 16px;
+    width: 16px;
+}
+
+div.anim-div {
+    left: 2em;
+    background: #ddd; width: 90%; border: 1px solid #ccc;height: 30px;position: relative;
+    text-transform:small-caps;font-size:22px;letter-spacing: .5em; color: #ccc;text-align: center;
+    margin: 2px;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+}
+
+html div.row-hilite {
+    background: #ded;
+}
+
+body {
+    background: #eee;
+    overflow: hidden;
+    width: 98%;
+    position: relative;
+}
+html {
+    border: 1px solid #ddd;
+}
+</style>
+
+</head>
+<body onunload="document.body.innerHTML = ''">
+<script>
+/** 
+ * buttons are  stored here, so I can save an atStart flag,
+ * to play the anim backwards,
+ * when the button is clicked the second time.
+ */
+function Button(id){ this.id=id; this.init(); }; 
+Button.getById = APE.getById;
+Button.prototype = {
+    init : function() {
+        var anim = new APE.anim.Animation( 1 ); // Duration: 1 sec.
+        
+        var transition = APE.anim.Transitions[this.id];
+        anim.transition = transition;
+        
+        var buttonEl = document.getElementById(this.id);
+
+
+        var endPosition = buttonEl.parentNode.offsetWidth - buttonEl.offsetWidth; // Where the anim ends at.
+        var style = document.getElementById( this.id ).style;
+
+        anim.onstart = function() { };
+        
+        anim.run = function(rationalValue) {         
+            style.left = (rationalValue * endPosition) + "px";
+
+            // Calculate saturation and the inverse.
+            var sat = Math.floor(255 * rationalValue);
+            var revSat = 255-sat;
+
+            style.backgroundColor = "rgb(" + sat + ", "+ sat +", "+ sat +")";
+            style.color = "rgb(" + revSat + ", "+ revSat +", "+ revSat +")";
+        };
+        this.anim = anim;
+    }
+};
+
+/** 
+ * @param buttonID {String} 
+ * The button ID is also the name of a transition function 
+ * in APE.anim.Transitions.
+ *
+ * An APE.anim.Transitions function is
+ * a function used for effecting the rationalValue in run();
+ */
+function doIt( buttonID ) {
+
+    var button = Button.getById(buttonID);
+
+    // Set the duration based on INPUT value.
+    var seconds = parseFloat(document.getElementById( "seconds" ).value);
+    if(isFinite( seconds ))
+        button.anim.duration = seconds * 1000;
+    // This starts the anim.
+    if(button.anim.transition === APE.anim.Transitions.loop)
+        button.anim.start();
+    else
+        button.anim.toggleDirection();
+};
+
+function testChecked() {
+    var all = document.getElementsByTagName("button");
+    for(var i = 0; i < all.length; i++) {
+        var button = all[i];
+        if(button.id) {
+            var input = button.parentNode.getElementsByTagName("input")[0];
+            if(input.checked)
+                doIt(button.id);
+        }
+    }
+}
+
+
+//--------------------------------------------------------
+// Row Hiliting.
+// The APE way to do this is to use EventPublisher instead,
+// but for simplicity of the example, I have excluded it.
+document.onclick = function(e) {
+    e=e||event;
+    var target = e.target || e.srcElement;
+    if(target.tagName == "INPUT") {
+        if(target.checked) 
+            target.parentNode.className += ' row-hilite';
+        else
+            target.parentNode.className = target.parentNode.className.replace(' row-hilite', '');
+    }
+    else if(target.tagName == "BUTTON" && target.id in APE.anim.Transitions) {
+        doIt(target.id);
+    }
+}
+
+function checkAll() {
+    var all = document.getElementsByTagName("button");
+    for(var i = 0; i < all.length; i++) {
+        var button = all[i];
+        if(button.id) {
+            var input = button.parentNode.getElementsByTagName("input")[0];
+            input.checked = !(input.checked);
+            if(input.checked)
+                input.parentNode.className += ' row-hilite';
+            else
+                input.parentNode.className = input.parentNode.className.replace(' row-hilite', '');
+        }
+    }
+    input = null;
+}
+
+</script>
+<h1>Animation Transitions Example</h1>
+
+<div class='anim-div'>
+    <input type="checkbox"/>
+    accel &nbsp;example
+    <button id='accel'>accel</button>
+</div>
+
+<div class='anim-div'>
+    <input type="checkbox"/>
+    decel &nbsp;example
+    <button id='decel'>decel</button>
+</div>
+
+<div class='anim-div'>
+    <input type="checkbox"/>
+    loop &nbsp;example
+    <button id='loop'>loop</button>
+</div>
+
+<div class='anim-div'>
+    <input type="checkbox"/>
+    spring &nbsp;example
+    <button id='spring' style="width: 5em">spring</button>
+</div>
+
+<div class='anim-div'>
+    <input type="checkbox"/>
+    swingToFrom &nbsp;example
+    <button id='swingToFrom' style="width: 8.5em">swingToFrom</button>
+</div>
+
+<div class='anim-div'>
+    <input type="checkbox"/>
+    wobble &nbsp;example
+    <button id='wobble' style="width: 5.4em">wobble</button>
+</div>
+
+<div class='anim-div'>
+    <input type="checkbox"/>
+    easeInEaseOut &nbsp;example
+    <button id='easeInEaseOut' style="width: 9.3em">easeInEaseOut</button>
+</div>
+
+<div class='anim-div'>
+    <input type="checkbox"/>
+    sigmoid &nbsp;example
+    <button id='sigmoid' style="width: 5.75em">sigmoid</button>
+</div>
+
+<div class='anim-div'>
+    <input type="checkbox"/>
+    sigmoid2 &nbsp;example
+    <button id='sigmoid2' style="width: 6.2em">sigmoid2</button>
+</div>
+
+<div class='anim-div'>
+    <input type="checkbox"/>
+    sigmoid3 &nbsp;example
+    <button id='sigmoid3' style="width: 6.2em">sigmoid3</button>
+</div>
+
+<div class='anim-div'>
+    <input type="checkbox"/>
+    sigmoid4 &nbsp;example
+    <button id='sigmoid4' style="width: 6.2em">sigmoid4</button>
+</div>
+
+<div class='anim-div'>
+    <input type="checkbox"/>
+    tan &nbsp;example
+    <button id='tan' style="width: 3.7em">tan</button>
+</div>
+
+<div class='anim-div'>
+    <input type="checkbox"/>
+    reverseWarp &nbsp;example
+    <button id='reverseWarp' style="width: 8em">reverseWarp</button>
+</div>
+
+<label style="margin-right: 1em; cursor:pointer;font-weight: 800" onclick="checkAll()">Toggle All</label>
+<button onclick="testChecked();">Test Checked</button>
+
+<label style="margin-right: .2em;margin-left: .8em;">seconds:<input type="text" id="seconds" style="margin-left: 1.3em"/></label>
+
+</body>
+</html>

@@ -1,0 +1,266 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+    <title>Form Test</title>
+
+    <link rel="stylesheet" type="text/css" href="../../yui-test/build/logger/assets/logger.css" />
+    <link rel="stylesheet" type="text/css" href="../../yui-test/build/yuitest/assets/yuitest.css" />
+    <link rel="stylesheet" type="text/css" href="../../yui-test/assets/testlogger.css" />
+
+    <script type="text/javascript" src="../../yui-test/build/yahoo-dom-event/yahoo-dom-event.js"></script>
+    <script type="text/javascript" src="../../yui-test/build/logger/logger.js"></script>
+    <script type="text/javascript" src="../../yui-test/build/yuitest/yuitest-beta.js"></script>
+
+    <script type="text/javascript" src="../../../build/APE.js"></script>
+    <script type="text/javascript" src="../../../build/form/Form.js"></script>
+
+</head>
+<body style="position:relative;top: 10px">
+<h3 style="margin: 2px 0">turn off autocomplete!</h3>
+<p style="margin:0">
+    Sometimes F5 causes wrong result in FF. Use ctrl+F5.
+</p>
+<form id="formNode" method="get" action="test.gs">
+<fieldset id="f1">
+    <input type="text" name="text" id="text"/>
+    <input type="password" name="password" id="pw"/>
+
+    <input type="checkbox" name="cb" id="cb1" value="c1"/>
+    <input type="checkbox" name="cb" id="cb2" checked="checked" value="c2"/>
+    <input type="checkbox" name="cb" id="cb3" checked="checked" value="c3"/>
+
+    <input type="radio" name="r" id="r1" value="r1"/>
+    <input type="radio" name="r" id="r2" checked="checked" value="r2"/>
+
+    <select name="s1">
+        <option disabled="disabled">select one disabled</option>
+        <option selected="selected">text selected</option>
+    </select>
+
+    <select multiple="multiple" name="s2">
+        <option>value</option>
+        <option>value</option>
+    </select>
+
+    <textarea name="t1">uno textarea</textarea>
+    
+    <button type="submit" name="btn1" value="sb">submit button</button>
+    <input type="submit" value="input submit">
+    
+    <button type="button" name="bb" value="bb1">button button</button>
+    <input type="image" value="ib" style="height: 30px;padding:0" id="sbImg" src="../../../resources/leaf.jpg" name="sbImg" alt="[sbImg]"/>
+
+</fieldset>
+
+<!-- these should not be serialized! -->
+<fieldset id="f2">
+    <input type="text" id="Ntext" value="N text"/>
+    <input type="password" id="Npw"/>
+
+    <input type="checkbox" id="Ncb1"/>
+    <input type="checkbox" id="Ncb2" checked="checked"/>
+
+    <input type="radio" id="Nr1"/>
+    <input type="radio" id="Nr2" checked="checked"/>
+
+    <select>
+        <option disabled="disabled">select one</option>
+        <option value="Nv">value</option>
+    </select>
+
+    <select multiple="multiple" id="Ns2">
+        <option>value</option>
+        <option>value</option>
+    </select>
+
+    <textarea id="t1">lorem textarea</textarea>
+
+</fieldset>
+
+</form>
+
+<form id="form2">
+<select name="back" multiple="multiple">
+<option selected='selected'>1</option>
+<option selected='selected'>2</option>
+<option selected='selected' value="3"></option>
+</select>
+</form>
+<div id="testNode"></div>
+
+<div id="testLogger"></div>
+
+<script type="text/javascript">
+setTimeout(function(){
+
+var util = YAHOO.util,
+    Assert = util.Assert,
+    UserAction = YAHOO.util.UserAction,
+    body = document.body,
+    formNode = document.getElementById('formNode'),
+    Form = APE.form.Form,
+    template = formNode.innerHTML,
+    expectedString = 
+      "text=&password=&cb=c2&cb=c3&r=r2&s1=text+selected&t1=uno+textarea";
+    
+formNode.style.height = formNode.offsetHeight + 'PX';
+
+var formTestCase = new YAHOO.tool.TestCase({
+    name : "Form Test Case",
+
+    setUp : function() {
+        formNode.onsubmit = null;
+    },
+
+    tearDown : function() {
+        formNode.innerHTML = template;
+    },
+
+    testSerialize : function() {
+        var form = new Form(formNode);
+        var actualString = form.serialize();
+        var expected = expectedString.split("&").sort(),
+            actualPair = actualString.split("?"),
+            actualQuery = actualPair[1].split('&').sort(),
+            actualSortedString = actualPair[0] + "?" + actualQuery.join("&"),
+            expectedSortedString = encodeURI(formNode.action + "?" + expected.join("&"));
+
+        Assert.areEqual(expectedSortedString, actualSortedString);
+    },
+
+    testSelectMultipleToObject : function(){
+        var f = new Form(document.getElementById('form2'));
+        var expected = { back : ['1','2','3'] };
+        var actual = f.toObject();
+        util.ObjectAssert.haveEqualProperties(expected, actual);
+    },
+
+    // Img controls are not included in successful controls?
+    testSerializeImg : function() {
+        var form = new Form(formNode);
+        var actualString;
+
+        document.getElementById('sbImg').onclick = function() {
+            actualString = form.serialize(this);
+            return false;
+        };
+        UserAction.simulateMouseEvent(document.getElementById('sbImg'), "click", 0, 0);
+
+        // XXX IE the simulated click won't submit the form.
+        //document.getElementById('sbImg').click();
+
+
+        this.wait(function(){
+            var expected = (expectedString + "&sbImg=ib").split("&").sort(),
+                actualPair = actualString.split("?"),
+                actualQuery = actualPair[1].split('&').sort(),
+                actualSortedString = actualPair[0] + "?" + actualQuery.join("&"),
+                expectedSortedString = encodeURI(formNode.action + "?" + expected.join("&"));
+            Assert.areEqual(expectedSortedString, actualSortedString);
+        }, 50);
+    },
+
+    testToObject : function() {
+        var a = expectedString.split("&"),
+            json = {};
+        for(var i = 0; i < a.length; i++) {
+            var pair = a[i].split("=");
+            var name = pair[0];
+            if(!json.hasOwnProperty(name))
+                json[name] = [];
+            json[name].push(pair[1].replace("+", " "));
+        }
+
+        var actual = new Form(formNode).toObject();
+        util.ObjectAssert.haveEqualProperties(json, actual);
+    },
+
+    testGetQueryString : function() {
+        var actualString = new Form(formNode).getQueryString();
+        var expected = expectedString.split("&").sort(),
+            actual = actualString.split("&").sort();
+        
+        Assert.areEqual(expected.join("&"), actual.join("&"));
+    },
+
+    testGetMultipartFormData : function() {
+        var form = new Form(mockFormWithFile("testFile", "test.txt", 
+            "Rika is sexy."));
+
+        var actual = form.getMultipartFormData();
+        var expected = /Content-Disposition: form-data; name="testFile"; filename="test.txt"\s*\r\n\r\nRika is sexy\./
+        util.ArrayAssert.containsMatch(function(x){return expected.test(x);}, actual);
+    },
+    
+    testFieldset : function() {
+        var q = 'text=&password=&cb=c1&r=r2&s1=text+selected&t1=ichi+no+textarea';
+        var fieldset = formNode.getElementsByTagName("fieldset")[0];
+        document.getElementsByName('t1')[0].value = "ichi no textarea";
+        var cbs = document.getElementsByName('cb');
+        for(var i = 0; i < cbs.length; i++)
+            cbs[i].checked = !cbs[i].checked;
+        var actualString = new Form(fieldset).getQueryString();
+        var expected = q.split("&").sort(),
+            actual = actualString.split("&").sort();
+        
+        Assert.areEqual(expected.join("&"), actual.join("&"));
+    },
+
+    testSubmit : function(){
+        var b = document.getElementsByName("btn1")[0];
+        var actualString = new Form(formNode).getQueryString(b);
+        var expected = expectedString+"&btn1="+ encodeURIComponent(b.value);
+            expected = expected.split("&").sort();
+        var actual = actualString.split("&").sort();
+        
+        Assert.areEqual(expected.join("&"), actual.join("&"));
+    },
+
+    // If a submit button with no name is passed,
+    // it can't be included. This is probably a careless
+    // programmer error, should this case throw instead?
+    testInvalidSubmit : function(){
+        var b = document.getElementsByName("btn1")[0];
+        b.name = "";
+        var actualString = new Form(formNode).getQueryString(b);
+        var expected = expectedString.split("&").sort();
+        var actual = actualString.split("&").sort();
+        Assert.areEqual(expected.join("&"), actual.join("&"));
+    }
+
+});
+
+// Can't really simulate the browse button action on any browser.
+function mockFormWithFile(inputName, fileName, value) {
+    return {
+        elements : [
+            {
+                type : "file",
+                name : inputName,
+                files : [
+                    {
+                        getAsBinary : function() {
+                            return value;
+                        },
+                        fileName : fileName,
+                        name : inputName
+                    }
+                ]
+            }
+        ]
+    };
+}
+var logger = new YAHOO.tool.TestLogger("testLogger");
+YAHOO.tool.TestRunner.add( formTestCase );
+
+// run the tests, or put them in the TestRunner.
+if (parent && parent != window) {
+    YAHOO.tool.TestManager.load();
+} else {
+    YAHOO.tool.TestRunner.run();
+}
+}, 100);</script>
+</body>
+</html>

@@ -1,0 +1,172 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+    <title>DOM ClassName Test</title>
+
+    <link rel="stylesheet" type="text/css" href="../../yui-test/build/logger/assets/logger.css" />
+    <link rel="stylesheet" type="text/css" href="../../yui-test/build/yuitest/assets/yuitest.css" />
+    <link rel="stylesheet" type="text/css" href="../../yui-test/assets/testlogger.css" />
+
+    <script type="text/javascript" src="../../yui-test/build/yahoo-dom-event/yahoo-dom-event.js"></script>
+    <script type="text/javascript" src="../../yui-test/build/logger/logger.js"></script>
+    <script type="text/javascript" src="../../yui-test/build/yuitest/yuitest-beta.js"></script>
+
+    <script type="text/javascript" src="../../../build/APE.js"></script>
+    <script type="text/javascript" src="../../../build/dom/classname-f.js"></script>
+
+    <style id="testSheet">
+        #testNode {
+            font-size: 12px;
+            font-family: fantasy;
+            padding: 6em;
+            height: 1000em;
+        }
+    </style>
+
+</head>
+<body style="position: relative;margin:0;padding:0;">
+<div id="testLogger"></div>
+<div id='template'><div id="xx"></div></div>
+<script type="text/javascript">
+setTimeout(function(){
+
+var dom = APE.dom,
+    Assert = YAHOO.util.Assert,
+    template = document.getElementById('template'),
+    tHTML = template.innerHTML;
+
+var classNameTestCase = new YAHOO.tool.TestCase({
+
+    setUp : function() {
+        template.innerHTML = tHTML;
+    },
+
+    tearDown : function () {
+       template.innerHTML = "";
+    },
+
+    name : "className functions", 
+
+    testHasToken : function() {
+        template.innerHTML = "<dfn class=' food' id='foo'>f</dfn>";
+        var foo = document.getElementById('foo');
+        Assert.isTrue(dom.hasToken(foo.className, 'food'));
+        Assert.isFalse(dom.hasToken(foo.className, 'foo'));
+    },
+
+    testRemoveClass : function() {
+        var s = "<dfn class='skinny tall skinny' id='aaa'>f</dfn>";
+        template.innerHTML = s;
+        var aaa = document.getElementById('aaa');
+        dom.removeClass(aaa, 'skinny');
+        Assert.areEqual(aaa.className, "tall");
+        template.innerHTML = s;
+        
+        aaa = document.getElementById('aaa');
+        dom.removeClass(aaa, "skin");
+        Assert.areEqual('skinny tall skinny', aaa.className);
+    },
+
+    testRemoveClassEmpty : function() {
+        var xx = document.getElementById('xx');
+        dom.removeClass(xx, 'skinny');
+        Assert.areEqual('', xx.className);
+    },
+    
+    testAddClassConditionally : function() {
+        var n = document.createElement('object');
+        n.className = "x";
+        dom.addClass(n, 'x');
+        dom.addClass(n, 'x');
+        Assert.areEqual(n.className, 'x');
+    },
+
+    testAddClassConditionallyEmpty : function() {
+        var n = document.createElement('object');
+        dom.addClass(n, 'x');
+        Assert.areEqual(n.className, 'x');
+    },
+    
+    testGetElementsByClassName : function() {
+        
+        template.innerHTML = "<a class='red red red'>a</a><u class='red'>u</u>";
+        var reds = dom.getElementsByClassName(document.body, '*', 'red');
+
+        Assert.areEqual(2, reds.length);
+        Assert.areEqual('u', reds[1].tagName.toLowerCase());
+    },
+
+    testGetElementsByClassNameEmpty : function() {
+        template.innerHTML =  "<a class='red red red'>a</a><u class='red'>u</u>";
+        var emptys = dom.getElementsByClassName(document.body, '*', '');
+
+        Assert.areEqual(0, emptys.length);
+    },
+
+
+    testFindAncestorWithClass : function() {
+        var s = "<div class='Aika'>"
+            + "<div class='Aika Miura' id='gf'>"
+            + "<span class='Garrett' id='b'>F</span>"
+            + "</div>"
+            + "</div>";
+        template.innerHTML = s;
+        var gf = document.getElementById('gf');
+        var b = document.getElementById("b");
+        var g = dom.findAncestorWithClass(b, 'Aika');
+        Assert.areEqual('gf', g.id);
+        var n = dom.findAncestorWithClass(g, 'Aika');
+        Assert.areEqual(g.parentNode, n);
+        n = dom.findAncestorWithClass(n, 'Aika');
+        Assert.isNull(n);
+    },
+
+    testFindAncestorWithClassContainer : function() {
+        var s = "<div class='Aika' id='AikaID'>"
+            + "<div class='Aika Miura' id='gf'>"
+            + "<span class='Garrett' id='b'>F</span>"
+            + "</div>"
+            + "</div>";
+        template.innerHTML = s;
+        var gf = document.getElementById('gf');
+        var b = document.getElementById("b");
+        var g = dom.findAncestorWithClass(b, 'Aika', document.getElementById('AikaID'));
+        Assert.areEqual('gf', g.id);
+    },
+
+    testFindAncestorWithClassContainerFail : function() {
+        var s = "<div class='Aika' id='AikaID'>"
+            + "<div class='Aika Miura' id='gf'>"
+            + "<span class='Garrett' id='b'>F</span>"
+            + "</div>"
+            + "</div>";
+        template.innerHTML = s;
+        var gf = document.getElementById('gf');
+        var b = document.getElementById("b");
+        var g = dom.findAncestorWithClass(b, 'Aika', document.getElementById('gf'));
+        Assert.isNull(g);
+    },
+
+    testFindAncestorWithClassFail : function() {
+        var template = document.getElementById('template');
+        var g = dom.findAncestorWithClass(template, 'asdf', template);
+    }
+});
+
+//create the logger
+var logger = new YAHOO.tool.TestLogger("testLogger");
+YAHOO.tool.TestRunner.add( classNameTestCase );
+
+// run the tests, or put them in the TestRunner.
+if (parent && parent != window) {
+    YAHOO.tool.TestManager.load();
+} else {
+    YAHOO.tool.TestRunner.run();
+}
+}, 100);
+</script>
+
+</body>
+</html>

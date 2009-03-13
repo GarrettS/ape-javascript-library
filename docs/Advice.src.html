@@ -1,0 +1,77 @@
+<html><head><meta http-equiv="content-type" content="text/html; charset=utf-8"> <style>
+	.KEYW {color: #933;}
+	.COMM {color: #bbb; font-style: italic;}
+	.NUMB {color: #393;}
+	.STRN {color: #393;}
+	.REGX {color: #339;}
+	.linenumber {border-right: 1px dotted #666; color: #666; font-style: normal;}
+	</style></head><body><pre><span class='linenumber'>  1</span> <span class="COMM">/**
+<span class='linenumber'>  2</span>  * @fileoverview AOP methods useful for testing.
+<span class='linenumber'>  3</span>  * @author Garrett Smith
+<span class='linenumber'>  4</span>  */</span><span class="WHIT">
+<span class='linenumber'>  5</span> </span><span class="WHIT"> </span><span class="NAME">APE.namespace</span><span class="PUNC">(</span><span class="STRN">"APE.aop"</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'>  6</span> 
+<span class='linenumber'>  7</span> </span><span class="WHIT"> </span><span class="NAME">APE.aop.Advice</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'>  8</span> </span><span class="WHIT">	</span><span class="COMM">/** 
+<span class='linenumber'>  9</span> 	 * Wraps o's method with advice.
+<span class='linenumber'> 10</span> 	 * If the advice returns false, o's method won't fire.
+<span class='linenumber'> 11</span> 	 *
+<span class='linenumber'> 12</span> 	 * @param {Object} o the object that has the method.
+<span class='linenumber'> 13</span> 	 * @param {string} funcName o's named method.
+<span class='linenumber'> 14</span> 	 * @param {Function} advice to wrap. 
+<span class='linenumber'> 15</span> 	 * @return 
+<span class='linenumber'> 16</span> 	 * If returning false, o's method won't fire;
+<span class='linenumber'> 17</span> 	 * If returning an array, the array is passed to apply to o's method call.
+<span class='linenumber'> 18</span> 	 * Otherwise, just call o with the original arguments it was called with (default).
+<span class='linenumber'> 19</span> 	 */</span><span class="WHIT">
+<span class='linenumber'> 20</span> </span><span class="WHIT">	</span><span class="NAME">addBefore</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">o</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">funcName</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">advice</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'> 21</span> </span><span class="WHIT">		</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">m</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">o</span><span class="PUNC">[</span><span class="NAME">funcName</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'> 22</span> </span><span class="WHIT">		</span><span class="NAME">o</span><span class="PUNC">[</span><span class="NAME">funcName</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="NAME">beforeAdvice</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'> 23</span> </span><span class="WHIT">			</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">proceed</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">advice.apply</span><span class="PUNC">(</span><span class="NAME">o</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">arguments</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'> 24</span> </span><span class="WHIT">			</span><span class="COMM">// Call o's method.</span><span class="WHIT">
+<span class='linenumber'> 25</span> </span><span class="WHIT">			</span><span class="KEYW">if</span><span class="PUNC">(</span><span class="NAME">proceed</span><span class="WHIT"> </span><span class="PUNC">!==</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'> 26</span> 
+<span class='linenumber'> 27</span> </span><span class="WHIT">				</span><span class="COMM">// Default: use arguments that o[funcName] was called with.</span><span class="WHIT">
+<span class='linenumber'> 28</span> </span><span class="WHIT">				</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">argsToApply</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">arguments</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'> 29</span> </span><span class="WHIT">				</span><span class="COMM">// Did we get other arguments?</span><span class="WHIT">
+<span class='linenumber'> 30</span> </span><span class="WHIT">				</span><span class="KEYW">if</span><span class="PUNC">(</span><span class="NAME">APE.aop.Advice.isArray</span><span class="PUNC">(</span><span class="NAME">proceed</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'> 31</span> </span><span class="WHIT">					</span><span class="NAME">argsToApply</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">proceed</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'> 32</span> </span><span class="WHIT">				</span><span class="PUNC">}</span><span class="WHIT">
+<span class='linenumber'> 33</span> </span><span class="WHIT">				</span><span class="COMM">// Allow host method to be called.</span><span class="WHIT">
+<span class='linenumber'> 34</span> </span><span class="WHIT">				</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">Function.prototype.apply.call</span><span class="PUNC">(</span><span class="NAME">m</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">o</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">argsToApply</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'> 35</span> </span><span class="WHIT">			</span><span class="PUNC">}</span><span class="WHIT">
+<span class='linenumber'> 36</span> </span><span class="WHIT">		</span><span class="PUNC">}</span><span class="WHIT">
+<span class='linenumber'> 37</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='linenumber'> 38</span> 
+<span class='linenumber'> 39</span> </span><span class="WHIT">	</span><span class="COMM">/** 
+<span class='linenumber'> 40</span> 	 * @param {Object} o The object whose method is to be advised.
+<span class='linenumber'> 41</span> 	 * @param {string} funcName o's named method.
+<span class='linenumber'> 42</span> 	 * @param {Function} advice to call after o[funcName] is called.
+<span class='linenumber'> 43</span> 	 *
+<span class='linenumber'> 44</span> 	 * @return the returnValue of the main function for argument [0],
+<span class='linenumber'> 45</span> 	 * plus the arguments to the original function.
+<span class='linenumber'> 46</span> 	 * 
+<span class='linenumber'> 47</span> 	 */</span><span class="WHIT">
+<span class='linenumber'> 48</span> </span><span class="WHIT">	</span><span class="NAME">addAfter</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">o</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">funcName</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">advice</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'> 49</span> </span><span class="WHIT">		</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">m</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">o</span><span class="PUNC">[</span><span class="NAME">funcName</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'> 50</span> </span><span class="WHIT">		</span><span class="NAME">o</span><span class="PUNC">[</span><span class="NAME">funcName</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="NAME">afterAdvice</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'> 51</span> </span><span class="WHIT">			</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">returnValue</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">Function.prototype.apply.call</span><span class="PUNC">(</span><span class="NAME">m</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">o</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">arguments</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'> 52</span> 
+<span class='linenumber'> 53</span> </span><span class="WHIT">			</span><span class="COMM">// First argument is the return value from the method.</span><span class="WHIT">
+<span class='linenumber'> 54</span> </span><span class="WHIT">			</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">args</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="NAME">returnValue</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'> 55</span> </span><span class="WHIT">			</span><span class="NAME">args</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">args.concat.apply</span><span class="PUNC">(</span><span class="NAME">args</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">arguments</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'> 56</span> </span><span class="WHIT">			</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">advice.apply</span><span class="PUNC">(</span><span class="NAME">o</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">args</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'> 57</span> </span><span class="WHIT">		</span><span class="PUNC">}</span><span class="WHIT">
+<span class='linenumber'> 58</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='linenumber'> 59</span> </span><span class="WHIT">	</span><span class="WHIT">
+<span class='linenumber'> 60</span> </span><span class="WHIT">	</span><span class="COMM">/** 
+<span class='linenumber'> 61</span> 	 * Can't rely on the constructor property across frames.
+<span class='linenumber'> 62</span> 	 * @return {boolean}
+<span class='linenumber'> 63</span> 	 */</span><span class="WHIT">
+<span class='linenumber'> 64</span> </span><span class="WHIT">	</span><span class="NAME">isArray</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">o</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT"> </span><span class="WHIT">
+<span class='linenumber'> 65</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">o</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='linenumber'> 66</span> </span><span class="WHIT">           </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">typeof</span><span class="WHIT"> </span><span class="NAME">o.length</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="STRN">"number"</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">typeof</span><span class="WHIT"> </span><span class="NAME">o.splice</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="STRN">"function"</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'> 67</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='linenumber'> 68</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">;</span><span class="WHIT">
+<span class='linenumber'> 69</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='linenumber'> 70</span> </span><span class="PUNC">}</span><span class="PUNC">;</span></pre></body></html>

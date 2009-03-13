@@ -1,0 +1,42 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+    <meta http-equiv="content-type" 
+    content="text/html; charset=iso-8859-1" />
+    <title>CSSOM positioning Test</title>
+
+<style type="text/css">
+html {
+    border: 3px solid #3F3;
+    margin: 50px 0;
+    position: static;
+}
+
+body {
+    border: 1px solid #f00;
+}
+
+#adiv {
+  position: absolute;
+  top: 0;
+}
+</style>
+
+</head>
+<body>
+<h1>Hello</h1>
+<div id="adiv">adiv</div>
+
+<div id='a' style="border: 1px dotted #39F">
+<div id='b' style="position: absolute;">b</div>
+</div>
+
+<br/>
+<script>
+var adiv = document.getElementById("adiv");
+document.write("<pre> adiv.offsetTop: "+adiv.offsetTop+"</pre>");
+</script>
+
+</body>
+</html>

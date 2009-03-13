@@ -1,0 +1,189 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+    <title>Calendar Test</title>
+    <link rel="stylesheet" type="text/css" href="../../yui-test/build/logger/assets/logger.css" />
+    <link rel="stylesheet" type="text/css" href="../../yui-test/build/yuitest/assets/yuitest.css" />
+    <link rel="stylesheet" type="text/css" href="../../yui-test/assets/testlogger.css" />
+
+    <script type="text/javascript" src="../../yui-test/build/yahoo-dom-event/yahoo-dom-event.js"></script>
+    <script type="text/javascript" src="../../yui-test/build/logger/logger.js"></script>
+    <script type="text/javascript" src="../../yui-test/build/yuitest/yuitest-beta.js"></script>
+
+    <script type="text/javascript" src="../../../build/ape-ep-dom.js"></script>
+    <script type="text/javascript" src="../../../build/widget/calendar/Calendar_en.js"></script>
+    <script type="text/javascript" src="../../../build/widget/calendar/Calendar.js"></script>
+</head>
+<body>
+
+<div id='template'>
+    <label for="start" id='sf'>Start <input id="start" type="text" size="18"/></label>
+
+    <input id='blah'/>
+</div>
+
+<div id="testLogger"></div>
+<script type="text/javascript">
+setTimeout(function(){
+    var Calendar = APE.widget.Calendar,
+        Assert = YAHOO.util.Assert,
+        DateAssert = YAHOO.util.DateAssert,
+        ArrayAssert = YAHOO.util.ArrayAssert,
+        sf, start,
+        Action = YAHOO.util.UserAction,
+        template = document.getElementById('template'),
+        templateHTML = template.innerHTML;
+
+    var calendarTest = new YAHOO.tool.TestCase({
+
+        //name of the test case - if not provided, one is auto-generated
+        name : "Calendar test",
+        
+
+        setUp : function () {
+            template.innerHTML = templateHTML;
+            sf = document.getElementById('sf');
+            start = document.getElementById('start');
+            self.focus();
+        },
+
+        tearDown : function () {
+            template.innerHTML = "";
+            start = sf = null;
+            var instances = Calendar.instances;
+            for(var x in instances) {
+                var instance = instances[x], calendarId = instance.calendarId;
+                if(!calendarId) continue;
+                var c = document.getElementById(calendarId);
+                c.parentNode.removeChild(c);
+            }
+            Calendar.instances = {};
+        },
+        
+        testGetByIdGetByNode : function() {
+            var c = Calendar.getById("start");
+            Assert.isNotNull(c);
+            Assert.areEqual(c, Calendar.getByNode( start ) );
+        },
+
+        testFocusHandler : function() {
+            var c = Calendar.getByNode( start );
+            start.focus();
+            this.wait(function(){
+                var calendarEl = document.getElementById(c.calendarId);
+                Assert.areEqual("visible", calendarEl.style.visibility, "calendar visiblity wrong.");
+                start.blur();
+                document.getElementById('blah').focus();
+                this.wait(function(){
+                    Assert.areEqual("hidden", calendarEl.style.visibility, "calendar visiblity not hidden.");
+                }, 30);
+            }, 30);
+        },
+
+        testFocusTransferToCalendar : function() {
+            var c = Calendar.getByNode( start );
+            start.focus();
+            this.wait(function(){
+                Assert.isFalse(c._isHidden);
+                var calendarEl = document.getElementById(c.calendarId);
+                start.blur();
+                Action.mousedown(calendarEl);
+                this.wait(function(){
+                    Assert.areEqual("visible", calendarEl.style.visibility, "calendar visiblity wrong.");
+                    Assert.isFalse(c._isHidden, "c._isHidden");
+                }, 20);
+            }, 20);
+        },
+
+        testSelectDateInFuture : function() {
+            var c = Calendar.getByNode( start );
+            start.focus();
+            this.wait(function(){
+                var calendarEl = document.getElementById(c.calendarId);
+
+                var d = new Date;
+                Action.mousedown(document.getElementById("start-next-month"));
+                Action.mousedown(document.getElementById("start-next-year"));
+                var daySelected = calendarEl.getElementsByTagName("b")[10];
+                Action.mousedown(daySelected);
+
+                Action.mousedown(document);
+                this.wait(function(){
+                    Assert.isTrue(c._isHidden, "c._isHidden");
+                    var newDate = new Date(start.value);
+                    d.setYear(d.getFullYear() + 1);
+                    d.setMonth(d.getMonth() + 1);
+                    d.setDate(daySelected.innerHTML);
+                    DateAssert.datesAreEqual(d, newDate);
+                }, 20);
+            }, 20);
+        },
+
+        testGetDateFromInput : function() {
+            
+            var expected = "December 9, 2006",
+                expectedDate = new Date(expected);
+
+            start.value = expected;
+
+            var c = Calendar.getByNode( start );
+            
+            start.focus();
+            this.wait(function(){
+                var id = "start-selected-day",
+                    selected = document.getElementById(id);
+
+                Assert.areEqual(selected.innerHTML, expectedDate.getDate().toString());
+                var actualYearMonthString = document.getElementById(c.calendarId + "-header").innerHTML,
+                    parts = actualYearMonthString.split(", ");
+                    actualMonth = parts[1],
+                    actualYear = parts[0],
+                    actualMonthNumber = new Date(actualMonth + " 12, "+actualYear).getMonth();
+
+                Assert.areEqual(expectedDate.getFullYear(), actualYear);
+                Assert.areEqual(expectedDate.getMonth(), actualMonthNumber);
+            },20);
+        },
+
+        testSetGetDate : function() {
+            var c = Calendar.getByNode( start );
+            var inp = new Date("January 12, 2004");
+            c.setDate(inp);
+            var actual = c.getDate();
+            DateAssert.datesAreEqual( inp, actual, "actual date wrong." );
+            var copy = new Date(inp);
+            inp.setMonth(10);
+            DateAssert.datesAreEqual( copy, actual, "better handle mutability." );
+        },
+
+        testTodaySelected : function() {
+            var c = Calendar.getByNode( start );
+            start.focus();
+
+            DateAssert.datesAreEqual(c.getDate(), new Date);
+            this.wait(function(){
+                var id = "start-selected-day",
+                    selected = document.getElementById(id);
+                ArrayAssert.contains(c.calendarClass+ "-today", selected.className.split(" "));
+            }, 20);  
+        }
+    });
+
+    //create the logger
+    new YAHOO.tool.TestLogger("testLogger");
+
+    //run the tests
+    YAHOO.tool.TestRunner.add( calendarTest );
+     //run the tests
+    if (parent && parent != window) {
+        YAHOO.tool.TestManager.load();
+    } else {
+        YAHOO.tool.TestRunner.run();
+    }
+
+}, 20);</script>
+</body>
+
+</html>

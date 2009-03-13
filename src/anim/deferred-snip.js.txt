@@ -1,0 +1,18 @@
+deferred : function() {
+	return this.hasOwnProperty('_deferred') && this._deferred || (this._deferred = new APE.anim.DeferredAnimation(this));
+},
+
+APE.anim.DeferredAnimation = function(anim){
+	this.anim = anim;
+};
+APE.extend( APE.anim.DeferredAnimation, APE.anim.Animation, {
+	seekTo : function(pos) {
+		if(this.playing) {
+			var ep = APE.EventPublisher.add( this.anim, "onend" );
+			function deferredSeekTo(){ this.anim.seekTo(pos); ep.remove( deferredSeekTo ); }
+			ep.add( deferredSeekTo );
+		}
+		else
+			return this.anim.seekTo(pos);
+	}
+});
