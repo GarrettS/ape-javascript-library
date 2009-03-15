@@ -331,6 +331,7 @@ APE.namespace("APE.dom");
 
 // For initializing load time constants.
     function init() {
+		inited = true;
         var body = doc.body;
         if(!body) return;
         var marginTop = "marginTop", position = "position", padding = "padding",
@@ -391,7 +392,7 @@ APE.namespace("APE.dom");
 
         xs[position] = "absolute";
         s[position] = stat;
-        if(x.offsetParent === body) {
+         if(x.offsetParent === body) {
             s[border] = bv;
             xs.top = "2px";
             // XXX Safari gets offsetParent wrong (says 'body' when body is static,

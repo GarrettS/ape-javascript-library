@@ -73,7 +73,7 @@
 	</target>
 
 	<target name="js.copy" depends="js.rollups">
-		<copy todir="${build}">
+		<copy todir="${build}" verbose="true">
 			<fileset dir="${src}" excludes="**/*.java"/>
 		</copy>
 	</target>

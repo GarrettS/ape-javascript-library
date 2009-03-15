@@ -173,7 +173,7 @@ APE.namespace("APE.dom");
         floatProp = 'cssFloat'in sty ? 'cssFloat': 'styleFloat',
         props = ["Top", "Right", "Bottom", "Left"],
         cornerProps = ["Topright", "Bottomright", "Bottomleft", "Topleft"];
-        docEl = sty = null;
+        sty = null;
     /** 
      * @memberOf APE.dom
      *

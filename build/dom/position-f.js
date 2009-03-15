@@ -331,7 +331,8 @@ APE.namespace("APE.dom");
 
 // For initializing load time constants.
     function init() {
-         var body = doc.body;
+		inited = true;
+        var body = doc.body;
         if(!body) return;
         var marginTop = "marginTop", position = "position", padding = "padding",
             stat = "static",
@@ -358,9 +359,69 @@ APE.namespace("APE.dom");
         // insertBefore - to avoid environment conditions with bottom script
         // where appendChild would fail.
         x = body.insertBefore(x, body.firstChild);
-    
-             s[position] = relative;
-             x[offsetTop]
+        IS_PARENT_BODY_BORDER_INCLUDED_IN_OFFSET = (x[offsetTop] === 1);
+
+        s[border] = z;
+
+        // Table test.
+        table.innerHTML = "<tbody><tr><td>x</td></tr></tbody>";
+        table.style[border] = "7px solid";
+        table.cellSpacing = table.cellPadding = z;
+
+        body.insertBefore(table, body.firstChild);
+        IS_TABLE_BORDER_INCLUDED_IN_TD_OFFSET = table.getElementsByTagName("td")[0].offsetLeft === 7;
+
+        body.removeChild(table);
+
+        // Now add margin to determine if body offsetTop is inherited.
+        s[marginTop] = one;
+        s[position] = relative;
+        IS_BODY_MARGIN_INHERITED = (x[offsetTop] === 1);
+
+        //IS_BODY_OFFSET_TOP_NO_OFFSETPARENT = body.offsetTop && !body.offsetParent;
+
+        IS_BODY_OFFSET_EXCLUDING_MARGIN = body[offsetTop] === 0;
+        s[marginTop] = z;
+        s.top = one;
+        IS_BODY_TOP_INHERITED = x[offsetTop] === 1;
+
+        s.top = z;
+        s[marginTop] = one;
+        s[position] = xs[position] = relative;
+        IS_BODY_OFFSET_IGNORED_WHEN_BODY_RELATIVE_AND_LAST_CHILD_POSITIONED = x[offsetTop] === 0;
+
+        xs[position] = "absolute";
+        s[position] = stat;
+         if(x.offsetParent === body) {
+            s[border] = bv;
+            xs.top = "2px";
+            // XXX Safari gets offsetParent wrong (says 'body' when body is static,
+            // but then positions element from ICB and then subtracts body's clientWidth.
+            // Safari is half wrong.
+            //
+            // XXX Mozilla says body is offsetParent but does NOT subtract EL's offsetLeft/Top.
+            // Mozilla is completely wrong.
+            IS_STATIC_BODY_OFFSET_PARENT_BUT_ABSOLUTE_CHILD_SUBTRACTS_BODY_BORDER_WIDTH = x[offsetTop] === 1;
+            s[border] = z;
+
+            xs[position] = relative;
+            ds[padding] = one;
+            s[marginTop] = z;
+
+            IS_CONTAINER_BODY_STATIC_INCLUDING_HTML_PADDING = x[offsetTop] === 3;
+
+            // Opera does not respect position: relative on BODY.
+            s[position] = relative;
+            IS_CONTAINER_BODY_RELATIVE_INCLUDING_HTML_PADDING_REL_CHILD = x[offsetTop] === 3;
+
+            xs[position] = "absolute";
+            IS_CONTAINER_BODY_RELATIVE_INCLUDING_HTML_PADDING_ABS_CHILD = x[offsetTop] === 3;
+
+            ds[padding] = z;
+            ds[marginTop] = one;
+
+            // Opera inherits HTML margin when body is relative and child is relative or absolute.
+            IS_CONTAINER_BODY_INCLUDING_HTML_MARGIN = x[offsetTop] === 3;
         }
 
         // xs.position = "fixed";

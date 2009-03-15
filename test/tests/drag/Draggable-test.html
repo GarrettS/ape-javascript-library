@@ -29,8 +29,9 @@ setTimeout(function(){
 
 // window.focus() seems to fix false failures 
 // with testNode.focus() not taking effect.
-self.focus();
-
+try {
+  self.focus();
+} catch(ex) { }
 // fix for broken pageX in initMouseEvent
 document.body.style.margin= "0";
 
@@ -640,7 +641,8 @@ var draggableTestCase = new YAHOO.tool.TestCase({
 
         var d = Draggable.getByNode( testNode ),
         testNode3 = document.getElementById('testNode3'),
-        gotDragOver = gotDragOut = false;
+        gotDragOver = false,
+        gotDragOut = false;
 
         d.selectedClassName = sClass;
         d.focusClassName = fClass;

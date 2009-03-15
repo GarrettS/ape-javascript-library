@@ -1,6 +1,7 @@
  APE.namespace("APE.dom.Event");
  (function(){
-     APE.dom.Event.getCoords = getCoords;
+	 var dom = APE.dom;
+     dom.Event.getCoords = getCoords;
      function getCoords(e) {
      var f;
      if("pageX"in e) {
