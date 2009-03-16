@@ -11,11 +11,20 @@ APE.namespace("APE.dom");
 
     APE.mixin(APE.dom, /** @scope APE.dom */{
         /** @function */ getStyle : _getComputedStyle,
+        
+        /* StyleTransition.js uses these. 
+         * move to new file. 
+         * StyleTransition.js seems too generalized.
+         */
         getCascadedStyle : getCascadedStyle,
         setOpacity : setOpacity,
         getFilterOpacity : getFilterOpacity,
         getStyleUnit : getStyleUnit,
         findInheritedStyle : findInheritedStyle,
+        
+        /* Draggable.js, drag-slider.js
+         * move to new file.
+         */
         getContainingBlock : getContainingBlock,
         getPixelCoords : getPixelCoords
     });
