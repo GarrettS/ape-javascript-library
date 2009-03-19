@@ -2,38 +2,37 @@
 
 	<property name="src" location="src"/>
 	<property name="build" location="build"/>
-	<target name="js.rollups">
+	
+	<target name="js.rollups" depends="js.copy">
 
 	<!-- concat all dom-f.js files, EXCEPT the first (style-f.js).
 		 Remove the APE.namespace(APE.dom) from each file (except the first)
 	-->
-		<concat destfile="${src}/dom/_dom.js">
-			<filelist dir="${src}/dom"
-				 files="viewport-f.js, position-f.js, classname-f.js, traversal-f.js, Event.js, Event-coords.js, gebi-f.js"/>
+        <property name='files' value='constants.js, viewport-f.js, position-f.js, classname-f.js, 
+traversal-f.js, Event.js, Event-coords.js, style-f.js, gebi-f.js'/>
+		<concat destfile="${build}/dom/dom.js">
+			<filelist dir="${build}/dom"
+				 files="${files}"/>
 			<filterchain>
 				<tokenfilter>
 					<replacestring from='APE.namespace("APE.dom");' to=""/>
 					<replacestring from="APE.namespace('APE.dom');" to=""/>
 				</tokenfilter>
 			</filterchain>
+            <header>/**dom.js rollup: ${files} */
+APE.namespace("APE.dom"<!--necessary space --> );</header>
 		</concat>
-
-		<!-- Add back in style-f.js -->
-		<concat destfile="${src}/dom/dom.js">
-			<filelist dir="${src}/dom" files="style-f.js, _dom.js"/>
-		</concat>
-		<delete file="${src}/dom/_dom.js"/>
 
 		<!-- build ape-ep-dom.js rollup -->
-		<concat destfile="${src}/ape-ep-dom.js">
-			<filelist dir="${src}"
+		<concat destfile="${build}/ape-ep-dom.js">
+			<filelist dir="${build}"
 				 files="APE.js, EventPublisher.js, dom/dom.js"/>
 		</concat>
 
 		<!-- build anim.js rollup -->
-		<concat destfile="${src}/anim/_anim.js">
-			<filelist dir="${src}/anim"
-				 files="StyleTransition.js"/>
+		<concat destfile="${build}/anim/anim.js">
+			<filelist dir="${build}/anim"
+				 files="Animation.js, StyleTransition.js"/>
 			<filterchain>
 				<tokenfilter>
 					<replacestring from='APE.namespace("APE.anim");' to=""/>
@@ -41,22 +40,22 @@
 				</tokenfilter>
 			</filterchain>
 		</concat>
-		<concat destfile="${src}/anim/anim.js">
-			<filelist dir="${src}/anim"
+		<concat destfile="${build}/anim/anim.js">
+			<filelist dir="${build}/anim"
 				 files="Animation.js, _anim.js"/>
 		</concat>
 		<delete file="${src}/anim/_anim.js"/>
 
 		<!-- build anim.js rollup -->
-		<concat destfile="${src}/ajax/ajax-form.js">
+		<concat destfile="${build}/ajax/ajax-form.js">
 			<filelist dir="${src}"
 				 files="ajax/AsyncRequest.js, form/Form.js"/>
 		</concat>
 
 		<!-- build drag-slider.js rollup -->
-		<concat destfile="${src}/drag/_drag-slider.js">
-			<filelist dir="${src}/drag"
-				 files="Slider.js"/>
+		<concat destfile="${build}/drag/drag-slider.js">
+			<filelist dir="${build}/drag"
+				 files="Draggable.js, Slider.js"/>
 			<filterchain>
 				<tokenfilter>
 					<replacestring from='APE.namespace("APE.drag");' to=""/>
@@ -64,23 +63,17 @@
 				</tokenfilter>
 			</filterchain>
 		</concat>
-		<concat destfile="${src}/drag/drag-slider.js">
-			<filelist dir="${src}/drag"
-				 files="Draggable.js, _drag-slider.js"/>
-		</concat>
-		<delete file="${src}/drag/_drag-slider.js"/>
-	
 	</target>
 
-	<target name="js.copy" depends="js.rollups">
+	<target name="js.copy">
 		<copy todir="${build}" verbose="true">
 			<fileset dir="${src}" excludes="**/*.java"/>
 		</copy>
 	</target>
 
-	<target name="js.minify" depends="js.copy">
+	<target name="js.minify" depends="js.rollups">
 		<apply executable="java" parallel="false" dest="${build}" taskname="yui">
-			<fileset dir="${src}" includes="**/*.js"/>
+			<fileset dir="${build}" includes="**/*.js"/>
 			<arg line="-jar"/>
 			<arg path="yuicompressor-2.4\build\yuicompressor-2.4.jar"/>
 			<arg line="-v"/>
@@ -92,6 +85,7 @@
 	</target>
 
 	<target name="clean">
+		<!-- TODO: change to delete everything -->
 		<delete file="${build}/EventPublisher-min.js" failonerror="false"/>
 	</target>
 </project>

@@ -1,0 +1,1 @@
+APE.namespace("APE.dom.Event");(function(){var B=APE.dom;B.Event.getCoords=A;function A(D){var C;if("pageX" in D){C=function(E){return{x:E.pageX,y:E.pageY}}}else{C=function(F){var E=B.getScrollOffsets(),F=F||event;return{x:F.clientX+E.left,y:F.clientY+E.top}}}return(B.Event.getCoords=C)(D)}})();

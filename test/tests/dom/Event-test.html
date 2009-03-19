@@ -76,19 +76,6 @@ var eventTestCase = new YAHOO.tool.TestCase({
         function bodyClicked() {
             called = true;
         }
-    },
-
-    testGetCoords : function() {
-        var coords,
-            testNode = document.getElementById('testNode');
-
-        document.body.onclick = function(e) {
-            coords = dom.Event.getCoords(e||event);
-        };
-
-        Action.click(testNode, {canBubble:true, clientX: 10, clientY: 10 } );
-        Assert.areEqual(10, coords.x, "coords x");
-        Assert.areEqual(10, coords.y, "coords y");
     }
 });
 

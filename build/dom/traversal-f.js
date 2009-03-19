@@ -34,7 +34,8 @@ APE.namespace("APE.dom");
             while(el != b && (b = b.parentNode) != null);
             return el === b;
         };
-    /**
+    }
+    /** 
      * @memberOf APE.dom
      * @param {HTMLElement} el the element to start from.
      * @param {String} attName the name of the attribute.
@@ -81,12 +82,17 @@ APE.namespace("APE.dom");
             return null;
     }
 
-    function getChildElements(el) {    
-        var i = 0, ret = [],
-            cn = el.childNodes;
-        for(var len = cn.length; i < len; i++) {
-            if("tagName"in cn[i])
+    function getChildElements(el) {
+        var i = 0, ret = [], len,
+            cn;
+        if('children' in el) {
+            return [].slice.call(el.children);
+        }
+        cn = el.childNodes;
+        for(len = cn.length; i < len; i++) {
+            if("tagName"in cn[i]) {
                 ret[ret.length] = cn[i];
+            }
         }
         return ret;
     }

@@ -14,8 +14,12 @@
     <script type="text/javascript" src="../../yui-test/build/yuitest/yuitest-beta.js"></script>
 
     <script type="text/javascript" src="../../../build/APE.js"></script>
-    <script type="text/javascript" src="../../../build/dom/style-f.js"></script>
     <script type="text/javascript" src="../../../build/dom/StyleSheetAdapter.js"></script>
+    <script type="text/javascript" src="../../../build/dom/constants.js"></script>
+    <script type="text/javascript" src="../../../build/dom/style-f.js"></script>
+    <script type="text/javascript" src="../../../build/dom/getContainingBlock.js"></script>
+    <script type="text/javascript" src="../../../build/dom/getPixelCoords.js"></script>
+    <script type="text/javascript" src="../../../build/dom/getCascadedStyle.js"></script>
 
     <style id="testSheet">
         #testNode {
@@ -54,168 +58,68 @@
  </div>
 <script type="text/javascript">
 setTimeout(function(){
-
+    
 var container = document.getElementById("container"),
     template = container.innerHTML,
     containerCssText = container.style.cssText,
     htmlCssText = document.documentElement.style.cssText,
-    bodyCssText = document.body.style.cssText;
+    bodyCssText = document.body.style.cssText,
+    sheet = new APE.dom.StyleSheetAdapter( "testSheet" ),
+    rule = sheet.getRule("#testNode") || sheet.addRule( "#testNode", "" );
 
 var Assert = YAHOO.util.Assert,
+    TestCase = YAHOO.tool.TestCase,
     ArrayAssert = YAHOO.util.ArrayAssert,
     dom = APE.dom;
 
-var getStyleTestCase = new YAHOO.tool.TestCase({
+/* StyleTransition.js uses these. 
+ * move to new file. 
+ * StyleTransition.js seems too generalized.
+getCascadedStyle : getCascadedStyle,
+getStyleUnit : getStyleUnit,
+findInheritedStyle : findInheritedStyle,
+*/
 
-    setUp : function() {
-        var sheet = new APE.dom.StyleSheetAdapter( "testSheet" );
-        this.data.rule = sheet.getRule("#testNode") || sheet.addRule( "#testNode", "" );
-        sheet = rule = null;
+var domconstants = new TestCase({
+    name : "constants.js",
+
+    testTextContent : function() {
+        var n = document.createElement('div');
+        div[dom.textContent] = "foo";
+        Assert.areSame("foo", div.innerHTML);
     },
 
-    data : {},
-
-    _should : {
-        ignore : { 
-            testGetComputedShorthandValues1pxFontSize : true,
-            testGetComputedShorthandValues100px : true
-        }
+    testIsComputedStyle : function() {
+        Assert.isTypeOf("boolean", dom.IS_COMPUTED_STYLE);
     },
 
-    tearDown : function () {
-        var data = this.data;
-        document.body.style.cssText = bodyCssText;
-        document.documentElement.style.cssText = htmlCssText;
-        container.style.cssText = containerCssText;
-        container.innerHTML = template;
-
-        var style = this.data.rule.style;
-
-        // Iterating through "length" in a for loop 
-        // returns camel-cased property names. 
-        // Use a for-in loop and swallow errors on things like functions or length.
-        for(var prop in style) {
-            try { 
-                style[prop] = "";
-            } catch (ex) { }
-        }
-        style = null;
-    },
-
-    name : "getStyle", 
-
-    testGetBodyColor : function() {
-        var color = dom.getStyle(document.body, "color");
-        ArrayAssert.contains(color, ["#000000", "rgb(0, 0, 0)", "rgb(0,0,0)"] );
-        YAHOO.log("color: " + color, 'info', "TestRunner"); 
-    },
-
+    testIsCurrentStyle : function() {
+        Assert.isTypeOf("boolean", dom.IS_CURRENT_STYLE);
+    }
+});
+var cascadedStyleTestCase = new TestCase({
+   
     testGetInheritedColor : function() {
-        var color = dom.findInheritedStyle(document.getElementById('testNode'), "color");
-        ArrayAssert.contains(color, ["#000000", "rgb(0, 0, 0)"]);
+	    var color = dom.findInheritedStyle(document.getElementById('testNode'), "color");
+	    ArrayAssert.contains(color, ["#000000", "rgb(0, 0, 0)"]);
+	},
+	
+	testGetInheritedBackgroundColor : function() {
+	    var color = dom.findInheritedStyle(document.getElementById('testNode'), "backgroundColor");
+	    var expected = dom.getStyle(document.documentElement, "backgroundColor");
+	    Assert.areEqual(expected, color);
+	},
+    testGetCascadedOpacity : function() {
+        var target = document.getElementById("target");
+        dom.setOpacity(target, .1);
+        var op = dom.getCascadedStyle(target, "opacity");
+        Assert.areEqual(0.1, parseFloat(op), "opacity found was wrong." );
     },
-
-    testGetInheritedBackgroundColor : function() {
-        var color = dom.findInheritedStyle(document.getElementById('testNode'), "backgroundColor");
-        var expected = dom.getStyle(document.documentElement, "backgroundColor");
-        Assert.areEqual(expected, color);
-    },
-
-    testGetComputedStyle : function() {
-        var ArrayAssert = YAHOO.util.ArrayAssert;
-
-        var testNode = document.getElementById( "testNode" );
-        var rule = this.data.rule;
-        rule.style.fontSize = "12px";
-        rule.style.fontFamily="serif";
-        rule.style.padding = "6em";
-        rule.style.height = "1000em";
-
-        this.wait(function(){
-            var foundFontSize = dom.getStyle(testNode, "fontSize" );
-            var foundPadding = dom.getStyle(testNode, "paddingBottom" );
-            var foundHeight = dom.getStyle(testNode, "height" );
-
-            if(parseFloat(foundHeight) == 12000 + (6 * 12 * 2))
-                YAHOO.log("browser included padding in height calculation.", "warn", "TestRunner");
-
-            Assert.areEqual( (6 * 12) + "px", foundPadding, 
-                "padding was set in em, and was either \nreturned wrong or miscalc'd by the browser." );
-            Assert.areEqual( (1000 * 12) + "px", foundHeight, 
-                "height was set in em, and was either \nreturned wrong or miscalc'd by the browser." );
-        }, 100);
-    },
-
-    testGetContainingBlock : function() {
-        var testNode = document.getElementById( "testNode" ),
-            expected = document.getElementById('container'),
-            cb = dom.getContainingBlock( testNode );
-
-        Assert.areEqual( container, cb );
-    },
-
-    testGetContainingBlockFixed : function() {
-        var testNode = document.getElementById( "testNode" ),
-            expected = null;
-        testNode.style.position = "fixed";
-        var cb = dom.getContainingBlock( testNode );
-
-        Assert.areEqual( null, cb );
-    },
-
-    testGetContainingBlockFixedContainer : function() {
-        var testNode = document.getElementById( "testNode" ),
-            expected = document.getElementById('container');
-        expected.style.position = "fixed";
-
-        var cb = dom.getContainingBlock( testNode );
-
-        Assert.areEqual( container, cb );
-    },
-
-    testGetContainingBlockBody : function() {
-        var cb = dom.getContainingBlock( document.body );
-
-        Assert.areEqual( document.documentElement, cb );
-    },
-
-    testGetContainingBlockRoot : function() {
-        var cb = dom.getContainingBlock( document.documentElement );
-
-        Assert.areEqual( document, cb );
-    },
-
-    testGetComputedClip : function() {
-        var testNode = document.getElementById( "testNode" );
-        var rule = this.data.rule;
-        rule.style.position = "absolute";
-
-        // This only works with px. It fails in IE with em,
-        // and fails in FF with em by returning clip(0 0 0 0); always.
-
-        rule.style.clip = "rect(12px 12px 10px 2px)";
-        var clip = dom.getStyle(testNode, "clip");
-        
-        Assert.areEqual("rect(12px 12px 10px 2px)", clip.toString().replace(/,/g, ""));
-        if(clip.top)
-            YAHOO.log("clip object found: {top: " + clip.top + ", right: " + clip.right + ", " +
-                "bottom: " + clip.bottom  + ", left: " + clip.left + "}", "info", "TestRunner");
-    },
-
-    testGetCascadedInlineStyle : function() {
-        var c1 = document.getElementById('c1');
-        c1.style.margin = "12px";
-        c1.style.fontSize = "10px";
-        var r = dom.getCascadedStyle( c1, 'margin', 'em' );
-        
-        Assert.areEqual("1.2em", r);
-    },
-
+    
     // Make sure the script doesn't do something dumb like 
     // add "px" to 0.
     testGetCascadedZIndex : function() {
         var testNode = document.getElementById( "testNode" );
-        var rule = this.data.rule;
         rule.style.zIndex = "0";
         rule.style.position = "absolute";
         var r = APE.dom.getCascadedStyle( testNode, 'zIndex' );
@@ -226,7 +130,6 @@ var getStyleTestCase = new YAHOO.tool.TestCase({
 
         var testNode = document.getElementById( "testNode" );
         testNode.parentNode.style.cssText = "";
-        var rule = this.data.rule;
         rule.style.fontSize = "13em";
         rule.style.padding = "6em";
         rule.style.height = "50em";
@@ -243,7 +146,6 @@ var getStyleTestCase = new YAHOO.tool.TestCase({
     testCascadedBlockValues : function() {
         var testNode = document.getElementById( "testNode" );
         testNode.parentNode.style.cssText = "position: relative; width:500px;";
-        var rule = this.data.rule;
         rule.style.padding = "80%";
         
         var foundPadding = dom.getCascadedStyle(testNode, "paddingBottom", "%" );
@@ -254,12 +156,6 @@ var getStyleTestCase = new YAHOO.tool.TestCase({
         Assert.isTrue( 1 >= difference, "was off by one or more px." );
         if(difference > 0) 
             YAHOO.log("testCascadedBlockValues: sub-pixel difference: " + difference, "warn", "TestRunner");
-    },
-
-    testGetComputedBodyMarginFailure : function() {
-        document.body.style.marginBottom = "2.2in";
-        var mb = dom.getStyle(document.body, "marginBottom");
-        Assert.areNotEqual("2.2in", mb, "expected to fail in IE; IE does not support computed styles.");
     },
 
     testGetCascadedBodyMargin : function() {
@@ -283,37 +179,6 @@ var getStyleTestCase = new YAHOO.tool.TestCase({
         if( (color == "#0a0a14") || (color == "#0A0A14"))
             YAHOO.log("Color was hex, not rgb: " + color, "warn", "TestLogger");
     },
-
-    testGetComputedOpacity : function() {
-        var target = document.getElementById("target");
-try{
-        dom.setOpacity(target, .1);
-    }catch(ex){alert(ex.message);}    
-        var op = dom.getStyle(target, "opacity");
-        Assert.areEqual(0.1, parseFloat(op), "opacity found was wrong." );
-    },
-
-    testGetCascadedOpacity : function() {
-        var target = document.getElementById("target");
-
-        dom.setOpacity(target, .1);
-        
-        var op = dom.getCascadedStyle(target, "opacity");
-        Assert.areEqual(0.1, parseFloat(op), "opacity found was wrong." );
-    },
-
-    testGetComputedBS : function() {
-        var target = document.getElementById("target");
-        var r = dom.getStyle(target, "bs");
-        Assert.areEqual("", r);
-    },
-
-    testGetCascadedBS : function() {
-        var target = document.getElementById("target");
-        var r = dom.getCascadedStyle(target, "bs");
-        Assert.areEqual("", r);
-    },
-    
     testGetStyleUnit : function() {
         var units = {
             em : "-12.2em",
@@ -333,6 +198,153 @@ try{
         Assert.areEqual( "", value, "No unit specified. Empty string should have been returned.");
     },
 
+    testGetCascadedShorthandValues : function() {
+        var c1 = document.getElementById("c1"),
+            inp = "1em 2em 3em 4em";
+        c1.style.padding = inp;
+        var out = dom.getCascadedStyle(c1, "padding", "em");
+        Assert.areEqual("1em 2em 3em 4em", out);
+    },
+
+    testGetCollapsedCascadedShorthandValues : function() {
+        var c1 = document.getElementById("c1"),
+            inp = "1em 1em 1em 1em";
+        c1.style.fontSize = "10px";
+        c1.style.borderWidth = inp;
+        c1.style.borderStyle = "solid";
+        var out = dom.getCascadedStyle(c1, "borderWidth", "em");
+        Assert.areEqual("1em", out);
+    },
+
+    testGetCascadedBS : function() {
+        var target = document.getElementById("target");
+        var r = dom.getCascadedStyle(target, "bs");
+        Assert.areEqual("", r);
+    }
+    
+});
+
+var opacityTestCase = new TestCase({
+
+    name : "dom style opacity adapter", 
+
+});
+		
+var getStyleTestCase = new TestCase({
+
+    setUp : function() {
+    },
+
+
+    _should : {
+        ignore : { 
+            testGetComputedShorthandValues1pxFontSize : true,
+            testGetComputedShorthandValues100px : true
+        }
+    },
+
+    tearDown : function () {
+        document.body.style.cssText = bodyCssText;
+        document.documentElement.style.cssText = htmlCssText;
+        container.style.cssText = containerCssText;
+        container.innerHTML = template;
+
+        var style = rule.style;
+
+        // Iterating through "length" in a for loop 
+        // returns camel-cased property names. 
+        // Use a for-in loop and swallow errors on things like functions or length.
+        for(var prop in style) {
+            try { 
+                style[prop] = "";
+            } catch (ex) { }
+        }
+        style = null;
+    },
+
+    name : "getStyle", 
+
+    testGetBodyColor : function() {
+        var color = dom.getStyle(document.body, "color");
+        ArrayAssert.contains(color, ["#000000", "rgb(0, 0, 0)", "rgb(0,0,0)"] );
+        YAHOO.log("color: " + color, 'info', "TestRunner"); 
+    },
+
+    testGetComputedOpacity : function() {
+        var target = document.getElementById("target");
+        dom.setOpacity(target, .1);
+        var op = dom.getStyle(target, "opacity");
+        Assert.areEqual(0.1, parseFloat(op), "opacity found was wrong." );
+    },
+
+    testGetCascadedWidth : function() {
+        var testNode = document.getElementById('testNode');
+        testNode.parentNode.style.width = "100px";
+        var actual = dom.getStyle(testNode, "width");
+        Assert.areEqual("100px", actual, "px");
+    },
+    
+    testGetComputedStyle : function() {
+        var ArrayAssert = YAHOO.util.ArrayAssert;
+
+        var testNode = document.getElementById( "testNode" );
+        rule.style.fontSize = "12px";
+        rule.style.fontFamily="serif";
+        rule.style.padding = "6em";
+        rule.style.height = "1000em";
+
+        this.wait(function(){
+            var foundFontSize = dom.getStyle(testNode, "fontSize" );
+            var foundPadding = dom.getStyle(testNode, "paddingBottom" );
+            var foundHeight = dom.getStyle(testNode, "height" );
+
+            if(parseFloat(foundHeight) == 12000 + (6 * 12 * 2))
+                YAHOO.log("browser included padding in height calculation.", "warn", "TestRunner");
+
+            Assert.areEqual( (6 * 12) + "px", foundPadding, 
+                "padding was set in em, and was either \nreturned wrong or miscalc'd by the browser." );
+            Assert.areEqual( (1000 * 12) + "px", foundHeight, 
+                "height was set in em, and was either \nreturned wrong or miscalc'd by the browser." );
+        }, 100);
+    },
+
+    testGetComputedClip : function() {
+        var testNode = document.getElementById( "testNode" );
+        rule.style.position = "absolute";
+
+        // This only works with px. It fails in IE with em,
+        // and fails in FF with em by returning clip(0 0 0 0); always.
+
+        rule.style.clip = "rect(12px 12px 10px 2px)";
+        var clip = dom.getStyle(testNode, "clip");
+        
+        Assert.areEqual("rect(12px 12px 10px 2px)", clip.toString().replace(/,/g, ""));
+        if(clip.top)
+            YAHOO.log("clip object found: {top: " + clip.top + ", right: " + clip.right + ", " +
+                "bottom: " + clip.bottom  + ", left: " + clip.left + "}", "info", "TestRunner");
+    },
+
+    testGetCascadedInlineStyle : function() {
+        var c1 = document.getElementById('c1');
+        c1.style.margin = "12px";
+        c1.style.fontSize = "10px";
+        var r = dom.getCascadedStyle( c1, 'margin', 'em' );
+        
+        Assert.areEqual("1.2em", r);
+    },
+
+    testGetComputedBodyMarginFailure : function() {
+        document.body.style.marginBottom = "2.2in";
+        var mb = dom.getStyle(document.body, "marginBottom");
+        Assert.areNotEqual("2.2in", mb, "expected to fail in IE; IE does not support computed styles.");
+    },
+
+    testGetComputedBS : function() {
+        var target = document.getElementById("target");
+        var r = dom.getStyle(target, "bs");
+        Assert.areEqual("", r);
+    },
+    
     testGetPixelCoords : function() {
         var target = document.getElementById("target");
         target.style.left = "12px";
@@ -343,8 +355,7 @@ try{
     },
 
     testGetPixelCoordsNoStyleValue : function() {
-        var testNode = document.getElementById('testNode'),
-          rule = this.data.rule;
+        var testNode = document.getElementById('testNode');
         rule.style.left = "100px";
         rule.style.top = "50px";
         
@@ -355,13 +366,6 @@ try{
         var coords = dom.getPixelCoords(testNode);
         Assert.areEqual(100, coords.x);
         Assert.areEqual(50, coords.y);
-    },
-
-    testGetCascadedWidth : function() {
-        var testNode = document.getElementById('testNode');
-        testNode.parentNode.style.width = "100px";
-        var actual = dom.getStyle(testNode, "width");
-        Assert.areEqual("100px", actual, "px");
     },
 
     testGetShorthandValues : function() {
@@ -400,9 +404,9 @@ try{
         var expected = "0px",
             s = document.getElementById("testNode").style,
             expected = "0px";
-            this.data.rule.style.borderRadius =  
-                this.data.rule.style.WebkitBorderRadius = 
-                this.data.rule.style.MozBorderRadius = "12px";
+            rule.style.borderRadius =  
+                rule.style.WebkitBorderRadius = 
+                rule.style.MozBorderRadius = "12px";
 
         if(!("borderRadius"in s || "WebkitBorderRadius"in s || "MozBorderRadius"in s)) {
             expected = "";
@@ -448,30 +452,61 @@ try{
         c1.style.margin = inp;
         var out = dom.getStyle(c1, "margin");
         Assert.areEqual("12px", out);
-    },
-
-    testGetCascadedShorthandValues : function() {
-        var c1 = document.getElementById("c1"),
-            inp = "1em 2em 3em 4em";
-        c1.style.padding = inp;
-        var out = dom.getCascadedStyle(c1, "padding", "em");
-        Assert.areEqual("1em 2em 3em 4em", out);
-    },
-
-    testGetCollapsedCascadedShorthandValues : function() {
-        var c1 = document.getElementById("c1"),
-            inp = "1em 1em 1em 1em";
-        c1.style.fontSize = "10px";
-        c1.style.borderWidth = inp;
-        c1.style.borderStyle = "solid";
-        var out = dom.getCascadedStyle(c1, "borderWidth", "em");
-        Assert.areEqual("1em", out);
     }
+
 });
 
+var getContainingBlockTestCase = new TestCase({
+
+    tearDown : function() {
+	    var container = document.getElementById("container");
+	    container.innerHTML = template;
+    },
+
+    testGetContainingBlock : function() {
+	    var testNode = document.getElementById( "testNode" ),
+	        expected = document.getElementById('container'),
+	        cb = dom.getContainingBlock( testNode );
+	
+	    Assert.areEqual( container, cb );
+	},
+	
+	testGetContainingBlockFixed : function() {
+	    var testNode = document.getElementById( "testNode" ),
+	        expected = null;
+	    testNode.style.position = "fixed";
+	    var cb = dom.getContainingBlock( testNode );
+	
+	    Assert.areEqual( null, cb );
+	},
+	
+	testGetContainingBlockFixedContainer : function() {
+	    var testNode = document.getElementById( "testNode" ),
+	        expected = document.getElementById('container');
+	    expected.style.position = "fixed";
+	    var cb = dom.getContainingBlock( testNode );
+	
+	    Assert.areEqual( expected, cb );
+	},
+	
+	testGetContainingBlockBody : function() {
+	    var cb = dom.getContainingBlock( document.body );
+	
+	    Assert.areEqual( document.documentElement, cb );
+	},
+	
+	testGetContainingBlockRoot : function() {
+	    var cb = dom.getContainingBlock( document.documentElement );
+	
+	    Assert.areEqual( document, cb );
+	}
+
+});
 //create the logger
 var logger = new YAHOO.tool.TestLogger("testLogger");
 YAHOO.tool.TestRunner.add( getStyleTestCase );
+YAHOO.tool.TestRunner.add( cascadedStyleTestCase );
+YAHOO.tool.TestRunner.add( getContainingBlockTestCase );
 
 // run the tests, or put them in the TestRunner.
 if (parent && parent != window) {

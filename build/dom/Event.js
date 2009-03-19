@@ -5,19 +5,21 @@
 APE.namespace("APE.dom");
 
 (function() {
+
+    var hasEventTarget = dom.hasEventTarget;
+
     APE.mixin(
-            APE.dom.Event = {}, {
-        getTarget : getTarget,
-        addCallback : addCallback,
-        removeCallback : removeCallback,
-        preventDefault : preventDefault
+        APE.dom.Event = {}, {
+            eventTarget : hasEventTarget,
+            getTarget : getTarget, 
+            addCallback : addCallback,
+            removeCallback : removeCallback,
+            preventDefault : preventDefault
     });
 
     function getTarget(e) {
         return e && e.target || event.srcElement;
     }
-
-    var hasEventTarget = "addEventListener" in this;
 
     /**
      * If EventTarget is supported, cb (input param) is returned.
