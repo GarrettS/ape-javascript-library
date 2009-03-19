@@ -23,9 +23,10 @@ APE.namespace("APE.dom");
         borderRadiusExp : /^[a-zA-Z]*[bB]orderRadius$/,
         tryGetShorthandValues : tryGetShorthandValues,
         getCurrentStyleValueFromAuto : getCurrentStyleValueFromAuto,
-        getCurrentStyleClipValues : getCurrentStyleClipValues
+        getCurrentStyleClipValues : getCurrentStyleClipValues,
+        convertNonPixelToPixel : convertNonPixelToPixel
     });
-    
+
     var view = document.defaultView,
         getCS = "getComputedStyle",
         IS_COMPUTED_STYLE = dom.IS_COMPUTED_STYLE,
@@ -111,7 +112,7 @@ APE.namespace("APE.dom");
                 value = (tryGetShorthandValues(cs, p)).join(" ");
             }
         }
-        else if(currentStyle in el) {
+        else {
             cs = el[currentStyle];
             if(p == "opacity" && !("opacity"in el[currentStyle]))
                 value = getFilterOpacity(el);
@@ -176,16 +177,16 @@ APE.namespace("APE.dom");
                     paddingWidth = parseFloat(getStyle(el, "paddingLeft"))||0
                         + parseFloat(getStyle(el, "paddingRight"))||0;
 
-                    return el.offsetWidth - el.clientLeft - borderWidth - paddingWidth + "px";
+                    return el.offsetWidth - el.clientLeft - borderWidth - paddingWidth + px;
                 } 
                 else if(p == "height") {
                     borderWidth = parseFloat(getStyle(el, "borderBottomWidth"))||0;
                     paddingWidth = parseFloat(getStyle(el, "paddingTop"))||0
                         + parseFloat(getStyle(el, "paddingBottom"))||0;
-                    return el.offsetHeight - el.clientTop - borderWidth + "px";
+                    return el.offsetHeight - el.clientTop - borderWidth + px;
                 }
             }
-            return s[pp] + "px";
+            return s[pp] + px;
         }
         if(p == "margin" && el[currentStyle].position != "absolute" && 
           doc.compatMode != "BackCompat") {
@@ -239,14 +240,7 @@ APE.namespace("APE.dom");
         return values;
     }
 
-    var pxExp = /\dpx$/, 
-        borderWidthExp = /^thi|med/,
-        nonPixelExp = /(-?\d+|(?:-?\d*\.\d+))(?:em|ex|pt|pc|in|cm|mm\s*)/,
-        unitExp = /(-?\d+|(?:-?\d*\.\d+))(px|em|ex|pt|pc|in|cm|mm|%)\s*/,
-        floatExp = /loat$/,
-	    positiveLengthExp = /(?:width|height|padding|fontSize)$/ig, 
-        percentFromContainingBlock = /^width|height|margin|padding|textIndent/,
-        inherFromParExp = /^(?:font|text|letter)/,
+    var nonPixelExp = /(-?\d+|(?:-?\d*\.\d+))(?:em|ex|pt|pc|in|cm|mm\s*)/,
         pixelDimensionExp = /width|height|top|left/,
         px = "px"; 
 

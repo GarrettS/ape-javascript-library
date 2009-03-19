@@ -83,16 +83,17 @@ APE.namespace("APE.dom");
     }
 
     function getChildElements(el) {
-        var i = 0, ret = [], len,
-            cn;
-        if('children' in el) {
-            return [].slice.call(el.children);
-        }
-        cn = el.childNodes;
+        var i = 0, ret = [], len, tagName,
+            cn = el.children || el.childNodes, c;
+        
+        // IE throws error when calling 
+        // Array.prototype.slice.call(el.children).
+        // IE also includes comment nodes.
         for(len = cn.length; i < len; i++) {
-            if("tagName"in cn[i]) {
-                ret[ret.length] = cn[i];
-            }
+            c = cn[i];
+            tagName = c.tagName;
+            if(typeof tagName !== "string" || tagName === "!") continue;
+            ret[ret.length] = c;
         }
         return ret;
     }

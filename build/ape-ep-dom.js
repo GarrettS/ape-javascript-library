@@ -496,7 +496,6 @@ APE.namespace("APE.dom" );
 	view = document.defaultView;
 	
     dom.IS_COMPUTED_STYLE = !!(typeof view != "undefined" && "getComputedStyle" in view);
-    dom.IS_CURRENT_STYLE = "currentStyle" in docEl;
 	dom.textContent = textContent in docEl ? textContent : "innerText";
 })();/**
  * @author Garret Smith
@@ -1241,16 +1240,17 @@ function normalizeString(s) { return s.replace(STRING_TRIM_EXP,'').replace(WS_MU
     }
 
     function getChildElements(el) {
-        var i = 0, ret = [], len,
-            cn;
-        if('children' in el) {
-            return [].slice.call(el.children);
-        }
-        cn = el.childNodes;
+        var i = 0, ret = [], len, tagName,
+            cn = el.children || el.childNodes, c;
+        
+        // IE throws error when calling 
+        // Array.prototype.slice.call(el.children).
+        // IE also includes comment nodes.
         for(len = cn.length; i < len; i++) {
-            if("tagName"in cn[i]) {
-                ret[ret.length] = cn[i];
-            }
+            c = cn[i];
+            tagName = c.tagName;
+            if(typeof tagName !== "string" || tagName === "!") continue;
+            ret[ret.length] = c;
         }
         return ret;
     }
@@ -1389,9 +1389,10 @@ function normalizeString(s) { return s.replace(STRING_TRIM_EXP,'').replace(WS_MU
         borderRadiusExp : /^[a-zA-Z]*[bB]orderRadius$/,
         tryGetShorthandValues : tryGetShorthandValues,
         getCurrentStyleValueFromAuto : getCurrentStyleValueFromAuto,
-        getCurrentStyleClipValues : getCurrentStyleClipValues
+        getCurrentStyleClipValues : getCurrentStyleClipValues,
+        convertNonPixelToPixel : convertNonPixelToPixel
     });
-    
+
     var view = document.defaultView,
         getCS = "getComputedStyle",
         IS_COMPUTED_STYLE = dom.IS_COMPUTED_STYLE,
@@ -1477,7 +1478,7 @@ function normalizeString(s) { return s.replace(STRING_TRIM_EXP,'').replace(WS_MU
                 value = (tryGetShorthandValues(cs, p)).join(" ");
             }
         }
-        else if(currentStyle in el) {
+        else {
             cs = el[currentStyle];
             if(p == "opacity" && !("opacity"in el[currentStyle]))
                 value = getFilterOpacity(el);
@@ -1542,16 +1543,16 @@ function normalizeString(s) { return s.replace(STRING_TRIM_EXP,'').replace(WS_MU
                     paddingWidth = parseFloat(getStyle(el, "paddingLeft"))||0
                         + parseFloat(getStyle(el, "paddingRight"))||0;
 
-                    return el.offsetWidth - el.clientLeft - borderWidth - paddingWidth + "px";
+                    return el.offsetWidth - el.clientLeft - borderWidth - paddingWidth + px;
                 } 
                 else if(p == "height") {
                     borderWidth = parseFloat(getStyle(el, "borderBottomWidth"))||0;
                     paddingWidth = parseFloat(getStyle(el, "paddingTop"))||0
                         + parseFloat(getStyle(el, "paddingBottom"))||0;
-                    return el.offsetHeight - el.clientTop - borderWidth + "px";
+                    return el.offsetHeight - el.clientTop - borderWidth + px;
                 }
             }
-            return s[pp] + "px";
+            return s[pp] + px;
         }
         if(p == "margin" && el[currentStyle].position != "absolute" && 
           doc.compatMode != "BackCompat") {
@@ -1605,14 +1606,7 @@ function normalizeString(s) { return s.replace(STRING_TRIM_EXP,'').replace(WS_MU
         return values;
     }
 
-    var pxExp = /\dpx$/, 
-        borderWidthExp = /^thi|med/,
-        nonPixelExp = /(-?\d+|(?:-?\d*\.\d+))(?:em|ex|pt|pc|in|cm|mm\s*)/,
-        unitExp = /(-?\d+|(?:-?\d*\.\d+))(px|em|ex|pt|pc|in|cm|mm|%)\s*/,
-        floatExp = /loat$/,
-	    positiveLengthExp = /(?:width|height|padding|fontSize)$/ig, 
-        percentFromContainingBlock = /^width|height|margin|padding|textIndent/,
-        inherFromParExp = /^(?:font|text|letter)/,
+    var nonPixelExp = /(-?\d+|(?:-?\d*\.\d+))(?:em|ex|pt|pc|in|cm|mm\s*)/,
         pixelDimensionExp = /width|height|top|left/,
         px = "px"; 
 

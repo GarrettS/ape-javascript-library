@@ -40,11 +40,6 @@ APE.namespace("APE.dom"<!--necessary space --> );</header>
 				</tokenfilter>
 			</filterchain>
 		</concat>
-		<concat destfile="${build}/anim/anim.js">
-			<filelist dir="${build}/anim"
-				 files="Animation.js, _anim.js"/>
-		</concat>
-		<delete file="${src}/anim/_anim.js"/>
 
 		<!-- build anim.js rollup -->
 		<concat destfile="${build}/ajax/ajax-form.js">
