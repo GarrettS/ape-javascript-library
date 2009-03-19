@@ -65,7 +65,7 @@ APE.namespace("APE.dom"<!--necessary space --> );</header>
 		</concat>
 	</target>
 
-	<target name="js.copy">
+	<target name="js.copy" depends="js.clean">
 		<copy todir="${build}" verbose="true">
 			<fileset dir="${src}" excludes="**/*.java"/>
 		</copy>
@@ -84,8 +84,9 @@ APE.namespace("APE.dom"<!--necessary space --> );</header>
 		</apply>
 	</target>
 
-	<target name="clean">
-		<!-- TODO: change to delete everything -->
-		<delete file="${build}/EventPublisher-min.js" failonerror="false"/>
+	<target name="js.clean">
+		<delete>
+			<fileset dir="${build}" includes="**/*.js"/>
+		</delete>
 	</target>
 </project>
