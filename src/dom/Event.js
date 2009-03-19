@@ -6,19 +6,20 @@ APE.namespace("APE.dom");
 
 (function() {
 
-    var hasEventTarget = dom.hasEventTarget;
+    var hasEventTarget = "addEventListener"in this,
+        eventTarget = hasEventTarget ? "target" : "srcElement";
 
     APE.mixin(
         APE.dom.Event = {}, {
-            eventTarget : hasEventTarget,
+            eventTarget : eventTarget,
             getTarget : getTarget, 
             addCallback : addCallback,
             removeCallback : removeCallback,
             preventDefault : preventDefault
     });
-
+    
     function getTarget(e) {
-        return e && e.target || event.srcElement;
+        return (e || event)[eventTarget];
     }
 
     /**
@@ -55,7 +56,7 @@ APE.namespace("APE.dom");
 
     /**
      * removeEventListener/detachEvent for DOM objects.
-     * @param {Object} o host object, Element, Document, Window.
+     * @param {EventTarget} o host object, Element, Document, Window.
      * @param (string} type
      * @param {Function} cb
      * @return {Function} bound If EventTarget is not supported,
@@ -71,6 +72,9 @@ APE.namespace("APE.dom");
         return bound;
     }
 
+    /**
+     * @param {Event}
+     */
     function preventDefault(ev) {
         ev = ev || event;
         if(typeof ev.preventDefault == "function") {
