@@ -57,6 +57,8 @@ APE.namespace("APE.dom"<!--necessary space --> );</header>
 					<replacestring from="APE.namespace('APE.drag');" to=""/>
 				</tokenfilter>
 			</filterchain>
+            <header>/**drag-slider.js rollup: Draggable.js, Slider.js*/
+APE.namespace("APE.drag"<!--necessary space --> );</header>
 		</concat>
 	</target>
 
