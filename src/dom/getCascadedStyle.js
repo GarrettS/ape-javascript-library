@@ -1,7 +1,7 @@
 /**
  * @fileoverview
  * getting cascaded styles for easy style transitions.
- * @requires getStyle.js
+ * @requires style-f.js, getContainingBlock.js
  */
 
 (function(){
