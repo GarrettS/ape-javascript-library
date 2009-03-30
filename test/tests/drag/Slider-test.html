@@ -274,7 +274,8 @@ var draggableTestCase = new YAHOO.tool.TestCase({
 
         if(testNodeHandle.focus)
             testNodeHandle.focus();
-        Action.mousedown( testNodeHandle );
+        Action.mousedown( testNodeHandle ); // draw focus anyway.
+        Action.mouseup( testNodeHandle ); // IE6 fails test w/o this.
         
         var lArr = 37,
             rArr = 39,
