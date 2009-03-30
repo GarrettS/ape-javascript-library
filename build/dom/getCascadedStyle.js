@@ -1,7 +1,7 @@
 /**
  * @fileoverview
  * getting cascaded styles for easy style transitions.
- * @requires getStyle.js
+ * @requires style-f.js, getContainingBlock.js
  */
 
 (function(){
@@ -87,8 +87,9 @@
             }
 
             else {
-                if(borderRadiusExp.test(p))
+                if(borderRadiusExp.test(p)) {
                     p = borderRadiusExp.exec(p)[0];
+                }
                 value = getCascadedFromComputed(el, p, desiredUnit);
             }
         }
@@ -101,12 +102,12 @@
             defaultView = doc.defaultView;
         
         if(p == "opacity") {
-            
+
             // currentStyle is pretty fucked in Opera.
             // returns "1". So go for getComputedStyle first.
-            if(IS_COMPUTED_STYLE)
+            if(IS_COMPUTED_STYLE) {
                 value = defaultView[getCS](el,'').opacity;
-            else if(!("opacity"in curSty)) {
+            } else if(!("opacity"in curSty)) {
                 value = dom.getFilterOpacity(el);
             }
         }
@@ -118,12 +119,15 @@
             // We've tried clip and opacity now, so it seems that the property 
             // does not exist, ala "WebkitBorderRadius" in IE.
             if(!(p in curSty)) return"";
-            if(floatExp.test(p))
+            if(floatExp.test(p)) {
                 p = floatProp;
+            } 
+            
             value = el[style][p] || curSty[p];
 
-            if(value == "auto") 
-                value = getCurrentStyleValueFromAuto(el, p) || value;
+            if(value == "auto") {
+                value = dom.getCurrentStyleValueFromAuto(el, p) || value;
+            }
 
         }
 
