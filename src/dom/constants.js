@@ -5,6 +5,6 @@ APE.namespace("APE.dom");
 	textContent = "textContent",
 	view = document.defaultView;
 	
-    dom.IS_COMPUTED_STYLE = !!(typeof view != "undefined" && "getComputedStyle" in view);
+    dom.IS_COMPUTED_STYLE = (typeof view != "undefined" && "getComputedStyle" in view);
 	dom.textContent = textContent in docEl ? textContent : "innerText";
 })();
