@@ -60,8 +60,8 @@ var styleTransitionTestCase = new YAHOO.tool.TestCase({
     },
 
     testWidth : function() {
+        
         var css = { width: "100px" };
-
         var st = new StyleTransition(c, css, .2);
         st.start();
         this.wait(function(){
