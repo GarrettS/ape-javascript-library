@@ -495,7 +495,7 @@ APE.namespace("APE.dom" );
 	textContent = "textContent",
 	view = document.defaultView;
 	
-    dom.IS_COMPUTED_STYLE = !!(typeof view != "undefined" && "getComputedStyle" in view);
+    dom.IS_COMPUTED_STYLE = (typeof view != "undefined" && "getComputedStyle" in view);
 	dom.textContent = textContent in docEl ? textContent : "innerText";
 })();/**
  * @author Garret Smith
@@ -1158,8 +1158,11 @@ function normalizeString(s) { return s.replace(STRING_TRIM_EXP,'').replace(WS_MU
 })();
 (function(){
 
-    var docEl = document.documentElement;
-
+    var docEl = document.documentElement,
+        tagName = "tagName",
+        caseTransform = /^H/.test(docEl[tagName]) ? 'toUpperCase' : 'toLowerCase',
+        tagExp = /^[A-Z]/;
+        
     APE.mixin(
         APE.dom, {
         contains : getContains(),
@@ -1177,21 +1180,25 @@ function normalizeString(s) { return s.replace(STRING_TRIM_EXP,'').replace(WS_MU
      * code body.contains(body); 
      * Whereas APE.dom.contains will return false.
      */
+
     function getContains(){
         if('compareDocumentPosition'in docEl)
             return function(el, b) {
                 return (el.compareDocumentPosition(b) & 16) !== 0;
         };
-        else if(docEl.contains)
+        else if('contains'in docEl)
             return function(el, b) {
                 return el !== b && el.contains(b);
         };
         return function(el, b) {
             if(el === b) return false;
-            while(el != b && (b = b.parentNode) != null);
+            while(el != b && (b = b.parentNode) !== null);
             return el === b;
         };
     }
+
+    //docEl = null;
+
     /** 
      * @memberOf APE.dom
      * @param {HTMLElement} el the element to start from.
@@ -1214,33 +1221,34 @@ function normalizeString(s) { return s.replace(STRING_TRIM_EXP,'').replace(WS_MU
         return null;
     }
 
-    var isUpperCase = /^H/.test(docEl.tagName);
-    function findAncestorWithTagName(el, tagName) {
-        tagName = (isUpperCase ? tagName.toUpperCase() : tagName.toLowerCase());
-        for(var parent = el.parentNode;parent != null; ){
-            if( parent.tagName === tagName )
+    function findAncestorWithTagName(el, tag) {
+        tag = tag[caseTransform]();
+        for(var parent = el.parentNode;parent !== null; ){
+            if( parent[tagName] === tag )
                 return parent;
             parent = parent.parentNode;
         }
         return null;
     }
 
+    /** Filter out text nodes and, in IE, comment nodes. */
     function findNextSiblingElement(el) {
-        for(var ns = el.nextSibling; ns != null; ns = ns.nextSibling)
-            if(ns.tagName) 
+        for(var ns = el.nextSibling; ns !== null; ns = ns.nextSibling)
+            if(tagName in ns && tagExp.test(ns[tagName])) 
                 return ns;
-            return null;
+        return null;
     }
 
     function findPreviousSiblingElement(el) {
-        for(var ps = el.previousSibling; ps != null; ps = ps.previousSibling)
-            if(ps.tagName) 
+        for(var ps = el.previousSibling; ps !== null; ps = ps.previousSibling) {
+            if(tagName in ps && tagExp.test(ps[tagName])) 
                 return ps;
-            return null;
+        }
+        return null;
     }
 
     function getChildElements(el) {
-        var i = 0, ret = [], len, tagName,
+        var i = 0, ret = [], len, tag,
             cn = el.children || el.childNodes, c;
         
         // IE throws error when calling 
@@ -1248,8 +1256,8 @@ function normalizeString(s) { return s.replace(STRING_TRIM_EXP,'').replace(WS_MU
         // IE also includes comment nodes.
         for(len = cn.length; i < len; i++) {
             c = cn[i];
-            tagName = c.tagName;
-            if(typeof tagName !== "string" || tagName === "!") continue;
+            tag = c[tagName];
+            if(typeof tag !== "string" || tag === "!") continue;
             ret[ret.length] = c;
         }
         return ret;
@@ -1339,31 +1347,35 @@ function normalizeString(s) { return s.replace(STRING_TRIM_EXP,'').replace(WS_MU
             ev.returnValue = false;
         }
     }
-})(); APE.namespace("APE.dom.Event");
- (function(){
-	 var dom = APE.dom;
-     dom.Event.getCoords = getCoords;
-     function getCoords(e) {
-     var f;
-     if("pageX"in e) {
-         f = function(e) {
-             return {
-                 x : e.pageX,
-                 y : e.pageY
-             };
-         };
-     }
-     else {
-         f = function(e){
-             var scrollOffsets = dom.getScrollOffsets(), e = e||event;
-             return {
-                 x : e.clientX + scrollOffsets.left,
-                 y : e.clientY + scrollOffsets.top
-             }
-         };
-     }
-     return(dom.Event.getCoords = f)(e);
-}
+})();/**
+ * @requires viewport-f.js (for scrollOffsets in IE).
+ */
+APE.namespace("APE.dom.Event");
+(function() {
+    var dom = APE.dom, 
+        Event = dom.Event;
+    Event.getCoords = getCoords;
+    function getCoords(e) {
+        var f;
+        if ("pageX" in e) {
+            f = function(e) {
+                return {
+                    x : e.pageX,
+                    y : e.pageY
+                };
+            };
+        } else {
+            f = function(e) {
+                var scrollOffsets = dom.getScrollOffsets(); 
+                e = e || window.event;
+                return {
+                    x : e.clientX + scrollOffsets.left,
+                    y : e.clientY + scrollOffsets.top
+                }
+            };
+        }
+        return (Event.getCoords = f)(e);
+    }
 })();/** @fileoverview
  * Getting computed styles, opacity functions.
  *
