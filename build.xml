@@ -1,89 +1,105 @@
 <project name="ape" basedir="." default="js.minify">
 
-	<property name="src" location="src"/>
-	<property name="build" location="build"/>
-	
-	<target name="js.rollups" depends="js.copy">
+    <property name="src" location="src"/>
+    <property name="test" location="test"/>
+    <property name="example" location="example"/>
+    <property name="build" location="build"/>
+    <property name="deploy" location="C:/Program Files/Apache/Tomcat 6.0/webapps/ape/test"/>
+    
+    <target name="js.rollups" depends="js.copy">
 
-	<!-- concat all dom-f.js files, EXCEPT the first (style-f.js).
-		 Remove the APE.namespace(APE.dom) from each file (except the first)
-	-->
+    <!-- concat all dom-f.js files, EXCEPT the first (style-f.js).
+         Remove the APE.namespace(APE.dom) from each file (except the first)
+    -->
         <property name='files' value='constants.js, viewport-f.js, position-f.js, classname-f.js, 
 traversal-f.js, Event.js, Event-coords.js, style-f.js, gebi-f.js'/>
-		<concat destfile="${build}/dom/dom.js">
-			<filelist dir="${build}/dom"
-				 files="${files}"/>
-			<filterchain>
-				<tokenfilter>
-					<replacestring from='APE.namespace("APE.dom");' to=""/>
-					<replacestring from="APE.namespace('APE.dom');" to=""/>
-				</tokenfilter>
-			</filterchain>
+        <concat destfile="${build}/dom/dom.js">
+            <filelist dir="${build}/dom"
+                 files="${files}"/>
+            <filterchain>
+                <tokenfilter>
+                    <replacestring from='APE.namespace("APE.dom");' to=""/>
+                    <replacestring from="APE.namespace('APE.dom');" to=""/>
+                </tokenfilter>
+            </filterchain>
             <header>/**dom.js rollup: ${files} */
 APE.namespace("APE.dom"<!--necessary space --> );</header>
-		</concat>
+        </concat>
 
-		<!-- build ape-ep-dom.js rollup -->
-		<concat destfile="${build}/ape-ep-dom.js">
-			<filelist dir="${build}"
-				 files="APE.js, EventPublisher.js, dom/dom.js"/>
-		</concat>
+        <!-- build ape-ep-dom.js rollup -->
+        <concat destfile="${build}/ape-ep-dom.js">
+            <filelist dir="${build}"
+                 files="APE.js, EventPublisher.js, dom/dom.js"/>
+        </concat>
 
-		<!-- build anim.js rollup -->
-		<concat destfile="${build}/anim/anim.js">
-			<filelist dir="${build}/anim"
-				 files="Animation.js, StyleTransition.js"/>
-			<filterchain>
-				<tokenfilter>
-					<replacestring from='APE.namespace("APE.anim");' to=""/>
-					<replacestring from="APE.namespace('APE.anim');" to=""/>
-				</tokenfilter>
-			</filterchain>
-		</concat>
+        <!-- build anim.js rollup -->
+        <concat destfile="${build}/anim/anim.js">
+            <filelist dir="${build}/anim"
+                 files="Animation.js, StyleTransition.js"/>
+            <filterchain>
+                <tokenfilter>
+                    <replacestring from='APE.namespace("APE.anim");' to=""/>
+                    <replacestring from="APE.namespace('APE.anim');" to=""/>
+                </tokenfilter>
+            </filterchain>
+        </concat>
 
-		<!-- build anim.js rollup -->
-		<concat destfile="${build}/ajax/ajax-form.js">
-			<filelist dir="${src}"
-				 files="ajax/AsyncRequest.js, form/Form.js"/>
-		</concat>
+        <!-- build anim.js rollup -->
+        <concat destfile="${build}/ajax/ajax-form.js">
+            <filelist dir="${src}"
+                 files="ajax/AsyncRequest.js, form/Form.js"/>
+        </concat>
 
-		<!-- build drag-slider.js rollup -->
-		<concat destfile="${build}/drag/drag-slider.js">
-			<filelist dir="${build}/drag"
-				 files="Draggable.js, Slider.js"/>
-			<filterchain>
-				<tokenfilter>
-					<replacestring from='APE.namespace("APE.drag");' to=""/>
-					<replacestring from="APE.namespace('APE.drag');" to=""/>
-				</tokenfilter>
-			</filterchain>
+        <!-- build drag-slider.js rollup -->
+        <concat destfile="${build}/drag/drag-slider.js">
+            <filelist dir="${build}/drag"
+                 files="Draggable.js, Slider.js"/>
+            <filterchain>
+                <tokenfilter>
+                    <replacestring from='APE.namespace("APE.drag");' to=""/>
+                    <replacestring from="APE.namespace('APE.drag');" to=""/>
+                </tokenfilter>
+            </filterchain>
             <header>/**drag-slider.js rollup: Draggable.js, Slider.js*/
 APE.namespace("APE.drag"<!--necessary space --> );</header>
-		</concat>
-	</target>
+        </concat>
+    </target>
 
-	<target name="js.copy" depends="js.clean">
-		<copy todir="${build}" verbose="true">
-			<fileset dir="${src}" excludes="**/*.java"/>
-		</copy>
-	</target>
+    <target name="js.copy" depends="js.clean">
+        <copy todir="${build}">
+            <fileset dir="${src}"/>
+        </copy>
+    </target>
 
-	<target name="js.minify" depends="js.rollups">
-		<apply executable="java" parallel="false" dest="${build}" taskname="yui">
-			<fileset dir="${build}" includes="**/*.js"/>
-			<arg line="-jar"/>
-			<arg path="yuicompressor-2.4\build\yuicompressor-2.4.jar"/>
-			<arg line="-v"/>
-			<srcfile/>
-			<arg line="-o"/>
-			<mapper type="glob" from="*.js" to="*-min.js"/>
-			<targetfile/>
-		</apply>
-	</target>
+    <target name="js.minify" depends="js.rollups">
+        <apply executable="java" parallel="false" dest="${build}" taskname="yui">
+            <fileset dir="${build}" includes="**/*.js"/>
+            <arg line="-jar"/>
+            <arg path="yuicompressor-2.4\build\yuicompressor-2.4.jar"/>
+            <!--arg line="-v"/-->
+            <srcfile/>
+            <arg line="-o"/>
+            <mapper type="glob" from="*.js" to="*-min.js"/>
+            <targetfile/>
+        </apply>
+    </target>
 
-	<target name="js.clean">
-		<delete>
-			<fileset dir="${build}" includes="**/*.js"/>
-		</delete>
-	</target>
+    <target name="js.clean">
+        <delete>
+            <fileset dir="${build}" includes="**/*.js"/>
+        </delete>
+    </target>
+    
+    <target name="deploy" depends="js.minify, deploy.copy"
+        description="copy test, build, example, to webserver directory">
+    </target>
+	
+    <target name="deploy.copy" 
+        description="copy test, build, example, to webserver directory">
+        <copy todir="${deploy}">
+            <fileset dir="${test}"/>
+            <fileset dir="${build}"/>
+            <fileset dir="${example}"/>
+        </copy>
+    </target>
 </project>
