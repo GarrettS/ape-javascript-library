@@ -167,7 +167,7 @@ var viewportTestCase = new YAHOO.tool.TestCase({
         dims = dom.getViewportDimensions();
 
     // Set the shim to the height dims.height -1.
-        shim.style.height = dims.height -1 + "px";
+        shim.style.height = dims.height  + "px";
 
         this.wait(function(){
         // Grab the scrollHeight (should be equal to dims.height).
@@ -178,7 +178,7 @@ var viewportTestCase = new YAHOO.tool.TestCase({
             ds.height = "100%";
             var scrollHeight = getScrollHeight();
 
-            Assert.areEqual(scrollHeight-1, shim.offsetHeight, "horz scrollbar added");
+            Assert.areEqual(scrollHeight, shim.offsetHeight, "horz scrollbar added");
             }, 10);
     },
 
@@ -198,11 +198,10 @@ var viewportTestCase = new YAHOO.tool.TestCase({
 function getScrollHeight(){
     var scrollHeight = document.scrollHeight||0;  // Safari 2. 
     var body = document.body;
-
     if(!scrollHeight) { 
     // XXX: IE returns element values (not viewport values)
     // for documentElement.scrollHeight.
-        scrollHeight = document.documentElement.scrollHeight || documentElement.clientHeight;
+        scrollHeight = Math.max(document.documentElement.scrollHeight, body.scrollHeight);
     }
     
     return scrollHeight;
