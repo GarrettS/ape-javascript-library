@@ -18,6 +18,7 @@ APE.namespace("APE.dom");
         findAncestorWithClass : findAncestorWithClass
     });
 
+    var className = "className";
     /** @param {String} s string to search
      * @param {String} token white-space delimited token the delimiter of the token.
      * This is generally used with element className:
@@ -32,14 +33,14 @@ APE.namespace("APE.dom");
      * @description removes all occurances of <code>klass</code> from element's className.
      */
     function removeClass(el, klass) {
-        var cn = el.className;
+        var cn = el[className];
         if(!cn) return;
         if(cn === klass) {
-            el.className = "";
+            el[className] = "";
             return;
         }
 
-        el.className = normalizeString(cn.replace(getTokenizedExp(klass, "g")," "));
+        el[className] = normalizeString(cn.replace(getTokenizedExp(klass, "g")," "));
     }
     /** @param {HTMLElement} el
      * @param {String} klass className token(s) to be added.
@@ -47,8 +48,8 @@ APE.namespace("APE.dom");
      * exist.
      */
     function addClass(el, klass) {
-        if(!el.className) el.className = klass;
-        if(!getTokenizedExp(klass).test(el.className)) el.className += " " + klass;
+        if(!el[className]) el[className] = klass;
+        if(!getTokenizedExp(klass).test(el[className])) el[className] += " " + klass;
     }
 
     var Exps = { };
@@ -56,11 +57,11 @@ APE.namespace("APE.dom");
         var p = token + "$" + flag;
         return (Exps[p] || (Exps[p] = RegExp("(?:^|\\s)"+token+"(?:$|\\s)", flag)));
     }
-
+    
     /** @param {HTMLElement} el
      * @param {String} tagName tagName to be searched. Use "*" for any tag.
      * @param {String} klass className token(s) to be added.
-     * @return {Array} Elements with the specified tagName and className.
+     * @return {Array|NodeList} Elements with the specified tagName and className.
      * Searches will generally be faster with a smaller HTMLCollection
      * and shorter tree.
      */
@@ -69,7 +70,7 @@ APE.namespace("APE.dom");
         tagName = tagName||"*";
         if(el.getElementsByClassName && (tagName === "*")) {
             // Native performance boost.
-            return Array.prototype.slice.call(el.getElementsByClassName(klass));
+            return el.getElementsByClassName(klass);
         }
         var exp = getTokenizedExp(klass,""),
             collection = el.getElementsByTagName(tagName),
@@ -78,7 +79,7 @@ APE.namespace("APE.dom");
             i,
             ret = Array(len);
         for(i = 0; i < len; i++){
-            if(exp.test(collection[i].className))
+            if(exp.test(collection[i][className]))
                 ret[counter++] = collection[i];
         }
         ret.length = counter; // trim array.
@@ -93,7 +94,7 @@ APE.namespace("APE.dom");
             return null;
         var exp = getTokenizedExp(klass,""), parent;
         for(parent = el.parentNode;parent != container;){
-            if( exp.test(parent.className) )
+            if( exp.test(parent[className]) )
                 return parent;
             parent = parent.parentNode;
         }

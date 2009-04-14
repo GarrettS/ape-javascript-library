@@ -22,7 +22,8 @@ APE.namespace("APE.dom" );
     });
 
 
-    var docEl = document.documentElement,
+    var documentElement = "documentElement", 
+        docEl = document[documentElement],
         IS_BODY_ACTING_ROOT = docEl && docEl.clientWidth === 0;
     docEl = null;
 
@@ -34,7 +35,7 @@ APE.namespace("APE.dom" );
      */
     function getScrollOffsets(win) {
         win = win || window;
-        var f, d = win.document, node = d.documentElement;
+        var f, d = win.document, node = d[documentElement];
         if("pageXOffset"in win)
             f = function() {
                 return{ left:win.pageXOffset, top: win.pageYOffset};
@@ -69,8 +70,8 @@ APE.namespace("APE.dom" );
 
     // Modern Webkit, Firefox, IE.
     // Might be undefined. 0 in older mozilla.
-        } else if(d.documentElement.clientHeight > 0){
-            node = d.documentElement;
+        } else if(d[documentElement].clientHeight > 0){
+            node = d[documentElement];
 
     // For older versions of Mozilla.
         } else if(typeof innerHeight == "number") {
@@ -91,7 +92,7 @@ APE.namespace("APE.dom" );
                 div = d.createElement('div');
             div.style.height = "2500px";
             d.body.insertBefore(div, d.body.firstChild);
-            var r = d.documentElement.clientHeight > 2400;
+            var r = d[documentElement].clientHeight > 2400;
             d.body.removeChild(div);
             return r;
         }
@@ -581,6 +582,7 @@ APE.namespace("APE.dom" );
         findAncestorWithClass : findAncestorWithClass
     });
 
+    var className = "className";
     /** @param {String} s string to search
      * @param {String} token white-space delimited token the delimiter of the token.
      * This is generally used with element className:
@@ -595,14 +597,14 @@ APE.namespace("APE.dom" );
      * @description removes all occurances of <code>klass</code> from element's className.
      */
     function removeClass(el, klass) {
-        var cn = el.className;
+        var cn = el[className];
         if(!cn) return;
         if(cn === klass) {
-            el.className = "";
+            el[className] = "";
             return;
         }
 
-        el.className = normalizeString(cn.replace(getTokenizedExp(klass, "g")," "));
+        el[className] = normalizeString(cn.replace(getTokenizedExp(klass, "g")," "));
     }
     /** @param {HTMLElement} el
      * @param {String} klass className token(s) to be added.
@@ -610,8 +612,8 @@ APE.namespace("APE.dom" );
      * exist.
      */
     function addClass(el, klass) {
-        if(!el.className) el.className = klass;
-        if(!getTokenizedExp(klass).test(el.className)) el.className += " " + klass;
+        if(!el[className]) el[className] = klass;
+        if(!getTokenizedExp(klass).test(el[className])) el[className] += " " + klass;
     }
 
     var Exps = { };
@@ -619,11 +621,11 @@ APE.namespace("APE.dom" );
         var p = token + "$" + flag;
         return (Exps[p] || (Exps[p] = RegExp("(?:^|\\s)"+token+"(?:$|\\s)", flag)));
     }
-
+    
     /** @param {HTMLElement} el
      * @param {String} tagName tagName to be searched. Use "*" for any tag.
      * @param {String} klass className token(s) to be added.
-     * @return {Array} Elements with the specified tagName and className.
+     * @return {Array|NodeList} Elements with the specified tagName and className.
      * Searches will generally be faster with a smaller HTMLCollection
      * and shorter tree.
      */
@@ -632,7 +634,7 @@ APE.namespace("APE.dom" );
         tagName = tagName||"*";
         if(el.getElementsByClassName && (tagName === "*")) {
             // Native performance boost.
-            return Array.prototype.slice.call(el.getElementsByClassName(klass));
+            return el.getElementsByClassName(klass);
         }
         var exp = getTokenizedExp(klass,""),
             collection = el.getElementsByTagName(tagName),
@@ -641,7 +643,7 @@ APE.namespace("APE.dom" );
             i,
             ret = Array(len);
         for(i = 0; i < len; i++){
-            if(exp.test(collection[i].className))
+            if(exp.test(collection[i][className]))
                 ret[counter++] = collection[i];
         }
         ret.length = counter; // trim array.
@@ -656,7 +658,7 @@ APE.namespace("APE.dom" );
             return null;
         var exp = getTokenizedExp(klass,""), parent;
         for(parent = el.parentNode;parent != container;){
-            if( exp.test(parent.className) )
+            if( exp.test(parent[className]) )
                 return parent;
             parent = parent.parentNode;
         }
@@ -670,7 +672,10 @@ function normalizeString(s) { return s.replace(STRING_TRIM_EXP,'').replace(WS_MU
 (function(){
 
     var docEl = document.documentElement,
+        nodeType = "nodeType",
         tagName = "tagName",
+        parentNode = "parentNode",
+        compareDocumentPosition = "compareDocumentPosition",
         caseTransform = /^H/.test(docEl[tagName]) ? 'toUpperCase' : 'toLowerCase',
         tagExp = /^[A-Z]/;
         
@@ -693,9 +698,9 @@ function normalizeString(s) { return s.replace(STRING_TRIM_EXP,'').replace(WS_MU
      */
 
     function getContains(){
-        if('compareDocumentPosition'in docEl)
+        if(compareDocumentPosition in docEl)
             return function(el, b) {
-                return (el.compareDocumentPosition(b) & 16) !== 0;
+                return (el[compareDocumentPosition](b) & 16) !== 0;
         };
         else if('contains'in docEl)
             return function(el, b) {
@@ -703,7 +708,7 @@ function normalizeString(s) { return s.replace(STRING_TRIM_EXP,'').replace(WS_MU
         };
         return function(el, b) {
             if(el === b) return false;
-            while(el != b && (b = b.parentNode) !== null);
+            while(el != b && (b = b[parentNode]) !== null);
             return el === b;
         };
     }
@@ -720,24 +725,24 @@ function normalizeString(s) { return s.replace(STRING_TRIM_EXP,'').replace(WS_MU
      * Returns null if not found.
      */
     function findAncestorWithAttribute(el, attName, value) {
-        for(var map, parent = el.parentNode;parent != null;){
+        for(var map, parent = el[parentNode];parent !== null;){
             map = parent.attributes;
             if(!map) return null;
             var att = map[attName];
             if(att && att.specified)
                 if(att.value === value || (value === undefined))
                     return parent;            
-            parent = parent.parentNode;
+            parent = parent[parentNode];
         }
         return null;
     }
 
     function findAncestorWithTagName(el, tag) {
         tag = tag[caseTransform]();
-        for(var parent = el.parentNode;parent !== null; ){
+        for(var parent = el[parentNode];parent !== null; ){
             if( parent[tagName] === tag )
                 return parent;
-            parent = parent.parentNode;
+            parent = parent[parentNode];
         }
         return null;
     }
@@ -745,19 +750,19 @@ function normalizeString(s) { return s.replace(STRING_TRIM_EXP,'').replace(WS_MU
     /** Filter out text nodes and, in IE, comment nodes. */
     function findNextSiblingElement(el) {
         for(var ns = el.nextSibling; ns !== null; ns = ns.nextSibling)
-            if(tagName in ns && tagExp.test(ns[tagName])) 
+            if(ns[nodeType] === 1) 
                 return ns;
         return null;
     }
 
     function findPreviousSiblingElement(el) {
         for(var ps = el.previousSibling; ps !== null; ps = ps.previousSibling) {
-            if(tagName in ps && tagExp.test(ps[tagName])) 
+            if(ps[nodeType] === 1) 
                 return ps;
         }
         return null;
     }
-
+   
     function getChildElements(el) {
         var i = 0, ret = [], len, tag,
             cn = el.children || el.childNodes, c;
@@ -767,8 +772,7 @@ function normalizeString(s) { return s.replace(STRING_TRIM_EXP,'').replace(WS_MU
         // IE also includes comment nodes.
         for(len = cn.length; i < len; i++) {
             c = cn[i];
-            tag = c[tagName];
-            if(typeof tag !== "string" || tag === "!") continue;
+            if(c[nodeType] !== 1) continue;
             ret[ret.length] = c;
         }
         return ret;

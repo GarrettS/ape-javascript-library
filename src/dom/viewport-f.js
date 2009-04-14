@@ -12,7 +12,8 @@ APE.namespace("APE.dom");
     });
 
 
-    var docEl = document.documentElement,
+    var documentElement = "documentElement", 
+        docEl = document[documentElement],
         IS_BODY_ACTING_ROOT = docEl && docEl.clientWidth === 0;
     docEl = null;
 
@@ -24,7 +25,7 @@ APE.namespace("APE.dom");
      */
     function getScrollOffsets(win) {
         win = win || window;
-        var f, d = win.document, node = d.documentElement;
+        var f, d = win.document, node = d[documentElement];
         if("pageXOffset"in win)
             f = function() {
                 return{ left:win.pageXOffset, top: win.pageYOffset};
@@ -59,8 +60,8 @@ APE.namespace("APE.dom");
 
     // Modern Webkit, Firefox, IE.
     // Might be undefined. 0 in older mozilla.
-        } else if(d.documentElement.clientHeight > 0){
-            node = d.documentElement;
+        } else if(d[documentElement].clientHeight > 0){
+            node = d[documentElement];
 
     // For older versions of Mozilla.
         } else if(typeof innerHeight == "number") {
@@ -81,7 +82,7 @@ APE.namespace("APE.dom");
                 div = d.createElement('div');
             div.style.height = "2500px";
             d.body.insertBefore(div, d.body.firstChild);
-            var r = d.documentElement.clientHeight > 2400;
+            var r = d[documentElement].clientHeight > 2400;
             d.body.removeChild(div);
             return r;
         }
