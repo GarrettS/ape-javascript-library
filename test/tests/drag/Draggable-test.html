@@ -14,6 +14,7 @@
     <script type="text/javascript" src="../../yui-test/build/yuitest/yuitest-beta.js"></script>
 
     <script type="text/javascript" src="../../../build/ape-ep-dom.js"></script>
+    <script type="text/javascript" src="../../../build/dom/Event-coords.js"></script>
     <script type="text/javascript" src="../../../build/dom/getContainingBlock.js"></script>
     <script type="text/javascript" src="../../../build/dom/getPixelCoords.js"></script>
     <script type="text/javascript" src="../../../build/drag/Draggable.js"></script>
@@ -77,7 +78,6 @@ var draggableTestCase = new YAHOO.tool.TestCase({
         
         var d = Draggable.getByNode( testNode ),
             gotFocus = gotMousedown = false;
-
         d.activeDragClassName = aClass;
         d.selectedClassName = sClass;
         d.focusClassName = fClass;
