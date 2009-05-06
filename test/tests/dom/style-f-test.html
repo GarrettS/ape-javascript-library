@@ -114,9 +114,9 @@ var getStyleTestCase = new TestCase({
         // returns camel-cased property names. 
         // Use a for-in loop and swallow errors on things like functions or length.
         for(var prop in style) {
-            try { 
-                style[prop] = "";
-            } catch (ex) { }
+          if (typeof style[prop] == 'string') {
+            style[prop] = "";
+          }
         }
         style = null;
     },
