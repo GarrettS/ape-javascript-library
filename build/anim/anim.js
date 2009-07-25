@@ -557,14 +557,8 @@ APE.extend(APE.anim.StyleTransition, APE.anim.Animation, {
                 this.style.zoom = "1";
                 fromValue = dom.getFilterOpacity(el);
             } else {
-                if (prop == 'clip'
-                        && (!fromValue || fromValue.indexOf("auto") != -1)) {
-                    fromValue = "rect(0px " + el.offsetWidth + "px "
-                            + el.offsetHeight + "px 0px)";
-                } else {
-                    units = dom.getStyleUnit(toValue);
-                    fromValue = dom.findInheritedStyle(el, prop, units);
-                }
+                units = dom.getStyleUnit(toValue);
+                fromValue = dom.findInheritedStyle(el, prop, units);
             }
             // Get a ITransitionAdapter from the factory.
             adapter = TransitionAdapterFactory.fromValues(prop, fromValue,
@@ -625,8 +619,6 @@ APE.anim.TransitionAdapterFactory = {
         }
         if (this.colorExp.test(prop))
             return new this.ColorTransitionAdapter(prop, fromValue, toValue);
-        if (prop == 'clip')
-            return new this.ClipTransitionAdapter(prop, fromValue, toValue);
         if (this.lengthExp.test(fromValue)) {
             return new this.LengthTransitionAdapter(prop, fromValue, toValue);
         }
@@ -661,8 +653,7 @@ APE.anim.TransitionAdapterFactory = {
         OpacityTransitionAdapter : OpacityTransitionAdapter,
         FontWeightTransitionAdapter : FontWeightTransitionAdapter,
         ThresholdTransitionAdapter : ThresholdTransitionAdapter,
-        ImmediateThresholdTransitionAdapter : ImmediateThresholdTransitionAdapter,
-        ClipTransitionAdapter : ClipTransitionAdapter
+        ImmediateThresholdTransitionAdapter : ImmediateThresholdTransitionAdapter
     };
 
     APE.mixin(APE.anim.TransitionAdapterFactory, Adapters);
@@ -740,43 +731,7 @@ APE.anim.TransitionAdapterFactory = {
         return v;
     };
 
-    var splitClipExp = /,?\s/, clipExp = /rect\(([^\)]+)\)/, zeroToPxExp = /0(\s|\))/g;
-
-    function ClipTransitionAdapter(prop, fromValue, toValue) {
-        this.prop = "clip";
-
-        var fromString = clipExp.exec(fromValue.replace(zeroToPxExp, "0px$1"))[1], toString = clipExp
-                .exec(toValue.replace(zeroToPxExp, "0px$1"))[1];
-
-        this.fromValues = fromString.split(splitClipExp);
-        this.toValues = toString.split(splitClipExp);
-        this.clips = [];
-        this.values = [];
-        this.init();
-    }
-
-    ClipTransitionAdapter.prototype = {
-        init : function() {
-            for (var i = 0, f, t; i < 4; i++) {
-                f = this.fromValues[i], t = this.toValues[i];
-                if (f == "0")
-                    f = "0px";
-                if (t == "0")
-                    t = "0px";
-                this.clips[i] = new LengthTransitionAdapter(this.prop, f, t);
-            }
-        },
-
-        blendTo : function(rationalValue) {
-            for (var i = 0; i < 4; i++)
-                this.values[i] = this.clips[i].blendTo(rationalValue);
-            return "rect(" + this.values.join(" ") + ")";
-        },
-
-        toString : function() {
-            return "ClipTransitionAdapter:    \n" + this.clips.join("    \n");
-        }
-    };
+    var zeroToPxExp = /0(\s|\))/g;
 
     /** @ignore */
     function OpacityTransitionAdapter(prop, fromValue, toValue) {

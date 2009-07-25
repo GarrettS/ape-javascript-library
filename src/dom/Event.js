@@ -19,7 +19,7 @@ APE.namespace("APE.dom");
     });
     
     function getTarget(e) {
-        return (e || event)[eventTarget];
+        return (e || window.event)[eventTarget];
     }
 
     /**
@@ -76,10 +76,10 @@ APE.namespace("APE.dom");
      * @param {Event}
      */
     function preventDefault(ev) {
-        ev = ev || event;
-        if(typeof ev.preventDefault == "function") {
+        ev = ev || window.event;
+        if("preventDefault" in ev) {
             ev.preventDefault();
-        } else if('returnValue' in ev) {
+        } else if("returnValue" in ev) {
             ev.returnValue = false;
         }
     }

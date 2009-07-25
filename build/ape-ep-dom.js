@@ -1287,7 +1287,7 @@ function normalizeString(s) { return s.replace(STRING_TRIM_EXP,'').replace(WS_MU
     });
     
     function getTarget(e) {
-        return (e || event)[eventTarget];
+        return (e || window.event)[eventTarget];
     }
 
     /**
@@ -1344,10 +1344,10 @@ function normalizeString(s) { return s.replace(STRING_TRIM_EXP,'').replace(WS_MU
      * @param {Event}
      */
     function preventDefault(ev) {
-        ev = ev || event;
-        if(typeof ev.preventDefault == "function") {
+        ev = ev || window.event;
+        if("preventDefault" in ev) {
             ev.preventDefault();
-        } else if('returnValue' in ev) {
+        } else if("returnValue" in ev) {
             ev.returnValue = false;
         }
     }

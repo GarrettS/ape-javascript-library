@@ -76,6 +76,7 @@ var viewportTestCase = new YAHOO.tool.TestCase({
     },
 
     testGetScrollOffsets : function() {
+        document.expando = false;
         ds.padding = bs.margin="10px";
         bs.border = "10px solid";
         ds.width = ds.height = "110%";

@@ -50,7 +50,7 @@ Adapters = {
     ClipTransitionAdapter : ClipTransitionAdapter
 };
 */
-
+       
 var styleTransitionTestCase = new YAHOO.tool.TestCase({
 
     name : "Style Transition Tests",
@@ -59,6 +59,12 @@ var styleTransitionTestCase = new YAHOO.tool.TestCase({
         c.style.cssText = "";
     },
 
+    _should : {
+        ignore : {
+            testClip : true
+        }
+    },
+    
     testWidth : function() {
         
         var css = { width: "100px" };
@@ -204,7 +210,7 @@ var styleTransitionTestCase = new YAHOO.tool.TestCase({
     },
 
     testToString : function() {
-        var css = { clip : "rect(10px 20px 20px -2px)" },
+        var css = { display : "none" },
             st = new StyleTransition(c, css, .2);
 
         Assert.isTypeOf("string", st.toString());
