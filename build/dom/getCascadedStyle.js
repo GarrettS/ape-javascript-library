@@ -111,12 +111,9 @@
                 value = dom.getFilterOpacity(el);
             }
         }
-        else if(p == 'clip' && !(p in curSty) && 'clipTop'in curSty) {
-            value = getCurrentStyleClipValues(el, curSty);
-        }
         else {
 
-            // We've tried clip and opacity now, so it seems that the property 
+            // We've tried opacity now, so it seems that the property 
             // does not exist, ala "WebkitBorderRadius" in IE.
             if(!(p in curSty)) return"";
             if(floatExp.test(p)) {

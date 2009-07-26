@@ -130,15 +130,17 @@ var APE = {
      * @memberOf APE
      */
     createFactory : function(constructor, prot) {
-        var baseObject = {}, 
-            instances = baseObject.instances = {}; // Export, for purge or cleanup.
-        if(prot) {
-            constructor.prototype = prot;
-        }
-        baseObject.getById = getById;
-        return baseObject;
+        return { getById : getById };
         function getById(id) {
-            return instances[id] || (instances[id] = APE.newApply(constructor, arguments));
+            if(!("instances" in this)) {
+            
+                // Public instances property, for purge or cleanup.
+                this.instances = {};
+                if(typeof prot == "function") {
+                    constructor.prototype = prot();
+                }
+            }
+            return this.instances[id] || (this.instances[id] = APE.newApply(constructor, arguments));
         }
     },
 
@@ -1405,7 +1407,6 @@ APE.namespace("APE.dom.Event");
         borderRadiusExp : /^[a-zA-Z]*[bB]orderRadius$/,
         tryGetShorthandValues : tryGetShorthandValues,
         getCurrentStyleValueFromAuto : getCurrentStyleValueFromAuto,
-        getCurrentStyleClipValues : getCurrentStyleClipValues,
         convertNonPixelToPixel : convertNonPixelToPixel
     });
 
@@ -1503,10 +1504,7 @@ APE.namespace("APE.dom.Event");
                     p = "styleFloat";
                 value = cs[p];
 
-                if(p == "clip" && !value && ("clipTop"in cs)) {
-                    value = getCurrentStyleClipValues(el, cs);
-                }
-                else if(value == "auto") 
+                if(value == "auto") 
                     value = getCurrentStyleValueFromAuto(el, p);
                 else if(!(p in cs)) return "";
             }
@@ -1522,23 +1520,6 @@ APE.namespace("APE.dom.Event");
             }
         }
         return value;
-    }
-
-    function getCurrentStyleClipValues(el, cs) {
-        var values = [], i = 0, prop;
-        for( ;i < 4; i++){
-            prop = props[i];
-            clipValue = cs['clip'+prop];
-            if(clipValue == "auto") {
-                clipValue = (prop == "Left" || prop == "Top" ? "0px" : prop == "Right" ? 
-                    el.offsetWidth + px : el.offsetHeight + px);
-            }
-            values.push(clipValue);
-        }
-        return {
-            top:values[0], right:values[1], bottom:values[2], left:values[3],
-            toString : function() {return 'rect(' + values.join(' ')+')';}
-        };
     }
 
     var sty = document.documentElement[style],

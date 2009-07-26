@@ -226,16 +226,19 @@ var creationalTest = new YAHOO.tool.TestCase({
     },
 
     testCreateFactory : function() {
-        var cFactory = APE.createFactory(C, { 
+        var cFactory = APE.createFactory(C, cCreatePrototype);
+        function cCreatePrototype() {
+            return { 
                 getId : function() {
                     return this.id;
                 }
-            }
-        );
+            };
+        }
         
         var c = cFactory.getById('c', 3);
         var c2 = cFactory.getById('c', 2);
         Assert.areSame(c, c2);
+        
     },
     
     testNewApply : function() {

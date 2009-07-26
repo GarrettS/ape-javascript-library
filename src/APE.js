@@ -130,15 +130,17 @@ var APE = {
      * @memberOf APE
      */
     createFactory : function(constructor, prot) {
-        var baseObject = {}, 
-            instances = baseObject.instances = {}; // Export, for purge or cleanup.
-        if(prot) {
-            constructor.prototype = prot;
-        }
-        baseObject.getById = getById;
-        return baseObject;
+        return { getById : getById };
         function getById(id) {
-            return instances[id] || (instances[id] = APE.newApply(constructor, arguments));
+            if(!("instances" in this)) {
+            
+                // Public instances property, for purge or cleanup.
+                this.instances = {};
+                if(typeof prot == "function") {
+                    constructor.prototype = prot();
+                }
+            }
+            return this.instances[id] || (this.instances[id] = APE.newApply(constructor, arguments));
         }
     },
 
