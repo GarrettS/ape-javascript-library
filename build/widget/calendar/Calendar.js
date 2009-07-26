@@ -135,7 +135,7 @@ APE.namespace("APE.widget");
                 readDateFromInput(this);
                 calStyle.visibility = "visible";
             },
-        
+       
             /**
              * Hides the calendar.
              * @param {Event} e the DOM Event the triggered the action.

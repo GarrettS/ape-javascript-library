@@ -15,7 +15,7 @@ APE.namespace("APE.widget");
     function scrollerCreatePrototype() {
         return {
             pos : 0,
-      
+            
             init : function() {
                 var el = document.getElementById(this.id),
                     item, items = el.childNodes,
@@ -134,21 +134,21 @@ APE.namespace("APE.widget");
                 }
             }
         };
-    }
     
-    // Private static methods -------------------------------------------------.
-    function getMoveScroller(scroller) {
-        return moveScroller;
-        function moveScroller() {
-          scroller.move();
-        };
-    }
-    /**
-     * onclick callback for Left/Right buttons.
-     */
-    function handleButtonClick() {
-        var dir = this.id.match(/(\w+)(Next|Prev)$/),
-            c = widget.Scroller.getById(dir[1]);
-        c.moveStart(dir[2] === "Next");
+        // Private static methods -------------------------------------------------.
+        function getMoveScroller(scroller) {
+            return moveScroller;
+            function moveScroller() {
+              scroller.move();
+            };
+        }
+        /**
+         * onclick callback for Left/Right buttons.
+         */
+        function handleButtonClick() {
+            var dir = this.id.match(/(\w+)(Next|Prev)$/),
+                c = widget.Scroller.getById(dir[1]);
+            c.moveStart(dir[2] === "Next");
+        }
     }
 })();
