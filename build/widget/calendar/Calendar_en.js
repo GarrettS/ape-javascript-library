@@ -1,17 +1,12 @@
 APE.namespace("APE.widget");
 APE.widget.CalendarLocale = {
 	days : {
-        full : ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-
         abbr : ["Su", "M",  "Tu", "W", "Th", "F", "Sa"]
 	},
     
     months : {
         full : ["January", "February", "March", "April", "May", "June", "July", "August"
-            , "September", "October", "November", "December"],
-
-        abbr : ["Jan", "Feb", "Mar", "Apr", "May", "Jun", 
-                "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+            , "September", "October", "November", "December"]
     },
     
     nextMonth : "next month",
