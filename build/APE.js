@@ -123,7 +123,7 @@ var APE = {
         if(!this.hasOwnProperty("instances")) this.instances = {};
         return this.instances[id] || (this.instances[id] = APE.newApply(this, arguments));
     },
-
+ 
     /** Creates a Factory method out of a function.
      * @param {Function} constructor
      * @param {Function} createPrototype function to lazily create the prototype.
