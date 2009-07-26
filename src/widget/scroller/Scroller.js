@@ -15,7 +15,7 @@ APE.namespace("APE.widget");
     function scrollerCreatePrototype() {
         return {
             pos : 0,
-        
+      
             init : function() {
                 var el = document.getElementById(this.id),
                     item, items = el.childNodes,
