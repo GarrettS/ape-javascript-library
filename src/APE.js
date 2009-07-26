@@ -126,18 +126,18 @@ var APE = {
 
     /** Creates a Factory method out of a function.
      * @param {Function} constructor
-     * @param {Object} prototype
+     * @param {Function} createPrototype function to lazily create the prototype.
      * @memberOf APE
      */
-    createFactory : function(constructor, prot) {
+    createFactory : function(constructor, createPrototype) {
         return { getById : getById };
         function getById(id) {
             if(!("instances" in this)) {
             
                 // Public instances property, for purge or cleanup.
                 this.instances = {};
-                if(typeof prot == "function") {
-                    constructor.prototype = prot();
+                if(typeof createPrototype == "function") {
+                    constructor.prototype = createPrototype();
                 }
             }
             return this.instances[id] || (this.instances[id] = APE.newApply(constructor, arguments));

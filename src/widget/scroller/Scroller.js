@@ -11,7 +11,7 @@ APE.namespace("APE.widget");
         this._queue = 0;
         this.init();
     }
- 
+
     function scrollerCreatePrototype() {
         return {
             pos : 0,
