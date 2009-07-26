@@ -224,7 +224,7 @@ var creationalTest = new YAHOO.tool.TestCase({
         var cc = C.getById(testNode.id, 11);
         Assert.areEqual(c, cc);
     },
-
+   
     testCreateFactory : function() {
         var cFactory = APE.createFactory(C, cCreatePrototype);
         function cCreatePrototype() {
