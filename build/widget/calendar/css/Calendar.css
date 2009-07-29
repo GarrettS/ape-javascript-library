@@ -8,12 +8,9 @@
 	-webkit-user-select: none;
 	font-size: 12px;
 	font-family: sans-serif;
-	opacity: .2;
 	filter:progid:DXImageTransform.Microsoft.Alpha(Opacity=20);
 	overflow: hidden;
 	visibility: hidden;
-	height: 0;
-	width: 0;
 	background: #f3f3f3;
 }
 

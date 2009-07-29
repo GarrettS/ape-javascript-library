@@ -1,5 +1,5 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
-"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
     <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
@@ -7,23 +7,23 @@
     <link rel="stylesheet" type="text/css" href="../../yui-test/build/logger/assets/logger.css" />
     <link rel="stylesheet" type="text/css" href="../../yui-test/build/yuitest/assets/yuitest.css" />
     <link rel="stylesheet" type="text/css" href="../../yui-test/assets/testlogger.css" />
- 
+
     <script type="text/javascript" src="../../yui-test/build/yahoo-dom-event/yahoo-dom-event.js"></script>
     <script type="text/javascript" src="../../yui-test/build/logger/logger.js"></script>
     <script type="text/javascript" src="../../yui-test/build/yuitest/yuitest-beta.js"></script>
- 
+
     <script type="text/javascript" src="../../../build/ape-ep-dom.js"></script>
     <script type="text/javascript" src="../../../build/widget/calendar/Calendar_en.js"></script>
     <script type="text/javascript" src="../../../build/widget/calendar/Calendar.js"></script>
 </head>
 <body>
- 
+
 <div id='template'>
     <label for="start" id='sf'>Start <input id="start" type="date" size="18"/></label>
- 
+
     <input id='blah'/>
 </div>
- 
+
 <div id="testLogger"></div>
 <script type="text/javascript">
 setTimeout(function(){
@@ -61,6 +61,13 @@ setTimeout(function(){
             }
             Calendar.instances = {};
         },
+
+        _should : {
+            ignore : {
+                testFocusHandler : Calendar.IS_NATIVE,
+                testCalendarStaysVisible : Calendar.IS_NATIVE,
+            }
+        },
         
         testGetById: function() {
             var c = Calendar.getById("start");
@@ -81,19 +88,28 @@ setTimeout(function(){
             }, 30);
         },
  
-        testFocusTransferToCalendar : function() {
+        testCalendarStaysVisible : function() {
             var c = Calendar.getById("start");
             start.focus();
             this.wait(function(){
                 Assert.isFalse(c._isHidden);
                 var calendarEl = document.getElementById(c.calendarId);
+
+                // Transfer focus to the calendar widget. 
+                // Calendar must still be visible.
                 start.blur();
+                
                 Action.mousedown(calendarEl);
+                // next month.
+                Action.mousedown(document.getElementById("start-next-month"));
+                // prev year.
+                Action.mousedown(document.getElementById("start-prev-year"));
+                
                 this.wait(function(){
                     Assert.areEqual("visible", calendarEl.style.visibility, "calendar visiblity wrong.");
                     Assert.isFalse(c._isHidden, "c._isHidden");
-                }, 20);
-            }, 20);
+                }, 170);
+            }, 270);
         },
  
         testSelectDateInFuture : function() {
@@ -216,6 +232,6 @@ setTimeout(function(){
     }
  
 }, 20);</script>
-</body>
+
  
-</html>
+</body>
