@@ -22,7 +22,7 @@ APE.namespace("APE.widget");
      */
     function Calendar( id ) {
         this.id = id;
-        if(widget.Calendar.isNative) return;
+        if(widget.Calendar.IS_NATIVE) return;
         readDateFromInput(this);
         this.initEvents();
     }
