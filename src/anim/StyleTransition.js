@@ -15,8 +15,9 @@
 (function(){
 
     var APE = window.APE, anim = APE.anim, dom = APE.dom,
-        _start = anim.Animation.prototype.start,
-        _end = anim.Animation.prototype.start;
+        ap = anim.Animation.prototype,
+        _start = ap._start,
+        _end = ap._end;
     
     /**
      * @param {String}
@@ -48,13 +49,13 @@
     
     APE.extend(anim.StyleTransition, anim.Animation, {
     
-        start : function() {
+        _start : function() {
             // Use id as weak ref, set "style" in start and end.
             this.style = document.getElementById(this.id).style;
             _start.call(this);
         },
 
-        end : function() {
+        _end : function() {
             this.style = null;
             _end.call(this);
         },
@@ -72,18 +73,18 @@
                 style = this.style, adapter;
             while (i < len) {
                 adapter = adapters[i++];
-                this.style[adapter.prop] = adapter.blendTo(rationalValue);
+                style[adapter.prop] = adapter.blendTo(rationalValue);
             }
         },
     
         /** @private */
         init : function(styleObject) {
             var el = document.getElementById(this.id), adapters = [], adapter, 
-            APE = window.APE,  
-            prop, fromValue, toValue, 
-            TransitionAdapterFactory = APE.anim.TransitionAdapterFactory, 
-            ThresholdTransitionAdapter = TransitionAdapterFactory.ThresholdTransitionAdapter, 
-            ImmediateThresholdTransitionAdapter = TransitionAdapterFactory.ImmediateThresholdTransitionAdapter;
+                APE = window.APE,  
+                prop, fromValue, toValue, 
+                TFactory = APE.anim.TransitionAdapterFactory, 
+                ThresholdTransitionAdapter = TFactory.ThresholdTransitionAdapter, 
+                ImmediateThresholdTransitionAdapter = TFactory.ImmediateThresholdTransitionAdapter;
     
             var style = el.style,
                 cssText = style.cssText,
@@ -118,7 +119,7 @@
                     toValue = dom.getStyle(el, prop);
                 }
                 // Get a ITransitionAdapter from the factory.
-                adapter = TransitionAdapterFactory.fromValues(prop, fromValues[prop],
+                adapter = TFactory.fromValues(prop, fromValues[prop],
                         toValue, el);
                 adapters.push(adapter);
             }
@@ -144,7 +145,7 @@
          */
         toString : function() {
             return "StyleTransitionAdapter : id=#" + this.id + "\n"
-                    + anim.Animation.prototype.toString.call(this)
+                    + ap.toString.call(this)
                     + "\nAdapters:\n  " + this.adapters.join("\n  ");
         }
     });

@@ -7,7 +7,7 @@
 <link type="text/css" rel="stylesheet" href="../resources/example.css"/>
 
 <style>
-div.anim-div button {
+div.anim-div div, div.anim-div button {
     position: absolute; left: 0;
     top: 2px; opacity: .8; 
     width: 8em /* for IE */; 
@@ -43,8 +43,8 @@ html {
 <h1>Animation Transitions Example</h1>
 <div class='anim-div'>
     seekTo &nbsp;example
-    <button id='linear' style="width: 10em;background-color: #131;border: 1px solid #030" 
-        onclick="seekToPosition()">seekToPosition();</button>
+    <div id='linear' style="width: 10em;background-color: #131;border: 1px solid #030" 
+        onclick="seekToPosition()">seekToPosition();</div>
 </div>
 
         <b style="display: block;margin: 4px 0;letter-spacing: 0;font-size: 12px;">position: 
@@ -62,7 +62,6 @@ html {
 <script type="text/javascript" src="../../build/color/ColorRGB.js"></script>
 <script type="text/javascript" src="../../build/dom/constants.js"></script>
 <script type="text/javascript" src="../../build/dom/style-f.js"></script>
-<script type="text/javascript" src="../../build/dom/getCascadedStyle.js"></script>
 <script type="text/javascript" src="../../build/anim/StyleTransition.js"></script>
 
 <script type="text/javascript">
@@ -94,7 +93,8 @@ Button.getById = APE.getById;
 
 function seekToPosition( ) {
     var position = parseFloat(document.getElementById("seekTo").value, 10);
-    Button.getById( 'linear' ).anim.seekTo(position);
+    var anim = Button.getById( 'linear' ).anim;
+    anim.seekTo(position);
 };
 
 function pause() {

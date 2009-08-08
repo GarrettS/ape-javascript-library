@@ -176,6 +176,22 @@ var styleTransitionTestCase = new YAHOO.tool.TestCase({
         }, 30);
     },
 
+    testSeekTo : function() {
+        // StyleTransition overrides Animation's 
+        // _start and _end methods. These are called 
+        // in Animation.prototype.seekTo.
+
+        var cs = c.style;
+        cs.width = "100px";
+
+        var css = { width: "500px" };
+        var st = new StyleTransition(c, css, .05);
+        st.seekTo(.5);
+        this.wait(function(){
+            Assert.areSame("300px", cs.width);
+        }, 90);
+    },
+    
     testClip : function() {
     
         var cs = c.style;
