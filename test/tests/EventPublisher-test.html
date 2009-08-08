@@ -129,6 +129,26 @@ var eventPublisherTest = new YAHOO.tool.TestCase({
         Assert.isTrue( called2 );
     },
 
+    testRemoveInFire : function() {
+        var called1 = false, called2 = false;
+
+        function cb( ev ) {
+            called1 = true;
+            ep.remove(cb2);
+        };
+        
+        function cb2( ev ) {
+            called2 = true;
+        };
+        
+        ep.add(cb);
+        ep.add(cb2);
+
+        testObject.fire( { isTest: true} );
+        Assert.isTrue( called1 );
+        Assert.isFalse( called2 );
+    },
+    
     testAsConstructor : function() {
         var firedSuccessfully = false;
 
