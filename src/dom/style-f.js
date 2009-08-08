@@ -41,20 +41,20 @@ APE.namespace("APE.dom");
      * calling this method on a browser that does not support filters
      * results in 1 being returned.  Use dom.getStyle or dom.getCascadedStyle instead
      */
-     function getFilterOpacity(el) {
-        var filters = el.filters;
-        if(!filters) return"";
-        try { // Will throw error if no DXImageTransform.
-            return filters['DXImageTransform.Microsoft.Alpha'].opacity/100;
+    function getFilterOpacity(el) {
+        var filter, filters = el.filters;
 
-        } catch(e) {
-            try { 
-                return filters('alpha').opacity/100;
-            } catch(e) {
-                return 1;
-            }
+        if(!filters || !("item" in filters))return"";
+        try {
+            filter = filters.item('alpha');
+        } catch(alpha) {
+            try {
+                filter = filters.item("DXImageTransform.Microsoft.Alpha");
+            } catch(ex){}
         }
+        return filter && filter.opacity/100 || 1;
     }
+    
 
     /** 
      * Cross-browser adapter method for style.filters vs style.opacity.
@@ -63,7 +63,7 @@ APE.namespace("APE.dom");
      * @param {ufloat} i [0-1] the amount of opacity.
      * @return {ufloat} [0-1] amount of opacity.
      */
-     function setOpacity(el, i) {
+    function setOpacity(el, i) {
         var s = el[style], cs;
         if("opacity"in s) {
             s.opacity = i;

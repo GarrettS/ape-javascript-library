@@ -251,6 +251,18 @@ var getStyleTestCase = new TestCase({
         Assert.areEqual(0.1, parseFloat(op), "opacity found was wrong." );
     },
 
+    testGetFilterOpacity : function() {
+        var alpha = "filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50)";
+        var expected = "";
+        if("filters" in target) {
+            target.style.cssText = alpha;
+            target.style.zoom = "1";
+            expected = "50"/100;
+        }
+        var actual = dom.getFilterOpacity(target);
+        Assert.areSame(expected, actual);
+    },
+    
     testGetCascadedWidth : function() {
         var testNode = document.getElementById('testNode');
         testNode.parentNode.style.width = "100px";

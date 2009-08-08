@@ -81,38 +81,28 @@
         init : function(styleObject) {
             var el = document.getElementById(this.id), adapters = [], adapter, 
                 APE = window.APE,  
-                prop, fromValue, toValue, 
-                TFactory = APE.anim.TransitionAdapterFactory, 
+                prop, toValue, 
+                style = el.style,
+                cssText = style.cssText,
+                fromValues = {},
+                TFactory = anim.TransitionAdapterFactory, 
                 ThresholdTransitionAdapter = TFactory.ThresholdTransitionAdapter, 
                 ImmediateThresholdTransitionAdapter = TFactory.ImmediateThresholdTransitionAdapter;
     
-            var style = el.style,
-                cssText = style.cssText,
-                fromValues = {};
             // Loop through style object to find values.
             for (prop in styleObject) {
-                toValue = styleObject[prop];
-                if (!toValue)
-                    continue; // CSSStyleRule.                
-                if (prop == "opacity" && !("opacity" in el.style)
-                        && ("filter" in el.style)) {
-                    prop = "alpha";
-                    el.style.zoom = "1";
-                    fromValue = dom.getFilterOpacity(el);
-                } else {
-                    fromValue = dom.getStyle(el, prop); 
+                if (!styleObject[prop]) continue; // CSSStyleRule. 
+                if (prop == "opacity" && !("opacity" in style) 
+                    && ("filter" in style) && !style.hasLayout) {
+                    style.zoom = "1";
                 }
-                fromValues[prop] = fromValue;
-            }
-            for(prop in styleObject) {
-                style[prop] = styleObject[prop];
+                fromValues[prop] = dom.getStyle(el, prop);
             }
             
-            // Override visibility and display so we can 
-            // calculate real values.
-            style.visibility = "visible";
-            style.display = "block";
+            // Set end style.
+            setEndStyle(el, styleObject);
 
+            // Read end style, create adapter (from, to).
             for(prop in styleObject) {
                 toValue = styleObject[prop];
                 if(lengthExp.test(toValue)){
@@ -123,6 +113,8 @@
                         toValue, el);
                 adapters.push(adapter);
             }
+            
+            // Set the styles back.
             style.cssText = cssText;
     
             // IE will not properly render visibility when
@@ -149,6 +141,23 @@
                     + "\nAdapters:\n  " + this.adapters.join("\n  ");
         }
     });
+
+    function setEndStyle(el, styleObject) {
+        var prop, toValue, style = el.style;
+        for(prop in styleObject) {
+            toValue = styleObject[prop];
+            if(prop === "opacity"){
+                dom.setOpacity(el, toValue);
+            }
+            else {
+                style[prop] = toValue;
+            }
+        }
+        // Override visibility and display so we can 
+        // calculate real values.
+        style.visibility = "visible";
+        style.display = "block";                
+    }
 
     var // "1px", "1.1px", "-.1px" => ["-.1px", "-.1", "px"]
         lengthExp = /(^-?\d+|(?:-?\d*\.\d+))(px|em|ex|pt|pc|in|cm|mm|%)/i,

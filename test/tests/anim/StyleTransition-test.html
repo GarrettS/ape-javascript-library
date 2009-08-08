@@ -98,18 +98,15 @@ var styleTransitionTestCase = new YAHOO.tool.TestCase({
     },
 
     testOpacity : function() {
+
         var css = { opacity: ".95" },
-            st = new StyleTransition(c, css, .2);
+            st = new StyleTransition(c, css, .1);
         st.start();
 
         this.wait(function(){
-
-            var opacity = c.style.opacity;
-            if("filters"in c)
-                opacity = dom.getFilterOpacity(c);
-
+            var opacity = dom.getStyle(c, "opacity");
             Assert.areEqual(0.95, parseFloat(opacity));
-        }, 300);
+        }, 200);
     },
 
     testFontWeight: function() {
