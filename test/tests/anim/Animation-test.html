@@ -73,6 +73,37 @@ var animationTestCase = new YAHOO.tool.TestCase({
         }, 90); // wait for run() to be called.
     },
 
+    // If an error occurs, continue the other animations,
+    // abort only the one that raised the error.
+    testAbortOne : function() {
+        var aMessage = bMessage = "",
+            aExpectedMessage = "a threw error";
+            bExpectedMessage = "";
+
+	    var a = new Animation(),
+	        b = new Animation();
+
+	    a.run = function() { throw Error(aExpectedMessage); };
+	    
+	    a.onabort = getMessageA;
+	    b.onabort = getMessageB;
+
+	    b.start(); // let b get a chance to run.
+	    a.start(); // Trigger a.run, which throws.
+
+	    this.wait(function(){
+            Assert.areSame( aExpectedMessage, aMessage);
+            Assert.areSame( bExpectedMessage, bMessage);
+	    }, 111); // wait for run() to be called.
+	    
+        function getMessageA(ex) {
+            aMessage = ex.message;
+        }
+        function getMessageB(ex) {
+            bMessage = ex.message;
+        }	    
+    },
+    
     testSeekTo : function() {
         var a = new Animation( .5 );
         a.seekTo(.4);

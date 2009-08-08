@@ -313,16 +313,17 @@ APE.namespace("APE.anim");
             var i = 0, animation;
     
             // Check activeAnimations.length each iteration. 
-            try {
-                for(; i < activeAnimations.length; i++) {
-                // If an error occurs, cancel the APE.anim and throw the error.
-                    animation = activeAnimations[i];
+            for(; i < activeAnimations.length; i++) {
+             // If an error occurs, continue the other animations,
+             // abort only the one that raised the error.
+                try {
+                   animation = activeAnimations[i];
                     _playFrame(animation);
-                }
-            } catch(ex) {
+                } catch(ex) {
                 // If an error occurs, abort the anim.
-                if(animation) {
-                    animation.abort(ex);
+                    if(animation) {
+                        animation.abort(ex);
+                    }
                 }
             }
         }
