@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
     <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
-    <title>Animation Test</title>
+    <title>StyleTransition Test</title>
 
     <link rel="stylesheet" type="text/css" href="../../yui-test/build/logger/assets/logger.css" />
     <link rel="stylesheet" type="text/css" href="../../yui-test/build/yuitest/assets/yuitest.css" />
@@ -16,7 +16,6 @@
     <script type="text/javascript" src="../../../build/APE.js"></script>
     <script type="text/javascript" src="../../../build/dom/constants.js"></script>
     <script type="text/javascript" src="../../../build/dom/style-f.js"></script>
-    <script type="text/javascript" src="../../../build/dom/getCascadedStyle.js"></script>
     <script type="text/javascript" src="../../../build/anim/Animation.js"></script>
     <script type="text/javascript" src="../../../build/anim/StyleTransition.js"></script>
     <script type="text/javascript" src="../../../build/color/ColorRGB.js"></script>
@@ -53,7 +52,7 @@ Adapters = {
        
 var styleTransitionTestCase = new YAHOO.tool.TestCase({
 
-    name : "Style Transition Tests",
+    name : "StyleTransition Tests",
 
     tearDown : function () {
         c.style.cssText = "";
@@ -105,8 +104,6 @@ var styleTransitionTestCase = new YAHOO.tool.TestCase({
 
         this.wait(function(){
 
-            // Some browsers return shorthand value, others (Mozilla) return 
-            // a full value, even when the shorthand value is assigned.
             var opacity = c.style.opacity;
             if("filters"in c)
                 opacity = dom.getFilterOpacity(c);
@@ -122,8 +119,6 @@ var styleTransitionTestCase = new YAHOO.tool.TestCase({
 
         this.wait(function(){
 
-            // Some browsers return shorthand value, others (Mozilla) return 
-            // a full value, even when the shorthand value is assigned.
             var fw = c.style.fontWeight;
 
             Assert.areEqual(100, (fw));
@@ -137,8 +132,6 @@ var styleTransitionTestCase = new YAHOO.tool.TestCase({
 
         this.wait(function(){
 
-            // Some browsers return shorthand value, others (Mozilla) return 
-            // a full value, even when the shorthand value is assigned.
             var fw = c.style.fontWeight;
 
             Assert.areEqual(100, parseInt(fw));
@@ -152,8 +145,6 @@ var styleTransitionTestCase = new YAHOO.tool.TestCase({
 
         this.wait(function(){
 
-            // Some browsers return shorthand value, others (Mozilla) return 
-            // a full value, even when the shorthand value is assigned.
             var textDecoration = c.style.textDecoration;
 
             Assert.areEqual("underline", textDecoration);
@@ -177,8 +168,6 @@ var styleTransitionTestCase = new YAHOO.tool.TestCase({
 
         this.wait(function(){
 
-            // Some browsers return shorthand value, others (Mozilla) return 
-            // a full value, even when the shorthand value is assigned.
             var visibility = c.style.visibility,
                 display = c.style.display;
 
@@ -201,8 +190,6 @@ var styleTransitionTestCase = new YAHOO.tool.TestCase({
 
         this.wait(function(){
 
-            // Some browsers return shorthand value, others (Mozilla) return 
-            // a full value, even when the shorthand value is assigned.
             var clip = c.style.clip;
 
             ArrayAssert.contains(clip, ["rect(10px 20px 20px -2px)", "rect(10px, 20px, 20px, -2px)"]);

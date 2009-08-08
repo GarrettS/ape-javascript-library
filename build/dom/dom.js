@@ -902,7 +902,7 @@ APE.namespace("APE.dom.Event");
 
 (function(){
 
-    var multiLengthPropExp = /^(?:margin|(border)(Width)|padding)$/,
+    var multiLengthPropExp = /^(?:margin|(border)(Width|Color|Style)|padding)$/,
         borderRadiusExp = /^[a-zA-Z]*[bB]orderRadius$/,
         dom = APE.dom;
     
@@ -912,8 +912,8 @@ APE.namespace("APE.dom.Event");
         getFilterOpacity : getFilterOpacity,
         
         // Capture (border)(Width) because we need to put "Top" in the middle.
-        multiLengthPropExp : /^(?:margin|(border)(Width)|padding)$/,
-        borderRadiusExp : /^[a-zA-Z]*[bB]orderRadius$/,
+        multiLengthPropExp : multiLengthPropExp,
+        borderRadiusExp : borderRadiusExp,
         tryGetShorthandValues : tryGetShorthandValues,
         getCurrentStyleValueFromAuto : getCurrentStyleValueFromAuto,
         convertNonPixelToPixel : convertNonPixelToPixel
@@ -1003,19 +1003,21 @@ APE.namespace("APE.dom.Event");
                 // would try to get a rect, but Webkit doesn't support that.
                 value = (tryGetShorthandValues(cs, p)).join(" ");
             }
-        }
-        else {
+        } else {
             cs = el[currentStyle];
             if(p == "opacity" && !("opacity"in el[currentStyle]))
                 value = getFilterOpacity(el);
             else {
-                if(p == "cssFloat")
+                if(p == "cssFloat") {
                     p = "styleFloat";
+                }
                 value = cs[p];
 
-                if(value == "auto") 
+                if(value == "auto") {
                     value = getCurrentStyleValueFromAuto(el, p);
-                else if(!(p in cs)) return "";
+                } else if(!(p in cs)) {
+                    return "";
+                }
             }
             matches = nonPixelExp.exec(value);
             if(matches) {

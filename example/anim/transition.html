@@ -10,9 +10,11 @@
 
 <style>
 
-div.anim-div button {
-    position: absolute; left: 0;
-    top: 2px; opacity: .8; 
+div.anim-div div {
+    position: absolute; 
+    left: 0;
+    top: 2px; 
+    opacity: .8; 
     display: block;
     font: .5em sans-serif;
     letter-spacing: 0;
@@ -84,8 +86,9 @@ function Button(id, styleObj) {
 }
 Button.getById = APE.getById;
 
-function doIt( buttonID, styleObj ) {    
-    Button.getById( buttonID, styleObj ).anim.toggleDirection( );
+function doIt( buttonID, styleObj ) {
+    var b = Button.getById( buttonID, styleObj );
+    b.anim.toggleDirection( );
 };
 
 function animateBack(){
@@ -96,21 +99,20 @@ function animateBack(){
 <h1>Animation Transitions Example : toggleDirection</h1>
 <div class='anim-div'>
     accel &nbsp;example
-    <button id='accel' style="width: 10em;background-color: #131;border: 1px solid #030;font-weight: 100" 
-        onclick="doIt('accel', longOrange)">Clementine</button>
+    <div id='accel' style="width: 10em;background-color: #131;border: 1px solid #030;font-weight: 100" 
+        onclick="doIt('accel', longOrange)">Clementine</div>
 </div>
 
 <div class='anim-div'>
     spring &nbsp;example
-    <button id='spring' style="width: 10em;background-color: #131;border: 1px solid #030" 
-        onclick="doIt('spring', fatRed)">Pomegranate</button>
+    <div id='spring' style="width: 10em;background-color: #131;border: 1px solid #030" 
+        onclick="doIt('spring', fatRed)">Pomegranate</div>
 </div>
 
 <script type="text/javascript" src="../../build/anim/Animation.js"></script>
 <script type="text/javascript" src="../../build/color/ColorRGB.js"></script>
 <script type="text/javascript" src="../../build/dom/constants.js"></script>
 <script type="text/javascript" src="../../build/dom/style-f.js"></script>
-<script type="text/javascript" src="../../build/dom/getCascadedStyle.js"></script>
 <script type="text/javascript" src="../../build/anim/StyleTransition.js"></script>
 </body>
 </html>

@@ -23,10 +23,12 @@ APE.namespace("APE.widget");
     function Calendar( id ) {
         this.id = id;
         if(widget.Calendar.IS_NATIVE) return;
+        protectedData[id] = {};
         readDateFromInput(this);
         this.initEvents();
     }
     
+    var protectedData = { };
     // Determine if input type="date" is supported.
     // If HTML 5 input type="date" is supported, exit.
     var inputTypeDate = document.createElement("input");

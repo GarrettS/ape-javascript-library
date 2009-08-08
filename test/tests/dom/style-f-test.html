@@ -208,7 +208,12 @@ var getStyleTestCase = new TestCase({
     _should : {
         ignore : { 
             testGetComputedShorthandValues1pxFontSize : true,
-            testGetComputedShorthandValues100px : true
+            testGetComputedShorthandValues100px : true,
+            
+            // http://ape.lighthouseapp.com/projects/27412/tickets/1-remove-support-for-getstyle-clip#ticket-1-1
+            //  remove support for getStyle "clip" 
+            testGetComputedClip : true
+            
         }
     },
 

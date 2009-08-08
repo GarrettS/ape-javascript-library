@@ -12,159 +12,192 @@
  * @requires APE.dom.style-f
  */
 
-/**
- * @param {String}
- *            id of the element
- * @param {Object}
- *            styleObject in the form of {color: "#030", fontSize : "12px"}
- * @param {ufloat}
- *            [duration] optional number of seconds.
- * @param {Function}
- *            [transition] optional funtion that takes a float [0-1] and returns
- *            a float [0-1]
- * @extends APE.anim.Animation
- * @constructor
- */
-APE.anim.StyleTransition = function(id, styleObject, duration, transition) {
-    APE.anim.Animation.call(this, duration); // invoke super constructor.
-    if (id.id)
-        id = id.id;
-    this.id = id;
-    this.adapters = [];
-    this.style = document.getElementById(id).style;
-    if (transition)
-        this.transition = transition;
-    this.init(styleObject);
-};
+(function(){
 
-APE.extend(APE.anim.StyleTransition, APE.anim.Animation, {
-
-    inited : false,
+    var APE = window.APE, anim = APE.anim, dom = APE.dom,
+        _start = anim.Animation.prototype.start,
+        _end = anim.Animation.prototype.start;
+    
     /**
-     * @method run
-     * @memberOf APE.anim.StyleTransition
-     * @description overrides (implements) <code>run()</code> in Animation.
-     *              Runs the animation, getting the correct value from each
-     *              ITransitionAdapter. This run() method gets called by
-     *              Animation.
+     * @param {String}
+     *            id of the element
+     * @param {Object}
+     *            styleObject in the form of {color: "#030", fontSize : "12px"}
+     * @param {ufloat}
+     *            [duration] optional number of seconds.
+     * @param {Function}
+     *            [transition] optional funtion that takes a float [0-1] and returns
+     *            a float [0-1]
+     * @extends APE.anim.Animation
+     * @constructor
      */
-    run : function run(rationalValue) {
-        var i = 0, adapters = this.adapters, len = adapters.length, adapter;
-        while (i < len) {
-            adapter = adapters[i++];
-            this.style[adapter.prop] = adapter.blendTo(rationalValue);
+    APE.anim.StyleTransition = StyleTransition;
+    
+    function StyleTransition(id, styleObject, duration, transition) {
+        anim.Animation.call(this, duration); // invoke super constructor.
+        if (id.id)
+            id = id.id;
+        this.id = id;
+        this.adapters = [];
+        
+        if (transition) {
+            this.transition = transition;
         }
-    },
+        this.init(styleObject);
+    }
+    
+    APE.extend(anim.StyleTransition, anim.Animation, {
+    
+        start : function() {
+            // Use id as weak ref, set "style" in start and end.
+            this.style = document.getElementById(this.id).style;
+            _start.call(this);
+        },
 
-    /** @private */
-    init : function(styleObject) {
-        if (this.inited)
-            return;
-
-        var el = document.getElementById(this.id), adapters = [], adapter, APE = window.APE, 
-        prop, units, fromValue, toValue, dom = APE.dom, 
-        TransitionAdapterFactory = APE.anim.TransitionAdapterFactory, 
-        ThresholdTransitionAdapter = TransitionAdapterFactory.ThresholdTransitionAdapter, 
-        ImmediateThresholdTransitionAdapter = TransitionAdapterFactory.ImmediateThresholdTransitionAdapter;
-
-        // Loop through style object to find values.
-        for (prop in styleObject) {
-            toValue = styleObject[prop];
-            if (!toValue)
-                continue; // CSSStyleRule.
-
-            if (prop == "opacity" && !("opacity" in this.style)
-                    && ("filter" in this.style)) {
-                prop = "alpha";
-                this.style.zoom = "1";
-                fromValue = dom.getFilterOpacity(el);
-            } else {
-                units = dom.getStyleUnit(toValue);
-                fromValue = dom.findInheritedStyle(el, prop, units);
+        end : function() {
+            this.style = null;
+            _end.call(this);
+        },
+        
+        /**
+         * @method run
+         * @memberOf APE.anim.StyleTransition
+         * @description overrides (implements) <code>run()</code> in Animation.
+         *              Runs the animation, getting the correct value from each
+         *              ITransitionAdapter. This run() method gets called by
+         *              Animation.
+         */
+        run : function run(rationalValue) {
+            var i = 0, adapters = this.adapters, len = adapters.length, 
+                style = this.style, adapter;
+            while (i < len) {
+                adapter = adapters[i++];
+                this.style[adapter.prop] = adapter.blendTo(rationalValue);
             }
-            // Get a ITransitionAdapter from the factory.
-            adapter = TransitionAdapterFactory.fromValues(prop, fromValue,
-                    toValue);
-            adapters.push(adapter);
+        },
+    
+        /** @private */
+        init : function(styleObject) {
+            var el = document.getElementById(this.id), adapters = [], adapter, 
+            APE = window.APE,  
+            prop, fromValue, toValue, 
+            TransitionAdapterFactory = APE.anim.TransitionAdapterFactory, 
+            ThresholdTransitionAdapter = TransitionAdapterFactory.ThresholdTransitionAdapter, 
+            ImmediateThresholdTransitionAdapter = TransitionAdapterFactory.ImmediateThresholdTransitionAdapter;
+    
+            var style = el.style,
+                cssText = style.cssText,
+                fromValues = {};
+            // Loop through style object to find values.
+            for (prop in styleObject) {
+                toValue = styleObject[prop];
+                if (!toValue)
+                    continue; // CSSStyleRule.                
+                if (prop == "opacity" && !("opacity" in el.style)
+                        && ("filter" in el.style)) {
+                    prop = "alpha";
+                    el.style.zoom = "1";
+                    fromValue = dom.getFilterOpacity(el);
+                } else {
+                    fromValue = dom.getStyle(el, prop); 
+                }
+                fromValues[prop] = fromValue;
+            }
+            for(prop in styleObject) {
+                style[prop] = styleObject[prop];
+            }
+            
+            // Override visibility and display so we can 
+            // calculate real values.
+            style.visibility = "visible";
+            style.display = "block";
+
+            for(prop in styleObject) {
+                toValue = styleObject[prop];
+                if(lengthExp.test(toValue)){
+                    toValue = dom.getStyle(el, prop);
+                }
+                // Get a ITransitionAdapter from the factory.
+                adapter = TransitionAdapterFactory.fromValues(prop, fromValues[prop],
+                        toValue, el);
+                adapters.push(adapter);
+            }
+            style.cssText = cssText;
+    
+            // IE will not properly render visibility when
+            // 1) visibility is initially hidden
+            // 2) alpha filter is applied
+            // 3) and visibility is then set to visible.
+            // after that, the element doesn't appear visible.
+            // Workaround: first transition is visibility.
+            adapters.sort(function(a, b) {
+                        return (a instanceof ImmediateThresholdTransitionAdapter
+                                ? -1
+                                : 1);
+                    });
+    
+            this.adapters = adapters;
+        },
+    
+        /**
+         * @memberOf APE.anim.StyleTransition Helpful debugging info.
+         */
+        toString : function() {
+            return "StyleTransitionAdapter : id=#" + this.id + "\n"
+                    + anim.Animation.prototype.toString.call(this)
+                    + "\nAdapters:\n  " + this.adapters.join("\n  ");
         }
+    });
 
-        // IE will not properly render visibility when
-        // 1) visibility is initially hidden
-        // 2) alpha filter is applied
-        // 3) and visibility is then set to visible.
-        // after that, the element doesn't appear visible.
-        // Workaround: first transition is visibility.
-        adapters.sort(function(a, b) {
-                    return (a instanceof ImmediateThresholdTransitionAdapter
-                            ? -1
-                            : 1);
-                });
+    var // "1px", "1.1px", "-.1px" => ["-.1px", "-.1", "px"]
+        lengthExp = /(^-?\d+|(?:-?\d*\.\d+))(px|em|ex|pt|pc|in|cm|mm|%)/i,
+        colorExp = /color/i,
+        positiveLengthExp = /(?:width|height|padding|fontSize)$/ig,
+        filterExp = /alpha/,
+        opacityExp = /^opacity/,
+        intExp = /^\d+$/,
+        noVisibilityExp = /^(?:hidden|collapse)/;
 
-        this.adapters = adapters;
-    },
 
     /**
-     * @memberOf APE.anim.StyleTransition Helpful debugging info.
+     * Factory for APE.anim.TransitionAdapterFactory Interface.
+     * 
+     * @return {ITransitionAdapter} ITransitionAdapter for a specific type of style
+     *         setting during run. The {ITransitionAdapter} implements
+     *         blendTo(rationaValue).
+     * @class
+     * @private Used internally.
      */
-    toString : function() {
-        return "StyleTransitionAdapter : id=#" + this.id + "\n"
-                + APE.anim.Animation.prototype.toString.call(this)
-                + "\nAdapters:\n  " + this.adapters.join("\n  ");
-    }
-
-});
-
-/**
- * Factory for APE.anim.TransitionAdapterFactory Interface.
- * 
- * @return {ITransitionAdapter} ITransitionAdapter for a specific type of style
- *         setting during run. The {ITransitionAdapter} implements
- *         blendTo(rationaValue).
- * @class
- * @private Used internally.
- */
-APE.anim.TransitionAdapterFactory = {
-    // "1px", "1.1px", "-.1px" => ["-.1px", "-.1", "px"]
-    lengthExp : /(^-?\d+|(?:-?\d*\.\d+))(px|em|ex|pt|pc|in|cm|mm|%)/i,
-    colorExp : /color/i,
-    positiveLengthExp : /(?:width|height|padding|fontSize)$/ig,
-    filterExp : /alpha/,
-    opacityExp : /^opacity/,
-    intExp : /^\d+$/,
-    noVisibilityExp : /^(?:hidden|collapse)/,
-
-    fromValues : function(prop, fromValue, toValue) {
-
-        if (this.positiveLengthExp.test(prop)) {
-            return new this.PositiveLengthTransitionAdapter(prop, fromValue,
-                    toValue);
+    anim.TransitionAdapterFactory = {
+    
+        fromValues : function(prop, fromValue, toValue) {
+    
+            var adapter;
+            if (positiveLengthExp.test(prop)) {
+                adapter = this.PositiveLengthTransitionAdapter;
+            } else if (colorExp.test(prop)) {
+                adapter = this.ColorTransitionAdapter;
+            } else if (lengthExp.test(fromValue)) {
+                adapter = this.LengthTransitionAdapter;
+            } else if (filterExp.test(prop)) {
+                adapter = this.FilterTransitionAdapter;
+            } else if (opacityExp.test(prop)) {
+                adapter = this.OpacityTransitionAdapter;
+            } else if (prop == "fontWeight" && intExp.test(fromValue) 
+                    && intExp.test(toValue)) {
+                adapter = this.FontWeightTransitionAdapter;
+            } else if (prop === "visibility" && noVisibilityExp.test(fromValue) 
+                    || prop == "display" && fromValue == "none") {
+                adapter = this.ImmediateThresholdTransitionAdapter;
+            } else {
+            // Return an object that sets toValue on completion.
+            adapter = this.ThresholdTransitionAdapter;
+            } 
+            return new adapter(prop, fromValue, toValue);
         }
-        if (this.colorExp.test(prop))
-            return new this.ColorTransitionAdapter(prop, fromValue, toValue);
-        if (this.lengthExp.test(fromValue)) {
-            return new this.LengthTransitionAdapter(prop, fromValue, toValue);
-        }
-        if (this.filterExp.test(prop))
-            return new this.FilterTransitionAdapter(prop, fromValue, toValue);
-        if (this.opacityExp.test(prop))
-            return new this.OpacityTransitionAdapter(prop, fromValue, toValue);
-        if (prop == "fontWeight" && this.intExp.test(fromValue)
-                && this.intExp.test(toValue)) {
-            return new this.FontWeightTransitionAdapter(prop, fromValue,
-                    toValue);
-        }
-        if (prop == "visibility" && this.noVisibilityExp.test(fromValue)
-                || prop == "display" && fromValue == "none")
-            return new this.ImmediateThresholdTransitionAdapter(prop,
-                    fromValue, toValue);
-        // Return an object that sets toValue on completion.
-        return new this.ThresholdTransitionAdapter(prop, fromValue, toValue);
-    }
-};
+    };
 
-(function() {
-
-    var APE = window.APE, ColorRGB = APE.color && APE.color.ColorRGB,
+    var ColorRGB = APE.color && APE.color.ColorRGB,
 
     Adapters = {
         /** @augments APE.anim.TransitionAdapterFactory */
@@ -178,7 +211,7 @@ APE.anim.TransitionAdapterFactory = {
         ImmediateThresholdTransitionAdapter : ImmediateThresholdTransitionAdapter
     };
 
-    APE.mixin(APE.anim.TransitionAdapterFactory, Adapters);
+    APE.mixin(anim.TransitionAdapterFactory, Adapters);
 
     function TransitionAdapter(prop, fromValue, toValue, units) {
         this.prop = prop;
@@ -187,6 +220,7 @@ APE.anim.TransitionAdapterFactory = {
         if (units)
             this.units = units;
     }
+    
     TransitionAdapter.prototype.toString = function() {
         var units = (this.units || '');
         return APE.getFunctionName(this.constructor) + ": " + this.prop + ", "
@@ -195,8 +229,9 @@ APE.anim.TransitionAdapterFactory = {
     };
 
     function ColorTransitionAdapter(prop, fromValue, toValue) {
-        if (!ColorRGB)
+        if (!ColorRGB) { // If script was included in wrong order.s
             ColorRGB = APE.color.ColorRGB;
+        }
         var f = ColorRGB.fromString(fromValue), t = toValue = ColorRGB
                 .fromString(toValue);
 
@@ -222,11 +257,8 @@ APE.anim.TransitionAdapterFactory = {
             });
 
     function LengthTransitionAdapter(prop, fromValue, toValue) {
-        var lengthExp = APE.anim.TransitionAdapterFactory.lengthExp, fromValues = lengthExp
-                .exec(fromValue), toValues = lengthExp.exec(toValue);
-
-        TransitionAdapter.call(this, prop, parseFloat(fromValues[0]),
-                parseFloat(toValues[0]), fromValues[2]);
+        TransitionAdapter.call(this, prop, parseFloat(fromValue),
+                parseFloat(toValue), "px");
     }
 
     APE.extend(LengthTransitionAdapter, TransitionAdapter);
@@ -252,8 +284,6 @@ APE.anim.TransitionAdapterFactory = {
                 + this.units;
         return v;
     };
-
-    var zeroToPxExp = /0(\s|\))/g;
 
     /** @ignore */
     function OpacityTransitionAdapter(prop, fromValue, toValue) {
@@ -313,7 +343,7 @@ APE.anim.TransitionAdapterFactory = {
 
     APE.extend(ThresholdTransitionAdapter, TransitionAdapter);
     ThresholdTransitionAdapter.prototype.blendTo = function(rationalValue) {
-        if (rationalValue == 1)
+        if (rationalValue === 1)
             return this.toValue;
         return this.fromValue;
     };
@@ -325,9 +355,9 @@ APE.anim.TransitionAdapterFactory = {
     APE.extend(ImmediateThresholdTransitionAdapter, TransitionAdapter);
     ImmediateThresholdTransitionAdapter.prototype.blendTo = function(
             rationalValue) {
-        if (rationalValue == 0) {
+        if (rationalValue === 0) {
             return this.fromValue;
         }
-        return this.toValue;
+       return this.toValue;
     };
 })();
