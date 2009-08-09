@@ -18,6 +18,7 @@ APE.namespace("APE.dom");
         setOpacity : setOpacity,
         getFilterOpacity : getFilterOpacity,
         
+        // TODO: Remove these from public interface. 
         // Capture (border)(Width) because we need to put "Top" in the middle.
         multiLengthPropExp : multiLengthPropExp,
         borderRadiusExp : borderRadiusExp,
@@ -26,12 +27,11 @@ APE.namespace("APE.dom");
         convertNonPixelToPixel : convertNonPixelToPixel
     });
 
-    var view = document.defaultView,
-        getCS = "getComputedStyle",
+    var getCS = "getComputedStyle",
         IS_COMPUTED_STYLE = dom.IS_COMPUTED_STYLE,
         currentStyle = "currentStyle",
+        opacity = "opacity",
         style = "style";
-    view = null;
     
     /** 
      * Special method for a browser that supports el.filters and not style.opacity.
@@ -43,19 +43,23 @@ APE.namespace("APE.dom");
      */
     function getFilterOpacity(el) {
         var filter, filters = el.filters;
-
-        if(!filters || !("item" in filters))return"";
+        if(!filters)return"";
         try {
-            filter = filters.item('alpha');
+            // Try the more common alphaType first.
+            // First time is a guess.
+            filter = filters(alphaTypes[0]);
         } catch(alpha) {
             try {
-                filter = filters["DXImageTransform.Microsoft.Alpha"];
+                // Try the other alpha type.
+                filter = filters(alphaTypes[1]);
+                alphaTypes.reverse();
             } catch(ex){}
         }
-        return filter && filter.opacity/100 || 1;
+        return filter && filter[opacity]/100 || 1;
     }
+    var alphaTypes = ["alpha", "DXImageTransform.Microsoft.Alpha"],
+        alphaString = "alpha("+opacity+"=";
     
-
     /** 
      * Cross-browser adapter method for style.filters vs style.opacity.
      * @memberOf APE.dom
@@ -64,14 +68,14 @@ APE.namespace("APE.dom");
      * @return {ufloat} [0-1] amount of opacity.
      */
     function setOpacity(el, i) {
-        var s = el[style], cs;
-        if("opacity"in s) {
-            s.opacity = i;
+        var s = el[style], cs, hasLayout = "hasLayout";
+        if(opacity in s) {
+            s[opacity] = i;
         }
         else if("filter"in s) {
             cs = el[currentStyle];
-            s.filter = 'alpha(opacity=' + (i * 100) + ')';
-            if(cs && ("hasLayout"in cs) && !cs.hasLayout) {
+            s.filter = alphaString + (i * 100) + ")";
+            if(cs && (hasLayout in cs) && !cs[hasLayout]) {
                 style.zoom = 1;
             }
         }
@@ -97,11 +101,13 @@ APE.namespace("APE.dom");
     function getStyle(el, p) {
         var value = "", cs, matches, splitVal, i, len, doc = el.ownerDocument, 
             defaultView = doc.defaultView;
+        if(/float/.test(p)) {
+            p = floatProp;
+        }
         if(IS_COMPUTED_STYLE) {
             cs = defaultView[getCS](el, "");
-            if(p == "borderRadius" && !("borderRadius"in cs)) {
-                p = "MozBorderRadius"in cs ? "MozBorderRadius" : 
-                    "WebkitBorderRadius"in cs ? "WebkitBorderRadius" : "";
+            if(borderRadiusExp.test(p)) {
+                p = borderRadiusProp;
             }
 
             if(!(p in cs)) return "";
@@ -112,12 +118,9 @@ APE.namespace("APE.dom");
             }
         } else {
             cs = el[currentStyle];
-            if(p == "opacity" && !("opacity"in el[currentStyle]))
+            if(p === opacity)
                 value = getFilterOpacity(el);
             else {
-                if(p == "cssFloat") {
-                    p = "styleFloat";
-                }
                 value = cs[p];
 
                 if(value == "auto") {
@@ -142,10 +145,16 @@ APE.namespace("APE.dom");
 
     var sty = document.documentElement[style],
         floatProp = 'cssFloat'in sty ? 'cssFloat': 'styleFloat',
+        
+        orderRadius = "orderRadius",
+        bor = "b"+orderRadius,
+        mor = "MozB"+orderRadius,
+        wor = "WebkitB"+orderRadius,
+        borderRadiusProp = bor in sty ? bor : mor in sty ? mor : wor,
         props = ["Top", "Right", "Bottom", "Left"],
         cornerProps = ["Topright", "Bottomright", "Bottomleft", "Topleft"];
-        sty = null;
-
+        sty = orderRadius = null;
+    
     function getCurrentStyleValueFromAuto(el, p) {
         
         var s = el[style], v, borderWidth, doc = el.ownerDocument;
@@ -170,7 +179,7 @@ APE.namespace("APE.dom");
             return s[pp] + px;
         }
         if(p == "margin" && el[currentStyle].position != "absolute" && 
-          doc.compatMode != "BackCompat") {
+          doc.compatMode !== "BackCompat") {
             v = parseFloat(getStyle(el.parentNode, 'width')) - el.offsetWidth;
             if(v == 0) return "0px";
             v = "0px " + v;
@@ -239,7 +248,7 @@ APE.namespace("APE.dom");
             // but a number that has a weird ending, we need to convert it to pixels.
 
             var val = matches[0]; // grab the -1.2em or whatever.
-            if(parseFloat(val) == 0) {
+            if(parseFloat(val) === 0) {
                 return "0px";
             }
 

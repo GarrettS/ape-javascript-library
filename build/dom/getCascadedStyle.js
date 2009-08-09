@@ -2,6 +2,8 @@
  * @fileoverview
  * getting cascaded styles for easy style transitions.
  * @requires style-f.js, getContainingBlock.js
+ * 
+ * @deprecated use "getStyle" in style-f.js instead.s
  */
 
 (function(){
