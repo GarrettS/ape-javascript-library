@@ -49,7 +49,7 @@ APE.namespace("APE.dom");
             filter = filters.item('alpha');
         } catch(alpha) {
             try {
-                filter = filters.item("DXImageTransform.Microsoft.Alpha");
+                filter = filters["DXImageTransform.Microsoft.Alpha"];
             } catch(ex){}
         }
         return filter && filter.opacity/100 || 1;

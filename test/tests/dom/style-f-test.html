@@ -252,6 +252,7 @@ var getStyleTestCase = new TestCase({
     },
 
     testGetFilterOpacity : function() {
+        var target = document.getElementById("target");
         var alpha = "filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50)";
         var expected = "";
         if("filters" in target) {
