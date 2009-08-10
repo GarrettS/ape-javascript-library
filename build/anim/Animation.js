@@ -37,7 +37,8 @@ APE.namespace("APE.anim");
  * @param {ufloat} [duration] Number of seconds to run the animation (default is 1).
  */
 (function(){
-    APE.anim.Animation = Animation;
+    APE.anim.Animation = Animation,
+    RVALUE = "rationalValue";
 
     function Animation( duration ) {
         if(typeof duration == "number")
@@ -158,12 +159,12 @@ APE.namespace("APE.anim");
         seekTo : function(pos, transitionBackwards) {
             pos = parseFloat(pos);
             if(!isFinite(pos)) return;
-            if(pos === this.rationalValue) return;
+            if(pos === this[RVALUE]) return;
     
             // The new distance is the difference between the 
             // pos and the currentPosition (position).
             this.startOffset = this.position;
-            this.startValue = this.rationalValue;
+            this.startValue = this[RVALUE];
     
             this.endValue = pos;
     
@@ -172,7 +173,7 @@ APE.namespace("APE.anim");
             // The new timeLimit is a percentage of the the full duration.
             this.timeLimit = this.duration * distance;
             
-            this.isReversed = (pos < this.rationalValue);
+            this.isReversed = (pos < this[RVALUE]);
             this._transitionBackwards = this.isReversed && transitionBackwards;
             if(this._transitionBackwards) {
                 this.endOffset = 1-this.transition(1-pos);
@@ -348,22 +349,22 @@ APE.namespace("APE.anim");
 
         if(elapsed >= anim.timeLimit) {
             anim.run(anim.position = anim.endOffset);
-            anim.rationalValue = anim.endValue;
+            anim[RVALUE] = anim.endValue;
             anim._end();
             return;
         }
         var rationalDistanceTraveled = (elapsed / anim.duration);
 
         if(anim.isReversed) {
-            anim.rationalValue = anim.startValue - rationalDistanceTraveled;
+            anim[RVALUE] = anim.startValue - rationalDistanceTraveled;
             if(anim._transitionBackwards)
-                anim.position = 1 - anim.transition(1-anim.rationalValue);
+                anim.position = 1 - anim.transition(1-anim[RVALUE]);
             else
-                anim.position = anim.transition(anim.rationalValue);
+                anim.position = anim.transition(anim[RVALUE]);
         }
         else {
-            anim.rationalValue = anim.startValue + rationalDistanceTraveled;
-            anim.position = anim.transition(anim.rationalValue);
+            anim[RVALUE] = anim.startValue + rationalDistanceTraveled;
+            anim.position = anim.transition(anim[RVALUE]);
         }
 
         if(typeof anim.onplay == "function")

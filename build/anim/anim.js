@@ -37,7 +37,8 @@
  * @param {ufloat} [duration] Number of seconds to run the animation (default is 1).
  */
 (function(){
-    APE.anim.Animation = Animation;
+    APE.anim.Animation = Animation,
+    RVALUE = "rationalValue";
 
     function Animation( duration ) {
         if(typeof duration == "number")
@@ -158,12 +159,12 @@
         seekTo : function(pos, transitionBackwards) {
             pos = parseFloat(pos);
             if(!isFinite(pos)) return;
-            if(pos === this.rationalValue) return;
+            if(pos === this[RVALUE]) return;
     
             // The new distance is the difference between the 
             // pos and the currentPosition (position).
             this.startOffset = this.position;
-            this.startValue = this.rationalValue;
+            this.startValue = this[RVALUE];
     
             this.endValue = pos;
     
@@ -172,7 +173,7 @@
             // The new timeLimit is a percentage of the the full duration.
             this.timeLimit = this.duration * distance;
             
-            this.isReversed = (pos < this.rationalValue);
+            this.isReversed = (pos < this[RVALUE]);
             this._transitionBackwards = this.isReversed && transitionBackwards;
             if(this._transitionBackwards) {
                 this.endOffset = 1-this.transition(1-pos);
@@ -348,22 +349,22 @@
 
         if(elapsed >= anim.timeLimit) {
             anim.run(anim.position = anim.endOffset);
-            anim.rationalValue = anim.endValue;
+            anim[RVALUE] = anim.endValue;
             anim._end();
             return;
         }
         var rationalDistanceTraveled = (elapsed / anim.duration);
 
         if(anim.isReversed) {
-            anim.rationalValue = anim.startValue - rationalDistanceTraveled;
+            anim[RVALUE] = anim.startValue - rationalDistanceTraveled;
             if(anim._transitionBackwards)
-                anim.position = 1 - anim.transition(1-anim.rationalValue);
+                anim.position = 1 - anim.transition(1-anim[RVALUE]);
             else
-                anim.position = anim.transition(anim.rationalValue);
+                anim.position = anim.transition(anim[RVALUE]);
         }
         else {
-            anim.rationalValue = anim.startValue + rationalDistanceTraveled;
-            anim.position = anim.transition(anim.rationalValue);
+            anim[RVALUE] = anim.startValue + rationalDistanceTraveled;
+            anim.position = anim.transition(anim[RVALUE]);
         }
 
         if(typeof anim.onplay == "function")
@@ -494,10 +495,21 @@ APE.anim.Transitions = {
 
 (function(){
 
-    var APE = window.APE, anim = APE.anim, dom = APE.dom,
-        ap = anim.Animation.prototype,
-        _start = ap._start,
-        _end = ap._end;
+    var APE = window.APE, 
+        anim = APE.anim, 
+        Animation = anim.Animation,
+        ap = Animation.prototype,
+        dom = APE.dom,
+        useFilter,
+        FVALUE = "fromValue",
+        OPACITY = "opacity",
+        TVALUE = "toValue",
+        PX = "px",
+        PROTO = "prototype",
+        BLEND_TO = "blendTo",
+        TO_STRING = "toString",
+        EXTEND = "extend",
+        STYLE = "style";
     
     /**
      * @param {String}
@@ -512,32 +524,30 @@ APE.anim.Transitions = {
      * @extends APE.anim.Animation
      * @constructor
      */
-    APE.anim.StyleTransition = StyleTransition;
+    anim.StyleTransition = StyleTransition;
     
     function StyleTransition(id, styleObject, duration, transition) {
-        anim.Animation.call(this, duration); // invoke super constructor.
+        Animation.call(this, duration); // invoke super constructor.
         if (id.id)
             id = id.id;
-        this.id = id;
-        this.adapters = [];
-        
+        this.id = id;        
         if (transition) {
             this.transition = transition;
         }
         this.init(styleObject);
     }
     
-    APE.extend(anim.StyleTransition, anim.Animation, {
+    APE[EXTEND](StyleTransition, Animation, {
     
         _start : function() {
             // Use id as weak ref, set "style" in start and end.
-            this.style = document.getElementById(this.id).style;
-            _start.call(this);
+            this[STYLE] = document.getElementById(this.id)[STYLE];
+            ap._start.call(this);
         },
 
         _end : function() {
-            this.style = null;
-            _end.call(this);
+            this[STYLE] = null;
+            ap._end.call(this);
         },
         
         /**
@@ -550,30 +560,28 @@ APE.anim.Transitions = {
          */
         run : function run(rationalValue) {
             var i = 0, adapters = this.adapters, len = adapters.length, 
-                style = this.style, adapter;
+                style = this[STYLE], adapter;
             while (i < len) {
                 adapter = adapters[i++];
-                style[adapter.prop] = adapter.blendTo(rationalValue);
+                style[adapter.prop] = adapter[BLEND_TO](rationalValue);
             }
         },
     
         /** @private */
         init : function(styleObject) {
             var el = document.getElementById(this.id), adapters = [], adapter, 
-                APE = window.APE,  
                 prop, toValue, 
-                style = el.style,
+                style = el[STYLE],
                 cssText = style.cssText,
-                fromValues = {},
-                TFactory = anim.TransitionAdapterFactory, 
-                ThresholdTransitionAdapter = TFactory.ThresholdTransitionAdapter, 
-                ImmediateThresholdTransitionAdapter = TFactory.ImmediateThresholdTransitionAdapter;
+                fromValues = {};
     
+            if(useFilter === undefined) {
+                useFilter = !(OPACITY in style) && ("filter" in style);
+            }
             // Loop through style object to find values.
             for (prop in styleObject) {
                 if (!styleObject[prop]) continue; // CSSStyleRule. 
-                if (prop == "opacity" && !("opacity" in style) 
-                    && ("filter" in style) && !style.hasLayout) {
+                if (prop === OPACITY && useFilter && !style.hasLayout) {
                     style.zoom = "1";
                 }
                 fromValues[prop] = dom.getStyle(el, prop);
@@ -589,8 +597,7 @@ APE.anim.Transitions = {
                     toValue = dom.getStyle(el, prop);
                 }
                 // Get a ITransitionAdapter from the factory.
-                adapter = TFactory.fromValues(prop, fromValues[prop],
-                        toValue, el);
+                adapter = TransitionAdapterFactory.fromValues(prop, fromValues[prop], toValue);
                 adapters.push(adapter);
             }
             
@@ -617,19 +624,18 @@ APE.anim.Transitions = {
          */
         toString : function() {
             return "StyleTransitionAdapter : id=#" + this.id + "\n"
-                    + ap.toString.call(this)
+                    + ap[TO_STRING].call(this)
                     + "\nAdapters:\n  " + this.adapters.join("\n  ");
         }
     });
 
     function setEndStyle(el, styleObject) {
-        var prop, toValue, style = el.style;
+        var prop, toValue, style = el[STYLE];
         for(prop in styleObject) {
             toValue = styleObject[prop];
-            if(prop === "opacity"){
+            if(prop === OPACITY){
                 dom.setOpacity(el, toValue);
-            }
-            else {
+            } else {
                 style[prop] = toValue;
             }
         }
@@ -644,7 +650,6 @@ APE.anim.Transitions = {
         colorExp = /color/i,
         positiveLengthExp = /(?:width|height|padding|fontSize)$/ig,
         filterExp = /alpha/,
-        opacityExp = /^opacity/,
         intExp = /^\d+$/,
         noVisibilityExp = /^(?:hidden|collapse)/;
 
@@ -658,72 +663,53 @@ APE.anim.Transitions = {
      * @class
      * @private Used internally.
      */
-    anim.TransitionAdapterFactory = {
+    var TransitionAdapterFactory = {
     
         fromValues : function(prop, fromValue, toValue) {
     
             var adapter;
             if (positiveLengthExp.test(prop)) {
-                adapter = this.PositiveLengthTransitionAdapter;
+                adapter = PositiveLengthTransitionAdapter;
             } else if (colorExp.test(prop)) {
-                adapter = this.ColorTransitionAdapter;
+                adapter = ColorTransitionAdapter;
             } else if (lengthExp.test(fromValue)) {
-                adapter = this.LengthTransitionAdapter;
-            } else if (filterExp.test(prop)) {
-                adapter = this.FilterTransitionAdapter;
-            } else if (opacityExp.test(prop)) {
-                adapter = this.OpacityTransitionAdapter;
+                adapter = LengthTransitionAdapter;
+            } else if (prop === OPACITY) {
+                adapter = useFilter ? FilterTransitionAdapter : OpacityTransitionAdapter;
             } else if (prop == "fontWeight" && intExp.test(fromValue) 
                     && intExp.test(toValue)) {
-                adapter = this.FontWeightTransitionAdapter;
+                adapter = FontWeightTransitionAdapter;
             } else if (prop === "visibility" && noVisibilityExp.test(fromValue) 
                     || prop == "display" && fromValue == "none") {
-                adapter = this.ImmediateThresholdTransitionAdapter;
+                adapter = ImmediateThresholdTransitionAdapter;
             } else {
             // Return an object that sets toValue on completion.
-            adapter = this.ThresholdTransitionAdapter;
+            adapter = ThresholdTransitionAdapter;
             } 
             return new adapter(prop, fromValue, toValue);
         }
     };
 
-    var ColorRGB = APE.color && APE.color.ColorRGB,
+    var ColorRGB = APE.color && APE.color.ColorRGB;
 
-    Adapters = {
-        /** @augments APE.anim.TransitionAdapterFactory */
-        PositiveLengthTransitionAdapter : PositiveLengthTransitionAdapter,
-        ColorTransitionAdapter : ColorTransitionAdapter,
-        LengthTransitionAdapter : LengthTransitionAdapter,
-        FilterTransitionAdapter : FilterTransitionAdapter,
-        OpacityTransitionAdapter : OpacityTransitionAdapter,
-        FontWeightTransitionAdapter : FontWeightTransitionAdapter,
-        ThresholdTransitionAdapter : ThresholdTransitionAdapter,
-        ImmediateThresholdTransitionAdapter : ImmediateThresholdTransitionAdapter
-    };
-
-    APE.mixin(anim.TransitionAdapterFactory, Adapters);
-
-    function TransitionAdapter(prop, fromValue, toValue, units) {
+    function TransitionAdapter(prop, fromValue, toValue) {
         this.prop = prop;
-        this.fromValue = fromValue;
-        this.toValue = toValue;
-        if (units)
-            this.units = units;
+        this[FVALUE] = fromValue;
+        this[TVALUE] = toValue;
     }
     
-    TransitionAdapter.prototype.toString = function() {
-        var units = (this.units || '');
+    TransitionAdapter[PROTO][TO_STRING] = function() {
         return APE.getFunctionName(this.constructor) + ": " + this.prop + ", "
-                + this.fromValue.toString() + units + " \u2014 "
-                + this.toValue.toString() + units;
+                + this[FVALUE][TO_STRING]() + " \u2014 "
+                + this[TVALUE][TO_STRING]();
     };
 
     function ColorTransitionAdapter(prop, fromValue, toValue) {
-        if (!ColorRGB) { // If script was included in wrong order.s
+        if (!ColorRGB) { // If script was included in wrong order.
             ColorRGB = APE.color.ColorRGB;
         }
-        var f = ColorRGB.fromString(fromValue), t = toValue = ColorRGB
-                .fromString(toValue);
+        var f = ColorRGB.fromString(fromValue), 
+            t = toValue = ColorRGB.fromString(toValue);
 
         TransitionAdapter.call(this, prop, f, t);
 
@@ -732,31 +718,28 @@ APE.anim.Transitions = {
         this.currentValue = new ColorRGB();
     }
 
-    APE.extend(ColorTransitionAdapter, TransitionAdapter, {
-
-                /**
-                 * Adapter/Strategy interface.
-                 * 
-                 * @return {String} rgb string of the blended values.
-                 */
-                blendTo : function(rationalValue) {
-                    var c = ColorRGB.blend(this.fromValue, this.toValue,
-                            rationalValue, this.currentValue);
-                    return c.toString();
-                }
-            });
+    APE[EXTEND](ColorTransitionAdapter, TransitionAdapter);
+    /**
+     * Adapter/Strategy interface.
+     * 
+     * @return {String} rgb string of the blended values.
+     */
+    ColorTransitionAdapter[PROTO][BLEND_TO] = function(rationalValue) {
+        var c = ColorRGB.blend(this[FVALUE], this[TVALUE],
+                rationalValue, this.currentValue);
+        return c[TO_STRING]();
+    }
 
     function LengthTransitionAdapter(prop, fromValue, toValue) {
         TransitionAdapter.call(this, prop, parseFloat(fromValue),
-                parseFloat(toValue), "px");
+                parseFloat(toValue));
     }
 
-    APE.extend(LengthTransitionAdapter, TransitionAdapter);
+    APE[EXTEND](LengthTransitionAdapter, TransitionAdapter);
 
-    LengthTransitionAdapter.prototype.blendTo = function(rationalValue) {
+    LengthTransitionAdapter[PROTO][BLEND_TO] = function(rationalValue) {
         var inverse = 1 - rationalValue;
-        return ((this.fromValue * inverse) + (this.toValue * rationalValue))
-                + this.units;
+        return ((this[FVALUE] * inverse) + (this[TVALUE] * rationalValue)) + PX;
     };
 
     function PositiveLengthTransitionAdapter() {
@@ -766,12 +749,11 @@ APE.anim.Transitions = {
     /**
      * @ignore extends LengthTransitionAdapter
      */
-    APE.extend(PositiveLengthTransitionAdapter, LengthTransitionAdapter);
+    APE[EXTEND](PositiveLengthTransitionAdapter, LengthTransitionAdapter);
 
-    PositiveLengthTransitionAdapter.prototype.blendTo = function(rationalValue) {
-        var inverse = 1 - rationalValue, v = Math.max(
-                (this.fromValue * inverse) + (this.toValue * rationalValue), 0)
-                + this.units;
+    PositiveLengthTransitionAdapter[PROTO][BLEND_TO] = function(rationalValue) {
+        var inverse = 1 - rationalValue, 
+            v = Math.max((this[FVALUE] * inverse) + (this[TVALUE] * rationalValue), 0) + PX;
         return v;
     };
 
@@ -781,10 +763,10 @@ APE.anim.Transitions = {
                 parseFloat(toValue));
     }
 
-    APE.extend(OpacityTransitionAdapter, TransitionAdapter);
-    OpacityTransitionAdapter.prototype.blendTo = function(rationalValue) {
+    APE[EXTEND](OpacityTransitionAdapter, TransitionAdapter);
+    OpacityTransitionAdapter[PROTO][BLEND_TO] = function(rationalValue) {
         var inverse = 1 - rationalValue, v = Math.max(
-                (this.fromValue * inverse) + (this.toValue * rationalValue), 0);
+                (this[FVALUE] * inverse) + (this[TVALUE] * rationalValue), 0);
         return v;
     };
 
@@ -797,22 +779,21 @@ APE.anim.Transitions = {
      * @ignore constructor FilterTransitionAdapter performs adapter service
      *         using IE filters crap.
      */
-    APE.extend(FilterTransitionAdapter, TransitionAdapter);
-    FilterTransitionAdapter.prototype.blendTo = function(rationalValue) {
+    APE[EXTEND](FilterTransitionAdapter, TransitionAdapter);
+    FilterTransitionAdapter[PROTO][BLEND_TO] = function(rationalValue) {
         var inverse = 1 - rationalValue, v = Math.abs(
-                (this.fromValue * inverse) + (this.toValue * rationalValue), 0);
+                (this[FVALUE] * inverse) + (this[TVALUE] * rationalValue), 0);
         return "alpha(opacity=" + Math.abs(v * 100) + ")";
     };
-
     /** Useful for z-index, font-weight */
     function FontWeightTransitionAdapter(prop, fromValue, toValue) {
         TransitionAdapter.call(this, prop, parseInt(fromValue),
                 parseInt(toValue));
     }
 
-    APE.extend(FontWeightTransitionAdapter, TransitionAdapter);
-    FontWeightTransitionAdapter.prototype.blendTo = function(rationalValue) {
-        var inverse = 1 - rationalValue, v = (((this.fromValue * inverse) + (this.toValue * rationalValue))
+    APE[EXTEND](FontWeightTransitionAdapter, TransitionAdapter);
+    FontWeightTransitionAdapter[PROTO][BLEND_TO] = function(rationalValue) {
+        var inverse = 1 - rationalValue, v = (((this[FVALUE] * inverse) + (this[TVALUE] * rationalValue))
                 / 100 << 0)
                 * 100;
         if (v < 100)
@@ -831,23 +812,22 @@ APE.anim.Transitions = {
         TransitionAdapter.call(this, prop, fromValue, toValue);
     }
 
-    APE.extend(ThresholdTransitionAdapter, TransitionAdapter);
-    ThresholdTransitionAdapter.prototype.blendTo = function(rationalValue) {
+    APE[EXTEND](ThresholdTransitionAdapter, TransitionAdapter);
+    ThresholdTransitionAdapter[PROTO][BLEND_TO] = function(rationalValue) {
         if (rationalValue === 1)
-            return this.toValue;
-        return this.fromValue;
+            return this[TVALUE];
+        return this[FVALUE];
     };
 
     function ImmediateThresholdTransitionAdapter(prop, fromValue, toValue) {
         TransitionAdapter.call(this, prop, fromValue, toValue);
     }
 
-    APE.extend(ImmediateThresholdTransitionAdapter, TransitionAdapter);
-    ImmediateThresholdTransitionAdapter.prototype.blendTo = function(
-            rationalValue) {
+    APE[EXTEND](ImmediateThresholdTransitionAdapter, TransitionAdapter);
+    ImmediateThresholdTransitionAdapter[PROTO][BLEND_TO] = function(rationalValue) {
         if (rationalValue === 0) {
-            return this.fromValue;
+            return this[FVALUE];
         }
-       return this.toValue;
+       return this[TVALUE];
     };
 })();

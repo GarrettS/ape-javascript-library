@@ -1431,11 +1431,11 @@ APE.namespace("APE.dom.Event");
         try {
             // Try the more common alphaType first.
             // First time is a guess.
-            filter = filters(alphaTypes[0]);
+            filter = filters.item(alphaTypes[0]);
         } catch(alpha) {
             try {
                 // Try the other alpha type.
-                filter = filters(alphaTypes[1]);
+                filter = filters.item(alphaTypes[1]);
                 alphaTypes.reverse();
             } catch(ex){}
         }
@@ -1455,8 +1455,7 @@ APE.namespace("APE.dom.Event");
         var s = el[style], cs, hasLayout = "hasLayout";
         if(opacity in s) {
             s[opacity] = i;
-        }
-        else if("filter"in s) {
+        } else if("filter"in s) {
             cs = el[currentStyle];
             s.filter = alphaString + (i * 100) + ")";
             if(cs && (hasLayout in cs) && !cs[hasLayout]) {
@@ -1502,8 +1501,9 @@ APE.namespace("APE.dom.Event");
             }
         } else {
             cs = el[currentStyle];
-            if(p === opacity)
+            if(p === opacity) {
                 value = getFilterOpacity(el);
+            }
             else {
                 value = cs[p];
 
