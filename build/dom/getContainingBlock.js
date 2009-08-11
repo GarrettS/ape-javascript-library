@@ -1,7 +1,7 @@
 APE.namespace("APE.dom");
 (function(){
 	var dom = APE.dom,  
-	getStyle = dom.getStyle;
+        POS = "position";
 	dom.getContainingBlock = getContainingBlock;
 	
 	/** 
@@ -11,13 +11,13 @@ APE.namespace("APE.dom");
 	 * @return {HTMLElement} el's containing block.
 	 */
 	function getContainingBlock(el) {
-	    var elPosition = getStyle(el, "position"), 
+	    var elPosition = dom.getStyle(el, POS), 
 	        docEl = el.ownerDocument.documentElement,
 	        parent = el.parentNode;
 	    if(/^(?:r|s)/.test(elPosition) || !elPosition) return parent;
-	    if(elPosition == "fixed") return null;
+	    if(elPosition === "fixed") return null;
 	    while(parent && parent != docEl) {
-	        if(getContainingBlock(parent, "position") != "static") {
+	        if(getContainingBlock(parent, POS) != "static") {
 	            return parent;
 	        }
 	        parent = parent.parentNode;

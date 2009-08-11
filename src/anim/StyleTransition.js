@@ -100,7 +100,7 @@
             // Loop through style object to find values.
             for (prop in styleObject) {
                 if (!styleObject[prop]) continue; // CSSStyleRule. 
-                if (prop === OPACITY && useFilter && !style.hasLayout) {
+                if (prop === OPACITY && useFilter && !el.currentStyle.hasLayout) {
                     style.zoom = "1";
                 }
                 fromValues[prop] = dom.getStyle(el, prop);

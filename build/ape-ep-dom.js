@@ -1393,29 +1393,22 @@ APE.namespace("APE.dom.Event");
 
 (function(){
 
-    var multiLengthPropExp = /^(?:margin|(border)(Width|Color|Style)|padding)$/,
-        borderRadiusExp = /^[a-zA-Z]*[bB]orderRadius$/,
-        dom = APE.dom;
+    var dom = APE.dom;
     
     APE.mixin(dom, /** @scope APE.dom */{
-        /** @function */ getStyle : getStyle,
-        setOpacity : setOpacity,
-        getFilterOpacity : getFilterOpacity,
-        
-        // TODO: Remove these from public interface. 
-        // Capture (border)(Width) because we need to put "Top" in the middle.
-        multiLengthPropExp : multiLengthPropExp,
-        borderRadiusExp : borderRadiusExp,
-        tryGetShorthandValues : tryGetShorthandValues,
-        getCurrentStyleValueFromAuto : getCurrentStyleValueFromAuto,
-        convertNonPixelToPixel : convertNonPixelToPixel
+        getStyle : getStyle,
+        setOpacity : setOpacity
     });
 
     var getCS = "getComputedStyle",
         IS_COMPUTED_STYLE = dom.IS_COMPUTED_STYLE,
-        currentStyle = "currentStyle",
-        opacity = "opacity",
-        style = "style";
+        CURRENT_STYLE = "currentStyle",
+        OPACITY = "opacity",
+        STYLE = "style",
+        PX = "px",
+        alphaString = "alpha("+OPACITY+"=",
+        multiLengthPropExp = /^(?:margin|(border)(Width|Color|Style)|padding)$/,
+        borderRadiusExp = /^[a-zA-Z]*[bB]orderRadius$/;
     
     /** 
      * Special method for a browser that supports el.filters and not style.opacity.
@@ -1426,23 +1419,10 @@ APE.namespace("APE.dom.Event");
      * results in 1 being returned.  Use dom.getStyle or dom.getCascadedStyle instead
      */
     function getFilterOpacity(el) {
-        var filter, filters = el.filters;
-        if(!filters)return"";
-        try {
-            // Try the more common alphaType first.
-            // First time is a guess.
-            filter = filters.item(alphaTypes[0]);
-        } catch(alpha) {
-            try {
-                // Try the other alpha type.
-                filter = filters.item(alphaTypes[1]);
-                alphaTypes.reverse();
-            } catch(ex){}
-        }
-        return filter && filter[opacity]/100 || 1;
+        if(!isFilter)return"";
+        var o = /opacity\s*=\s*(\d+)/i.exec(el[STYLE].filter), d;
+        return o && (d=o[1]) ? d/100 : 1;
     }
-    var alphaTypes = ["alpha", "DXImageTransform.Microsoft.Alpha"],
-        alphaString = "alpha("+opacity+"=";
     
     /** 
      * Cross-browser adapter method for style.filters vs style.opacity.
@@ -1452,14 +1432,14 @@ APE.namespace("APE.dom.Event");
      * @return {ufloat} [0-1] amount of opacity.
      */
     function setOpacity(el, i) {
-        var s = el[style], cs, hasLayout = "hasLayout";
-        if(opacity in s) {
-            s[opacity] = i;
-        } else if("filter"in s) {
-            cs = el[currentStyle];
+        var s = el[STYLE], cs, hasLayout = "hasLayout";
+        if(OPACITY in s) {
+            s[OPACITY] = i;
+        } else if(isFilter) {
+            cs = el[CURRENT_STYLE];
             s.filter = alphaString + (i * 100) + ")";
-            if(cs && (hasLayout in cs) && !cs[hasLayout]) {
-                style.zoom = 1;
+            if(cs && !cs[hasLayout]) {
+                s.zoom = 1;
             }
         }
     }
@@ -1482,35 +1462,33 @@ APE.namespace("APE.dom.Event");
      * @return {String} the computed style value or the empty string if no value was found.
      */
     function getStyle(el, p) {
-        var value = "", cs, matches, splitVal, i, len, doc = el.ownerDocument, 
-            defaultView = doc.defaultView;
+        var value = "", cs, matches, splitVal, i, len, doc = el.ownerDocument;
         if(/float/.test(p)) {
             p = floatProp;
         }
         if(IS_COMPUTED_STYLE) {
-            cs = defaultView[getCS](el, "");
+            cs = doc.defaultView[getCS](el, "");
             if(borderRadiusExp.test(p)) {
                 p = borderRadiusProp;
             }
 
-            if(!(p in cs)) return "";
+            if(!(p in cs))return"";
             value = cs[p];
             if(value === "") {
                 // would try to get a rect, but Webkit doesn't support that.
                 value = (tryGetShorthandValues(cs, p)).join(" ");
             }
         } else {
-            cs = el[currentStyle];
-            if(p === opacity) {
+            cs = el[CURRENT_STYLE];
+            if(p === OPACITY) {
                 value = getFilterOpacity(el);
-            }
-            else {
+            } else {
                 value = cs[p];
 
-                if(value == "auto") {
+                if(value === "auto") {
                     value = getCurrentStyleValueFromAuto(el, p);
                 } else if(!(p in cs)) {
-                    return "";
+                    return"";
                 }
             }
             matches = nonPixelExp.exec(value);
@@ -1527,8 +1505,9 @@ APE.namespace("APE.dom.Event");
         return value;
     }
 
-    var sty = document.documentElement[style],
+    var sty = document.documentElement[STYLE],
         floatProp = 'cssFloat'in sty ? 'cssFloat': 'styleFloat',
+        isFilter = "filter"in sty,
         
         orderRadius = "orderRadius",
         bor = "b"+orderRadius,
@@ -1537,35 +1516,34 @@ APE.namespace("APE.dom.Event");
         borderRadiusProp = bor in sty ? bor : mor in sty ? mor : wor,
         props = ["Top", "Right", "Bottom", "Left"],
         cornerProps = ["Topright", "Bottomright", "Bottomleft", "Topleft"];
-        sty = orderRadius = null;
+    sty = bor = mor = wor = orderRadius = null;
     
     function getCurrentStyleValueFromAuto(el, p) {
         
-        var s = el[style], v, borderWidth, doc = el.ownerDocument;
-        if("pixelWidth"in s && pixelDimensionExp.test(p)) {
+        var s = el[STYLE], v, borderWidth, doc = el.ownerDocument;
+        if("pixelWidth"in s && /width|height|top|left/.test(p)) {
             var pp = "pixel" + (p.charAt(0).toUpperCase()) + p.substring(1);
             v = s[pp];
             if(v === 0) {
-                if(p == "width") {
+                if(p === "width") {
                     borderWidth = parseFloat(getStyle(el, "borderRightWidth"))||0;
                     paddingWidth = parseFloat(getStyle(el, "paddingLeft"))||0
                         + parseFloat(getStyle(el, "paddingRight"))||0;
 
-                    return el.offsetWidth - el.clientLeft - borderWidth - paddingWidth + px;
-                } 
-                else if(p == "height") {
+                    return el.offsetWidth - el.clientLeft - borderWidth - paddingWidth + PX;
+                } else if(p === "height") {
                     borderWidth = parseFloat(getStyle(el, "borderBottomWidth"))||0;
                     paddingWidth = parseFloat(getStyle(el, "paddingTop"))||0
                         + parseFloat(getStyle(el, "paddingBottom"))||0;
-                    return el.offsetHeight - el.clientTop - borderWidth + px;
+                    return el.offsetHeight - el.clientTop - borderWidth + PX;
                 }
             }
-            return s[pp] + px;
+            return s[pp] + PX;
         }
-        if(p == "margin" && el[currentStyle].position != "absolute" && 
+        if(p == "margin" && el[CURRENT_STYLE].position != "absolute" && 
           doc.compatMode !== "BackCompat") {
             v = parseFloat(getStyle(el.parentNode, 'width')) - el.offsetWidth;
-            if(v == 0) return "0px";
+            if(v == 0) return"0px";
             v = "0px " + v;
             return v + " " + v;
         }
@@ -1592,13 +1570,11 @@ APE.namespace("APE.dom.Event");
             propertyList = props;
             prefix = multiMatch[1]||multiMatch[0];
             suffix = multiMatch[2] || ""; // ["borderWidth", "border", "Width"]
-        }
-        else if(borderRadiusExp.test(p)) {
+        } else if(borderRadiusExp.test(p)) {
            propertyList = cornerProps;
             prefix = borderRadiusExp.exec(p)[0];
             suffix = ""; 
-        }
-        else return [""];
+        } else return [""];
 
         prevValue = cs[prefix + propertyList[0] + suffix ];
         values = [prevValue];
@@ -1614,9 +1590,7 @@ APE.namespace("APE.dom.Event");
         return values;
     }
 
-    var nonPixelExp = /(-?\d+|(?:-?\d*\.\d+))(?:em|ex|pt|pc|in|cm|mm\s*)/,
-        pixelDimensionExp = /width|height|top|left/,
-        px = "px"; 
+    var nonPixelExp = /(-?\d+|(?:-?\d*\.\d+))(?:em|ex|pt|pc|in|cm|mm\s*)/; 
 
     /**
      * @requires nonPixelExp
@@ -1633,21 +1607,21 @@ APE.namespace("APE.dom.Event");
 
             var val = matches[0]; // grab the -1.2em or whatever.
             if(parseFloat(val) === 0) {
-                return "0px";
+                return"0px";
             }
 
-            var s = el[style],
+            var s = el[STYLE],
                 sLeft = s.left,
                 rs = el.runtimeStyle,
                 rsLeft = rs.left;
 
-            rs.left = el[currentStyle].left;
+            rs.left = el[CURRENT_STYLE].left;
             s.left = (val || 0);
 
             // The element does not need to have position: to get values.
             // IE's math is a little off with converting em to px; IE rounds to 
             // the nearest pixel.
-            val = s.pixelLeft + px;
+            val = s.pixelLeft + PX;
             // put it back.
             s.left = sLeft;
             rs.left = rsLeft;

@@ -19,7 +19,6 @@
     <script type="text/javascript" src="../../../build/dom/style-f.js"></script>
     <script type="text/javascript" src="../../../build/dom/getContainingBlock.js"></script>
     <script type="text/javascript" src="../../../build/dom/getPixelCoords.js"></script>
-    <script type="text/javascript" src="../../../build/dom/getCascadedStyle.js"></script>
 
     <style id="testSheet">
         #testNode {
@@ -72,133 +71,6 @@ getStyleUnit : getStyleUnit,
 findInheritedStyle : findInheritedStyle,
 */
 
-var cascadedStyleTestCase = new TestCase({
-   
-    testGetInheritedColor : function() {
-	    var color = dom.findInheritedStyle(document.getElementById('testNode'), "color");
-	    ArrayAssert.contains(color, ["#000000", "rgb(0, 0, 0)"]);
-	},
-	
-	testGetInheritedBackgroundColor : function() {
-	    var color = dom.findInheritedStyle(document.getElementById('testNode'), "backgroundColor");
-	    var expected = dom.getStyle(document.documentElement, "backgroundColor");
-	    Assert.areEqual(expected, color);
-	},
-    testGetCascadedOpacity : function() {
-        var target = document.getElementById("target");
-        dom.setOpacity(target, .1);
-        var op = dom.getCascadedStyle(target, "opacity");
-        Assert.areEqual(0.1, parseFloat(op), "opacity found was wrong." );
-    },
-    
-    // Make sure the script doesn't do something dumb like 
-    // add "px" to 0.
-    testGetCascadedZIndex : function() {
-        var testNode = document.getElementById( "testNode" );
-        rule.style.zIndex = "0";
-        rule.style.position = "absolute";
-        var r = APE.dom.getCascadedStyle( testNode, 'zIndex' );
-        Assert.areEqual("0", r);
-    },
-
-    testGetCascadedStyleSheet : function() {
-
-        var testNode = document.getElementById( "testNode" );
-        testNode.parentNode.style.cssText = "";
-        rule.style.fontSize = "13em";
-        rule.style.padding = "6em";
-        rule.style.height = "50em";
-        
-        var foundFontSize = dom.getCascadedStyle(testNode, "fontSize", "em" );
-        var foundPadding = dom.getCascadedStyle(testNode, "paddingBottom", "em" );
-        var foundHeight = dom.getCascadedStyle(testNode, "height", "em" );
-
-        Assert.areEqual( "13em", foundFontSize );
-        Assert.areEqual( "6em", foundPadding, "em" );
-        Assert.areEqual( "50em", foundHeight, "height was wrong." );
-    },
-
-    testCascadedBlockValues : function() {
-        var testNode = document.getElementById( "testNode" );
-        testNode.parentNode.style.cssText = "position: relative; width:500px;";
-        rule.style.padding = "80%";
-        
-        var foundPadding = dom.getCascadedStyle(testNode, "paddingBottom", "%" );
-
-        var foundPaddingFloat = parseFloat(foundPadding);
-        var difference = 80 - foundPaddingFloat;
-
-        Assert.isTrue( 1 >= difference, "was off by one or more px." );
-        if(difference > 0) 
-            YAHOO.log("testCascadedBlockValues: sub-pixel difference: " + difference, "warn", "TestRunner");
-    },
-
-    testGetCascadedBodyMargin : function() {
-        document.body.style.marginBottom = "2.2in";
-        var mb = dom.getCascadedStyle(document.body, "marginBottom");
-        Assert.areEqual("2.2in", parseFloat(mb) + "in", "expected to fail in IE; IE does not support computed styles.");
-        if(mb != "2.2in") 
-            YAHOO.log("Browser provided odd formatting: " + mb);
-    },
-
-    testFindInheritedStyle : function() {
-        document.body.style.backgroundColor = "rgb(10, 10, 20)";
-        var target = document.getElementById("target");
-
-        for(var n = target; n != document.body; n = n.parentNode)
-            n.style.backgroundColor = "transparent";
-
-        var color = dom.findInheritedStyle( target, "backgroundColor" );
-        ArrayAssert.contains( color, ["#0a0a14", "#0A0A14", "rgb(10, 10, 20)", "rgb(10,10,20)"] );
-
-        if( (color == "#0a0a14") || (color == "#0A0A14"))
-            YAHOO.log("Color was hex, not rgb: " + color, "warn", "TestLogger");
-    },
-    testGetStyleUnit : function() {
-        var units = {
-            em : "-12.2em",
-            ex : "1893ex",
-            px : "17px",
-            pt : " 0pt",
-            pc : "0.0pc",
-            'in' : "-12in",
-            cm : "0cm",
-            mm : ".9mm"
-        };
-        for(var p in units) {
-            var value = dom.getStyleUnit(units[p]);
-            Assert.areEqual( p, value, "unit was not parsed correctly by getStyleUnit()");
-        }
-        value = dom.getStyleUnit("0");
-        Assert.areEqual( "", value, "No unit specified. Empty string should have been returned.");
-    },
-
-    testGetCascadedShorthandValues : function() {
-        var c1 = document.getElementById("c1"),
-            inp = "1em 2em 3em 4em";
-        c1.style.padding = inp;
-        var out = dom.getCascadedStyle(c1, "padding", "em");
-        Assert.areEqual("1em 2em 3em 4em", out);
-    },
-
-    testGetCollapsedCascadedShorthandValues : function() {
-        var c1 = document.getElementById("c1"),
-            inp = "1em 1em 1em 1em";
-        c1.style.fontSize = "10px";
-        c1.style.borderWidth = inp;
-        c1.style.borderStyle = "solid";
-        var out = dom.getCascadedStyle(c1, "borderWidth", "em");
-        Assert.areEqual("1em", out);
-    },
-
-    testGetCascadedBS : function() {
-        var target = document.getElementById("target");
-        var r = dom.getCascadedStyle(target, "bs");
-        Assert.areEqual("", r);
-    }
-    
-});
-
 var getStyleTestCase = new TestCase({
 
     setUp : function() {
@@ -245,23 +117,58 @@ var getStyleTestCase = new TestCase({
     },
 
     testGetComputedOpacity : function() {
-        var target = document.getElementById("target");
+        var target = document.getElementById("target"),
+            ts = target.style;
+        ts.position = "static";
+        ts.borderStyle = "none";
+        ts.borderWidth = "0px";
+        ts.height = ts.width = "auto";
         dom.setOpacity(target, .1);
         var op = dom.getStyle(target, "opacity");
         Assert.areEqual(0.1, parseFloat(op), "opacity found was wrong." );
     },
 
+    testSetOpacity : function() {
+        var target = document.getElementById("target");
+        dom.setOpacity(target, .1);
+        var op = dom.getStyle(target, "opacity");
+        Assert.areEqual(0.1, parseFloat(op), "opacity found was wrong." );
+    },
+    
     testGetFilterOpacity : function() {
         var target = document.getElementById("target");
-        var alpha = "filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50)";
-        var expected = "";
+        var alpha = "filter: progid:DXImageTransform.Microsoft.Alpha(   "
+                  + "       opacity    =   50  )";
+        var expected = .5;
         if("filters" in target) {
             target.style.cssText = alpha;
-            target.style.zoom = "1";
-            expected = "50"/100;
+        } else {
+            target.style.cssText = "opacity: .5";
         }
-        var actual = dom.getFilterOpacity(target);
+        var actual = +dom.getStyle(target, "opacity");
         Assert.areSame(expected, actual);
+    },
+    
+    testGetFilterOpacity0 : function() {
+        var target = document.getElementById("target");
+        var alpha = "filter: alpha(   "
+                  + "       opacity    =   0  )",
+            expected = 0;
+        if("filters" in target) {
+            target.style.cssText = alpha;
+            target.style.zoom = "0";
+        } else {
+            target.style.cssText = "opacity: 0";
+        }
+        var actual = +dom.getStyle(target, "opacity");
+        Assert.areSame(expected, actual);
+    },
+
+    testGetFilterOpacityUnset : function() {
+        var target = document.getElementById("target")
+            actual = dom.getStyle(target, "opacity"),
+            expected = "1";
+        Assert.areEqual(expected, actual);
     },
     
     testGetCascadedWidth : function() {
@@ -309,15 +216,6 @@ var getStyleTestCase = new TestCase({
         if(clip.top)
             YAHOO.log("clip object found: {top: " + clip.top + ", right: " + clip.right + ", " +
                 "bottom: " + clip.bottom  + ", left: " + clip.left + "}", "info", "TestRunner");
-    },
-
-    testGetCascadedInlineStyle : function() {
-        var c1 = document.getElementById('c1');
-        c1.style.margin = "12px";
-        c1.style.fontSize = "10px";
-        var r = dom.getCascadedStyle( c1, 'margin', 'em' );
-        
-        Assert.areEqual("1.2em", r);
     },
 
     testGetComputedBodyMarginFailure : function() {
@@ -492,7 +390,7 @@ var getContainingBlockTestCase = new TestCase({
 //create the logger
 var logger = new YAHOO.tool.TestLogger("testLogger");
 YAHOO.tool.TestRunner.add( getStyleTestCase );
-YAHOO.tool.TestRunner.add( cascadedStyleTestCase );
+//YAHOO.tool.TestRunner.add( cascadedStyleTestCase );
 YAHOO.tool.TestRunner.add( getContainingBlockTestCase );
 
 // run the tests, or put them in the TestRunner.
