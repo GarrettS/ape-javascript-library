@@ -165,9 +165,18 @@ var getStyleTestCase = new TestCase({
     },
 
     testGetFilterOpacityUnset : function() {
-        var target = document.getElementById("target")
+        var target = document.getElementById("target"),
             actual = dom.getStyle(target, "opacity"),
             expected = "1";
+        Assert.areEqual(expected, actual);
+    },
+
+    testGetFilterOpacityInheritedDecimal : function() {
+        var testNode = document.getElementById( "testNode" ),
+            actual, expected = .555;
+        rule.style.opacity = ""+expected;
+        rule.style.filter = "alpha(Opacity= " + (100*expected) + ")";
+        actual = dom.getStyle(testNode, "opacity");
         Assert.areEqual(expected, actual);
     },
     

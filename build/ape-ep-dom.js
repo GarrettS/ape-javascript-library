@@ -1406,22 +1406,25 @@ APE.namespace("APE.dom.Event");
         OPACITY = "opacity",
         STYLE = "style",
         PX = "px",
+        FILTER = "filter",
         alphaString = "alpha("+OPACITY+"=",
         multiLengthPropExp = /^(?:margin|(border)(Width|Color|Style)|padding)$/,
-        borderRadiusExp = /^[a-zA-Z]*[bB]orderRadius$/;
+        borderRadiusExp = /^[a-zA-Z]*[bB]orderRadius$/,
+        alphaOpExp = /opacity\s*=\s*([\d\.]+)/i;
     
     /** 
      * Special method for a browser that supports el.filters and not style.opacity.
      * @memberOf APE.dom
-     * @param {HTMLElement} el the element to find opacity on.
+     * @param {currentStyle} cs an IE currentStyle to find opacity on.
      * @return {ufloat} [0-1] amount of opacity.
      * calling this method on a browser that does not support filters
      * results in 1 being returned.  Use dom.getStyle or dom.getCascadedStyle instead
      */
-    function getFilterOpacity(el) {
-        if(!isFilter)return"";
-        var o = /opacity\s*=\s*(\d+)/i.exec(el[STYLE].filter), d;
-        return o && (d=o[1]) ? d/100 : 1;
+    function getFilterOpacity(cs) {
+        var o, f = cs[FILTER];
+        if(!alphaOpExp.test(f)) return 1;
+        o = alphaOpExp.exec(f);
+        return o[1]/100;
     }
     
     /** 
@@ -1432,13 +1435,13 @@ APE.namespace("APE.dom.Event");
      * @return {ufloat} [0-1] amount of opacity.
      */
     function setOpacity(el, i) {
-        var s = el[STYLE], cs, hasLayout = "hasLayout";
+        var s = el[STYLE], cs;
         if(OPACITY in s) {
             s[OPACITY] = i;
-        } else if(isFilter) {
+        } else if(FILTER in s) {
+            s[FILTER] = alphaString + (i * 100) + ")";
             cs = el[CURRENT_STYLE];
-            s.filter = alphaString + (i * 100) + ")";
-            if(cs && !cs[hasLayout]) {
+            if(cs && !cs.hasLayout) {
                 s.zoom = 1;
             }
         }
@@ -1481,7 +1484,7 @@ APE.namespace("APE.dom.Event");
         } else {
             cs = el[CURRENT_STYLE];
             if(p === OPACITY) {
-                value = getFilterOpacity(el);
+                value = getFilterOpacity(cs);
             } else {
                 value = cs[p];
 
@@ -1507,7 +1510,6 @@ APE.namespace("APE.dom.Event");
 
     var sty = document.documentElement[STYLE],
         floatProp = 'cssFloat'in sty ? 'cssFloat': 'styleFloat',
-        isFilter = "filter"in sty,
         
         orderRadius = "orderRadius",
         bor = "b"+orderRadius,
