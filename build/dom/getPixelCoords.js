@@ -8,9 +8,8 @@ APE.namespace("APE.dom");
  * @return {Object} {x: Number, y:Number} */
     dom.getPixelCoords = getPixelCoords;
 	function getPixelCoords(el){
-        var hasPixelCoords = "pixelLeft" in el.style,
-            ret;
-        var f = (dom.IS_COMPUTED_STYLE ? function(el) {
+        var ret,
+            f = (dom.IS_COMPUTED_STYLE ? function(el) {
             var cs = el.ownerDocument.defaultView.getComputedStyle(el, "");
             return {
                 x : parseInt(cs.left, 10)||0,

@@ -119,7 +119,9 @@ APE.namespace("APE.dom" );
         inited,
         documentElement = doc.documentElement,
         round = Math.round, max = Math.max,
-
+        GET_COMPUTED_STYLE = "getComputedStyle",
+        DEFAULT_VIEW = "defaultView",
+        
     // Load-time constants.
         IS_BODY_ACTING_ROOT = documentElement && documentElement.clientWidth === 0,
 
@@ -159,15 +161,18 @@ APE.namespace("APE.dom" );
         // In Safari 2.0.4, BODY can have offsetTop when offsetParent is null.
         // but offsetParent will be HTML (root) when HTML has position.
         // IS_BODY_OFFSET_TOP_NO_OFFSETPARENT,
-
-        IS_COMPUTED_STYLE_SUPPORTED = doc.defaultView
-            && typeof doc.defaultView.getComputedStyle != "undefined",
+        
+        IS_COMPUTED_STYLE_SUPPORTED = doc[DEFAULT_VIEW]
+            && typeof doc[DEFAULT_VIEW][GET_COMPUTED_STYLE] != "undefined",
         getBoundingClientRect = "getBoundingClientRect",
         relative = "relative",
         borderTopWidth = "borderTopWidth",
         borderLeftWidth = "borderLeftWidth",
         positionedExp = /^(?:r|a)/,
         absoluteExp = /^(?:a|f)/;
+        
+    // release from closure.
+    doc = documentElement = null;
 
     /**
      * @memberOf APE.dom
@@ -230,12 +235,17 @@ APE.namespace("APE.dom" );
                 box = getOffsetCoords(container, null);
                 x -= box.x;
                 y -= box.y;
-                if(IS_BODY_ACTING_ROOT && container === body && IS_CLIENT_TOP_SUPPORTED) {
-                    x -= borderLeft;
-                    y -= borderTop;
+                if(IS_CLIENT_TOP_SUPPORTED) {
+                    if(IS_BODY_ACTING_ROOT && container === body) {
+                        x -= borderLeft;
+                        y -= borderTop;
+                    } else if(container !== doc 
+                        && container !== documentElement && container !== body) {
+                        x -= container.clientLeft;
+                        y -= container.clientTop;
+                    }
                 }
             }
-
             if(IS_BODY_ACTING_ROOT && IS_CURRENT_STYLE_SUPPORTED
                 && container != doc && container !== body) {
                 bodyCurrentStyle = body.currentStyle;
@@ -256,14 +266,14 @@ APE.namespace("APE.dom" );
 
             var offsetLeft = el.offsetLeft,
                 offsetTop = el.offsetTop,
-                defaultView = doc.defaultView,
-                cs = defaultView.getComputedStyle(el, '');
+                defaultView = doc[DEFAULT_VIEW],
+                cs = defaultView[GET_COMPUTED_STYLE](el, '');
             if(cs.position == "fixed") {
                 coords.x = offsetLeft + documentElement.scrollLeft;
                 coords.y = offsetTop + documentElement.scrollTop;
                 return coords;
             }
-            var bcs = defaultView.getComputedStyle(body,''),
+            var bcs = defaultView[GET_COMPUTED_STYLE](body,''),
                 isBodyStatic = !positionedExp.test(bcs.position),
                 lastOffsetParent = el,
                 parent = el.parentNode,
@@ -289,7 +299,7 @@ APE.namespace("APE.dom" );
                         // See IS_PARENT_BODY_BORDER_INCLUDED_IN_OFFSET below.
                         if( !IS_PARENT_BODY_BORDER_INCLUDED_IN_OFFSET &&
                             ! (parent.tagName === TABLE && IS_TABLE_BORDER_INCLUDED_IN_TD_OFFSET)) {
-                                var pcs = defaultView.getComputedStyle(parent, "");
+                                var pcs = defaultView[GET_COMPUTED_STYLE](parent, "");
                                 // Mozilla doesn't support clientTop. Add borderWidth to the sum.
                                 offsetLeft += parseFloat(pcs[borderLeftWidth])||0;
                                 offsetTop += parseFloat(pcs[borderTopWidth])||0;
@@ -329,7 +339,7 @@ APE.namespace("APE.dom" );
             // If the lastOffsetParent is document,
             // it is not positioned (and hence, not absolute).
             if(lastOffsetParent != doc) {
-                lastOffsetPosition = defaultView.getComputedStyle(lastOffsetParent,'').position;
+                lastOffsetPosition = defaultView[GET_COMPUTED_STYLE](lastOffsetParent,'').position;
                 isLastElementAbsolute = absoluteExp.test(lastOffsetPosition);
                 isLastOffsetElementPositioned = isLastElementAbsolute ||
                     positionedExp.test(lastOffsetPosition);
@@ -350,7 +360,7 @@ APE.namespace("APE.dom" );
 
             // Case for padding on documentElement.
             if(container === body) {
-                dcs = defaultView.getComputedStyle(documentElement,'');
+                dcs = defaultView[GET_COMPUTED_STYLE](documentElement,'');
                 if(
                     (!isBodyStatic &&
                         ((IS_CONTAINER_BODY_RELATIVE_INCLUDING_HTML_PADDING_REL_CHILD && !isLastElementAbsolute)
@@ -407,7 +417,7 @@ APE.namespace("APE.dom" );
                     // have to add it back in.
                     if(container === doc && !isBodyStatic
                         && !IS_CONTAINER_BODY_RELATIVE_INCLUDING_HTML_PADDING_REL_CHILD) {
-                        if(!dcs) dcs = defaultView.getComputedStyle(documentElement,'');
+                        if(!dcs) dcs = defaultView[GET_COMPUTED_STYLE](documentElement,'');
                         bodyOffsetTop += parseFloat(dcs.paddingTop)||0;
                         bodyOffsetLeft += parseFloat(dcs.paddingLeft)||0;
                     }
@@ -558,9 +568,6 @@ APE.namespace("APE.dom" );
     function isBelowElement(a, b) {
         return (getOffsetCoords(a).y + a.offsetHeight >= getOffsetCoords(b).y + b.offsetHeight);
     }
-
-    // release from closure.
-    isInsideElement = isAboveElement = isBelowElement = null;
 })();
 /**
  * @fileoverview dom ClassName Functions.
@@ -919,7 +926,7 @@ APE.namespace("APE.dom.Event");
         alphaString = "alpha("+OPACITY+"=",
         multiLengthPropExp = /^(?:margin|(border)(Width|Color|Style)|padding)$/,
         borderRadiusExp = /^[a-zA-Z]*[bB]orderRadius$/,
-        alphaOpExp = /opacity\s*=\s*([\d\.]+)/i;
+        alphaOpExp = /opacity\s*=\s*([\d]+)/i;
     
     /** 
      * Special method for a browser that supports el.filters and not style.opacity.
