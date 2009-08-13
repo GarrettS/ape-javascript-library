@@ -102,6 +102,10 @@ document.body.style.position = "static";
 
 
 var container = document.getElementById("container"),
+	target = document.getElementById("target"),
+	c1 = document.getElementById("c1"),
+
+	// Save original state in template.
     template = container.innerHTML,
     containerCssText = container.style.cssText,
     htmlCssText = document.documentElement.style.cssText,
@@ -117,7 +121,7 @@ var positionTestCase = new YAHOO.tool.TestCase({
     name : "getOffsetCoords Test",
     
     setUp : function () {
-        scrollTo(0, 0);
+	    scrollTo(0, 0);
     },
 
     _should : {
@@ -134,7 +138,12 @@ var positionTestCase = new YAHOO.tool.TestCase({
 
         // target is positioned from the top/left of it's parent's line-box text area;
         // excluding parent's leading, which CANNOT BE CALCULATED.
-            testTargetInlineRel : true
+            testTargetInlineRel : true,
+
+        // testFixedTarget Fails in chrome when viewport has scroll. 
+        // Why ignore? If the element is fixed position, 
+        // find its position with getStyle(target, "top").
+            testFixedTarget : true
         }
     },
 
@@ -834,7 +843,6 @@ var positionTestCase = new YAHOO.tool.TestCase({
             container = document.getElementById('container');
         container.style.position = 'fixed';
         container.style.top = "10px";
-
         var coords = dom.getOffsetCoords( target, container );
         Assert.areEqual( 5, coords.y );
     },
@@ -870,11 +878,29 @@ var positionTestCase = new YAHOO.tool.TestCase({
         c1.style.border = "10px solid";
 
         document.getElementById('overlapping').style.display = 'none';
-        var coords = dom.getOffsetCoords( target, c1 );
+        var coords = dom.getOffsetCoords( target, cont );
         Assert.areEqual(10, coords.y, 'y');
         Assert.areEqual(10, coords.x, 'x');
     },
 
+    testTargetToParentBorder : function(){
+        var target = document.getElementById('target');
+        var c1 = document.getElementById('c1');
+        
+        // XXX Fails in Firefox 3 if display is inline.
+        // http://meyerweb.com/eric/thoughts/2008/05/06/line-height-abnormal/
+
+        target.style.display = "block";
+        target.style.top = "0";
+        target.style.left = "-2px";
+        c1.style.border = "10px solid";
+
+        document.getElementById('overlapping').style.display = 'none';
+        var coords = dom.getOffsetCoords( target, c1 );
+        Assert.areEqual(0, coords.y, 'y coord wrong');
+        Assert.areEqual(-2, coords.x, 'x coord wrong');
+    },
+    
     testDivInTD : function() {
         var div = document.getElementById("testdiv");
         var coords = dom.getOffsetCoords( div, undefined, {}  );
@@ -969,7 +995,7 @@ var positionTestCase = new YAHOO.tool.TestCase({
 var scrolledPositionTestCase = new YAHOO.tool.TestCase(positionTestCase);
 // After setUp(), scroll the window.
 APE.aop.Advice.addAfter(scrolledPositionTestCase, "setUp", function() {
-    document.body.scrollTop = (10, 100); 
+    scrollTo(10, 100);
     // Logger does not save state, so I hack it here. 
     if(location.search.indexOf("info") >= 0) 
     YAHOO.log("scrollTo(10, 100)", "info", "TestRunner");
