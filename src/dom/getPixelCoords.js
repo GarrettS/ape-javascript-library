@@ -8,22 +8,27 @@ APE.namespace("APE.dom");
  * @return {Object} {x: Number, y:Number} */
     dom.getPixelCoords = getPixelCoords;
 	function getPixelCoords(el){
+        var hasPixelCoords = "pixelLeft" in el.style,
+            ret;
         var f = (dom.IS_COMPUTED_STYLE ? function(el) {
             var cs = el.ownerDocument.defaultView.getComputedStyle(el, "");
             return {
-                x : parseInt(cs.left)||0,
-                y : parseInt(cs.top)||0
+                x : parseInt(cs.left, 10)||0,
+                y : parseInt(cs.top, 10)||0
             };
         } : function(el){
             var style = el.style;
             return {
-                // pixelLeft will return 0 when the element does not have 
-                // left: in the style attribute.
-                x : style.pixelLeft || parseInt(dom.getStyle(el,"left"))||0,
-                y : style.pixelTop || parseInt(dom.getStyle(el,"top"))||0
+                // pixelLeft, in IE returns 0 when the element does not have 
+                // left: in the style attribute, so if that fails, 
+                // try to read the style.
+                x : style.pixelLeft || parseInt(dom.getStyle(el,"left"), 10)||0,
+                y : style.pixelTop || parseInt(dom.getStyle(el,"top"), 10)||0
             };
         });
-        this.getPixelCoords = f;
-        return f(el);
+        ret = (this.getPixelCoords = f)(el);
+        el = null;
+        return ret;
+
     }
 })();

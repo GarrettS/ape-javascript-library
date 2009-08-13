@@ -26,7 +26,7 @@ APE.namespace("APE.dom");
         alphaString = "alpha("+OPACITY+"=",
         multiLengthPropExp = /^(?:margin|(border)(Width|Color|Style)|padding)$/,
         borderRadiusExp = /^[a-zA-Z]*[bB]orderRadius$/,
-        alphaOpExp = /opacity\s*=\s*([\d\.]+)/i;
+        alphaOpExp = /opacity\s*=\s*([\d\.e]+)/i;
     
     /** 
      * Special method for a browser that supports el.filters and not style.opacity.
