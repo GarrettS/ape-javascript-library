@@ -182,7 +182,7 @@ body {
 </style>
 
 <script type="text/javascript">
-onload = function() {
+window.onload = function() {
 
 //-----------------------------------------------------------------------------
 // The only drop-target element (Trash). We'll make this draggable, too, later.
@@ -197,7 +197,6 @@ onload = function() {
 		APE.dom.addClass(this.el, "trash-full");
         //console.log(dropEvent);
 		dropEvent.dragObj.el.style.display = "none";
-        dropEvent.dragObj.select(false);
 	};
 
 //-----------------------------------------------------------------------------
@@ -239,7 +238,6 @@ onload = function() {
     trashEl.ondblclick = function(){if(prompt("enter password", "********"))alert("permission denied");};
 
     var desktop = APE.drag.Draggable.getByNode(document.getElementById("desktop"));
-    desktop.constraint = APE.drag.Draggable.constraints.HORZ;
     APE.EventPublisher.get(desktop, "onfocus").addBefore(function(){return false;});
     desktop.activeDragClassName = "desktop-drag";
     desktop.keepInContainer = true;
