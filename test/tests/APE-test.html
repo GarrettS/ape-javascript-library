@@ -128,35 +128,6 @@ var apeTest = new YAHOO.tool.TestCase({
         Assert.isFalse(isBogusProp);
     },
 
-    testGetFunctionName : function() {
-        var f = function() {};
-        Assert.areEqual("", APE.getFunctionName(f));
-        f = function g(){};
-        Assert.areEqual("g", APE.getFunctionName(f));
-    },
-
-    testGetFunctionNameAnonymousCustomToString : function() {
-        var f = function() {};
-        f.toString = function() { return "function g()"; };
-        Assert.areEqual("", APE.getFunctionName(f));
-    },
-
-    testGetFunctionNameCustomToString : function() {
-        var f = function f() {};
-        Assert.areEqual("f", APE.getFunctionName(f));
-    },
-
-    testGetFunctionNameOther : function() {
-        var h = { }, error;
-        try {
-            APE.getFunctionName(h);
-        }
-        catch (e) {
-            error = e;
-        }
-        Assert.isInstanceOf(TypeError, error, "error was not thrown");
-    },
-
     testToString : function() {
         Assert.isString(APE.toString());
     }
@@ -177,24 +148,26 @@ var creationalTest = new YAHOO.tool.TestCase({
     },
 
     testGetByNode : function() {
-        CN.getByNode = APE.getByNode;
-        var c = CN.getByNode(testNode, 7, 1);
+
+        var CNFactory = APE.createFactory(CN);
+        
+        var c = CNFactory.getByNode(testNode, 7, 1);
         Assert.areEqual(testNode.id, c.id);
         Assert.areEqual(7, c.j);
         Assert.areEqual(1, c.k);
         var d = document.createElement("div");
-        CN.getByNode(d);
+        CNFactory.getByNode(d);
         YAHOO.log("created id: " + d.id, "info", "TestRunner");
         Assert.areNotEqual("", d.id);
 
         // Try to get it again - it should have the same id.
         var id = d.id;
-        CN.getByNode(d);
+        CNFactory.getByNode(d);
         Assert.areEqual(id, d.id);
 
         // Create a new one. It should have a unique ID.
         var d2 = document.createElement("div");
-        c = CN.getByNode(d2);
+        c = CNFactory.getByNode(d2);
         Assert.areNotEqual(d.id, d2.id);
    },
 
@@ -204,10 +177,10 @@ var creationalTest = new YAHOO.tool.TestCase({
             this.toString = function() { return el.id + ": " + s; }
         };
 
-        C.getByNode = APE.getByNode;
-        var c1 = C.getByNode(document.body, "foo"),
+        CFactory = APE.createFactory(C);
+        var c1 = CFactory.getByNode(document.body, "foo"),
             id1 = document.body.id;
-        var c2 = C.getByNode(document.body, "foo"),
+        var c2 = CFactory.getByNode(document.body, "foo"),
             id2 = document.body.id;
 
         Assert.areEqual(id1, id2);
@@ -224,7 +197,7 @@ var creationalTest = new YAHOO.tool.TestCase({
         var cc = C.getById(testNode.id, 11);
         Assert.areEqual(c, cc);
     },
-   
+    
     testCreateFactory : function() {
         var cFactory = APE.createFactory(C, cCreatePrototype);
         function cCreatePrototype() {
@@ -236,23 +209,25 @@ var creationalTest = new YAHOO.tool.TestCase({
         }
         
         var c = cFactory.getById('c', 3);
-        var c2 = cFactory.getById('c', 2);
+        var c2 = cFactory.getById('c', 3);
         Assert.areSame(c, c2);
         
     },
     
-    testNewApply : function() {
-        function Girl(name, weight, occupation) { 
-            this.name = name;
-            this.weight = weight;
-            this.occupation = occupation;
+    testCreateFactoryNode : function() {
+        var cFactory = APE.createFactory(C, cCreatePrototype);
+        function cCreatePrototype() {
+            return { 
+                getId : function() {
+                    return this.id;
+                }
+            };
         }
-        var lisa = APE.newApply(Girl, ["Lisa", 100, "tea shop"]);
-        Assert.areEqual("Lisa", lisa.name);
-        Assert.areEqual(100, lisa.weight);
-        Assert.areEqual("tea shop", lisa.occupation);
-        Assert.areEqual(Girl, lisa.constructor);
-        Assert.isInstanceOf( Girl, lisa );
+        
+        var c = cFactory.getById('c', 3);
+        var c2 = cFactory.getById({id:'c'}, 2);
+        Assert.areSame(c, c2);
+        
     },
 
     testDeferError: function() {
