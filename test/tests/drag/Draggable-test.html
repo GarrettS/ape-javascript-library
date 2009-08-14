@@ -113,10 +113,10 @@ var draggableTestCase = new YAHOO.tool.TestCase({
                     this.wait(function(){                        
                         Assert.areEqual( "orig", testNode.className,
                                 'testNode should NOT have selection' );
-                    }, 10);
-                }, 10);
-            }, 10);
-        }, 10);
+                    }, 50);
+                }, 50);
+            }, 50);
+        }, 50);
 
     },
     
@@ -167,14 +167,16 @@ var draggableTestCase = new YAHOO.tool.TestCase({
 
         Action.mousedown( testNode );
 
-        Action.mousemove( document );
-        Action.mousemove( document, {clientX:101} );
-
-        Assert.areEqual(left, testNode.style.left);
-        Assert.areEqual(top, testNode.style.top);
-        StringAssert.doesNotContain( aClass, testNode.className );        
-        StringAssert.contains( aClass, d.el.className );        
-        Action.mouseup(document);
+        Action.mousemove( document, {clientX:1} );
+        this.wait(function(){
+	        Action.mousemove( document, {clientX:101} );
+	
+	        Assert.areEqual(left, testNode.style.left);
+	        Assert.areEqual(top, testNode.style.top);
+	        StringAssert.doesNotContain( aClass, testNode.className );        
+	        StringAssert.contains( aClass, d.el.className );        
+	        Action.mouseup(document);
+        }, 26);
     },
 
     testDisable : function() {
@@ -216,12 +218,16 @@ var draggableTestCase = new YAHOO.tool.TestCase({
         if(testNode.focus)
             testNode.focus();
         Action.mousedown( testNode, {clientX: 0, clientY: 0} );
-        Action.mousemove( document );
-        Action.mousemove( document, {clientX:83, clientY:111} );
-        var coords2 = dom.getOffsetCoords( testNode );
-    
-        Assert.areEqual( 83, coords2.x );
-        Assert.areEqual( coords.y, coords2.y, "y pos should not have changed." );
+        Action.mousemove( document, {clientX:1, clientY:1} );
+
+        // Threshold is 25ms (so wait for it to kick in).
+        this.wait(function() {
+            Action.mousemove( document, {clientX:83, clientY:111} );
+            var coords2 = dom.getOffsetCoords( testNode );
+            Assert.areEqual( 83, coords2.x, "x wrong" );
+            Assert.areEqual( coords.y, coords2.y, 
+                    "y pos should not have changed." );
+        }, 26);
     },
 
     testConstraintVert : function() {
@@ -234,12 +240,17 @@ var draggableTestCase = new YAHOO.tool.TestCase({
         
         testNode.focus();
         Action.mousedown( testNode, {clientX: 0, clientY: 0} );
-        Action.mousemove( document );
-        Action.mousemove( document, {clientX:221, clientY:111} );
-        var coords2 = dom.getOffsetCoords( testNode );
-    
-        Assert.areEqual( 111, coords2.y );
-        Assert.areEqual( coords.x, coords2.x, "x pos should not have changed." );
+
+        
+        Action.mousemove( document, {clientX:1, clientY:1} );
+        this.wait(function() {
+	        Action.mousemove( document, {clientX:221, clientY:111} );
+
+	        var coords2 = dom.getOffsetCoords( testNode );
+	    
+	        Assert.areEqual( 111, coords2.y, "y coords wrong" );
+	        Assert.areEqual( coords.x, coords2.x, "x pos should not have changed." );
+	    }, 26);
     },
 
     testFromBottom : function() {
@@ -297,11 +308,13 @@ var draggableTestCase = new YAHOO.tool.TestCase({
 
         if(testNode.focus)
             testNode.focus();
-        Action.mousemove(document);
-        Action.mousemove( document, {clientX: 33, clientY: 55} );
-
-        Assert.areEqual( 33, parseInt(testNode.style.left), "left was wrong");
-        Assert.areEqual( 55, parseInt(testNode.style.top), "top was wrong");
+        Action.mousemove(document, {clientX: 1, clientY: 1});
+        this.wait(function(){
+	        Action.mousemove( document, {clientX: 33, clientY: 55} );
+	
+	        Assert.areEqual( 33, parseInt(testNode.style.left), "left was wrong");
+	        Assert.areEqual( 55, parseInt(testNode.style.top), "top was wrong");
+        }, 26);
     },
 
     testSetHandleFail : function() {
@@ -346,7 +359,7 @@ var draggableTestCase = new YAHOO.tool.TestCase({
         this.wait(function(){
             Action.mousedown( testNode2 );
             StringAssert.isEmpty( testNode.className, 'testNode class should be empty' );
-        }, 10);
+        }, 50);
     },
 
     testSelectGroupFailure : function() {
@@ -381,9 +394,9 @@ var draggableTestCase = new YAHOO.tool.TestCase({
                 this.wait(function(){
                     StringAssert.isEmpty( testNode.className, 'testNode' );
                     StringAssert.isEmpty( testNode2.className,'testNode2' );
-                }, 10);
-            }, 10);
-        }, 10);
+                }, 50);
+            }, 50);
+        }, 50);
     },
 
     testSelectGroup : function() {
@@ -423,9 +436,9 @@ var draggableTestCase = new YAHOO.tool.TestCase({
                 this.wait(function(){
                     StringAssert.isEmpty( testNode.className, 'testNode' );
                     StringAssert.isEmpty( testNode2.className,'testNode2' );
-                }, 10);
-            }, 10);
-        }, 10);
+                }, 50);
+            }, 50);
+        }, 50);
     },
    
     testCarryGroup : function() {
@@ -606,9 +619,9 @@ var draggableTestCase = new YAHOO.tool.TestCase({
                 Action.mouseup( document , {clientX : 120, clientY : 120} );
                 this.wait(function(){
                     Assert.isTrue(gotDrop, "testNode2 did not get drop event");
-                }, 10);
-            }, 10);
-        }, 10);
+                }, 50);
+            }, 50);
+        }, 50);
     },
 
     testDragOver : function() {
@@ -642,7 +655,7 @@ var draggableTestCase = new YAHOO.tool.TestCase({
             Assert.areEqual('dragOver', dt.dragOverClassName, "drag over className didn't happen.");
             Assert.isTrue( gotDragOver, "didn't get dragover.");
             Action.mouseup( document );
-        }, 10);
+        }, 50);
     },
 
     testRemoveDropTarget : function() {
