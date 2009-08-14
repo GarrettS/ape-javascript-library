@@ -84,18 +84,20 @@ var eventPublisherTest = new YAHOO.tool.TestCase({
     },
     
     testAddAfter : function() {
-        var called = false, calledAfter = false;
+        var called = false, calledAfter = false, context;
         ep.add(function( ev ) {
             called = true;
             Assert.isFalse( calledAfter );
         });
         ep.addAfter(function( ev ) {
             calledAfter = true;
+            context = this;
             Assert.isTrue( called );
         });
         testObject.fire( );
         Assert.isTrue( called );       
-        Assert.isTrue( calledAfter );       
+        Assert.isTrue( calledAfter );
+        Assert.areSame(testObject, context, "wrong context");      
     },
 
     testGetEvent : function() {

@@ -66,7 +66,7 @@ APE.EventPublisher.prototype = {
  *  @return {EventPublisher} this;
  */
     addBefore : function(f, thisArg) {
-        return APE.EventPublisher.add(this, "beforeFire", f, thisArg); 
+        return APE.EventPublisher.add(this, "beforeFire", f, thisArg||this.src); 
     },
     
 /**  Adds afterAdvice to the callStack. This fires after the callstack. 
@@ -76,7 +76,7 @@ APE.EventPublisher.prototype = {
  *  @return {EventPublisher} this;
  */
     addAfter : function(f, thisArg) {
-        return APE.EventPublisher.add(this, "afterFire", f, thisArg); 
+        return APE.EventPublisher.add(this, "afterFire", f, thisArg||this.src); 
     },
 
     /** 
