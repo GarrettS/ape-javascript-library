@@ -77,7 +77,7 @@ var draggableTestCase = new YAHOO.tool.TestCase({
         testNode2Handle = document.getElementById('testNode2-handle');
     },
 
-    testFocusBlur : function() {
+    testActivate : function() {
         
         testNodeHandle.className = "orig";
         
@@ -91,7 +91,6 @@ var draggableTestCase = new YAHOO.tool.TestCase({
             
             var orig = testNodeHandle.className;
 
-            StringAssert.contains( "ape-slider-h-handle-focus", testNodeHandle.className );
             StringAssert.contains( "ape-slider-track-active", testNodeHandle.parentNode.className );
             Action.mouseup( document );
 

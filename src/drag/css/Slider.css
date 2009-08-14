@@ -39,7 +39,8 @@ label.ape-slider-label, input {
 	top: -5px;
 }
 
-.ape-slider-h-handle-focus {
+/** Active Slider Handle */
+.ape-slider-track-active .ape-slider-h-handle {
     background: url('../../resources/drag/img/slider_osx-focus.gif') no-repeat;
 }
 
@@ -58,6 +59,6 @@ label.ape-slider-label, input {
 	top: 83px;
 	left: -4px;
 }
-.ape-slider-v-handle-focus {
-    background: url('./../resources/drag/img/slider_osx-v-focus.gif') no-repeat;
+.ape-slider-track-active .ape-slider-v-handle {
+    background: url('../../resources/drag/img/slider_osx-v-focus.gif') no-repeat;
 }
