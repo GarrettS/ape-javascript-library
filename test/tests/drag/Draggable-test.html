@@ -475,7 +475,6 @@ var draggableTestCase = new YAHOO.tool.TestCase({
 
         var d = Draggable.getByNode( testNode ),
             d2 = Draggable.getByNode( testNode2 ),
-            glided = false,
             glidended = false,
             testNode3 = document.getElementById("testNode3");
 
@@ -487,10 +486,6 @@ var draggableTestCase = new YAHOO.tool.TestCase({
 
         testNode3.style.left = "9px";
         testNode3.style.top = "-1px";
-
-        d2.onglide = function() {
-            glided = true;
-        };
 
         d.onglideend = function() {
             glidended = true;
@@ -504,19 +499,20 @@ var draggableTestCase = new YAHOO.tool.TestCase({
 
         Action.mousemove( document, {clientX: 10, clientY: 40});
 
-        Assert.areEqual("10px", testNode.style.left);
-        Assert.areEqual("20px", testNode2.style.top);
-
-        StringAssert.contains("DOC", dt.el.className);
-        Action.keypress( document, {keyCode:ESC} );
-
         this.wait(function(){
-            Assert.areEqual("0px", testNode.style.left);
-            Assert.areEqual("-20px", testNode2.style.top);
-            Assert.isTrue(glided, "d2 did not glide");
-            Assert.isTrue(glidended, "d did not fire onglideend");
-            StringAssert.doesNotContain("DOC", dt.el.className);
-        }, 200);
+	        Assert.areEqual("10px", testNode.style.left);
+	        Assert.areEqual("20px", testNode2.style.top);
+	
+	        StringAssert.contains("DOC", dt.el.className);
+	        Action.keypress( document, {keyCode:ESC} );
+	
+	        this.wait(function(){
+	            Assert.areEqual("0px", testNode.style.left);
+	            Assert.areEqual("-20px", testNode2.style.top);
+	            Assert.isTrue(glidended, "d did not fire onglideend");
+	            StringAssert.doesNotContain("DOC", dt.el.className);
+	        }, 200);
+        }, 78);
     },
 
     testKeepInContainerFail : function() {
