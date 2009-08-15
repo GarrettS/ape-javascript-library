@@ -1089,7 +1089,7 @@ APE.namespace("APE.dom.Event");
             prefix = multiMatch[1]||multiMatch[0];
             suffix = multiMatch[2] || ""; // ["borderWidth", "border", "Width"]
         } else if(borderRadiusExp.test(p)) {
-           propertyList = cornerProps;
+            propertyList = cornerProps;
             prefix = borderRadiusExp.exec(p)[0];
             suffix = ""; 
         } else return [""];

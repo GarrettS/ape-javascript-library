@@ -113,10 +113,10 @@ var draggableTestCase = new YAHOO.tool.TestCase({
                     this.wait(function(){                        
                         Assert.areEqual( "orig", testNode.className,
                                 'testNode should NOT have selection' );
-                    }, 50);
-                }, 50);
-            }, 50);
-        }, 50);
+                    }, 78);
+                }, 78);
+            }, 78);
+        }, 78);
 
     },
     
@@ -176,7 +176,7 @@ var draggableTestCase = new YAHOO.tool.TestCase({
 	        StringAssert.doesNotContain( aClass, testNode.className );        
 	        StringAssert.contains( aClass, d.el.className );        
 	        Action.mouseup(document);
-        }, 26);
+        }, 78);
     },
 
     testDisable : function() {
@@ -227,7 +227,7 @@ var draggableTestCase = new YAHOO.tool.TestCase({
             Assert.areEqual( 83, coords2.x, "x wrong" );
             Assert.areEqual( coords.y, coords2.y, 
                     "y pos should not have changed." );
-        }, 26);
+        }, 78);
     },
 
     testConstraintVert : function() {
@@ -250,7 +250,7 @@ var draggableTestCase = new YAHOO.tool.TestCase({
 	    
 	        Assert.areEqual( 111, coords2.y, "y coords wrong" );
 	        Assert.areEqual( coords.x, coords2.x, "x pos should not have changed." );
-	    }, 26);
+	    }, 78);
     },
 
     testFromBottom : function() {
@@ -314,7 +314,7 @@ var draggableTestCase = new YAHOO.tool.TestCase({
 	
 	        Assert.areEqual( 33, parseInt(testNode.style.left), "left was wrong");
 	        Assert.areEqual( 55, parseInt(testNode.style.top), "top was wrong");
-        }, 26);
+        }, 40);
     },
 
     testSetHandleFail : function() {
@@ -359,7 +359,7 @@ var draggableTestCase = new YAHOO.tool.TestCase({
         this.wait(function(){
             Action.mousedown( testNode2 );
             StringAssert.isEmpty( testNode.className, 'testNode class should be empty' );
-        }, 50);
+        }, 78);
     },
 
     testSelectGroupFailure : function() {
@@ -387,16 +387,15 @@ var draggableTestCase = new YAHOO.tool.TestCase({
                 // focus was prevented by user attempting the impossible.
                 StringAssert.isEmpty( testNode2.className );
 
-                if(document.documentElement.focus) document.documentElement.focus();
                 Action.mousedown( document.documentElement, {clientX: 200, clientY : 430} );
-                Action.mouseup( document );
+                Action.mouseup( document.documentElement, {clientX:2, clientY: 100} );
                 
                 this.wait(function(){
                     StringAssert.isEmpty( testNode.className, 'testNode' );
                     StringAssert.isEmpty( testNode2.className,'testNode2' );
-                }, 50);
-            }, 50);
-        }, 50);
+                }, 78);
+            }, 78);
+        }, 78);
     },
 
     testSelectGroup : function() {
@@ -436,9 +435,9 @@ var draggableTestCase = new YAHOO.tool.TestCase({
                 this.wait(function(){
                     StringAssert.isEmpty( testNode.className, 'testNode' );
                     StringAssert.isEmpty( testNode2.className,'testNode2' );
-                }, 50);
-            }, 50);
-        }, 50);
+                }, 78);
+            }, 78);
+        }, 78);
     },
    
     testCarryGroup : function() {
@@ -504,6 +503,7 @@ var draggableTestCase = new YAHOO.tool.TestCase({
         Action.mousedown( testNode2, {ctrlKey:true, metaKey:true} );
 
         Action.mousemove( document, {clientX: 10, clientY: 40});
+
         Assert.areEqual("10px", testNode.style.left);
         Assert.areEqual("20px", testNode2.style.top);
 
@@ -532,7 +532,7 @@ var draggableTestCase = new YAHOO.tool.TestCase({
 
         testNode.style.width = "48px";
         testNode.style.height = "18px";
-        testNode.style.border = "1px solid"; // 50 x 20.
+        testNode.style.border = "1px solid"; // 78 x 20.
 
         var d = Draggable.getByNode( testNode );
 
@@ -563,7 +563,7 @@ var draggableTestCase = new YAHOO.tool.TestCase({
 
         testNode.style.width = "48px";
         testNode.style.height = "18px";
-        testNode.style.border = "1px solid"; // 50 x 20.
+        testNode.style.border = "1px solid"; // 78 x 20.
 
         var d = Draggable.getByNode( testNode );
 
@@ -619,9 +619,9 @@ var draggableTestCase = new YAHOO.tool.TestCase({
                 Action.mouseup( document , {clientX : 120, clientY : 120} );
                 this.wait(function(){
                     Assert.isTrue(gotDrop, "testNode2 did not get drop event");
-                }, 50);
-            }, 50);
-        }, 50);
+                }, 78);
+            }, 78);
+        }, 78);
     },
 
     testDragOver : function() {
@@ -655,7 +655,7 @@ var draggableTestCase = new YAHOO.tool.TestCase({
             Assert.areEqual('dragOver', dt.dragOverClassName, "drag over className didn't happen.");
             Assert.isTrue( gotDragOver, "didn't get dragover.");
             Action.mouseup( document );
-        }, 50);
+        }, 78);
     },
 
     testRemoveDropTarget : function() {
