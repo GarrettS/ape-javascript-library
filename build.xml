@@ -3,8 +3,8 @@
     <property name="src" location="src"/>
     <property name="test" location="test"/>
     <property name="example" location="example"/>
-    <property name="build" location="build"/>
-    <property name="deploy" location="C:/Program Files/Apache/Tomcat 6.0/webapps/ape/test"/>
+	<property name="build" location="build"/>
+    <property name="deploy" location="C:/Program Files/Apache/Tomcat/webapps/ROOT/ape/"/>
     
     <target name="js.rollups" depends="js.copy">
 
@@ -94,12 +94,10 @@ APE.namespace("APE.drag"<!--necessary space --> );</header>
         description="copy test, build, example, to webserver directory">
     </target>
 	
-    <target name="deploy.copy" 
+    <target name="deploy.copy" depends="js.rollups"
         description="copy test, build, example, to webserver directory">
         <copy todir="${deploy}">
-            <fileset dir="${test}"/>
-            <fileset dir="${build}"/>
-            <fileset dir="${example}"/>
+            <fileset dir="."/>
         </copy>
     </target>
 </project>

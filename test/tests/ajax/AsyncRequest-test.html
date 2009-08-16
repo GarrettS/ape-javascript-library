@@ -31,15 +31,19 @@ var Assert = YAHOO.util.Assert,
     name : "AsyncRequest Tests",
 
     setUp : function () {
-        AsyncRequest.instances = {};
     },
 
+    tearDown : function(){
+        AsyncRequest.instances = {};
+    },
+    
     //---------------------------------------------------------------------
     // Test methods - names must begin with "test"
     //---------------------------------------------------------------------
 
     // make sure that oncomplete fires {successful: true}
     testDone : function() {
+    
         var req = AsyncRequest.getById("", {action:"data.json.txt", method:"GET"} ),
             completed = false,
             succeeded = false;
@@ -58,6 +62,7 @@ var Assert = YAHOO.util.Assert,
 
         // send the request.
         req.send();
+
         this.wait(function(){
             Assert.isTrue(completed, "completed");
             Assert.isTrue(succeeded, "succeeded");
@@ -249,15 +254,15 @@ var Assert = YAHOO.util.Assert,
     },
 
     testConfigData : function() {
-        var config = {action:"data.json.txt", method:"POST", id : 12 };
+        var y = {};
+        var config = {action:"data.json.txt", method:"POST", id : "12" };
         var req = AsyncRequest.getById("", config );
-        Assert.areSame(12, req.config.id, "config data missing.");
+        Assert.areSame("12", req.config.id, "config data missing.");
     },
 
     testGetById : function() {
         var config = {action:"data.json.txt", method:"POST"  };
         var req = AsyncRequest.getById("12", config );
-        var req2 = AsyncRequest.getById("12", config );
         Assert.areSame(req, req2);
     }
 });
