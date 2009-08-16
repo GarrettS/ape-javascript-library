@@ -344,7 +344,7 @@ APE.namespace("APE.dom");
 // For initializing load time constants.
     function init() {
 		inited = true;
-        var body = doc.body;
+        var d = document, body = d.body;
         if(!body) return;
         var marginTop = "marginTop", position = "position", padding = "padding",
             stat = "static",
@@ -354,11 +354,11 @@ APE.namespace("APE.dom");
             z = "0",
             one = "1px",
             offsetTop = "offsetTop",
-            ds = documentElement.style,
+            ds = d.documentElement.style,
             dCssText = ds.cssText,
-            x = doc.createElement('div'),
+            x = d.createElement('div'),
             xs = x.style,
-            table = doc.createElement(TABLE);
+            table = d.createElement(TABLE);
 
         s[padding] = s[marginTop] = s.top = z;
         ds.position = stat;

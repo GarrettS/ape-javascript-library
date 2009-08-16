@@ -14,7 +14,6 @@ APE.namespace("APE.ajax");
      */
     APE.ajax.AsyncRequest = APE.createFactory(AsyncRequest, createAsyncProto);
 
-    var defaultEnctype = 'application/x-www-form-urlencoded';
     function AsyncRequest(id, formConfig) {
         this.id = id;
         this.httpMethod = formConfig.method && formConfig.method.toLowerCase()||"get";
@@ -33,7 +32,8 @@ APE.namespace("APE.ajax");
         }
     }
 
-    var nType = 'XMLHttpRequest', aType = 'ActiveXObject',
+    var defaultEnctype = 'application/x-www-form-urlencoded',
+        nType = 'XMLHttpRequest', aType = 'ActiveXObject',
         type = (nType in self) ? nType : aType,
         isNative = nType == type,
         /** store up to 4 XHR objects. */

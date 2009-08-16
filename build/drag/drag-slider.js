@@ -61,14 +61,17 @@ APE.namespace("APE.drag" );
         this.isRel = dom.getStyle(el, "position").toLowerCase() == "relative";
     
         // default 'container' is the containing block.
-        this.container = (this.isRel ? el.parentNode : dom.getContainingBlock(el));
+        var c = (this.isRel ? el.parentNode : dom.getContainingBlock(el));
+        if(c === null) c = document.documentElement;        
+        this.container = c; 
+
         this.dropTargets = [];
         this.handle = el;
         this.onbeforeexitcontainer = beforeExitContainer;
         el.style.zIndex = dom.getStyle(el, "zIndex") || highestZIndex++;
         setIeTopLeft(el);
     }
-        
+    
     /* default "onbeforeexitcontainer" handler */
     function beforeExitContainer() { return !this.keepInContainer; }
     
@@ -222,8 +225,11 @@ APE.namespace("APE.drag" );
         function setUpCoords(e, newDo) {
             var container = newDo.container,
                 el = newDo.el,
-                cb = dom.getContainingBlock(el),
-                coords = dom.getOffsetCoords(cb, container),
+                d = document,
+                docEl = d.documentElement,
+                cb = dom.getContainingBlock(el)||docEl,
+                cWidth, cHeight,
+                coords = (cb === container) ? {x:0, y:0} : dom.getOffsetCoords(cb, container);
               // subtract in-flow offsets.
                 pixelCoords = dom.getPixelCoords(el),
               // Due to the AVK-CSSOM Mess, offsetTop/offsetLeft are broken - DO NOT USE offset*!
@@ -246,10 +252,18 @@ APE.namespace("APE.drag" );
                 // Safari 1 can't read styles. TODO: test Safari 2.
              
             if(newDo.keepInContainer) {
+                if(container === d.body) {
+                    cWidth = parseInt(dom.getStyle(container, "width"), 10);
+                    cHeight = parseInt(dom.getStyle(container, "height"), 10);
+                } else {
+                    cWidth = container.clientWidth;
+                    cHeight = container.clientHeight;
+                }
+
                 newDo.minX = 0 - inFlowOffsetX;
-                newDo.maxX = container.clientWidth - newDo.el.offsetWidth - inFlowOffsetX;
+                newDo.maxX = cWidth - el.offsetWidth - inFlowOffsetX;
                 newDo.minY = 0 - inFlowOffsetY;
-                newDo.maxY = container.clientHeight - newDo.el.offsetHeight - inFlowOffsetY;
+                newDo.maxY = cHeight - el.offsetHeight - inFlowOffsetY;
             }
         }
         
@@ -464,11 +478,12 @@ APE.namespace("APE.drag" );
             }
             
             if(!dOTarg.dragMultiple) {
-                if(!metaKey)
+                if(!metaKey) {
                     removeGroupSelection();
     
-                // User tried to add to group. Just exit.
-                else {
+                // User tried to add to group. Exit, but don't 
+                // deselect on mouseup.
+                } else {
                     keepUserSelection = true;
                     return false;
                 }
@@ -553,37 +568,37 @@ APE.namespace("APE.drag" );
             var eventCoords = getEventCoords(e),
                 ePageX = eventCoords.x, ePageY = eventCoords.y,
                 distX = ePageX - mousedownX,
-                distY = ePageY - mousedownY;
+                distY = ePageY - mousedownY,
+                isDragStopped = false,
+                newX = dO.origX + distX,
+                newY = dO.origY + distY,
+                id;
             
-            // drag the bitch.
+            // Initiate dragging.
             if(dO.isBeingDragged == false) {
                 dragStart(dO, e);
                 
-                for(var id in draggableList) {
+                for(id in draggableList) {
                     dragStart(draggableList[id], e);
              
                 }
             }
-            dO.newX = dO.origX + distX;
-            dO.newY = dO.origY + distY;
     
             dO.hasBeenDragged = (dO.hasBeenDragged || (distX || distY));
             
-            var isLeft = dO.newX < dO.minX,
-                isRight = dO.newX > dO.maxX,
-                isAbove = dO.newY < dO.minY,
-                isBelow = dO.newY > dO.maxY;
-    
-            if(typeof dO.onbeforedrag == FUNCTION && dO.onbeforedrag(e) == false) return;
-            
-            var isOutsideContainer = dO.container != null,
+            var isLeft = newX < dO.minX,
+                isRight = newX > dO.maxX,
+                isAbove = newY < dO.minY,
+                isBelow = newY > dO.maxY,
+                isOutsideContainer = dO.container != null,
                 hasOnDrag = (typeof dO.ondrag == FUNCTION),
                 isBeforeExitContainerFunction = typeof dO.onbeforeexitcontainer == FUNCTION,
                 planesStopped = 0;
-    
+                
+            if(typeof dO.onbeforedrag == FUNCTION && dO.onbeforedrag(e) == false) return;
+                
             
             isOutsideContainer &= ( isLeft || isRight || isAbove || isBelow );
-            
             if(isOutsideContainer && (isBeforeExitContainerFunction || 
                                     dO.onbeforeexitcontainer() == false)) {
                 if(isLeft) {
@@ -610,8 +625,7 @@ APE.namespace("APE.drag" );
                     }
                 } else {
                     dO.isAtLeft = dO.isAtRight = false;
-                    dO.moveToX( dO.newX );
-
+                    dO.moveToX( newX );
                     carryGroup(distX, null);
                 }
                 if(isAbove) {
@@ -639,22 +653,23 @@ APE.namespace("APE.drag" );
                     }
                 } else {
                     dO.isAtTop = dO.isAtBottom = false;
-                    dO.moveToY( dO.newY );
+                    dO.moveToY( newY );
                     carryGroup(null, distY);
                 }
                 
-                dO.isDragStopped = planesStopped == 2;
+                isDragStopped = planesStopped == 2;
                 
-                if(dO.isDragStopped && typeof dO.ondragstop == FUNCTION)
+                if(isDragStopped && typeof dO.ondragstop == FUNCTION) {
                     dO.ondragstop(e);
-                else 
+                } else {
                     if(hasOnDrag)
                         dO.ondrag(e);
+                }
             } else {            // In container.
-                dO.isDragStopped = dO.isAtLeft = dO.isAtRight =
+                isDragStopped = dO.isAtLeft = dO.isAtRight =
                     dO.isAtTop = dO.isAtBottom = false;
-                dO.moveToX( dO.newX );
-                dO.moveToY( dO.newY );
+                dO.moveToX( newX );
+                dO.moveToY( newY );
                 carryGroup(distX, distY);
                 if(hasOnDrag)
                     dO.ondrag(e);
@@ -879,12 +894,7 @@ APE.namespace("APE.drag" );
             grabX : 0,
             /* where draggable was grabbed from */
             grabY : 0,
-        
-            /* Where it will move to next. onbeforedrag */
-            newX : 0, 
-            /* Where it will move to next. onbeforedrag */
-            newY : 0,
-        
+            
             /* drag object can be dragged outside of its container */
             keepInContainer : false,
             
@@ -1056,5 +1066,5 @@ APE.namespace("APE.drag" );
             /** @event Hit a drop target. Fires for each object being dragged. */
             ondrop : undef
         };
-    }    
+    }
 })();/** slider.js * (c) 2007 Garrett Smith * http:// dhtmlkitchen.com * * requires: Draggable, EventPublisher */(function(){    var APE = window.APE,        drag = APE.drag,        dom = APE.dom,        Slider = drag.Slider = APE.createFactory(SliderC, createSliderProto),        HORZ = 1,        VERT = 2,        MINVAL = "minValue",        MAXVAL = "maxValue";        Slider.direction = {        HORZ : HORZ,        VERT : VERT    };    function SliderC(el, dir, minValue, maxValue) {        this.id = el.id;        this.dir = dir;        this.value = 0;        this.rationalValue = 0;            var handle = drag.Draggable.getByNode(el, dir);        handle.keepInContainer = true;        this.handle = handle;        this[MINVAL] = minValue||0;        this[MAXVAL] = maxValue;        this.trackbar = el.parentNode;        this.tDist = 0;        this.init();    }        function createSliderProto() {                        // IE and Webkit ignore keyEvents on the element.        APE.EventPublisher.add(document, "onkeydown", _keyDown, this);        var ACTIVE_TRACKBAR = "ape-slider-track-active",            activeSlider = null;                return {                         init : function() {                var EventPublisher = APE.EventPublisher,                    el = document.getElementById(this.id),                    handle = this.handle,                    container = this.trackbar;                        EventPublisher.add(handle, "ondragend", dragEnd, this);                EventPublisher.add(handle, "onglideend", dragEnd, this);                                        EventPublisher.add(handle, "ondrag", sliderSlid, this);                        EventPublisher.add(el, "onfocus", sliderFocus, this);                EventPublisher.add(el, "onblur", sliderBlur, this);                        EventPublisher.add(handle, "onglide", sliderSlid, this);                        EventPublisher.add(handle, "ondragstop", sliderSlid, this);                if(this.dir === VERT){                    this.tDist = container.clientHeight - el.offsetHeight;                    handle.moveToX = moveToNo;                } else {                    this.tDist = container.clientWidth - el.offsetWidth;                    handle.moveToY = moveToNo;                }                        // Default: use pixels for min/max.                if(this[MAXVAL] === undefined)                     this[MAXVAL] = this.tDist;                EventPublisher.add(this.trackbar, "onmousedown", trackbarMouseDown);            },                    ticks : 15,                        	rationalValue : 0,                	slideToX : function(x) {            	this.handle.moveToX(x);            	if(typeof slider.onslide === "function")                	slider.onslide();                            },                        /** setValue moves the slider to x or y coordinate based on value              */        	setValue : function(v) {                        // keep in range, throw no error.             	v = Math.max(this[MINVAL], v);            	v = Math.min(this[MAXVAL], v);                    	var h = this.handle,                    d = this[MAXVAL] - this[MINVAL],                    rationalValue = (v - this[MINVAL]) / d;                        // this.handle.onbeforedragstart();            	if(this.dir === VERT) {                             	h.moveToY(this.tDist  * (1 - rationalValue));                } else {                 	h.moveToX(this.tDist * rationalValue );                }            	this.rationalValue = rationalValue;            	this.value = v;            },                    	slideToY : function(y) {            	this.handle.moveToY(y);            	this.onslide();            },                    	setRationalValue : function(fRat, bOnslide) {            	fRat = Math.max(0, fRat);            	fRat = Math.min(1, fRat);            	this.rationalValue = fRat;            	this.setValue(this[MINVAL] + (fRat * (this[MAXVAL] - this[MINVAL])));            	if(bOnslide)                	sliderSlid.call(this, {});            }        };        function moveToNo(){}                 function trackbarMouseDown(e) {            var target = dom.Event.getTarget(e),                slider = Slider.instances[this.getElementsByTagName("*")[0].id];            if(target !== this) return true;            if(!e) e = event;            else if(e.preventDefault)                e.preventDefault();                dom.addClass(this, ACTIVE_TRACKBAR);            slider.handle.grab(e);            sliderSlid.call(slider, e);                          return false;        }                      function dragEnd(e) {            dom.removeClass(this.trackbar, ACTIVE_TRACKBAR);            if(typeof this.onslideend === "function")                this.onslideend(e);         }                 function sliderFocus(e) {            activeSlider = this;            dom.addClass(this.trackbar, ACTIVE_TRACKBAR);        }                function sliderBlur(e) {            if(activeSlider === this)                activeSlider = null;            dom.removeClass(this.trackbar, ACTIVE_TRACKBAR);        }                        function sliderSlid(e) {             this.value = 0;            var el = document.getElementById(this.id),                rationalValue = 0;                if(this.dir === HORZ) {                if(el.offsetLeft > 0)                    rationalValue = el.offsetLeft / this.tDist;                else                    rationalValue = 0;            }            else {                if(el.offsetTop > 0) {                    var distFromBottom = this.tDist - el.offsetTop;                    rationalValue = distFromBottom / this.tDist;                }                else                    rationalValue = 1;            }            this.rationalValue = rationalValue;            this.value = rationalValue * (this[MAXVAL] - this[MINVAL]);            if(this.onslide) this.onslide(e||{});         }            var lastKeyTime;        function _keyDown(e) {            e = e||window.event;            if(e.stopPropagation) {                // Safari 3 doesn't actually stop propagation; ignores cancelBubble = true.                // Doesn't support originalTarget, either.                e.stopPropagation();            }            e.cancelBubble = true; // just in case some actually fires a keyEvent on a handle.                // IE, Opera, Webkit all need this:            // If stopPropagation and cancelBubble fail, check the timeStamp.            // If the timeStamp is recurrant, exit.            // Opera 9.2: timeStamp is always 0. always. IE does not support event.timeStamp.            var timeStamp = +new Date,                 slider = activeSlider;            if(!slider) return;                        if(timeStamp - lastKeyTime < 5) return; // recurrant.            lastKeyTime = timeStamp; // record.            var keyCode = e.keyCode,                lArr = keyCode === 37,                rArr = keyCode === 39,                uArr = keyCode === 38,                dArr = keyCode === 40;                if( !(lArr || rArr || uArr || dArr) ) return true;                if(slider && slider.id in Slider.instances) {                if(lArr || dArr)                    slider.setValue(slider.value - slider[MAXVAL]/slider.ticks, 0);                else if(rArr || uArr)                    slider.setValue(slider.value + slider[MAXVAL]/slider.ticks, 0);                if(slider.onslide)                    slider.onslide(e);                return false;            }        }    }     })();

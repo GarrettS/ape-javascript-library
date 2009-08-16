@@ -60,14 +60,17 @@ APE.namespace("APE.drag");
         this.isRel = dom.getStyle(el, "position").toLowerCase() == "relative";
     
         // default 'container' is the containing block.
-        this.container = (this.isRel ? el.parentNode : dom.getContainingBlock(el));
+        var c = (this.isRel ? el.parentNode : dom.getContainingBlock(el));
+        if(c === null) c = document.documentElement;        
+        this.container = c; 
+
         this.dropTargets = [];
         this.handle = el;
         this.onbeforeexitcontainer = beforeExitContainer;
         el.style.zIndex = dom.getStyle(el, "zIndex") || highestZIndex++;
         setIeTopLeft(el);
     }
-        
+    
     /* default "onbeforeexitcontainer" handler */
     function beforeExitContainer() { return !this.keepInContainer; }
     
@@ -221,8 +224,11 @@ APE.namespace("APE.drag");
         function setUpCoords(e, newDo) {
             var container = newDo.container,
                 el = newDo.el,
-                cb = dom.getContainingBlock(el),
-                coords = dom.getOffsetCoords(cb, container),
+                d = document,
+                docEl = d.documentElement,
+                cb = dom.getContainingBlock(el)||docEl,
+                cWidth, cHeight,
+                coords = (cb === container) ? {x:0, y:0} : dom.getOffsetCoords(cb, container);
               // subtract in-flow offsets.
                 pixelCoords = dom.getPixelCoords(el),
               // Due to the AVK-CSSOM Mess, offsetTop/offsetLeft are broken - DO NOT USE offset*!
@@ -245,10 +251,18 @@ APE.namespace("APE.drag");
                 // Safari 1 can't read styles. TODO: test Safari 2.
              
             if(newDo.keepInContainer) {
+                if(container === d.body) {
+                    cWidth = parseInt(dom.getStyle(container, "width"), 10);
+                    cHeight = parseInt(dom.getStyle(container, "height"), 10);
+                } else {
+                    cWidth = container.clientWidth;
+                    cHeight = container.clientHeight;
+                }
+
                 newDo.minX = 0 - inFlowOffsetX;
-                newDo.maxX = container.clientWidth - newDo.el.offsetWidth - inFlowOffsetX;
+                newDo.maxX = cWidth - el.offsetWidth - inFlowOffsetX;
                 newDo.minY = 0 - inFlowOffsetY;
-                newDo.maxY = container.clientHeight - newDo.el.offsetHeight - inFlowOffsetY;
+                newDo.maxY = cHeight - el.offsetHeight - inFlowOffsetY;
             }
         }
         
@@ -463,11 +477,12 @@ APE.namespace("APE.drag");
             }
             
             if(!dOTarg.dragMultiple) {
-                if(!metaKey)
+                if(!metaKey) {
                     removeGroupSelection();
     
-                // User tried to add to group. Just exit.
-                else {
+                // User tried to add to group. Exit, but don't 
+                // deselect on mouseup.
+                } else {
                     keepUserSelection = true;
                     return false;
                 }
@@ -552,37 +567,37 @@ APE.namespace("APE.drag");
             var eventCoords = getEventCoords(e),
                 ePageX = eventCoords.x, ePageY = eventCoords.y,
                 distX = ePageX - mousedownX,
-                distY = ePageY - mousedownY;
+                distY = ePageY - mousedownY,
+                isDragStopped = false,
+                newX = dO.origX + distX,
+                newY = dO.origY + distY,
+                id;
             
-            // drag the bitch.
+            // Initiate dragging.
             if(dO.isBeingDragged == false) {
                 dragStart(dO, e);
                 
-                for(var id in draggableList) {
+                for(id in draggableList) {
                     dragStart(draggableList[id], e);
              
                 }
             }
-            dO.newX = dO.origX + distX;
-            dO.newY = dO.origY + distY;
     
             dO.hasBeenDragged = (dO.hasBeenDragged || (distX || distY));
             
-            var isLeft = dO.newX < dO.minX,
-                isRight = dO.newX > dO.maxX,
-                isAbove = dO.newY < dO.minY,
-                isBelow = dO.newY > dO.maxY;
-    
-            if(typeof dO.onbeforedrag == FUNCTION && dO.onbeforedrag(e) == false) return;
-            
-            var isOutsideContainer = dO.container != null,
+            var isLeft = newX < dO.minX,
+                isRight = newX > dO.maxX,
+                isAbove = newY < dO.minY,
+                isBelow = newY > dO.maxY,
+                isOutsideContainer = dO.container != null,
                 hasOnDrag = (typeof dO.ondrag == FUNCTION),
                 isBeforeExitContainerFunction = typeof dO.onbeforeexitcontainer == FUNCTION,
                 planesStopped = 0;
-    
+                
+            if(typeof dO.onbeforedrag == FUNCTION && dO.onbeforedrag(e) == false) return;
+                
             
             isOutsideContainer &= ( isLeft || isRight || isAbove || isBelow );
-            
             if(isOutsideContainer && (isBeforeExitContainerFunction || 
                                     dO.onbeforeexitcontainer() == false)) {
                 if(isLeft) {
@@ -609,8 +624,7 @@ APE.namespace("APE.drag");
                     }
                 } else {
                     dO.isAtLeft = dO.isAtRight = false;
-                    dO.moveToX( dO.newX );
-
+                    dO.moveToX( newX );
                     carryGroup(distX, null);
                 }
                 if(isAbove) {
@@ -638,22 +652,23 @@ APE.namespace("APE.drag");
                     }
                 } else {
                     dO.isAtTop = dO.isAtBottom = false;
-                    dO.moveToY( dO.newY );
+                    dO.moveToY( newY );
                     carryGroup(null, distY);
                 }
                 
-                dO.isDragStopped = planesStopped == 2;
+                isDragStopped = planesStopped == 2;
                 
-                if(dO.isDragStopped && typeof dO.ondragstop == FUNCTION)
+                if(isDragStopped && typeof dO.ondragstop == FUNCTION) {
                     dO.ondragstop(e);
-                else 
+                } else {
                     if(hasOnDrag)
                         dO.ondrag(e);
+                }
             } else {            // In container.
-                dO.isDragStopped = dO.isAtLeft = dO.isAtRight =
+                isDragStopped = dO.isAtLeft = dO.isAtRight =
                     dO.isAtTop = dO.isAtBottom = false;
-                dO.moveToX( dO.newX );
-                dO.moveToY( dO.newY );
+                dO.moveToX( newX );
+                dO.moveToY( newY );
                 carryGroup(distX, distY);
                 if(hasOnDrag)
                     dO.ondrag(e);
@@ -878,12 +893,7 @@ APE.namespace("APE.drag");
             grabX : 0,
             /* where draggable was grabbed from */
             grabY : 0,
-        
-            /* Where it will move to next. onbeforedrag */
-            newX : 0, 
-            /* Where it will move to next. onbeforedrag */
-            newY : 0,
-        
+            
             /* drag object can be dragged outside of its container */
             keepInContainer : false,
             
@@ -1055,5 +1065,5 @@ APE.namespace("APE.drag");
             /** @event Hit a drop target. Fires for each object being dragged. */
             ondrop : undef
         };
-    }    
+    }
 })();
