@@ -29,9 +29,7 @@ APE.namespace("APE.ajax");
         // copy config.
         this.config = {};
         for(var prop in formConfig) {
-            if(typeof this.config[prop] == "string") {
-                this.config[prop] = formConfig[prop];
-            }
+            this.config[prop] = formConfig[prop];
         }
     }
 
@@ -93,7 +91,6 @@ APE.namespace("APE.ajax");
                     ar.ontimeout(/* Should we pass anything here? */);
                     ar.req.abort(); // Directly abort the request, don't fire "onabort".
                     oncomplete(ar);
-                    ar = null; 
                 };
                 ar.timeoutID = self.setTimeout( userTimeout, ar.timeoutMillis );
             }
@@ -102,7 +99,6 @@ APE.namespace("APE.ajax");
             function readyStateChangePoll() {
                 if( ar.req.readyState === 4 ) {
                     processResponse(ar);
-                    ar = null; 
                 }
             }
     
