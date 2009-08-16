@@ -112,11 +112,17 @@ var getStyleTestCase = new TestCase({
 
         // Iterating through "length" in a for loop 
         // returns camel-cased property names. 
-        // Use a for-in loop and swallow errors on things like functions or length.
+        // Use a for-in loop and swallow errors on things like functions or length,
+        // or "clip" for IE.
         for(var prop in style) {
-          if (typeof style[prop] == 'string') {
-            style[prop] = "";
-          }
+            try{ 
+	          if(typeof style[prop] == 'string') {
+	            style[prop] = "";
+	          }
+            } catch(ex) { 
+                // IE will throw errors on "clip" if it is an empty string.
+                // alert("error setting " + prop + ex.message);
+            }
         }
         style = null;
     },
@@ -407,9 +413,8 @@ var getContainingBlockTestCase = new TestCase({
 	testGetContainingBlockRoot : function() {
 	    var cb = dom.getContainingBlock( document.documentElement );
 	
-	    Assert.areEqual( document, cb );
+	    Assert.areEqual( null, cb, "containing block not null" );
 	}
-
 });
 //create the logger
 var logger = new YAHOO.tool.TestLogger("testLogger");

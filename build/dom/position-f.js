@@ -7,8 +7,10 @@
 /** @name APE.dom */
 APE.namespace("APE.dom");
 (function() {
+    
+    var dom = APE.dom;
     APE.mixin(
-        APE.dom,
+        dom,
             /** @scope APE.dom */ {
             getOffsetCoords : getOffsetCoords,
             isAboveElement : isAboveElement,
@@ -103,7 +105,7 @@ APE.namespace("APE.dom");
      */
     function getOffsetCoords(el, container, coords) {
 
-        var doc = el.ownerDocument,
+        var doc = el[dom.OWNER_DOCUMENT],
             documentElement = doc.documentElement,
             body = doc.body;
 

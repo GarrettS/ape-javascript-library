@@ -38,6 +38,10 @@ var domconstants = new TestCase({
 
     testIsComputedStyle : function() {
         Assert.isTypeOf("boolean", dom.IS_COMPUTED_STYLE);
+    },
+
+    testOwnerDocument : function() {
+        Assert.areSame(document, document.body[dom.OWNER_DOCUMENT]);
     }
 });
 var logger = new YAHOO.tool.TestLogger("testLogger");

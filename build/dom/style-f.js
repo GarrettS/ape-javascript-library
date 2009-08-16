@@ -81,7 +81,8 @@ APE.namespace("APE.dom");
      * @return {String} the computed style value or the empty string if no value was found.
      */
     function getStyle(el, p) {
-        var value = "", cs, matches, splitVal, i, len, doc = el.ownerDocument;
+        var value = "", cs, matches, splitVal, i, len, 
+        doc = el[dom.OWNER_DOCUMENT];
         if(/float/.test(p)) {
             p = floatProp;
         }
@@ -138,7 +139,7 @@ APE.namespace("APE.dom");
     
     function getCurrentStyleValueFromAuto(el, p) {
         
-        var s = el[STYLE], v, borderWidth, doc = el.ownerDocument;
+        var s = el[STYLE], v, borderWidth, doc = el[dom.OWNER_DOCUMENT];
         if("pixelWidth"in s && /width|height|top|left/.test(p)) {
             var pp = "pixel" + (p.charAt(0).toUpperCase()) + p.substring(1);
             v = s[pp];

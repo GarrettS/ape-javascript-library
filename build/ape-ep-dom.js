@@ -485,10 +485,14 @@ if(window.CollectGarbage)
 APE.namespace("APE.dom" );
 (function(){
 	var dom = APE.dom,
-	docEl = document.documentElement,  
-	textContent = "textContent",
-	view = document.defaultView;
+	    od = "ownerDocument",
+	    doc = document,
+	    docEl = doc.documentElement,
+        OWNER_DOCUMENT = docEl && od in docEl ? od : "document",
+    	textContent = "textContent",
+    	view = doc.defaultView;
 	
+	dom.OWNER_DOCUMENT = OWNER_DOCUMENT;
     dom.IS_COMPUTED_STYLE = (typeof view != "undefined" && "getComputedStyle" in view);
 	dom.textContent = textContent in docEl ? textContent : "innerText";
 })();/**
@@ -589,8 +593,10 @@ APE.namespace("APE.dom" );
 /** @name APE.dom */
 
 (function() {
+    
+    var dom = APE.dom;
     APE.mixin(
-        APE.dom,
+        dom,
             /** @scope APE.dom */ {
             getOffsetCoords : getOffsetCoords,
             isAboveElement : isAboveElement,
@@ -685,7 +691,7 @@ APE.namespace("APE.dom" );
      */
     function getOffsetCoords(el, container, coords) {
 
-        var doc = el.ownerDocument,
+        var doc = el[dom.OWNER_DOCUMENT],
             documentElement = doc.documentElement,
             body = doc.body;
 
@@ -1464,7 +1470,8 @@ APE.namespace("APE.dom.Event");
      * @return {String} the computed style value or the empty string if no value was found.
      */
     function getStyle(el, p) {
-        var value = "", cs, matches, splitVal, i, len, doc = el.ownerDocument;
+        var value = "", cs, matches, splitVal, i, len, 
+        doc = el[dom.OWNER_DOCUMENT];
         if(/float/.test(p)) {
             p = floatProp;
         }
@@ -1521,7 +1528,7 @@ APE.namespace("APE.dom.Event");
     
     function getCurrentStyleValueFromAuto(el, p) {
         
-        var s = el[STYLE], v, borderWidth, doc = el.ownerDocument;
+        var s = el[STYLE], v, borderWidth, doc = el[dom.OWNER_DOCUMENT];
         if("pixelWidth"in s && /width|height|top|left/.test(p)) {
             var pp = "pixel" + (p.charAt(0).toUpperCase()) + p.substring(1);
             v = s[pp];
