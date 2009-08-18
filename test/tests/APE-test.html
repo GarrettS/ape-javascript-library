@@ -67,7 +67,6 @@ var apeTest = new YAHOO.tool.TestCase({
             soundhole : undefined,
             constructor: "Yumi" 
         });
-
         Assert.areEqual(extendReturn, ElectricGuitar);
 
         var testGuitar = new ElectricGuitar;
@@ -77,11 +76,11 @@ var apeTest = new YAHOO.tool.TestCase({
         for(var i = 0; i < allProps.length; i++)
             ObjectAssert.hasProperty(allProps[i], testGuitar);
         
-        Assert.areEqual(document.title, testGuitar.whammyBar);
-        Assert.areEqual(undefined, testGuitar.piezos);
-        Assert.areEqual( undefined, testGuitar.soundhole );
-        Assert.areEqual( 0, testGuitar.numStrings );
-        Assert.areEqual( "Guitar", testGuitar.toString() );
+        Assert.areEqual(document.title, testGuitar.whammyBar, "whammyBar");
+        Assert.areEqual(undefined, testGuitar.piezos, "piezos");
+        Assert.areEqual( undefined, testGuitar.soundhole, "soundhole" );
+        Assert.areEqual( 0, testGuitar.numStrings, "numStrings" );
+        Assert.areEqual( "Guitar", testGuitar.toString(), "toString()" );
         Assert.areEqual( "Ibanez", testGuitar.make );
         Assert.areNotEqual( Guitar, testGuitar.constructor, "testGuitar had the wrong constructor.");
         Assert.areEqual( ElectricGuitar, testGuitar.constructor, "testGuitar had the wrong constructor.");
