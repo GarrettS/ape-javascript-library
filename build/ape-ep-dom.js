@@ -6,87 +6,107 @@
  * <p>
  * Released under Academic Free Licence 3.0.
  * </p>
- *
- * @author Garrett Smith
  */
-
-/** @name APE
- * @namespace */
 (function(){
+    if(typeof APE !== "undefined") throw Error("APE is already defined.");
+    self.APE = {
+        namespace : namespace,
+        mixin : mixin,
+        extend : extend,
+        createFactory : createFactory,
+        getById : getById,
+        deferError : deferError,
+        toString : function() { return "[APE JavaScript Library]"; }
+    };
 
     function F(){}
     
     var getIdI = 0,
+        INSTANCES = "instances",
         PROTOTYPE = "prototype",
         OP = Object[PROTOTYPE], 
-        HAS_OWN_PROPERTY = "hasOwnProperty",
-        INSTANCES = "instances",
-        OP = Object.prototype,
-        oHap = OP[HAS_OWN_PROPERTY],
-        hasOwnProperty = oHap;
+        opHap = OP.hasOwnProperty,
+        jscriptSkips = ['toString', 'valueOf'];
 
-    if(typeof APE !== "undefined") throw Error("APE is already defined.");
-    self.APE = {
     
-        namespace : namespace,
-        /**
-         * @memberOf APE
-         * @description Prototype inheritance.
-         * @param {Object} subclass
-         * @param {Object} superclass
-         * @param {Object} mixin If present, <var>mixin</var>'s own properties are copied to receiver
-         * using APE.mixin(subclass.prototoype, superclass.prototype).
-         */
-        extend : function(subclass, superclass, mixin) {
-            var subp;
-            F[PROTOTYPE] = superclass[PROTOTYPE];
-            subclass[PROTOTYPE] = subp = new F;
-            if(typeof mixin == "object")
-                APE.mixin(subp, mixin);
-            subp.constructor = subclass;
-            return subclass;
-        },
-    
-        /**
-         * Shallow copy of properties; does not look up prototype chain.
-         * Copies all properties in s to r, using hasOwnProperty.
-         * @param {Object} r the receiver of properties.
-         * @param {Object} s the supplier of properties.
-         * Accounts for JScript DontEnum bug for valueOf and toString.
-         * @return {Object} r the receiver.
-         */
-        mixin : function(r, s) {
-            var jscriptSkips = ['toString', 'valueOf'],
-                prop,
-                i = 0,
-                skipped;
-            for(prop in s) {
-                if(s[HAS_OWN_PROPERTY](prop))
-                    r[prop] = s[prop];
+    /**
+     * does <em>not</em> automatically add APE to the front of the chain, as YUI does.
+     * @param {String} s the namespace. "foo.bar" would create a namespace foo.bar, but only
+     * if that namespace did not exist.
+     * @return {Package} the namespace.
+     */
+    function namespace(s) {
+        var packages = s.split("."),
+            pkg = self,
+            i = 0,
+            len = packages.length,
+            name;
+        for (; i < len; i++) {
+            name = packages[i];
+
+            // Internet Explorer does not support
+            // hasOwnProperty window (or Host obj), so call Object.prototype.hasOwnProperty.
+            // Opera does not support the global object or [[Put]] properly (see below)
+            if(!hasOwnProperty(pkg, name)) {
+                pkg[name] = new Package((pkg.qualifiedName||"APE")+"."+name);
             }
-            // JScript DontEnum bug.
-            for( ; i < jscriptSkips.length; i++) {
-                skipped = jscriptSkips[i];
-                if(s[HAS_OWN_PROPERTY](skipped))
-                    r[skipped] = s[skipped];
+            pkg = pkg[name];
+        }
+        return pkg;
+    }
+
+    /**
+     * Shallow copy of properties; does not look up prototype chain.
+     * Copies all properties in s to r, using hasOwnProperty.
+     * @param {Object} r the receiver of properties.
+     * @param {Object} s the supplier of properties.
+     * Accounts for JScript DontEnum bug for valueOf and toString.
+     * @return {Object} r the receiver.
+     */
+    function mixin(r, s) {
+        var prop,
+            i = 0,
+            skipped;
+        for(prop in s) {
+            if(hasOwnProperty(s, prop)) {
+                r[prop] = s[prop];
             }
-            return r;
-        },
+        }
+        // JScript DontEnum bug.
+        for( ; i < jscriptSkips.length; i++) {
+            skipped = jscriptSkips[i];
+            if(hasOwnProperty(s, skipped))
+                r[skipped] = s[skipped];
+        }
+        return r;
+    }
     
-        createFactory : createFactory,
-    
-        getById : getById,    
-        /** Throws the error in a setTimeout 1ms.
-         *  Deferred errors are useful for Event Notification systems,
-         * Animation, and testing.
-         * @param {Error} error that occurred.
-         */
-        deferError : function(error) {
-            setTimeout(function(){throw error;},1);
-        },
-        
-        toString : function() { return "[APE JavaScript Library]"; }
-    };
+    /**
+     * @memberOf APE
+     * @description Prototype inheritance.
+     * @param {Object} subclass
+     * @param {Object} superclass
+     * @param {Object} mixin If present, <var>mixin</var>'s own properties are copied to receiver
+     * using APE.mixin(subclass.prototoype, superclass.prototype).
+     */
+    function extend(subclass, superclass, mixin) {
+        var subp;
+        F[PROTOTYPE] = superclass[PROTOTYPE];
+        subclass[PROTOTYPE] = subp = new F;
+        if(typeof mixin == "object")
+            APE.mixin(subp, mixin);
+        subp.constructor = subclass;
+        return subclass;
+    }
+
+    /** Throws the error in a setTimeout 1ms.
+     *  Deferred errors are useful for Event Notification systems,
+     * Animation, and testing.
+     * @param {Error} error that occurred.
+     */
+    function deferError(error) {
+        window.setTimeout(function(){throw error;},1);
+    }
 
     /** Creates a Factory method out of a function.
      * @param {Function} constructor
@@ -110,9 +130,10 @@
         }
     }
     
+   // Not exported----------------------------------
     function getOrCreate(id, ctor, args) {
         // Public instances property, for purge or cleanup.
-        if(!this[HAS_OWN_PROPERTY](INSTANCES)) this[INSTANCES] = {};
+        if(!hasOwnProperty(this, INSTANCES)) this[INSTANCES] = {};
         return this[INSTANCES][id] || (this[INSTANCES][id] = newApply(ctor, args));
     }
     
@@ -122,25 +143,6 @@
      * 
      * Creational method meant for being cross-cut.
      * @param {HTMLElement} el An element that has an id.
-     * @requires {Object} an object to bind to.
-     * @description <code>getById</code> must be assigned to a function constructor
-     * that accepts an HTMLElement's <code>id</code> for
-     * its first argument.
-     * @example <pre>
-     * function Slider(el, config){ }
-     * Slider.getById = APE.getById;
-     * </pre>
-     * This allows for implementations to use a factory method with the constructor.
-     * <pre>
-     * Slider.getById( "weight", 1 );
-     * </pre>
-     * Subsequent calls to:
-     * <pre>
-     * Slider.getById( "weight" );
-     * </pre>
-     * will return the same Slider instance.
-     * An <code>instances</code> property is added to the constructor object
-     * that <code>getById</code> is assigned to.
      * @return <pre>new this(id [,args...])</pre>
      */
     function getById(id){
@@ -170,63 +172,49 @@
      * @memberOf APE
      */
     function newApply(constructor, args) {
-        F[PROTOTYPE] = constructor[PROTOTYPE];// Copy prototype.
-        F[PROTOTYPE].constructor = constructor;
-        var i = new F;
+        var i, 
+            fp = F[PROTOTYPE] = constructor[PROTOTYPE];// Copy prototype.
+        fp.constructor = constructor;
+        i = new F;
         constructor.apply(i, args); // Apply the original constructor.
         return i;
-    }
-
-    /**
-     * @memberOf APE
-     * @description creates a namespace split on "."
-     * does <em>not</em> automatically add APE to the front of the chain, as YUI does.
-     * @param {String} s the namespace. "foo.bar" would create a namespace foo.bar, but only
-     * if that namespace did not exist.
-     * @return {Package} the namespace.
-     */
-    function namespace(s) {
-        var packages = s.split("."),
-            pkg = self,
-            qName = pkg.qualifiedName,
-            i = 0,
-            len = packages.length,
-            name;
-        for (; i < len; i++) {
-            name = packages[i];
-
-            // Internet Explorer does not support
-            // hasOwnProperty window (or Host obj), so call Object.prototype.hasOwnProperty.
-            // Opera does not support the global object or [[Put]] properly (see below)
-            if(!hasOwnProperty.call(pkg, name)) {
-                pkg[name] = new Package((qName||"APE")+"."+name);
-            }
-            pkg = pkg[name];
-        }
-        return pkg;
     }
 
     Package[PROTOTYPE].toString = function(){
         return"["+this.qualifiedName+"]";
     };
 
-    /* constructor Package
-     */
     function Package(qualifiedName) {
         this.qualifiedName = qualifiedName;
     }
     
-            
-    if(hasOwnProperty && !hasOwnProperty.call(self, "Object")) {
+    /** Wheelchair assistance for Safari 2, which does not have native impl.
+     * @param {Object} o a Native ECMAScript Object object. */   
+    function hasOwnProperty(o, p) { 
+        var xp;
+        if(p in o) {
+            if(opHap) {
+                return opHap.call(o, p);
+            }
+            xp = o.__proto__;
+            if(xp) {
+                return !(p in xp) || xp[p] !== o[p];
+            }
+            return OP[p] !== o[p];
+        } else {
+            return false;
+        }
+    }
+
+    if(opHap && !opHap.call(self, "Object")) {
+        var oldOpHap = opHap;
         /**
          * @overrides Object.prototype.hasOwnProperty
-         * @method
          * This is a conditional patch that affects some versions of Opera.
          * It is perfectly safe to do this and does not affect enumeration.
          */
-        hasOwnProperty = OP[HAS_OWN_PROPERTY] = function(p) {
-            if(this === self) return (p in this) && (OP[p] !== this[p]);
-            return oHap.call(this, p);
+        opHap = OP.hasOwnProperty = function(p) {
+            return (this === self) ? (p in this && this[p] !== OP[p]) : oldOpHap.call(this, p);
         };
     }
 })();/** 

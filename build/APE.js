@@ -8,7 +8,6 @@
  * </p>
  */
 (function(){
-
     if(typeof APE !== "undefined") throw Error("APE is already defined.");
     self.APE = {
         namespace : namespace,
@@ -39,7 +38,6 @@
     function namespace(s) {
         var packages = s.split("."),
             pkg = self,
-            qName = pkg.qualifiedName,
             i = 0,
             len = packages.length,
             name;
@@ -50,7 +48,7 @@
             // hasOwnProperty window (or Host obj), so call Object.prototype.hasOwnProperty.
             // Opera does not support the global object or [[Put]] properly (see below)
             if(!hasOwnProperty(pkg, name)) {
-                pkg[name] = new Package((qName||"APE")+"."+name);
+                pkg[name] = new Package((pkg.qualifiedName||"APE")+"."+name);
             }
             pkg = pkg[name];
         }
@@ -70,8 +68,9 @@
             i = 0,
             skipped;
         for(prop in s) {
-            if(hasOwnProperty(s, prop))
+            if(hasOwnProperty(s, prop)) {
                 r[prop] = s[prop];
+            }
         }
         // JScript DontEnum bug.
         for( ; i < jscriptSkips.length; i++) {
@@ -189,21 +188,33 @@
         this.qualifiedName = qualifiedName;
     }
     
-    /** Crutches for Safari 2, which does not have native impl.
-     * @param {Object} o a Native ECMAScript Object object. */
-    function hasOwnProperty(o, p) {
-        return (p in o) && (opHap ? opHap.call(o, p) : (OP[p] !== o[p]));
+    /** Wheelchair assistance for Safari 2, which does not have native impl.
+     * @param {Object} o a Native ECMAScript Object object. */   
+    function hasOwnProperty(o, p) { 
+        var xp;
+        if(p in o) {
+            if(opHap) {
+                return opHap.call(o, p);
+            }
+            xp = o.__proto__;
+            if(xp) {
+                return !(p in xp) || xp[p] !== o[p];
+            }
+            return OP[p] !== o[p];
+        } else {
+            return false;
+        }
     }
-    
+
     if(opHap && !opHap.call(self, "Object")) {
+        var oldOpHap = opHap;
         /**
          * @overrides Object.prototype.hasOwnProperty
-         * @method
          * This is a conditional patch that affects some versions of Opera.
          * It is perfectly safe to do this and does not affect enumeration.
          */
-        OP.hasOwnProperty = function(p) {
-            return (this === self) ? (OP[p] !== this[p]) : opHap.call(this, p);
+        opHap = OP.hasOwnProperty = function(p) {
+            return (this === self) ? (p in this && this[p] !== OP[p]) : oldOpHap.call(this, p);
         };
     }
 })();

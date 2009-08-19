@@ -41,6 +41,16 @@ var apeTest = new YAHOO.tool.TestCase({
         Assert.isNotNull(window.APE.test.pkg2, "pkg2 was not found.");
     },
 
+    _should : {
+        // Patch to Object.prototype.hasOwnProperty for Opera
+        // cannot be tested in Safari < 2.0.2 because it is
+        // missing.
+        ignore : {
+            testHasOwnProperty : 
+                typeof Object.prototype.hasOwnProperty != "function"
+        }
+    },
+    
     testExtend : function() {
         function Guitar() {}
         Guitar.prototype = {
