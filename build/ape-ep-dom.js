@@ -26,6 +26,7 @@
         PROTOTYPE = "prototype",
         OP = Object[PROTOTYPE], 
         opHap = OP.hasOwnProperty,
+        functionToString = Function[PROTOTYPE].toString,
         jscriptSkips = ['toString', 'valueOf'];
 
     
@@ -90,9 +91,8 @@
      * using APE.mixin(subclass.prototoype, superclass.prototype).
      */
     function extend(subclass, superclass, mixin) {
-        var subp;
         F[PROTOTYPE] = superclass[PROTOTYPE];
-        subclass[PROTOTYPE] = subp = new F;
+        var subp = subclass[PROTOTYPE] = new F;
         if(typeof mixin == "object")
             APE.mixin(subp, mixin);
         subp.constructor = subclass;
@@ -105,7 +105,7 @@
      * @param {Error} error that occurred.
      */
     function deferError(error) {
-        window.setTimeout(function(){throw error;},1);
+        self.setTimeout(function(){throw error;},1);
     }
 
     /** Creates a Factory method out of a function.
@@ -161,7 +161,7 @@
     
     function getFunctionName(fun) {
         if(typeof fun.name === "string") return fun.name;
-        var name = Function[PROTOTYPE].toString.call(fun).match(/\s([a-z]+)\(/i);
+        var name = functionToString.call(fun).match(/\s([a-z]+)\(/i);
         return name && name[1]||"";
     }
 
@@ -171,12 +171,12 @@
      * Instantiates a constructor and uses apply().
      * @memberOf APE
      */
-    function newApply(constructor, args) {
+    function newApply(ctor, args) {
         var i, 
-            fp = F[PROTOTYPE] = constructor[PROTOTYPE];// Copy prototype.
-        fp.constructor = constructor;
+            fp = F[PROTOTYPE] = ctor[PROTOTYPE];// Copy prototype.
+        fp.constructor = ctor;
         i = new F;
-        constructor.apply(i, args); // Apply the original constructor.
+        ctor.apply(i, args); // Apply the original constructor.
         return i;
     }
 
@@ -191,19 +191,17 @@
     /** Wheelchair assistance for Safari 2, which does not have native impl.
      * @param {Object} o a Native ECMAScript Object object. */   
     function hasOwnProperty(o, p) { 
-        var xp;
         if(p in o) {
             if(opHap) {
                 return opHap.call(o, p);
             }
-            xp = o.__proto__;
+            var xp = o.__proto__;
             if(xp) {
                 return !(p in xp) || xp[p] !== o[p];
             }
             return OP[p] !== o[p];
-        } else {
-            return false;
-        }
+        }  
+        return false;
     }
 
     if(opHap && !opHap.call(self, "Object")) {
