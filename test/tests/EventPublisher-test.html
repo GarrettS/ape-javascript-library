@@ -80,7 +80,7 @@ var eventPublisherTest = new YAHOO.tool.TestCase({
 
         testObject.fire( );
         Assert.isTrue( called );       
-        Assert.isTrue( calledBefore );       
+        Assert.isTrue( calledBefore );
     },
     
     testAddAfter : function() {
@@ -177,41 +177,51 @@ var eventPublisherTest = new YAHOO.tool.TestCase({
     // Add 2 callbacks, remove the first, 
     // then make sure that only the second one fires.
     testRemoveBefore : function(){
-        var called = false;
+        var called = false,
+            cb2Fired = false;
 
         function cb( ev ) {
             called = true;
             Assert.isTrue( ev.isTest );
-        };
+        }
         function cb2( ev ) {
-            Assert.fail("should not have been called.");
-        };
+            cb2Fired = true;
+        }
         ep.add(cb);
         ep.addBefore(cb2);
+
         ep.removeBefore(cb2);
 
         testObject.fire( { isTest: true} );
         Assert.isTrue( called );
+
+        this.wait(function(){ 
+            Assert.isFalse(cb2Fired, "cb2 should not have been called.");
+        }, 20);
     },
 
     // Add 2 callbacks, remove the first, 
     // then make sure that only the second one fires.
     testRemoveAfter : function(){
-        var called = false;
+        var called = false,
+            cb2Called = false;
 
         function cb( ev ) {
             called = true;
             Assert.isTrue( ev.isTest );
-        };
+        }
         function cb2( ev ) {
-            Assert.fail("should not have been called.");
-        };
+            b2Called = true;
+        }
         ep.add(cb);
         ep.addAfter(cb2);
         ep.removeAfter(cb2);
 
         testObject.fire( { isTest: true} );
         Assert.isTrue( called );
+        this.wait(function(){
+            Assert.isFalse(cb2Called, "cb2 should not have been called.");
+        }, 20);
     },
 
     // calling toString should not throw an error.
