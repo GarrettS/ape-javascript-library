@@ -1,13 +1,13 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
-        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
 <head>
-    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" >
     <title>Animation Test</title>
 
-    <link rel="stylesheet" type="text/css" href="../../yui-test/build/logger/assets/logger.css" />
-    <link rel="stylesheet" type="text/css" href="../../yui-test/build/yuitest/assets/yuitest.css" />
-    <link rel="stylesheet" type="text/css" href="../../yui-test/assets/testlogger.css" />
+    <link rel="stylesheet" type="text/css" href="../../yui-test/build/logger/assets/logger.css" >
+    <link rel="stylesheet" type="text/css" href="../../yui-test/build/yuitest/assets/yuitest.css" >
+    <link rel="stylesheet" type="text/css" href="../../yui-test/assets/testlogger.css" >
 
     <script type="text/javascript" src="../../yui-test/build/yahoo-dom-event/yahoo-dom-event.js"></script>
     <script type="text/javascript" src="../../yui-test/build/logger/logger.js"></script>
@@ -291,18 +291,7 @@ var transitionTestCase = new YAHOO.tool.TestCase({
 
     testSigmoid : function() {
         var a = new Animation(.1);
-        a.transition = APE.anim.Transitions.sigmoid;
-        a.start();
-        this.wait(
-            function() {
-                Assert.areEqual(1, a.position, "position was not 1.");
-            }, 150);
-    },
-
-
-    testSigmoid : function() {
-        var a = new Animation(.1);
-        a.transition = APE.anim.Transitions.sigmoid;
+        a.transition = APE.anim.Transitions.getSigmoid();
         a.start();
         this.wait(
             function() {
@@ -312,7 +301,7 @@ var transitionTestCase = new YAHOO.tool.TestCase({
 
     testSigmoid2 : function() {
         var a = new Animation(.1);
-        a.transition = APE.anim.Transitions.sigmoid2;
+        a.transition = APE.anim.Transitions.getSigmoid(2);
         a.start();
         this.wait(
             function() {
@@ -322,7 +311,7 @@ var transitionTestCase = new YAHOO.tool.TestCase({
 
     testSigmoid3 : function() {
         var a = new Animation(.1);
-        a.transition = APE.anim.Transitions.sigmoid3;
+        a.transition = APE.anim.Transitions.getSigmoid(3);
         a.start();
         this.wait(
             function() {
@@ -332,32 +321,12 @@ var transitionTestCase = new YAHOO.tool.TestCase({
 
     testSigmoid4 : function() {
         var a = new Animation(.1);
-        a.transition = APE.anim.Transitions.sigmoid4;
+        a.transition = APE.anim.Transitions.getSigmoid(4);
         a.start();
         this.wait(
             function() {
                 Assert.areEqual(1, a.position, "sig4: position was not 1.");
             }, 150);
-    },
-
-    testTan : function() {
-        var a = new Animation(.1);
-        a.transition = APE.anim.Transitions.tan;
-        a.start();
-        this.wait(
-            function() {
-                Assert.areEqual(1, a.position, "tan: position was not 1.");
-            }, 150);
-    },
-
-    testReverseWarp : function() {
-        var a = new Animation(.1);
-        a.transition = APE.anim.Transitions.reverseWarp;
-        a.start();
-        this.wait(
-            function() {
-                Assert.areEqual(1, a.position, "rev warp: position was not 1.");
-            }, 190);
     },
 
     testEaseInEaseOut : function() {
