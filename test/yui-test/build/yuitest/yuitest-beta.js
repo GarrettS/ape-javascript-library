@@ -29,10 +29,8 @@ YAHOO.tool.TestCase = function (template /*:Object*/) {
     
     // copy over all properties from the template to this object
     for (var prop in template) {
-        // Garrett, added hasOwnProperty, 
-        // useful for cloning templates.
-        if(template.hasOwnProperty(prop))
-            this[prop] = template[prop];
+        
+        this[prop] = template[prop];
     }    
     
     //check for a valid name
