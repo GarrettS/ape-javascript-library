@@ -108,7 +108,6 @@
             
             // Set end style.
             setEndStyle(el, styleObject);
-
             // Read end style, create adapter (from, to).
             for(prop in styleObject) {
                 toValue = styleObject[prop];
@@ -130,10 +129,8 @@
             // after that, the element doesn't appear visible.
             // Workaround: first transition is visibility.
             adapters.sort(function(a, b) {
-                        return (a instanceof ImmediateThresholdTransitionAdapter
-                                ? -1
-                                : 1);
-                    });
+                return (a instanceof ImmediateThresholdTransitionAdapter) ? -1 : 1;
+            });
     
             this.adapters = adapters;
         },
@@ -168,10 +165,8 @@
         lengthExp = /(^-?\d+|(?:-?\d*\.\d+))(px|em|ex|pt|pc|in|cm|mm|%)/i,
         colorExp = /color/i,
         positiveLengthExp = /(?:width|height|padding|fontSize)$/ig,
-        filterExp = /alpha/,
         intExp = /^\d+$/,
         noVisibilityExp = /^(?:hidden|collapse)/;
-
 
     /**
      * Factory for APE.anim.TransitionAdapterFactory Interface.
@@ -228,7 +223,7 @@
             ColorRGB = APE.color.ColorRGB;
         }
         var f = ColorRGB.fromString(fromValue), 
-            t = toValue = ColorRGB.fromString(toValue);
+            t = ColorRGB.fromString(toValue);
 
         TransitionAdapter.call(this, prop, f, t);
 
@@ -306,8 +301,8 @@
     };
     /** Useful for z-index, font-weight */
     function FontWeightTransitionAdapter(prop, fromValue, toValue) {
-        TransitionAdapter.call(this, prop, parseInt(fromValue),
-                parseInt(toValue));
+        TransitionAdapter.call(this, prop, parseInt(fromValue ,10),
+                parseInt(toValue ,10));
     }
 
     APE[EXTEND](FontWeightTransitionAdapter, TransitionAdapter);

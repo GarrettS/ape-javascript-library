@@ -1,13 +1,13 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
-        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
 <head>
-    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" >
     <title>DOM Style Test</title>
 
-    <link rel="stylesheet" type="text/css" href="../../yui-test/build/logger/assets/logger.css" />
-    <link rel="stylesheet" type="text/css" href="../../yui-test/build/yuitest/assets/yuitest.css" />
-    <link rel="stylesheet" type="text/css" href="../../yui-test/assets/testlogger.css" />
+    <link rel="stylesheet" type="text/css" href="../../yui-test/build/logger/assets/logger.css" >
+    <link rel="stylesheet" type="text/css" href="../../yui-test/build/yuitest/assets/yuitest.css" >
+    <link rel="stylesheet" type="text/css" href="../../yui-test/assets/testlogger.css" >
 
     <script type="text/javascript" src="../../yui-test/build/yahoo-dom-event/yahoo-dom-event.js"></script>
     <script type="text/javascript" src="../../yui-test/build/logger/logger.js"></script>
@@ -20,7 +20,7 @@
     <script type="text/javascript" src="../../../build/dom/getContainingBlock.js"></script>
     <script type="text/javascript" src="../../../build/dom/getPixelCoords.js"></script>
 
-    <style id="testSheet">
+    <style id="testSheet" type="text/css">
         #testNode {
             font-size: 12px;
             font-family: fantasy;
@@ -55,7 +55,9 @@ var container = document.getElementById("container"),
     containerCssText = container.style.cssText,
     htmlCssText = document.documentElement.style.cssText,
     bodyCssText = document.body.style.cssText,
-    sheet = new APE.dom.StyleSheetAdapter( "testSheet" ),
+    dSheets = document.styleSheets,
+    styleSheet = dSheets[dSheets.length - 1],
+    sheet = new APE.dom.StyleSheetAdapter( styleSheet ),
     rule = sheet.getRule("#testNode") || sheet.addRule( "#testNode", "" );
 
 var Assert = YAHOO.util.Assert,
@@ -200,8 +202,10 @@ var getStyleTestCase = new TestCase({
         actual = dom.getStyle(testNode, "opacity");
         Assert.areEqual(expected, actual);
     },
-    
-    testGetCascadedWidth : function() {
+
+    // Safari 2 fails this one, and the same problem 
+    // can be seen in StyleSheetAdapter-test.
+    testGetWidthFromAuto : function() {
         var testNode = document.getElementById('testNode');
         testNode.parentNode.style.width = "100px";
         var actual = dom.getStyle(testNode, "width");
@@ -314,23 +318,6 @@ var getStyleTestCase = new TestCase({
         Assert.areEqual(inp.replace(/em/g, "0px"), out);
     },
 
-    testGetComputedBorderRadius : function() {
-        
-        var expected = "0px",
-            s = document.getElementById("testNode").style,
-            expected = "0px";
-            rule.style.borderRadius =  
-                rule.style.WebkitBorderRadius = 
-                rule.style.MozBorderRadius = "12px";
-
-        if(!("borderRadius"in s || "WebkitBorderRadius"in s || "MozBorderRadius"in s)) {
-            expected = "";
-        }
-        var actual = dom.getStyle(document.body, "borderRadius");
-        if(expected == '')
-            YAHOO.log("This browser doesn't support border-radius" , 'warn', "TestRunner"); 
-        Assert.areEqual(expected, actual);
-    },
 
     testGetComputedShorthandValues100px : function() {
         var c1 = document.getElementById("c1"),

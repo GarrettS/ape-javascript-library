@@ -84,16 +84,19 @@ var styleTransitionTestCase = new YAHOO.tool.TestCase({
         }, 300);
     },
 
-    testMargin : function() {
-        var css = { margin: "-100px" };
 
+    // Safari 2 can't read shorthand values.
+    testMargin : function() {
+        var css = { margin: "100px" };
+        c.style.top = "200px"; // avoid issue with saf 2 scrolling window.
+        c.style.position = "relative";
         var st = new StyleTransition(c, css, .2);
         st.start();
         this.wait(function(){
 
             // Some browsers return shorthand value, others (Mozilla) return 
             // a full value, even when the shorthand value is assigned.
-            ArrayAssert.contains(c.style.margin, ["-100px", "-100px -100px -100px -100px"]);
+            ArrayAssert.contains(c.style.margin, ["100px", "100px 100px 100px 100px"]);
         }, 300);
     },
 

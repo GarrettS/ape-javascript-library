@@ -1,13 +1,13 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
-        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
 <head>
-    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
-    <title>DOM ClassName Test</title>
+    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" >
+    <title>DOM StyleSheetAdapter Test</title>
 
-    <link rel="stylesheet" type="text/css" href="../../yui-test/build/logger/assets/logger.css" />
-    <link rel="stylesheet" type="text/css" href="../../yui-test/build/yuitest/assets/yuitest.css" />
-    <link rel="stylesheet" type="text/css" href="../../yui-test/assets/testlogger.css" />
+    <link rel="stylesheet" type="text/css" href="../../yui-test/build/logger/assets/logger.css" >
+    <link rel="stylesheet" type="text/css" href="../../yui-test/build/yuitest/assets/yuitest.css" >
+    <link rel="stylesheet" type="text/css" href="../../yui-test/assets/testlogger.css" >
 
     <script type="text/javascript" src="../../yui-test/build/yahoo-dom-event/yahoo-dom-event.js"></script>
     <script type="text/javascript" src="../../yui-test/build/logger/logger.js"></script>
@@ -27,7 +27,7 @@
 
 </head>
 <body style="position: relative;margin:0;padding:0;">
-<div id="template"><div id="testDiv"></div></div>
+<div id="template"><div id="testDiv" style="position: relative"></div></div>
 <div id="testLogger"></div>
 <script type="text/javascript">
 setTimeout(function(){
@@ -70,6 +70,21 @@ var classNameTestCase = new YAHOO.tool.TestCase({
         var sheet = new APE.dom.StyleSheetAdapter('testSheet');
         sheet.addRule("#testDiv", "width: 1000px");
         Assert.areEqual(1000, document.getElementById('testDiv').offsetWidth);
+    },
+
+    testFromStyleSheet : function() {
+        var ds = document.styleSheets,
+            styleSheet = ds[ds.length-1];
+        var sheet = new APE.dom.StyleSheetAdapter( styleSheet );
+        sheet.addRule("#testDiv", "width: 1000px");
+        this.wait(function(){
+            var td = document.getElementById('testDiv'),
+                dv = document.defaultView,
+                w = (dv && dv.getComputedStyle(td, "") ||
+                        td.currentStyle).width;
+                
+            Assert.areEqual(1000, parseInt(w,10));
+        }, 90);
     }
 
 });

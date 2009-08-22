@@ -1,14 +1,14 @@
- <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
-        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
 <head>
-	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" >
     <title>Animation Transitions</title>
-<link type="text/css" rel="stylesheet" href="../resources/example.css"/>
+<link type="text/css" rel="stylesheet" href="../resources/example.css">
 <script type="text/javascript" src="../../build/APE.js"></script>
 <script type="text/javascript" src="../../build/EventPublisher.js"></script>
 
-<style>
+<style type="text/css">
 
 div.anim-div div {
     position: absolute; 
@@ -16,7 +16,7 @@ div.anim-div div {
     top: 2px; 
     opacity: .8; 
     display: block;
-    font: .5em sans-serif;
+    font: 16px sans-serif;
     letter-spacing: 0;
     text-align: left;
     background-color: #eee;
@@ -24,6 +24,7 @@ div.anim-div div {
     padding: 1px;
     text-align: center;
     -webkit-border-radius: 0;
+    left: 0;
 }
 
 div.anim-div {
@@ -45,62 +46,67 @@ html {
 
 </head>
 <body>
-<script>
+<script type="text/javascript">
+window.onload = function(){        
 
-var longOrange = {
-    padding: "2px",
-    zIndex : 100,
-    color: "#002",
-    backgroundColor: "#ffc",
-    letterSpacing: ".2em",
-    width: "60em",
-    opacity: .8, // StyleAdapter takes care of opacity for IE.
-    /// border: "3px solid #ccc" // Shorthand values will not transition smoothly.
-    borderWidth: "8px",
-    borderColor: "#FC0",
-    fontWeight : 900,
+    var accel = document.getElementById("accel"),
+        spring = document.getElementById("spring");
+        spring.onclick = accel.onclick = function(){
+            return ButtonFactory.getById(this.id).start();
+        };
 
-    // border-radius may not transition smoothly.
-    // getComputedStyle returns "" in Saf 3, FF 2.
-    WebkitBorderRadius : ".9em", 
-    MozBorderRadius : ".9em"
+    var ButtonFactory = APE.createFactory(Button, function(){
+        return {
+            start: function(){
+                this.anim.toggleDirection( );
+            }
+        };
+    });
+            
+    ButtonFactory.getById("accel", {
+         padding: "2px",
+         zIndex : 100,
+         color: "#002",
+         backgroundColor: "#ffc",
+         letterSpacing: ".2em",
+         width: "60em",
+         opacity: .8, // getStyle takes care of opacity for IE.
+         /// border: "3px solid #ccc" // Shorthand values will not transition smoothly.
+         borderWidth: "8px",
+         borderColor: "#FC0",
+         fontWeight : 900     
+     });
+     
+     ButtonFactory.getById("spring", {
+         color: "#600",
+         backgroundColor: "#f53",
+         width: "10em",
+         padding: "2px",
+         opacity: .9, // getStyle takes care of opacity for IE.
+         borderWidth: "10px",
+         borderColor: "#900",
+         fontWeight : 900,
+         fontSize : "90px"
+     });
+    
+	function Button(id, styleObj) {
+	    this.id = id;
+	    this.anim = new APE.anim.StyleTransition(id, styleObj, 2, APE.anim.Transitions[id]);
+	
+	    // console.log(this.anim.toString());
+	}
+		
+	function animateBack(){
+	    // Helpful debuggin info.
+	    // console.dir(this);
+	}
 };
-
-var fatRed = {
-    color: "#600",
-    backgroundColor: "#f53",
-    width: "10em",
-    padding: "2px",
-    opacity: .9, // StyleAdapter takes care of opacity for IE.
-    borderWidth: "10px",
-    borderColor: "#900",
-    fontWeight : 900,
-    fontSize : "3em"
-};
-
-function Button(id, styleObj) {
-    this.id = id;
-    this.anim = new APE.anim.StyleTransition(id, styleObj, 2, APE.anim.Transitions[id]);
-
-    // console.log(this.anim.toString());
-}
-Button.getById = APE.getById;
-
-function doIt( buttonID, styleObj ) {
-    var b = Button.getById( buttonID, styleObj );
-    b.anim.toggleDirection( );
-};
-
-function animateBack(){
-    console.dir(this);
-}
-
 </script>
 <h1>Animation Transitions Example : toggleDirection</h1>
 <div class='anim-div'>
     accel &nbsp;example
     <div id='accel' style="width: 10em;background-color: #131;border: 1px solid #030;font-weight: 100" 
-        onclick="doIt('accel', longOrange)">Clementine</div>
+        >Clementine</div>
 </div>
 
 <div class='anim-div'>

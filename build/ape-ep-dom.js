@@ -1382,7 +1382,6 @@ APE.namespace("APE.dom.Event");
  *
  * @author Garrett Smith
  */
-
 /**@name APE.dom 
  * @namespace*/
 
@@ -1404,7 +1403,6 @@ APE.namespace("APE.dom.Event");
         FILTER = "filter",
         alphaString = "alpha("+OPACITY+"=",
         multiLengthPropExp = /^(?:margin|(border)(Width|Color|Style)|padding)$/,
-        borderRadiusExp = /^[a-zA-Z]*[bB]orderRadius$/,
         alphaOpExp = /opacity\s*=\s*([\d]+)/i;
     
     /** 
@@ -1462,20 +1460,18 @@ APE.namespace("APE.dom.Event");
     function getStyle(el, p) {
         var value = "", cs, matches, splitVal, i, len, 
         doc = el[dom.OWNER_DOCUMENT];
+        
         if(/float/.test(p)) {
             p = floatProp;
         }
         if(IS_COMPUTED_STYLE) {
             cs = doc.defaultView[getCS](el, "");
-            if(borderRadiusExp.test(p)) {
-                p = borderRadiusProp;
-            }
 
             if(!(p in cs))return"";
             value = cs[p];
             if(value === "") {
                 // would try to get a rect, but Webkit doesn't support that.
-                value = (tryGetShorthandValues(cs, p)).join(" ");
+                value = tryGetShorthandValues(cs, p).join(" ");
             }
         } else {
             cs = el[CURRENT_STYLE];
@@ -1493,10 +1489,10 @@ APE.namespace("APE.dom.Event");
             matches = nonPixelExp.exec(value);
             if(matches) {
                 splitVal = value.split(" ");
-                splitVal[0] = convertNonPixelToPixel( el, matches);
+                splitVal[0] = convertNonPixelToPixel( el, matches[0]);
                 for(i = 1, len = splitVal.length; i < len; i++) {
                     matches = nonPixelExp.exec(splitVal[i]);
-                    splitVal[i] = convertNonPixelToPixel( el, matches);
+                    splitVal[i] = convertNonPixelToPixel( el, matches[0]);
                 }
                 value = splitVal.join(" ");
             }
@@ -1506,21 +1502,13 @@ APE.namespace("APE.dom.Event");
 
     var sty = document.documentElement[STYLE],
         floatProp = 'cssFloat'in sty ? 'cssFloat': 'styleFloat',
-        
-        orderRadius = "orderRadius",
-        bor = "b"+orderRadius,
-        mor = "MozB"+orderRadius,
-        wor = "WebkitB"+orderRadius,
-        borderRadiusProp = bor in sty ? bor : mor in sty ? mor : wor,
-        props = ["Top", "Right", "Bottom", "Left"],
-        cornerProps = ["Topright", "Bottomright", "Bottomleft", "Topleft"];
-    sty = bor = mor = wor = orderRadius = null;
+        props = ["Top", "Right", "Bottom", "Left"];
     
     function getCurrentStyleValueFromAuto(el, p) {
         
-        var s = el[STYLE], v, borderWidth, doc = el[dom.OWNER_DOCUMENT];
+        var s = el[STYLE], v, pp, borderWidth, doc = el[dom.OWNER_DOCUMENT];
         if("pixelWidth"in s && /width|height|top|left/.test(p)) {
-            var pp = "pixel" + (p.charAt(0).toUpperCase()) + p.substring(1);
+            pp = "pixel" + (p.charAt(0).toUpperCase()) + p.substring(1);
             v = s[pp];
             if(v === 0) {
                 if(p === "width") {
@@ -1568,10 +1556,6 @@ APE.namespace("APE.dom.Event");
             propertyList = props;
             prefix = multiMatch[1]||multiMatch[0];
             suffix = multiMatch[2] || ""; // ["borderWidth", "border", "Width"]
-        } else if(borderRadiusExp.test(p)) {
-            propertyList = cornerProps;
-            prefix = borderRadiusExp.exec(p)[0];
-            suffix = ""; 
         } else return [""];
 
         prevValue = cs[prefix + propertyList[0] + suffix ];
@@ -1588,31 +1572,26 @@ APE.namespace("APE.dom.Event");
         return values;
     }
 
-    var nonPixelExp = /(-?\d+|(?:-?\d*\.\d+))(?:em|ex|pt|pc|in|cm|mm\s*)/; 
-
+    var nonPixelExp = /(-?\d+|(?:-?\d*\.\d+))(?:em|ex|pt|pc|in|cm|mm\s*)/;
     /**
-     * @requires nonPixelExp
      * @param {HTMLElement} el
-     * @param {Array} String[] of matches from nonPixelExp.exec( val ).
+     * @param {String} val 
      */
-    function convertNonPixelToPixel(el, matches) {
-
+    function convertNonPixelToPixel(el, val) {
+        
         if(el.runtimeStyle) {
 
             // http://erik.eae.net/archives/2007/07/27/18.54.15/#comment-102291
             // If we're not dealing with a regular pixel number
             // but a number that has a weird ending, we need to convert it to pixels.
 
-            var val = matches[0]; // grab the -1.2em or whatever.
             if(parseFloat(val) === 0) {
                 return"0px";
             }
-
             var s = el[STYLE],
                 sLeft = s.left,
                 rs = el.runtimeStyle,
                 rsLeft = rs.left;
-
             rs.left = el[CURRENT_STYLE].left;
             s.left = (val || 0);
 
@@ -1620,6 +1599,7 @@ APE.namespace("APE.dom.Event");
             // IE's math is a little off with converting em to px; IE rounds to 
             // the nearest pixel.
             val = s.pixelLeft + PX;
+
             // put it back.
             s.left = sLeft;
             rs.left = rsLeft;
