@@ -188,8 +188,13 @@
         this.qualifiedName = qualifiedName;
     }
     
-    /** Wheelchair assistance for Safari 2, which does not have native impl.
-     * @param {Object} o a Native ECMAScript Object object. */   
+    /** Crutches for Safari 2, which does not have native impl.
+     * @param {Object} o a Native ECMAScript Object object. 
+     * This fails in Safari 2 in one case:
+     * function X(){ this.t = 1; }
+     * X.prototype.t = 1;
+     * hasOwnProperty(new X, "t"); // False in Safari 2.
+     */   
     function hasOwnProperty(o, p) { 
         if(p in o) {
             if(opHap) {

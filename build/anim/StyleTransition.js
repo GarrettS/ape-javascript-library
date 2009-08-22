@@ -77,7 +77,7 @@
          *              ITransitionAdapter. This run() method gets called by
          *              Animation.
          */
-        run : function run(rationalValue) {
+        run : function(rationalValue) {
             var i = 0, adapters = this.adapters, len = adapters.length, 
                 style = this[STYLE], adapter;
             while (i < len) {
@@ -218,7 +218,7 @@
     }
     
     TransitionAdapter[PROTO][TO_STRING] = function() {
-        return APE.getFunctionName(this.constructor) + ": " + this.prop + ", "
+        return "Transition: " + this.prop + ", "
                 + this[FVALUE][TO_STRING]() + " \u2014 "
                 + this[TVALUE][TO_STRING]();
     };

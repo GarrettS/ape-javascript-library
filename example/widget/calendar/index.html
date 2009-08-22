@@ -47,7 +47,6 @@
 </div>
 
 <script src="../../../build/ape-ep-dom.js" type="text/javascript"></script>
-<script src="../../../build/dom/getCascadedStyle.js" type="text/javascript"></script>
 
 <script src="../../../build/anim/Animation.js" type="text/javascript"></script>
 <script src="../../../build/anim/StyleTransition.js" type="text/javascript"></script>
@@ -104,7 +103,7 @@ setTimeout(function(){
         return new anim.StyleTransition(
              id, 
              endStyle, duration,
-             anim.Transitions.sigmoid3
+             anim.Transitions.getSigmoid(3)
          );
     }
                     

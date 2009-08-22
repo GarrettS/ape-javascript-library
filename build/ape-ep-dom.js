@@ -188,8 +188,13 @@
         this.qualifiedName = qualifiedName;
     }
     
-    /** Wheelchair assistance for Safari 2, which does not have native impl.
-     * @param {Object} o a Native ECMAScript Object object. */   
+    /** Crutches for Safari 2, which does not have native impl.
+     * @param {Object} o a Native ECMAScript Object object. 
+     * This fails in Safari 2 in one case:
+     * function X(){ this.t = 1; }
+     * X.prototype.t = 1;
+     * hasOwnProperty(new X, "t"); // False in Safari 2.
+     */   
     function hasOwnProperty(o, p) { 
         if(p in o) {
             if(opHap) {
@@ -310,9 +315,9 @@ APE.EventPublisher.prototype = {
  *  @return {Function} the function that was passed in, or null if not found;
  */
     remove : function(fp, thisArg) {
-        var cs = this._callStack, i = 0, len, call;
+        var cs = this._callStack, i, call;
         if(!thisArg) thisArg = this.src;
-        for(len = cs.length; i < len; i++) {
+        for(i = 0; i < cs.length; i++) {
             call = cs[i];
             if(call[0] === fp && call[1] === thisArg) {
                 return cs.splice(i, 1);
@@ -327,7 +332,7 @@ APE.EventPublisher.prototype = {
  *  @return {Function} the function that was passed in, or null if not found (uses remove());
  */
     removeBefore : function(fp, thisArg) {
-        return this.getEvent("beforeFire").remove(fp, thisArg);
+        return this.getEvent("beforeFire").remove(fp, thisArg||this.src);
     },
 
 
@@ -337,7 +342,7 @@ APE.EventPublisher.prototype = {
  *  @return {Function} the function that was passed in, or null if not found (uses remove());
  */
     removeAfter : function(fp, thisArg) {
-        return this.getEvent("afterFire").remove(fp, thisArg);
+        return this.getEvent("afterFire").remove(fp, thisArg||this.src);
     },
 
 /** Fires the event. */
@@ -377,7 +382,7 @@ APE.EventPublisher.fire = function(publisher) {
     return fireEvent; 
     function fireEvent(e) {
         var preventDefault = false,
-            i = 0, len,
+            i,
             cs = publisher._callStack, csi;
 
         // beforeFire can affect return value.
@@ -388,7 +393,7 @@ APE.EventPublisher.fire = function(publisher) {
             } catch(ex){APE.deferError(ex);}
         }
 
-        for(len = cs.length; i < len; i++) {
+        for(i = 0; i < cs.length; i++) {
             csi = cs[i]; 
             // If an error occurs, continue the event fire,
             // but still throw the error.
@@ -421,12 +426,11 @@ APE.EventPublisher.fire = function(publisher) {
  */
 APE.EventPublisher.get = function(src, sEvent) {
 
-    var publisherList = this.Registry.hasOwnProperty(sEvent) && this.Registry[sEvent] || 
-        (this.Registry[sEvent] = []),
-        i = 0, len = publisherList.length,
+    var publisherList = this.Registry[sEvent] || (this.Registry[sEvent] = []),
+        i,
         publisher;
     
-    for(; i < len; i++)
+    for(i = 0; i < publisherList.length; i++)
         if(publisherList[i].src === src)
             return publisherList[i];
     
@@ -467,7 +471,7 @@ APE.EventPublisher.cleanUp = function() {
     }
 };
 if(window.CollectGarbage)
-    APE.EventPublisher.get( window, "onunload" ).addAfter( APE.EventPublisher.cleanUp, APE.EventPublisher );/**dom.js rollup: constants.js, viewport-f.js, position-f.js, classname-f.js,  traversal-f.js, Event.js, Event-coords.js, style-f.js, gebi-f.js */
+    APE.EventPublisher.get( window, "onunload" ).addAfter( APE.EventPublisher.cleanUp, APE.EventPublisher );/**dom.js rollup: constants.js, viewport-f.js, position-f.js, classname-f.js,  traversal-f.js, Event.js, Event-coords.js, style-f.js */
 APE.namespace("APE.dom" );
 (function(){
 	var dom = APE.dom,
@@ -1622,32 +1626,4 @@ APE.namespace("APE.dom.Event");
             return val;
         }
     }
-})();/**
- * XXX: IE Fix for getElementById returning elements by name.
- */
-(function(){
-    var d = document, x = d.body, c,
-        g = 'getElementById',
-        orig = document[g];
-
-    if(!x) return setTimeout(arguments.callee,50);
-
-    try {
-        c = d.createElement("<A NAME=0>");
-        x.insertBefore(c, x.firstChild);
-        if(d[g]('0')){
-            x.removeChild(c);
-            d[g] = getElementById;
-        }
-    } catch(x){}
-    function getElementById(id) {
-        var el = Function.prototype.call.call(orig, this, id), els, i;
-
-        if(el.id == id) return el;
-        els = this.getElementsByName(id);
-
-        for(i = 0; i < els.length; i++)
-            if(els[i].id === id) return els[i];
-        return null;
-    };
 })();

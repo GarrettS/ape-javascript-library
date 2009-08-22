@@ -142,8 +142,9 @@ setTimeout(function(){
                 Action.mousedown(daySelected);
  
                 Action.mousedown(document);
+                start.blur();
                 this.wait(function(){
-                    Assert.isTrue(c._isHidden, "c._isHidden");
+                    Assert.areSame("hidden", calendarEl.style.visibility, "was not hidden");
                     var split = start.value.split("-");
                     var actualDate = new Date(0);
                     var split = start.value.split("-");

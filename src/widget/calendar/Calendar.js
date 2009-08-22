@@ -23,26 +23,20 @@ APE.namespace("APE.widget");
     function Calendar( id ) {
         this.id = id;
         if(widget.Calendar.IS_NATIVE) return;
-        protectedData[id] = {};
         readDateFromInput(this);
         this.initEvents();
     }
     
-    var protectedData = { };
     // Determine if input type="date" is supported.
     // If HTML 5 input type="date" is supported, exit.
     var inputTypeDate = document.createElement("input");
     inputTypeDate.setAttribute("type", "date");
-    var IS_NATIVE = widget.Calendar.IS_NATIVE = /date/i.test(inputTypeDate.type);
+    var IS_NATIVE = widget.Calendar.IS_NATIVE = /date/i.test(inputTypeDate.type),
+        daysInMonth = [31,28,31,30,31,30,31,31,30,31,30,31],
+        activeCalendar = null;
+        
     inputTypeDate = null;
     
-   /** 
-     * Days in months. JavaScript Date object does not provide this.
-     * @type {[number]}
-     */
-    var daysInMonth = [31,28,31,30,31,30,31,31,30,31,30,31],
-        activeCalendar = null;
-
     function createCalendarPrototype(){
         return {
                 
@@ -235,9 +229,7 @@ APE.namespace("APE.widget");
             }
         }
         
-        /** 
-         * creates the HTML used for the calendar.
-         */        
+        /** creates the HTML used for the calendar. */        
         function createCalendarOnDemand(calendar) {
             if(!calendar.calendarId) {
                 calendar.calendarId = calendar.id + "-calendar";
