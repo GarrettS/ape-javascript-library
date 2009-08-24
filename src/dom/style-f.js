@@ -24,7 +24,10 @@ APE.namespace("APE.dom");
         FILTER = "filter",
         alphaString = "alpha("+OPACITY+"=",
         multiLengthPropExp = /^(?:margin|(border)(Width|Color|Style)|padding)$/,
-        alphaOpExp = /opacity\s*=\s*([\d]+)/i;
+        alphaOpExp = /\Wopacity\s*=\s*([\d]+)/i,
+        f = "cssFloat",
+        floatProp = f in document.documentElement[STYLE] ? f : "styleFloat",
+        props = ["Top", "Right", "Bottom", "Left"];
     
     /** 
      * Special method for a browser that supports el.filters and not style.opacity.
@@ -120,10 +123,6 @@ APE.namespace("APE.dom");
         }
         return value;
     }
-
-    var sty = document.documentElement[STYLE],
-        floatProp = 'cssFloat'in sty ? 'cssFloat': 'styleFloat',
-        props = ["Top", "Right", "Bottom", "Left"];
     
     function getCurrentStyleValueFromAuto(el, p) {
         

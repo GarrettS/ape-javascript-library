@@ -185,6 +185,21 @@ var getStyleTestCase = new TestCase({
         Assert.areSame(expected, actual);
     },
 
+    testGetFilterOpacityWithStartOpacity : function() {
+        var target = document.getElementById("target");
+        var alpha = "filter: alpha(startOpacity=10"
+                  + "       opacity    =   0  )",
+            expected = 0;
+        if("filters" in target) {
+            target.style.cssText = alpha;
+            target.style.zoom = "0";
+        } else {
+            target.style.cssText = "opacity: 0";
+        }
+        var actual = +dom.getStyle(target, "opacity");
+        Assert.areSame(expected, actual);
+    },
+
     testGetFilterOpacityUnset : function() {
         var target = document.getElementById("target"),
             actual = dom.getStyle(target, "opacity"),
