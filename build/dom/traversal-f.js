@@ -2,13 +2,12 @@ APE.namespace("APE.dom");
 (function(){
 
     var docEl = document.documentElement,
-        nodeType = "nodeType",
-        tagName = "tagName",
-        parentNode = "parentNode",
-        compareDocumentPosition = "compareDocumentPosition",
-        caseTransform = /^H/.test(docEl[tagName]) ? 'toUpperCase' : 'toLowerCase',
-        tagExp = /^[A-Z]/;
-        
+        hasNamedItem = "getNamedItem" in docEl.attributes,
+        NODE_TYPE = "nodeType",
+        COMPARE_POSITION = "compareDocumentPosition",
+        PARENT_NODE = "parentNode",
+        caseTransform = /^H/.test(docEl.tagName) ? 'toUpperCase' : 'toLowerCase';
+
     APE.mixin(
         APE.dom, {
         contains : getContains(),
@@ -18,7 +17,8 @@ APE.namespace("APE.dom");
         findPreviousSiblingElement : findPreviousSiblingElement,
         getChildElements : getChildElements
     });
-
+    docEl = null;
+    
     /** 
      * @memberOf APE.dom
      * @return {boolean} true if a contains b.
@@ -28,9 +28,9 @@ APE.namespace("APE.dom");
      */
 
     function getContains(){
-        if(compareDocumentPosition in docEl)
+        if(COMPARE_POSITION in docEl)
             return function(el, b) {
-                return (el[compareDocumentPosition](b) & 16) !== 0;
+                return (el[COMPARE_POSITION](b) & 16) !== 0;
         };
         else if('contains'in docEl)
             return function(el, b) {
@@ -38,12 +38,10 @@ APE.namespace("APE.dom");
         };
         return function(el, b) {
             if(el === b) return false;
-            while(el != b && (b = b[parentNode]) !== null);
+            while(el !== b && (b = b[PARENT_NODE]) !== null);
             return el === b;
         };
     }
-
-    //docEl = null;
 
     /** 
      * @memberOf APE.dom
@@ -55,24 +53,26 @@ APE.namespace("APE.dom");
      * Returns null if not found.
      */
     function findAncestorWithAttribute(el, attName, value) {
-        for(var map, parent = el[parentNode];parent !== null;){
+        for(var att, map, parent = el[PARENT_NODE];parent !== null;){
             map = parent.attributes;
-            if(!map) return null;
-            var att = map[attName];
-            if(att && att.specified)
-                if(att.value === value || (value === undefined))
-                    return parent;            
-            parent = parent[parentNode];
+            if(!map || !hasNamedItem) return null;
+            att = map.getNamedItem(attName);
+            if(att && att.specified) {
+                if(att.value === value || (value === undefined)) {
+                    return parent;
+                }
+            }
+            parent = parent[PARENT_NODE];
         }
         return null;
     }
 
     function findAncestorWithTagName(el, tag) {
         tag = tag[caseTransform]();
-        for(var parent = el[parentNode];parent !== null; ){
-            if( parent[tagName] === tag )
+        for(var parent = el[PARENT_NODE];parent !== null; ){
+            if( parent.tagName === tag )
                 return parent;
-            parent = parent[parentNode];
+            parent = parent[PARENT_NODE];
         }
         return null;
     }
@@ -80,30 +80,30 @@ APE.namespace("APE.dom");
     /** Filter out text nodes and, in IE, comment nodes. */
     function findNextSiblingElement(el) {
         for(var ns = el.nextSibling; ns !== null; ns = ns.nextSibling)
-            if(ns[nodeType] === 1) 
+            if(ns[NODE_TYPE] === 1) 
                 return ns;
         return null;
     }
 
     function findPreviousSiblingElement(el) {
         for(var ps = el.previousSibling; ps !== null; ps = ps.previousSibling) {
-            if(ps[nodeType] === 1) 
+            if(ps[NODE_TYPE] === 1) 
                 return ps;
         }
         return null;
     }
    
     function getChildElements(el) {
-        var i = 0, ret = [], len, tag,
-            cn = el.children || el.childNodes, c;
+        var i = 0, j, ret = [], len,
+            cn = el.childNodes, c;
         
         // IE throws error when calling 
         // Array.prototype.slice.call(el.children).
         // IE also includes comment nodes.
-        for(len = cn.length; i < len; i++) {
+        for(len = cn.length, j = 0; i < len; i++) {
             c = cn[i];
-            if(c[nodeType] !== 1) continue;
-            ret[ret.length] = c;
+            if(c[NODE_TYPE] !== 1) continue;
+            ret[j++] = c;
         }
         return ret;
     }

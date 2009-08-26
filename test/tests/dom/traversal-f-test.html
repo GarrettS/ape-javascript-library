@@ -94,7 +94,7 @@ var viewportTestCase = new YAHOO.tool.TestCase({
 
     testFindPreviousSiblingElement : function() {
         var prev = dom.findPreviousSiblingElement(afterTestNode);
-        Assert.areEqual(testNode, prev);
+        Assert.areEqual(testNode, prev, "found " + prev.id);
     },
 
     testFindNextSiblingElement : function() {
