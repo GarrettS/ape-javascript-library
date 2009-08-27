@@ -1,0 +1,95 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+    <title>DOM Style Test</title>
+
+    <link rel="stylesheet" type="text/css" href="../../yui-test/build/logger/assets/logger.css">
+    <link rel="stylesheet" type="text/css" href="../../yui-test/build/yuitest/assets/yuitest.css">
+    <link rel="stylesheet" type="text/css" href="../../yui-test/assets/testlogger.css">
+
+    <script type="text/javascript" src="../../yui-test/build/yahoo-dom-event/yahoo-dom-event.js"></script>
+    <script type="text/javascript" src="../../yui-test/build/logger/logger.js"></script>
+    <script type="text/javascript" src="../../yui-test/build/yuitest/yuitest-beta.js"></script>
+
+    <script type="text/javascript" src="../../../build/APE.js"></script>
+    <script type="text/javascript" src="../../../build/dom/position-f.js"></script>
+    <script type="text/javascript" src="../../../build/dom/constants.js"></script>
+    <script type="text/javascript" src="../../../build/dom/style-f.js"></script>
+    <script type="text/javascript" src="../../../build/dom/getContainingBlock.js"></script>
+    <script type="text/javascript" src="../../../build/dom/setIeTopLeft.js"></script>
+
+</head>
+<body style="position:relative; margin: 0; padding: 0;">
+    <div id="testNode" style="position: relative; width: 200px" tabIndex="0">bbb</div>
+<div id="testLogger" style="margin-top: 30px"></div><!-- In IE, a relatively positioned descendant gets position offset by font-size! -->
+<script type="text/javascript">
+setTimeout(function(){
+
+var Assert = YAHOO.util.Assert,
+    TestCase = YAHOO.tool.TestCase,
+    bodyCssText = document.body.style.cssText,
+    testNodeCssText = document.getElementById('testNode').style.cssText,
+    
+    dom = APE.dom;
+
+var domIeTopLeftTest = new TestCase({
+    name : "setIeTopLeft.js",
+
+    tearDown : function(){
+        document.body.style.cssText = bodyCssText;
+        var testNode = document.getElementById('testNode');
+        testNode.style.cssText = testNodeCssText;
+},
+    
+    testSetFromBottom : function(){
+
+        var testNode = document.getElementById("testNode");
+        
+        document.body.style.height="500px";
+        document.body.style.width="500px";
+	
+	    testNode.style.bottom = testNode.style.right = "0";
+	    testNode.style.position = "absolute";
+        testNode.style.width = "120px";
+        testNode.style.height = "120px";
+	
+	    APE.dom.setIeTopLeft(testNode);
+	    
+	    var coords = dom.getOffsetCoords( testNode ),
+	        expectedTop = 500 - testNode.offsetHeight,
+	        expectedLeft = 500 - testNode.offsetWidth;
+	
+	    // Make sure the coords are correct.
+	    Assert.areEqual( expectedTop, coords.y, 'coords y was wrong' );
+	    Assert.areEqual( expectedLeft, coords.x, 'coords x was wrong' );
+	
+	    var dv = document.defaultView,
+	        el = testNode,
+	        s = el.style,
+	        cs = (dv && dv.getComputedStyle && dv.getComputedStyle(el,"")) 
+	            || el.currentStyle,
+	
+	        // If this throws an error in IE, it means failure of _setIeTopLeft();
+	        top = testNode.style.top || cs.top,
+	        left = testNode.style.left || cs.left;
+	    Assert.areEqual( expectedTop, parseInt(top), 'style.top was wrong' );
+	    Assert.areEqual( expectedLeft, parseInt(left), 'style.left was wrong' );
+	}
+
+});
+var logger = new YAHOO.tool.TestLogger("testLogger");
+YAHOO.tool.TestRunner.add( domIeTopLeftTest );
+
+// run the tests, or put them in the TestRunner.
+if (parent && parent != window) {
+    YAHOO.tool.TestManager.load();
+} else {
+    YAHOO.tool.TestRunner.run();
+}
+}, 100);
+</script>
+
+</body>
+</html>

@@ -149,6 +149,21 @@ var getStyleTestCase = new TestCase({
         Assert.areEqual(0.1, parseFloat(op), "opacity found was wrong." );
     },
 
+    testGetHeightFromPercentage : function() {
+        var target = document.getElementById("target"),
+	        ts = target.style,
+	        container = target.parentNode,
+	        cs = container.style;
+
+        cs.cssText = "height: 200px; position: relative; width: 100px";
+        ts.cssText = "height: 50%;position: absolute;font-size: 1px;display: block"
+
+        this.wait(function(){
+            var actual = dom.getStyle(target, "height");
+            Assert.areEqual("100px", actual, "height found was wrong." );
+        }, 50);
+    },
+    
     testSetOpacity : function() {
         var target = document.getElementById("target");
         dom.setOpacity(target, .1);

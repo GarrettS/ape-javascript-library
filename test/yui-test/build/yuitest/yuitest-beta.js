@@ -2347,11 +2347,23 @@ YAHOO.util.UserAction = {
     {
         
         //check target
-        target = YAHOO.util.Dom.get(target);        
+        target = YAHOO.util.Dom.get(target);
+        
         if (!target){
             throw new Error("simulateMouseEvent(): Invalid target.");
         }
-        
+        var doc = target.ownerDocument || target.document || target,
+            win = doc.parentWindow;
+            
+        if(!win) {
+            var scriptElement = doc.createElement('script'),
+                head;
+            scriptElement.innerHTML = 'document.parentWindow=window';
+            head = doc.getElementsByTagName("head")[0];
+            head.appendChild(scriptElement);
+            win = doc.parentWindow;
+        }
+
         //check event type
         if (YAHOO.lang.isString(type)){
             type = type.toLowerCase();
@@ -2416,9 +2428,9 @@ YAHOO.util.UserAction = {
         var customEvent /*:MouseEvent*/ = null;
             
         //check for DOM-compliant browsers first
-        if (YAHOO.lang.isFunction(document.createEvent)){
+        if (YAHOO.lang.isFunction(doc.createEvent)){
         
-            customEvent = document.createEvent("MouseEvents");
+            customEvent = doc.createEvent("MouseEvents");
         
             //Safari 2.x (WebKit 418) still doesn't implement initMouseEvent()
             if (customEvent.initMouseEvent){
@@ -2427,9 +2439,8 @@ YAHOO.util.UserAction = {
                                      ctrlKey, altKey, shiftKey, metaKey, 
                                      button, relatedTarget);
             } else { //Safari
-            
                 //the closest thing available in Safari 2.x is UIEvents
-                customEvent = document.createEvent("UIEvents");
+                customEvent = doc.createEvent("UIEvents");
                 customEvent.initEvent(type, bubbles, cancelable);
                 customEvent.view = view;
                 customEvent.detail = detail;
@@ -2437,6 +2448,14 @@ YAHOO.util.UserAction = {
                 customEvent.screenY = screenY;
                 customEvent.clientX = clientX;
                 customEvent.clientY = clientY;
+ 
+                // Doesn't fucking work. Readonly in Safari 2.
+                // try {
+                // customEvent.pageX = clientX + win.pageXOffset;
+                // customEvent.pageY = clientY + win.pageYOffset;
+                // } catch(ex) {
+                // }
+
                 customEvent.ctrlKey = ctrlKey;
                 customEvent.altKey = altKey;
                 customEvent.metaKey = metaKey;
@@ -2461,16 +2480,16 @@ YAHOO.util.UserAction = {
                     customEvent.fromElement = relatedTarget||null;
                 }
             }
-
+            
             //fire the event
             var ret = target.dispatchEvent(customEvent);
             
             return ret;
 
-        } else if (YAHOO.lang.isObject(document.createEventObject)){ //IE
+        } else if (YAHOO.lang.isObject(doc.createEventObject)){ //IE
         
             //create an IE event object
-            customEvent = document.createEventObject();
+            customEvent = doc.createEventObject();
             
             //assign available properties
             customEvent.bubbles = bubbles;
@@ -3243,5 +3262,27 @@ YAHOO.lang.extend(YAHOO.tool.TestLogger, YAHOO.widget.LogReader, {
     }
     
 });
+(function(){
+
+    if(typeof MouseEvent == "undefined") return
+    
+    var expected = 10,
+        actual;
+    function cb(ev){
+        ev = ev||event;
+        actual = ev.pageX;
+    }
+    document.onmousemove = cb;
+    YAHOO.util.UserAction.mousemove(document, {clientX: expected});
+    if(expected !== actual) {
+
+        MouseEvent.prototype.__defineGetter__('pageX', function() {
+            return this.clientX + window.pageXOffset;
+        });
+        MouseEvent.prototype.__defineGetter__('pageY', function() {
+            return this.clientY + window.pageYOffset;
+        });
+    }
+})();
 
 YAHOO.register("yuitest", YAHOO.tool.TestRunner, {version: "2.4.0", build: "733"});

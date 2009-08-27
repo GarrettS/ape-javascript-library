@@ -738,7 +738,9 @@ function normalizeString(s) { return s.replace(STRING_TRIM_EXP,'').replace(WS_MU
     function findAncestorWithAttribute(el, attName, value) {
         for(var att, map, parent = el[PARENT_NODE];parent !== null;){
             map = parent.attributes;
-            if(!map || !hasNamedItem) return null;
+            if(!map || !hasNamedItem) {
+                return null;
+            }
             att = map.getNamedItem(attName);
             if(att && att.specified) {
                 if(att.value === value || (value === undefined)) {
@@ -931,6 +933,7 @@ APE.namespace("APE.dom.Event");
         alphaString = "alpha("+OPACITY+"=",
         multiLengthPropExp = /^(?:margin|(border)(Width|Color|Style)|padding)$/,
         alphaOpExp = /\Wopacity\s*=\s*([\d]+)/i,
+        autoPercentExp = /^auto|\d%$/,
         f = "cssFloat",
         floatProp = f in document.documentElement[STYLE] ? f : "styleFloat",
         props = ["Top", "Right", "Bottom", "Left"];
@@ -1002,16 +1005,20 @@ APE.namespace("APE.dom.Event");
             if(value === "") {
                 // would try to get a rect, but Webkit doesn't support that.
                 value = tryGetShorthandValues(cs, p).join(" ");
-            }
+            } 
+            // Special case Safari 2.
+            if(p == "zIndex" && value == "normal") return "0";
+            if(autoPercentExp.test(value)) {
+                value = getCurrentStyleValueFromAutoOrPercent(el, p);
+            } 
         } else {
             cs = el[CURRENT_STYLE];
             if(p === OPACITY) {
                 value = getFilterOpacity(cs);
             } else {
                 value = cs[p];
-
-                if(value === "auto") {
-                    value = getCurrentStyleValueFromAuto(el, p);
+                if(autoPercentExp.test(value)) {
+                    value = getCurrentStyleValueFromAutoOrPercent(el, p);
                 } else if(!(p in cs)) {
                     return"";
                 }
@@ -1030,36 +1037,36 @@ APE.namespace("APE.dom.Event");
         return value;
     }
     
-    function getCurrentStyleValueFromAuto(el, p) {
-        
+    function getCurrentStyleValueFromAutoOrPercent(el, p) {
         var s = el[STYLE], v, pp, borderWidth, doc = el[dom.OWNER_DOCUMENT];
         if("pixelWidth"in s && /width|height|top|left/.test(p)) {
             pp = "pixel" + (p.charAt(0).toUpperCase()) + p.substring(1);
             v = s[pp];
-            if(v === 0) {
-                if(p === "width") {
-                    borderWidth = parseFloat(getStyle(el, "borderRightWidth"))||0;
-                    paddingWidth = parseFloat(getStyle(el, "paddingLeft"))||0
-                        + parseFloat(getStyle(el, "paddingRight"))||0;
-
-                    return el.offsetWidth - el.clientLeft - borderWidth - paddingWidth + PX;
-                } else if(p === "height") {
-                    borderWidth = parseFloat(getStyle(el, "borderBottomWidth"))||0;
-                    paddingWidth = parseFloat(getStyle(el, "paddingTop"))||0
-                        + parseFloat(getStyle(el, "paddingBottom"))||0;
-                    return el.offsetHeight - el.clientTop - borderWidth + PX;
-                }
-            }
-            return s[pp] + PX;
         }
-        if(p == "margin" && el[CURRENT_STYLE].position != "absolute" && 
-          doc.compatMode !== "BackCompat") {
+        if(v) {
+            return v + PX;
+        }
+        var clientTop = el.clientTop||0,
+            clientLeft = el.clientLeft||0;
+        if(p === "width") {
+            borderWidth = parseFloat(getStyle(el, "borderRightWidth"))||clientLeft;
+            paddingWidth = parseFloat(getStyle(el, "paddingLeft"))||0
+                + parseFloat(getStyle(el, "paddingRight"))||0;
+
+            return el.offsetWidth - clientLeft - borderWidth - paddingWidth + PX;
+        } else if(p === "height") {
+            borderWidth = parseFloat(getStyle(el, "borderBottomWidth"))||clientTop;
+            paddingWidth = parseFloat(getStyle(el, "paddingTop"))||0
+                + parseFloat(getStyle(el, "paddingBottom"))||0;
+            return el.offsetHeight - clientTop - borderWidth + PX;
+        } else if(p == "margin" && el[CURRENT_STYLE].position != "absolute") {
             v = parseFloat(getStyle(el.parentNode, 'width')) - el.offsetWidth;
             if(v == 0) return"0px";
             v = "0px " + v;
             return v + " " + v;
         }
-        
+        // Could be zIndex.
+        return "0";
         // Can't get borderWidth because we only have clientTop and clientLeft.
     }
 
