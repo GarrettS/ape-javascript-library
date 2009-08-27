@@ -55,7 +55,9 @@ APE.namespace("APE.dom");
     function findAncestorWithAttribute(el, attName, value) {
         for(var att, map, parent = el[PARENT_NODE];parent !== null;){
             map = parent.attributes;
-            if(!map || !hasNamedItem) return null;
+            if(!map || !hasNamedItem) {
+                return null;
+            }
             att = map.getNamedItem(attName);
             if(att && att.specified) {
                 if(att.value === value || (value === undefined)) {

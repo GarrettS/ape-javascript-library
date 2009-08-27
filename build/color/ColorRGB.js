@@ -9,22 +9,22 @@
 APE.namespace("APE.color");
 
 (function(){
+    var APE = self.APE,
+        color = APE.color,
+        /* matches 3 or 6 digit color hex */
+        hexPattern = /(?:\s|^)#(?:[\da-f]{3}|[\da-f]{6})(?:\s|$)/i,
+        /* matches an rgb(i, i, i) String. */
+        rgbPattern = /rgb\(([\d]{1,3})\,\s?([\d]{1,3})\,\s?([\d]{1,3})\)/;
+        
+    color.ColorRGB = ColorRGB;
+    color.ColorHSV = ColorHSV;
+    
     /** ColorRGB
      * @constructor
      * @param {uint} r 0-255
      * @param {uint} g 0-255
      * @param {uint} b 0-255
      */
-    var APE = self.APE,
-        color = APE.color,
-        /* matches 3 or 6 digit color hex */
-        hexPattern = /(?:#)[0-9a-f]{3,6}/i,
-        /* matches an rgb(i, i, i) String with optional percent signs. */
-        rgbPattern = /rgb\(([\d]{1,3})\,\s?([\d]{1,3})\,\s?([\d]{1,3})\)/;
-        
-    color.ColorRGB = ColorRGB;
-    color.ColorHSV = ColorHSV;
-    
     function ColorRGB(r, g, b) {
         this.r = r;
         this.g = g;
@@ -51,7 +51,7 @@ APE.namespace("APE.color");
      */
     function fromHexString(hex) {
         if(!hexPattern.test(hex)) 
-            throw Error("ColorRGB.fromHexString(hex) invalid input: " + hex);
+            throw Error("ColorRGB.fromHexString(hex) invalid: " + hex);
         var n = parseInt(hex.substring(1), 16),
             r, g, b;
     
@@ -176,7 +176,7 @@ APE.namespace("APE.color");
             
             function toHexByte(bite) {
                 var hex = bite.toString(16);
-                return (hex.length == 2 ? hex : "0" + hex);
+                return (hex.length === 2 ? hex : "0" + hex);
             }
         },
         
@@ -184,7 +184,7 @@ APE.namespace("APE.color");
      * @return {boolean} true if this r,g,b equal other's r,g,b.
      */ 
         equals : function(c) {
-            return (this.r == c.r) && (this.b == c.b) && (this.g == c.g);
+            return (this.r === c.r) && (this.b === c.b) && (this.g === c.g);
         },
         
         /** @return {boolean} if r,g,b are all numbers 0-255. 
