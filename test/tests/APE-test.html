@@ -142,7 +142,7 @@ var apeTest = new YAHOO.tool.TestCase({
     }
 });
 
-var C, CN, testNode = document.createElement("u");
+var C, testNode = document.createElement("u");
 testNodeId = "testCreational";
 testNode.id = testNodeId;
 document.body.appendChild(testNode);
@@ -152,18 +152,17 @@ var creationalTest = new YAHOO.tool.TestCase({
     name : "APE creationalTest",
     
     setUp : function() {
-        C = function(id, i ) { this.id = id; this.i = i; };
-        CN = function(el, j, k) { this.id = el.id; this.j = j; this.k = k; };
+        C = function(id, i, j ) { this.id = id; this.i = i; this.j = j; };
     },
 
     testGetByNode : function() {
 
-        var CNFactory = APE.createFactory(CN);
+        var CNFactory = APE.createFactory(C);
         
         var c = CNFactory.getByNode(testNode, 7, 1);
         Assert.areEqual(testNode.id, c.id);
-        Assert.areEqual(7, c.j);
-        Assert.areEqual(1, c.k);
+        Assert.areEqual(7, c.i, "i wrong.");
+        Assert.areEqual(1, c.j, "j wrong.");
         var d = document.createElement("div");
         CNFactory.getByNode(d);
         YAHOO.log("created id: " + d.id, "info", "TestRunner");

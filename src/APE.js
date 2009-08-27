@@ -119,19 +119,24 @@
             getByNode : getById
         };
         
-        function getById(idEl) {
-            var id = (typeof idEl === "string") ? idEl : getId(idEl);
+        function getById(id) {
+            if(typeof id.id == "string") {
+            // Modifying - id - modifies the arguments object; 
+            // but not in poor Safari 2.x.
+                arguments[0] = getId(id);
+            }
             if(!(INSTANCES in this)) {
                 if(typeof createPrototype === "function") {
                     ctor[PROTOTYPE] = createPrototype();
-                }
+                } 
             }
-            return getOrCreate.call(this, id, ctor, arguments);
+            return getOrCreate.call(this, ctor, arguments);
         }
     }
     
    // Not exported----------------------------------
-    function getOrCreate(id, ctor, args) {
+    function getOrCreate(ctor, args) {
+        var id = args[0];
         // Public instances property, for purge or cleanup.
         if(!hasOwnProperty(this, INSTANCES)) this[INSTANCES] = {};
         return this[INSTANCES][id] || (this[INSTANCES][id] = newApply(ctor, args));
@@ -146,7 +151,7 @@
      * @return <pre>new this(id [,args...])</pre>
      */
     function getById(id){
-        return getOrCreate.call(this, id, this, arguments);
+        return getOrCreate.call(this, this, arguments);
     }
     
     function getId(el) {

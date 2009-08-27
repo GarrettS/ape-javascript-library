@@ -27,7 +27,8 @@
     <div id="testNode" style="position: relative;margin:0; width: 200px;left: 0" 
         tabindex="0"
     class="ape-slider-track ape-slider-h-track">
-        <div id="testNode-handle" class="ape-slider-handle ape-slider-h-handle"></div>
+        <div id="testNode-handle" class="ape-slider-handle ape-slider-h-handle"
+        tabindex="0"></div>
     </div>
     <div id="testNode2" style="position: relative; width: 10px; height: 100px;" 
         tabindex="0"
@@ -68,13 +69,32 @@ var draggableTestCase = new YAHOO.tool.TestCase({
     // pageX broken, so all tests test target from 0, 0.
 
     tearDown : function() {
-        Draggable.instanceDestructor();
+        
+        // Deletes all properties of instances and 
+        // all instances themselves.
+        for(var prop in Slider.instances) {
+            var i = Slider.instances[prop],
+                handle = i.handle,
+                el = document.getElementById(i.id);
+            handle["onglideend"] = noop;
+            handle["ondragend"] = noop;
+            handle["onglideend"] = noop;
+            handle["ondrag"] = noop;
+            el["onfocus"] = noop;
+            el["onblur"] = noop;
+            handle["onglide"] = noop;
+            handle["ondragstop"] = noop;
+            delete Slider.instances[prop];
+        }
         Slider.instances = {};
+        function noop(){}
+        Action.mouseup(document);
         testNodeHandle.className = "";
         template.innerHTML = templateHTML;
         document.body.style.cssText = oldBodyCssText;
         testNodeHandle = document.getElementById('testNode-handle');
         testNode2Handle = document.getElementById('testNode2-handle');
+        Draggable.instanceDestructor();
     },
 
     testActivate : function() {
@@ -85,7 +105,6 @@ var draggableTestCase = new YAHOO.tool.TestCase({
 
         if(testNodeHandle.focus)
             testNodeHandle.focus();
-        Action.mousedown( testNodeHandle );
 
         this.wait(function(){
             
@@ -246,10 +265,8 @@ var draggableTestCase = new YAHOO.tool.TestCase({
 
     testKeyNeg : function() {
         var d = Slider.getByNode( testNodeHandle, Slider.direction.HORZ );
-
-        if(testNodeHandle.focus)
-            testNodeHandle.focus();
         Action.mousedown( testNodeHandle );
+        Action.mouseup( document );
 
         var lArr = 37,
             rArr = 39,
@@ -257,12 +274,10 @@ var draggableTestCase = new YAHOO.tool.TestCase({
             dArr = 40;
 
         Action.keydown( document, {keyCode: lArr } );
-        Action.mouseup( document );
+        Action.keyup(document);
 
         this.wait(function(){ 
             Assert.areEqual( 0, d.value );
-            if(testNodeHandle.blur)
-                testNodeHandle.blur();
         }, 30);
     },
 
@@ -271,23 +286,42 @@ var draggableTestCase = new YAHOO.tool.TestCase({
 
         d.maxValue = 150;
 
+        Action.mousedown( testNodeHandle ); // draw focus anyway.
         if(testNodeHandle.focus)
             testNodeHandle.focus();
-        Action.mousedown( testNodeHandle ); // draw focus anyway.
-        Action.mouseup( testNodeHandle ); // IE6 fails test w/o this.
-        
         var lArr = 37,
             rArr = 39,
             uArr = 38,
             dArr = 40;
 
-        Action.keydown( document, {keyCode: rArr } );
-        this.wait(function(){ 
+        this.wait(function(){
+            Action.keydown( document, {keyCode: rArr } );
             Action.keyup(document);
-            Assert.areEqual( 10, d.value );
-            if(testNodeHandle.blur)
-                testNodeHandle.blur();
-        }, 10);
+                    Assert.areEqual( 10, d.value );
+        }, 250);
+    },
+
+    testGlideBackTo0 : function(){
+        var d = Slider.getByNode( testNodeHandle, Slider.direction.HORZ ),
+        actualValue;
+
+	    d.onslideend = function() {
+	        actualValue = this.value;
+	    };
+	
+	    Action.mousedown( testNodeHandle );
+        if(testNodeHandle.focus)
+            testNodeHandle.focus();	    
+        Action.mousemove( document, {clientX : 12 } );
+
+        var ESC = 27;
+        Action.keydown( document, {keyCode: ESC} );
+        Action.keyup(document);
+
+        this.wait(function(){  
+	        Assert.areSame( 0, actualValue, "value after slideend wrong." );
+	    }, 250);
+
     }
 });
 

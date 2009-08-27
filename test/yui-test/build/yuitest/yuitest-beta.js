@@ -3271,7 +3271,9 @@ YAHOO.lang.extend(YAHOO.tool.TestLogger, YAHOO.widget.LogReader, {
     function cb(ev){
         ev = ev||event;
         actual = ev.pageX;
+        document.onmousemove = m;
     }
+    var m = document.onmousemove;
     document.onmousemove = cb;
     YAHOO.util.UserAction.mousemove(document, {clientX: expected});
     if(expected !== actual) {

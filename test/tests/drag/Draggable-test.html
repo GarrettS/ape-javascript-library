@@ -1,13 +1,13 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
-        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
 <head>
-    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
     <title>Drag Test</title>
 
-    <link rel="stylesheet" type="text/css" href="../../yui-test/build/logger/assets/logger.css" />
-    <link rel="stylesheet" type="text/css" href="../../yui-test/build/yuitest/assets/yuitest.css" />
-    <link rel="stylesheet" type="text/css" href="../../yui-test/assets/testlogger.css" />
+    <link rel="stylesheet" type="text/css" href="../../yui-test/build/logger/assets/logger.css">
+    <link rel="stylesheet" type="text/css" href="../../yui-test/build/yuitest/assets/yuitest.css">
+    <link rel="stylesheet" type="text/css" href="../../yui-test/assets/testlogger.css">
 
     <script type="text/javascript" src="../../yui-test/build/yahoo-dom-event/yahoo-dom-event.js"></script>
     <script type="text/javascript" src="../../yui-test/build/logger/logger.js"></script>
@@ -20,8 +20,8 @@
     <script type="text/javascript" src="../../../build/dom/Event-coords.js"></script>
     <script type="text/javascript" src="../../../build/dom/getContainingBlock.js"></script>
     <script type="text/javascript" src="../../../build/dom/getPixelCoords.js"></script>
+    <script type="text/javascript" src="../../../build/dom/setIeTopLeft.js"></script>
     <script type="text/javascript" src="../../../build/drag/Draggable.js"></script>
-
 </head>
 <body style="position:relative;">
 <div id="testLogger"></div>
@@ -42,6 +42,8 @@ try {
 document.body.style.margin= "0";
 
 var MOUSE_MOVE_TEST_WARNING = "Please keep your mouse offscreen and don't move it.";
+
+var ESC = 27;
 
 var Assert = YAHOO.util.Assert,
     StringAssert = YAHOO.util.StringAssert,
@@ -74,12 +76,26 @@ var draggableTestCase = new YAHOO.tool.TestCase({
 
         // otherwise the test puts the Draggable into 
         // a weird state.
-        Action.mousedown(document);
-        Action.mouseup(document);
+        Action.mousedown(document, {clientX: 330, clientY: 330});
+        Action.mouseup(document, {clientX: 330, clientY: 330});
         testNode = document.getElementById('testNode');
         testNode2 = document.getElementById('testNode2');
     },
+    
+    testMouseup : function() {
+        // should not throw error.
+        Draggable.getByNode( testNode ); // to kick off "init events in Draggable".
+        Action.mousedown( document.body, {clientX: 330, clientY: 330} );
+        Action.mouseup( document.body, {clientX: 330, clientY: 330} );
+    },
 
+    _should : {
+        ignore : {
+        // Safari 2 issue: pageX.
+            testYuiTestMouseMove : true
+        }        
+    },
+    
     testSelect : function() {
         
         testNode.className = "orig";
@@ -142,7 +158,7 @@ var draggableTestCase = new YAHOO.tool.TestCase({
         Action.mousedown( testNode );
         Assert.isTrue( bds, "onbeforedrag start should not have fired." );
 
-        Assert.isFalse( ds, "drag start <em>still</em> should not have fired." );
+        Assert.isFalse( ds, "drag start <em>still<\/em> should not have fired." );
 
         //screenX, screenY, clientX, clientY, altKey, ctrlKey, shiftKey, metaKey
         Action.mousemove( document );
@@ -163,12 +179,9 @@ var draggableTestCase = new YAHOO.tool.TestCase({
         d.activeDragClassName = aClass;
         d.dragCopy = true;
 
-        if(testNode.focus)
-            testNode.focus();
-
         Action.mousedown( testNode );
 
-        Action.mousemove( document, {clientX:1} );
+        Action.mousemove( document, {clientX:101} );
         this.wait(function(){
 	        Action.mousemove( document, {clientX:101} );
 	
@@ -209,26 +222,40 @@ var draggableTestCase = new YAHOO.tool.TestCase({
         Assert.isString(d.toString());
     },
 
+    testYuiTestMouseMove : function(){
+        var expected = 10,
+        actual;
+	    function cb(ev){
+	        ev = ev||event;
+	        actual = ev.pageX;
+	    }
+	    document.onmousemove = cb;
+	    Action.mousemove(document, {clientX: expected});
+	    Assert.areEqual(expected, actual, "pageX issue.");
+    },
+    
     testConstraintHorz : function() {
 
         var d = Draggable.getByNode( testNode );
         d.moveToY = function(){};
         
-        var coords = dom.getOffsetCoords( testNode );
+        var coords = dom.getOffsetCoords( testNode ),
+            moveToCoords = {clientX:83, clientY:111};
         
-        if(testNode.focus)
-            testNode.focus();
         Action.mousedown( testNode, {clientX: 0, clientY: 0} );
-        Action.mousemove( document, {clientX:1, clientY:1} );
+        Action.mousemove( document, moveToCoords );
 
         // Threshold is 25ms (so wait for it to kick in).
         this.wait(function() {
-            Action.mousemove( document, {clientX:83, clientY:111} );
-            var coords2 = dom.getOffsetCoords( testNode );
-            Assert.areEqual( 83, coords2.x, "x wrong" );
-            Assert.areEqual( coords.y, coords2.y, 
-                    "y pos should not have changed." );
-        }, 78);
+            Action.mousemove( document, moveToCoords );
+            this.wait(function(){
+                Action.mousemove( document, moveToCoords );
+	            var coords2 = dom.getOffsetCoords( testNode );
+	            Assert.areEqual( 83, coords2.x, "x wrong" );
+	            Assert.areEqual( coords.y, coords2.y, 
+	                    "y pos should not have changed." );
+	        }, 78);
+        }, 110);
     },
 
     testConstraintVert : function() {
@@ -239,7 +266,6 @@ var draggableTestCase = new YAHOO.tool.TestCase({
         
         var coords = dom.getOffsetCoords( testNode );
         
-        testNode.focus();
         Action.mousedown( testNode, {clientX: 0, clientY: 0} );
 
         
@@ -262,6 +288,11 @@ var draggableTestCase = new YAHOO.tool.TestCase({
         testNode.style.position = "absolute";
         testNode.style.width = "120px";
 
+        
+        // Simple way to set top/left.
+        testNode.style.top= testNode.offsetTop + "px";
+        testNode.style.left= testNode.offsetLeft +.9 +"px";
+        
         var d = Draggable.getByNode( testNode );
 
         var coords = dom.getOffsetCoords( testNode ),
@@ -465,10 +496,47 @@ var draggableTestCase = new YAHOO.tool.TestCase({
         Assert.areEqual("20px", testNode2.style.top);
     },
 
+    testOnglide : function() {
+        // because it is in-flow, offset by it's prev sibling (testNode).
+        testNode2.style.top = "-20px";
+        testNode.style.height = "20px";
+
+        document.body.style.height = "900px"
+
+        var d = Draggable.getByNode( testNode ),
+            d2 = Draggable.getByNode( testNode2 ),
+            glided = false;
+
+        d.dragMultiple = d2.dragMultiple = true;
+
+        d2.onglide = function() {
+            glided = true;
+        };
+
+        Action.mousedown( testNode );
+
+        Action.mouseup( document );
+        Action.mousedown( testNode2, {ctrlKey:true, metaKey:true} );
+
+        // Opera and Chrome need duplicate coords here.
+        var coords = {clientX: 110, clientY: 140};
+        Action.mousemove( document, coords);
+
+        this.wait(function(){
+            Action.mousemove( document, coords);
+                        
+            Assert.areEqual("110px", testNode.style.left);
+            Assert.areEqual("120px", testNode2.style.top);
+    
+            Action.keydown( document, {keyCode:ESC} );
+    
+            this.wait(function(){
+                Assert.isTrue(glided, "d did not fire onglide");
+            }, 120);
+        }, 78);
+    },
+    
     testReleaseGroup : function() {
-
-        var ESC = 27;
-
         // because it is in-flow, offset by it's prev sibling (testNode).
         testNode2.style.top = "-20px";
         testNode.style.height = "20px";
@@ -479,6 +547,10 @@ var draggableTestCase = new YAHOO.tool.TestCase({
             d2 = Draggable.getByNode( testNode2 ),
             glidended = false,
             testNode3 = document.getElementById("testNode3");
+
+        d2.onglide = function() {
+            glided = true;
+        };
 
         d.dragMultiple = d2.dragMultiple = true;
 
@@ -510,7 +582,7 @@ var draggableTestCase = new YAHOO.tool.TestCase({
 	        Assert.areEqual("20px", testNode2.style.top);
 	
 	        StringAssert.contains("DOC", dt.el.className);
-	        Action.keypress( document, {keyCode:ESC} );
+	        Action.keydown( document, {keyCode:ESC} );
 	
 	        this.wait(function(){
 	            Assert.areEqual("0px", testNode.style.left);
@@ -602,15 +674,15 @@ var draggableTestCase = new YAHOO.tool.TestCase({
         testNode3.style.top = "100px";
         testNode3.style.height = "20px";
 
-        var dt = d2.addDropTarget( testNode3 );
+        var dt = d.addDropTarget( testNode3);
+        d2.addDropTarget( testNode3 );
+
         dt.ondrop = function(e) {
             if(e.dragObj.id === testNode2.id) gotDrop = true;
         };
 
         d.dragMultiple = d2.dragMultiple = true;
 
-        if(testNode.focus)
-            testNode.focus();
         Action.mousedown( testNode );
 
         this.wait(function(){
@@ -623,13 +695,11 @@ var draggableTestCase = new YAHOO.tool.TestCase({
 
             this.wait(function(){
                 Assert.isTrue( d.isSelected, 'd was not selected' );
-                Assert.isTrue( d2.isSelected, 'd was not selected' );
+                Assert.isTrue( d2.isSelected, 'd2 was not selected' );
 
                 // Mouseup occurs right on the bottom edge of testNode3.
                 Action.mouseup( document , {clientX : 120, clientY : 120} );
-                this.wait(function(){
-                    Assert.isTrue(gotDrop, "testNode2 did not get drop event");
-                }, 78);
+                Assert.isTrue(gotDrop, "testNode2 did not get drop event");
             }, 78);
         }, 78);
     },
@@ -668,10 +738,44 @@ var draggableTestCase = new YAHOO.tool.TestCase({
         }, 78);
     },
 
+    testReleaseOverDropTarget : function() {
+        var d = Draggable.getByNode( testNode ),
+	        testNode3 = document.getElementById('testNode3'),
+	        gotDrop = false;
+
+        testNode3.style.position = "absolute";
+        testNode3.style.top = "100px";
+        testNode3.style.height = "20px";
+
+        var dt = d.addDropTarget( testNode3);
+
+        dt.ondrop = function(e) {
+            gotDrop = true;
+        };
+
+        Action.mousedown( testNode );
+        Action.mousemove( document, {clientX : 20, clientY : 20 } );
+
+        this.wait(function(){
+            Action.mousemove( document, {clientX : 20, clientY : 20 } );
+
+            this.wait(function(){
+                var ESC = 27;
+                Action.keydown( document, {keyCode: ESC} );
+
+                // Mouseup occurs right on the bottom edge of testNode3.
+                Action.mouseup( document , {clientX : 20, clientY : 20} );
+                this.wait(function(){
+                    Assert.isFalse(gotDrop, "testNode2 did not get drop event");
+                }, 100); // let it glide back, so to avoid odd state.
+            }, 78);
+        }, 78);
+    },
+    
     testRemoveDropTarget : function() {
         var d = Draggable.getByNode( testNode ),
-        testNode3 = document.getElementById('testNode3'),
-        gotDrop = false;
+	        testNode3 = document.getElementById('testNode3'),
+	        gotDrop = false;
 
         testNode3.style.position = "absolute";
         testNode3.style.top = "100px";
@@ -679,12 +783,41 @@ var draggableTestCase = new YAHOO.tool.TestCase({
 
         var dt = d.addDropTarget( testNode3 );
         d.removeDropTarget( dt );
-    }
+    },
 
+    testGrab : function(){
+        var dO = Draggable.getByNode( testNode ),
+            testNode3 = document.getElementById('testNode3'),
+            actualX, actualY,
+	        grabbled = false;
+        testNode.style.left = testNode.style.top = "20px";
+        testNode.style.height = "20px";
+        testNode.style.width = "100px";
+        testNode3.style.cssText = "position: absolute; top: 0px; left: 0px;";
+        testNode3.onmousedown = grabIt;
+        Action.mousedown(testNode3, {clientX:0, clientY:0});
+        function grabIt(ev) {
+            dO.grab(ev, 10, 10);
+            actualX = dO.x;
+            actualY = dO.y;
+        }
+        // should be centered on cursor.
+        Assert.areEqual(10 - 50, dO.x, "x wrong");
+        Assert.areEqual(10 - 10, dO.y, "y wrong");
+    }
 });
 
 // Set the TestRunner's logger by invoking a constructor
 new YAHOO.tool.TestLogger("testLogger");
+
+//for(var test in draggableTestCase) {
+//    if(/^test/.test( test )) {
+//        if(test !== "testConstraintHorz") {
+//            delete draggableTestCase[test];   
+//        }
+//    }
+//}
+
 TestRunner.add( draggableTestCase );
 
 if (parent && parent != window) {

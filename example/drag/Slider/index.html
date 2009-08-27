@@ -1,12 +1,11 @@
-<?xml version="1.0" encoding="iso-8859-1"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-        "http://www.w3.org/TR/2000/REC-xhtml1-20000126/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
 <head>
-<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" >
 <title>Slider Demo</title>
 
-<link type="text/css" rel="stylesheet" href="../../../build/drag/css/Slider.css" />
+<link type="text/css" rel="stylesheet" href="../../../build/drag/css/Slider.css" >
 
 <style type="text/css" media="screen">
 html {
@@ -58,21 +57,23 @@ body {
 </div>
 <label id='lb-display' for='weight' class="ape-slider-label">
 	lb <input id='weight' name='lb' value='' size='5' maxlength='5' 
-		onblur='slider.setValue(this.value);updateSliders(slider, slider2);'/>
+        tabindex="0"
+		onblur='slider.setValue(this.value);updateSliders(slider, slider2);'>
 </label>
 
 <div id='weight-vertical-track' class='ape-slider-track ape-slider-v-track'>
 	<div id="weight-vertical-handle" class="ape-slider-handle ape-slider-v-handle"
-	         tabindex="0"
+	         tabindex="0" 
 	></div>
 </div>
 <label id='kg-display' for='weight-vertical' class="ape-slider-label">
 	<input id='weight-vertical' name='kg' value='' size='5' maxlength='5'
-		onblur='slider2.setValue(this.value);updateSliders(slider2, slider);'/>
+             tabindex="0" 
+		onblur='slider2.setValue(this.value);updateSliders(slider2, slider);'>
 
 kg </label>
 
-<div id='instructions'>
+<div id='instructions' >
     <pre>
 (shift +) tab  - change focus 
 esc            - cancel
@@ -102,7 +103,7 @@ var slider, slider2;
  	slider2.minValue = 0;
  	slider2.maxValue = 453.59237;
  	
-	slider.onslide = function () {
+ 	slider.onslide = function () {
 		updateSliders(this, slider2);
 	};
 	

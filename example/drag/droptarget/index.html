@@ -1,11 +1,10 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-        "http://www.w3.org/TR/2000/REC-xhtml1-20000126/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
 <head>
-	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" >
 	<title>drag demo</title>
 	<style type="text/css" media="Screen">
-/* <![CDATA[ */
 
 html { height: 100%; }
 
@@ -34,7 +33,7 @@ body {
 }
 
 .folder-style {
-	position: relative;
+	position: absolute;
 	text-align: center;
  	height: 48px;
  	width: 53px;
@@ -177,23 +176,31 @@ body {
     background: #98A3CB;
     -moz-user-select: none;
 }
-
-/* ]]> */
 </style>
 
 <script type="text/javascript">
 window.onload = function() {
 
+    
 //-----------------------------------------------------------------------------
 // The only drop-target element (Trash). We'll make this draggable, too, later.
 
-	var trashEl = document.getElementById("trash");
+    var trashEl = document.getElementById("trash");
+    
+    // Simple way to set top/left, needed for IE and 
+    // older versions of Safari.
+    trashEl.style.top= trashEl.offsetTop + "px";
+    trashEl.style.left= trashEl.offsetLeft+ "px";
+    
 	var trashDropTarget = APE.drag.DropTarget.getByNode(trashEl);
+    
 	trashDropTarget.dragOverClassName = "icon-drop-target-over";
 	
 	// event handlers for trash :ondrop, ondragover, ondragout. 
 	// When an object is dropped here and that object has trash as a dropTarget, the trash is notified.
-	trashDropTarget.ondrop = function(dropEvent) {
+	trashDropTarget.ondrop = trashReceivedDrop;
+
+	function trashReceivedDrop(dropEvent) {
 		APE.dom.addClass(this.el, "trash-full");
         //console.log(dropEvent);
 		dropEvent.dragObj.el.style.display = "none";
@@ -210,9 +217,10 @@ window.onload = function() {
  *   can be dragged with other objects in the same container (dragMultiple = true)
  *   has trashDropTarget (addDropTarget(trashDropTarget))
  */
- 	Directory = function(el) {
+ var Draggable = APE.drag.Draggable;
+ 	function Directory(id) {
  		
- 		this.dragObj = APE.drag.Draggable.getByNode(el);
+ 		this.dragObj = Draggable.getByNode(document.getElementById(id));
  		this.dragObj.keepInContainer = true; 
  		this.dragObj.dragCopy = true;
  		this.dragObj.dragMultiple = true;
@@ -224,21 +232,20 @@ window.onload = function() {
  		this.dragObj.focusClassName = "folder-focus";
  		this.dragObj.selectedClassName = "folder-selected";
         //this.dragObj.setHandle(el.getElementsByTagName('span')[0]);
-	};
+	}
 	
 	// Let's instantiate some Directories.
-	new Directory(document.getElementById("UntitledFolder"));
-	new Directory(document.getElementById("UntitledFolder2"));
-	new Directory(document.getElementById("MusicFolder"));
-	new Directory(document.getElementById("PicturesFolder"));
-	new Directory(document.getElementById("MP3Folder"));
+	new Directory("UntitledFolder");
+	new Directory("UntitledFolder2");
+	new Directory("MusicFolder");
+	new Directory("PicturesFolder");
+	new Directory("MP3Folder");
 
-    new Directory(trashEl);
-	
-    trashEl.ondblclick = function(){if(prompt("enter password", "********"))alert("permission denied");};
+    new Directory("trash");
 
-    var desktop = APE.drag.Draggable.getByNode(document.getElementById("desktop"));
-    APE.EventPublisher.get(desktop, "onfocus").addBefore(function(){return false;});
+    var desktop = Draggable.getByNode(document.getElementById("desktop"));
+    desktop.moveToY = function(){};
+    
     desktop.activeDragClassName = "desktop-drag";
     desktop.keepInContainer = true;
     desktop.isDragEnabled = false;
@@ -247,7 +254,7 @@ window.onload = function() {
     t.checked = false;
     t.onclick = function(){ desktop.isDragEnabled = !desktop.isDragEnabled; };
 	
-    var sticky = APE.drag.Draggable.getByNode(document.getElementById("sticky"));
+    var sticky = Draggable.getByNode(document.getElementById("sticky"));
     sticky.keepInContainer = true;	
 };
 </script>
@@ -283,9 +290,11 @@ esc..............cancel dragging
 	</div>
 <div id='trash' class="trash-style" tabindex="6"></div>
 </div>
-
-<label id='desktopToggle'><input type='checkbox' />drag desktop horizontally</label>
-
+<form action="">
+<div>
+<label id='desktopToggle'><input type='checkbox'>drag desktop horizontally</label>
+</div>
+</form>
 <p style='position: absolute; bottom: 12px; background: #fff;font: 10px arial, sans-serif;'>
 	Trash icons courtesy of <a href="http://proenca.deviantart.com/">Proenca</a>.
 </p>

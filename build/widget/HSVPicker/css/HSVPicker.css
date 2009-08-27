@@ -148,3 +148,10 @@ body {
 	height: 11px;
 	background: url("../img/slider.gif") no-repeat;
 }
+
+ .ape-hsv-transparent .ape-hsv-saturation-value-frame {
+    visibility: hidden;
+}
+.ape-hsv-transparent .ape-hsv-hue {
+    background-image: none;
+ }
