@@ -20,7 +20,6 @@
     <script type="text/javascript" src="../../../build/dom/Event-coords.js"></script>
     <script type="text/javascript" src="../../../build/dom/getContainingBlock.js"></script>
     <script type="text/javascript" src="../../../build/dom/getPixelCoords.js"></script>
-    <script type="text/javascript" src="../../../build/dom/setIeTopLeft.js"></script>
     <script type="text/javascript" src="../../../build/drag/Draggable.js"></script>
 </head>
 <body style="position:relative;">
@@ -41,9 +40,8 @@ try {
 // fix for broken pageX in initMouseEvent
 document.body.style.margin= "0";
 
-var MOUSE_MOVE_TEST_WARNING = "Please keep your mouse offscreen and don't move it.";
-
-var ESC = 27;
+var MOUSE_MOVE_TEST_WARNING = "Please keep your mouse offscreen and don't move it.",
+    ESC = 27;
 
 var Assert = YAHOO.util.Assert,
     StringAssert = YAHOO.util.StringAssert,
@@ -80,6 +78,8 @@ var draggableTestCase = new YAHOO.tool.TestCase({
         Action.mouseup(document, {clientX: 330, clientY: 330});
         testNode = document.getElementById('testNode');
         testNode2 = document.getElementById('testNode2');
+
+        document.documentElement.style.cssText = "";
     },
     
     testMouseup : function() {
@@ -283,7 +283,10 @@ var draggableTestCase = new YAHOO.tool.TestCase({
     testFromBottom : function() {
 
         document.body.style.height="300px";
-
+        document.body.style.width ="500px";
+        document.documentElement.style.fontSize = "0";
+        document.documentElement.style.letterSpacing = "-10px";
+        
         testNode.style.bottom = testNode.style.right = "0";
         testNode.style.position = "absolute";
         testNode.style.width = "120px";
@@ -291,7 +294,7 @@ var draggableTestCase = new YAHOO.tool.TestCase({
         
         // Simple way to set top/left.
         testNode.style.top= testNode.offsetTop + "px";
-        testNode.style.left= testNode.offsetLeft +.9 +"px";
+        testNode.style.left= testNode.offsetLeft +"px";
         
         var d = Draggable.getByNode( testNode );
 
