@@ -269,13 +269,8 @@
  * <code>fire</code>, et c.
  */
 (function(){
-/** 
- * Map of [APE.EventPublisher], keyed by type.
- * @private
- * @static
- * @memberOf {APE.EventPublisher}
- */
 var APE = self.APE,
+   /** Map of [APE.EventPublisher], keyed by type. */
     Registry = {};
 
 APE.EventPublisher = EventPublisher;
