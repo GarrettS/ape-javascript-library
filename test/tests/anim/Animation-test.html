@@ -23,7 +23,7 @@
 
 </div>
 <script type="text/javascript">
-setTimeout(function(){
+window.onload = function(){
 
 var container = document.getElementById("container"),
     template = container.innerHTML;
@@ -107,21 +107,18 @@ var animationTestCase = new YAHOO.tool.TestCase({
     testSeekTo : function() {
         var a = new Animation( .5 );
         a.seekTo(.4);
-        this.wait(function(){       
-            Assert.areEqual(.4, a.position);
-            a.seekTo(.1);
+        a.seekTo(.1);
+        this.wait(function(){
+            Assert.areEqual(.1, a.position);
+            a.seekTo(-.1);
             this.wait(function(){
-                Assert.areEqual(.1, a.position);
-                a.seekTo(-.1);
+                Assert.areEqual(-.1, a.position);                
+                a.seekTo(.2);
                 this.wait(function(){
-                    Assert.areEqual(-.1, a.position);                
-                    a.seekTo(.2);
-                    this.wait(function(){
-                        Assert.areEqual(.2, a.position);
-                    }, 350);
-                }, 250);
-            }, 200);
-        }, 220);
+                    Assert.areEqual(.2, a.position);
+                }, 350);
+            }, 250);
+        }, 300);
     },
 
     // Just to make sure there is no Error in toString.
@@ -406,7 +403,6 @@ if (parent && parent != window) {
 } else {
     YAHOO.tool.TestRunner.run();
 }
-}, 100);
-
+};
 </script>
 </body>
