@@ -1,13 +1,13 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
-        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
 <head>
-    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" >
     <title>Slider Test</title>
 
-    <link rel="stylesheet" type="text/css" href="../../yui-test/build/logger/assets/logger.css" />
-    <link rel="stylesheet" type="text/css" href="../../yui-test/build/yuitest/assets/yuitest.css" />
-    <link rel="stylesheet" type="text/css" href="../../yui-test/assets/testlogger.css" />
+    <link rel="stylesheet" type="text/css" href="../../yui-test/build/logger/assets/logger.css" >
+    <link rel="stylesheet" type="text/css" href="../../yui-test/build/yuitest/assets/yuitest.css" >
+    <link rel="stylesheet" type="text/css" href="../../yui-test/assets/testlogger.css" >
 
     <script type="text/javascript" src="../../yui-test/build/yahoo-dom-event/yahoo-dom-event.js"></script>
     <script type="text/javascript" src="../../yui-test/build/logger/logger.js"></script>
@@ -18,22 +18,22 @@
     <script type="text/javascript" src="../../../build/dom/getContainingBlock.js"></script>
     <script type="text/javascript" src="../../../build/drag/Draggable.js"></script>
     <script type="text/javascript" src="../../../build/drag/Slider.js"></script>
-    <link type="text/css" rel="stylesheet" href="../../../build/drag/css/Slider.css" />
+    <link type="text/css" rel="stylesheet" href="../../../build/drag/css/Slider.css" >
 
 </head>
 <body style="position:relative;">
 <div id="testLogger"></div>
 <div id="template" style="height: 100%; width: 100%;">
     <div id="testNode" style="position: relative;margin:0; width: 200px;left: 0" 
-        tabindex="0"
     class="ape-slider-track ape-slider-h-track">
         <div id="testNode-handle" class="ape-slider-handle ape-slider-h-handle"
         tabindex="0"></div>
     </div>
     <div id="testNode2" style="position: relative; width: 10px; height: 100px;" 
-        tabindex="0"
         class="ape-slider-track ape-slider-v-track">
-        <div id="testNode2-handle" class="ape-slider-handle ape-slider-v-handle"></div>
+        <div id="testNode2-handle" 
+                tabindex="0"
+        class="ape-slider-handle ape-slider-v-handle"></div>
     </div>
 </div>
 <script type="text/javascript">
@@ -60,6 +60,7 @@ var Assert = YAHOO.util.Assert,
     testNode2Handle = document.getElementById('testNode2-handle'),
     template = document.getElementById('template'),
     templateHTML = template.innerHTML,
+    canFocus = "focus" in testNodeHandle,
     oldBodyCssText = document.body.style.cssText;
 
 var draggableTestCase = new YAHOO.tool.TestCase({
@@ -68,6 +69,15 @@ var draggableTestCase = new YAHOO.tool.TestCase({
 
     // pageX broken, so all tests test target from 0, 0.
 
+    _should : {
+        ignore : {
+    // Some browsers don't have "focus" or fire "onfocus" 
+    // for arbitrary elements.
+            testActivate : !canFocus,
+            testKey1Tic : !canFocus
+       }
+    },
+    
     tearDown : function() {
         
         // Deletes all properties of instances and 
@@ -103,20 +113,17 @@ var draggableTestCase = new YAHOO.tool.TestCase({
         
         var d = Slider.getByNode( testNodeHandle, Slider.direction.HORZ );
 
-        if(testNodeHandle.focus)
-            testNodeHandle.focus();
-
+        Action.mousedown(testNodeHandle); // Force "onfocus" to fire in Safari.
+        testNodeHandle.focus(); 
+        YAHOO.log("OK: browser supports focus() on div.", "info", "TestRunner");
         this.wait(function(){
-            
+           
             var orig = testNodeHandle.className;
-
             StringAssert.contains( "ape-slider-track-active", testNodeHandle.parentNode.className );
             Action.mouseup( document );
-
             if(testNodeHandle.blur)
                 testNodeHandle.blur();
         }, 10);
-
     },
     
     testOnslide : function() {
@@ -128,9 +135,11 @@ var draggableTestCase = new YAHOO.tool.TestCase({
             slid = true;
         };
 
+        // Safari 2 doesn't fire "onfocus" with a call
+        // to "focus()", so we dispatch an event.
+        Action.mousedown(testNodeHandle);
         if(testNodeHandle.focus)
             testNodeHandle.focus();
-        Action.mousedown( testNodeHandle );
         
         Action.mousemove( document, {clientX : 12 } );
         this.wait(function(){
@@ -294,11 +303,11 @@ var draggableTestCase = new YAHOO.tool.TestCase({
             uArr = 38,
             dArr = 40;
 
+        Action.keydown( document, {keyCode: rArr } );
         this.wait(function(){
-            Action.keydown( document, {keyCode: rArr } );
             Action.keyup(document);
-                    Assert.areEqual( 10, d.value );
-        }, 250);
+                Assert.areEqual( 10, d.value );
+        }, 50);
     },
 
     testGlideBackTo0 : function(){
@@ -326,9 +335,12 @@ var draggableTestCase = new YAHOO.tool.TestCase({
 });
 
 // Set the TestRunner's logger by invoking a constructor
-new YAHOO.tool.TestLogger("testLogger");
+var testLogger = new YAHOO.tool.TestLogger("testLogger");
 TestRunner.add( draggableTestCase );
 
+if(!("focus" in document.createElement("div"))) {
+    YAHOO.log("browser does not support focus() on div.", "warn", "TestRunner");
+}
 if (parent && parent != window) {
     YAHOO.tool.TestManager.load();
 } else {
