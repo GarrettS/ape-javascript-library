@@ -249,17 +249,7 @@ var eventPublisherTest = new YAHOO.tool.TestCase({
         // unregister all callbacks.
         APE.EventPublisher.cleanUp();
         
-        for(var type in APE.EventPublisher.Registry) {
-            var publisherList = APE.EventPublisher.Registry[type];
-            for(var i = 0, len = publisherList.length; i < len; i++) {
-
-                var publisher = publisherList[i];
-                YAHOO.util.ObjectAssert.hasProperty(publisher.type, publisher.src, "event type not found in src");
-                
-                Assert.isNull(publisher.src[ publisher.type ],
-                "event handler callback was not removed, but should have been: " +  publisher.src);
-            }
-        }
+        Assert.isNull(document.body.onclick);
     },
 
     // Test to make sure all event callbacks fire,
