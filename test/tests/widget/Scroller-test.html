@@ -1,0 +1,106 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+    <title>Scroller Test</title>
+    <link rel="stylesheet" type="text/css" href="../../yui-test/build/logger/assets/logger.css">
+    <link rel="stylesheet" type="text/css" href="../../yui-test/build/yuitest/assets/yuitest.css">
+    <link rel="stylesheet" type="text/css" href="../../yui-test/assets/testlogger.css">
+
+    <script type="text/javascript" src="../../yui-test/build/yahoo-dom-event/yahoo-dom-event.js"></script>
+    <script type="text/javascript" src="../../yui-test/build/logger/logger.js"></script>
+    <script type="text/javascript" src="../../yui-test/build/yuitest/yuitest-beta.js"></script>
+
+    <script type="text/javascript" src="../../../build/ape-ep-dom.js"></script>
+    <script type="text/javascript" src="../../../build/widget/Scroller/Scroller.js"></script>
+</head>
+<body>
+
+<div id='template'>
+	<div class="scrollerContainer" id="s1Container">
+	<div id="s1Prev" class="scrollerButton scrollerButton-disabled">&laquo;</div>
+	<div id="s1Frame" class="scrollerFrame">
+	    <ul id="s1" class="scroller">
+	    <li><div>item 0</div></li>
+	    <li><div>item 1</div></li>
+	    <li><div>item 2</div></li>
+	    <li><div>item 3</div></li>
+	    <li><div>item 4</div></li>
+	    <li><div>item 5</div></li>
+	    <li><div>item 6</div></li>
+	    <li><div>item 7</div></li>
+	    <li><div>item 8</div></li>
+	    <li><div>item 9</div></li>
+	    </ul>
+	</div>
+	<div id="s1Next" class="scrollerButton scrollerButtonNext">&raquo;</div>
+	</div>
+</div>
+
+<div id="testLogger"></div>
+<script type="text/javascript">
+window.onload = function(){
+    var Scroller = APE.widget.Scroller,
+        Assert = YAHOO.util.Assert,
+        DateAssert = YAHOO.util.DateAssert,
+        ArrayAssert = YAHOO.util.ArrayAssert,
+        s1,
+        Action = YAHOO.util.UserAction,
+        template = document.getElementById('template'),
+        templateHTML = template.innerHTML;
+ 
+    var scrollerTest = new YAHOO.tool.TestCase({
+ 
+        //name of the test case - if not provided, one is auto-generated
+        name : "Scroller test",
+        
+ 
+        setUp : function () {
+            template.innerHTML = templateHTML;
+            sf = document.getElementById('sf');
+            start = document.getElementById('start');
+            self.focus();
+        },
+ 
+        tearDown : function () {
+            template.innerHTML = "";
+            start = sf = null;
+            Scroller.instances = {};
+        },
+
+        _should : {
+            ignore : {                
+            }
+        },
+        
+        testGetById: function() {
+            var c = Scroller.getById("s1");
+            Assert.isNotNull(c);
+        },
+
+        testMoveNext : function() {
+            var c = Scroller.getById("s1");
+            c.next();
+        },
+
+        testMovePrev : function() {
+            var c = Scroller.getById("s1");
+            Assert.fail();
+        }
+     });
+ 
+    //create the logger
+    new YAHOO.tool.TestLogger("testLogger");
+ 
+    //run the tests
+    YAHOO.tool.TestRunner.add( scrollerTest );
+     //run the tests
+    if (parent && parent != window) {
+        YAHOO.tool.TestManager.load();
+    } else {
+        YAHOO.tool.TestRunner.run();
+    }
+ 
+};</script>
+</body>

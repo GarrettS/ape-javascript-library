@@ -3,62 +3,19 @@
 <html lang="en">
 <head>
     <title>Scroller</title>
-    <style type="text/css">
-    .scroller {
-      list-style: none;
-      width: 5000px;
-      position: relative;
-      margin: 0;
-      padding: 0;
-    }
-    
-    .scrollerFrame {
-      overflow: hidden;
-      float: left;
-      margin-left: 2px;
-    }
-    
-    .scroller li {
-      float: left;
-      border: 1px solid #eee;
-      margin: 0;
-      text-align: center;
-      padding: 1px;
-    }
-    
-    .scroller li div {
-      margin: 1px;
-      background: #f3f3f3;
-      width: 3em;
-      font-size: 14px;
-      padding: 12px;
-    }
-    #s1Frame { 
-      width: 216px;
-      border: 3px double #69b;
-    }
-    
-    .scrollerButton { 
-      float: left;
-      color: #00c;
-      cursor: default;
-      margin-top: 8px;
-      font-size: 26px;
-      user-select: none;
-      -moz-user-select: none;
-      -webkit-user-select: none;
-    }
-    .scrollerButtonNext {
-      float: right;
-    }
-    #s1Container {
-      width: 254px;
-    }
-    
-    .scrollerButton-disabled {
-      opacity: .4;
-    }
-    </style>
+    <link rel="stylesheet" type="text/css" 
+        href="../../../build/widget/Scroller/Scroller.css" >
+        
+<style type="text/css">
+#s1Frame { 
+    width: 216px;
+    border: 3px double #69b;
+}
+
+#s1Container {
+    width: 254px;
+}
+</style>
 </head>
 <body>
 <div class="scrollerContainer" id="s1Container">

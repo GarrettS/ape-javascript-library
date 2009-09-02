@@ -14,7 +14,7 @@ APE.namespace("APE.color");
         /* matches 3 or 6 digit color hex */
         hexPattern = /(?:\s|^)#(?:[\da-f]{3}|[\da-f]{6})(?:\s|$)/i,
         /* matches an rgb(i, i, i) String. */
-        rgbPattern = /rgb\(([\d]{1,3})\,\s?([\d]{1,3})\,\s?([\d]{1,3})\)/;
+        rgbPattern = /rgb\((\d{1,3}),\s?(\d{1,3}),\s?(\d{1,3})\)/;
         
     color.ColorRGB = ColorRGB;
     color.ColorHSV = ColorHSV;
