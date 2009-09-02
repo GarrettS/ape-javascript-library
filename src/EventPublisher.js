@@ -41,27 +41,14 @@
  * @description creates an <code>EventPublisher</code> with methods <code>add()</code>,
  * <code>fire</code>, et c.
  */
-(function(){
-var APE = self.APE,
-   /** Map of [APE.EventPublisher], keyed by type. */
-    Registry = {};
-
-APE.EventPublisher = EventPublisher;
-APE.mixin(EventPublisher, {
-    get : get,
-    add : add,
-    fire : fire,
-    cleanUp : cleanUp
-});
-
-function EventPublisher(src, type) {
+APE.EventPublisher = function(src, type) {
     this.src = src;
     // Really could use a List of bound methods here. 
     this._callStack = [];
     this.type = type;
-}
+};
 
-EventPublisher.prototype = {
+APE.EventPublisher.prototype = {
 
 /**  
  *  @param {Function} fp the callback function that gets called when src[sEvent] is called.
@@ -79,7 +66,7 @@ EventPublisher.prototype = {
  *  @return {EventPublisher} this;
  */
     addBefore : function(f, thisArg) {
-        return add(this, "beforeFire", f, thisArg||this.src); 
+        return APE.EventPublisher.add(this, "beforeFire", f, thisArg||this.src); 
     },
     
 /**  Adds afterAdvice to the callStack. This fires after the callstack. 
@@ -89,7 +76,7 @@ EventPublisher.prototype = {
  *  @return {EventPublisher} this;
  */
     addAfter : function(f, thisArg) {
-        return add(this, "afterFire", f, thisArg||this.src); 
+        return APE.EventPublisher.add(this, "afterFire", f, thisArg||this.src); 
     },
 
     /** 
@@ -97,7 +84,7 @@ EventPublisher.prototype = {
      * @return {EventPublisher} this;
      */
     getEvent : function(type) {
-        return get(this, type);
+        return APE.EventPublisher.get(this, type);
     },
 
 /**  Removes fp from callstack.
@@ -107,7 +94,7 @@ EventPublisher.prototype = {
  */
     remove : function(fp, thisArg) {
         var cs = this._callStack, i, call;
-        thisArg = thisArg || this.src;
+        if(!thisArg) thisArg = this.src;
         for(i = 0; i < cs.length; i++) {
             call = cs[i];
             if(call[0] === fp && call[1] === thisArg) {
@@ -123,7 +110,7 @@ EventPublisher.prototype = {
  *  @return {Function} the function that was passed in, or null if not found (uses remove());
  */
     removeBefore : function(fp, thisArg) {
-        return get(this, "beforeFire").remove(fp, thisArg||this.src);
+        return this.getEvent("beforeFire").remove(fp, thisArg||this.src);
     },
 
 
@@ -133,12 +120,12 @@ EventPublisher.prototype = {
  *  @return {Function} the function that was passed in, or null if not found (uses remove());
  */
     removeAfter : function(fp, thisArg) {
-        return get(this, "afterFire").remove(fp, thisArg||this.src);
+        return this.getEvent("afterFire").remove(fp, thisArg||this.src);
     },
 
 /** Fires the event. */
     fire : function(payload) {
-        return fire(this)(payload);
+        return APE.EventPublisher.fire(this)(payload);
     },
 
 /** helpful debugging info */
@@ -148,25 +135,6 @@ EventPublisher.prototype = {
     }
 };
 
-/**
- * @static
- * @memberOf {APE.EventPublisher}
- * called onunload, automatically onunload. 
- * This is only called for if window.CollectGarbage is 
- * supported. IE has memory leak problems; other browsers have fast forward/back,
- * but that won't work if there's an onunload handler.
- */
-function cleanUp() {
-    var type, publisherList, publisher, i, len;
-    for(type in Registry) {
-        publisherList = Registry[type];
-        for(i = 0, len = publisherList.length; i < len; i++) {
-            publisher = publisherList[i];
-            publisher.src[publisher.type] = null;
-        }
-    }
-}
-
 /** 
  *  @static
  *  @param {Object} src the object which calls the function
@@ -174,9 +142,9 @@ function cleanUp() {
  *  @param {Function} fp the callback function that gets called when src[sEvent] is called.
  *  @param {Object} thisArg the context that the function executes in.
  */
-function add(src, sEvent, fp, thisArg) {
-    return get(src, sEvent).add(fp, thisArg);
-}
+APE.EventPublisher.add = function(src, sEvent, fp, thisArg) {
+    return APE.EventPublisher.get(src, sEvent).add(fp, thisArg);
+};
 
 /** 
  * @static
@@ -184,7 +152,10 @@ function add(src, sEvent, fp, thisArg) {
  * @memberOf {APE.EventPublisher}
  * @return {boolean} false if any one of callStack's methods return false.
  */
-function fire(publisher) {    
+APE.EventPublisher.fire = function(publisher) {
+    // This closure sucks. We should have partial/bind in ES.
+    // If we did, this could more reasonably be a prototype method.
+    
     // return function w/identifier doesn't work in Safari 2.
     return fireEvent; 
     function fireEvent(e) {
@@ -221,7 +192,7 @@ function fire(publisher) {
         }
         return !preventDefault;
     }
-}
+};
 
 /** 
  * @static
@@ -231,30 +202,51 @@ function fire(publisher) {
  * Looks for an APE.EventPublisher in the Registry.
  * If none found, creates and adds one to the Registry.
  */
-function get(src, sEvent) {
+APE.EventPublisher.get = function(src, sEvent) {
 
-    var publisherList = Registry[sEvent] || (Registry[sEvent] = []),
-        i, len,
+    var publisherList = this.Registry[sEvent] || (this.Registry[sEvent] = []),
+        i,
         publisher;
     
-    for(i = 0, len = publisherList.length; i < len; i++) {
-        publisher = publisherList[i];
-        if(publisher.src === src) {
-            return publisher;
-        }
-    }
+    for(i = 0; i < publisherList.length; i++)
+        if(publisherList[i].src === src)
+            return publisherList[i];
     
     // not found.
-    publisher = new EventPublisher(src, sEvent);
+    publisher = new APE.EventPublisher(src, sEvent);
     // Steal. 
-    if(src[sEvent]) {
+    if(src[sEvent])
         publisher.add(src[sEvent], src);
-    }
-    src[sEvent] = fire(publisher);
-    publisherList[len] = publisher;
+    src[sEvent] = this.fire(publisher);
+    publisherList[publisherList.length] = publisher;
     return publisher;
-}
+};
 
-if(self.CollectGarbage)
-    EventPublisher.get( self, "onunload" ).addAfter( cleanUp, EventPublisher );
-})();
+/** 
+ * Map of [APE.EventPublisher], keyed by type.
+ * @private
+ * @static
+ * @memberOf {APE.EventPublisher}
+ */
+APE.EventPublisher.Registry = {};
+
+/**
+ * @static
+ * @memberOf {APE.EventPublisher}
+ * called onunload, automatically onunload. 
+ * This is only called for if window.CollectGarbage is 
+ * supported. IE has memory leak problems; other browsers have fast forward/back,
+ * but that won't work if there's an onunload handler.
+ */
+APE.EventPublisher.cleanUp = function() {
+    var type, publisherList, publisher, i, len;
+    for(type in this.Registry) {
+        publisherList = this.Registry[type];
+        for(i = 0, len = publisherList.length; i < len; i++) {
+            publisher = publisherList[i];
+            publisher.src[publisher.type] = null;
+        }
+    }
+};
+if(window.CollectGarbage)
+    APE.EventPublisher.get( window, "onunload" ).addAfter( APE.EventPublisher.cleanUp, APE.EventPublisher );
