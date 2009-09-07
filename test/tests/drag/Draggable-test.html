@@ -1102,9 +1102,9 @@ function addAnim(testEvent) {
     }
 }
 
-if (parent && parent != self && 
-        parent.YAHOO && 
-        parent.YAHOO.tool) {
+if (parent && parent != self 
+        && parent.YAHOO  &&   
+        parent.YAHOO.tool ) {
     YAHOO.tool.TestManager.load();
 } else {
     YAHOO.tool.TestRunner.run();
@@ -1113,5 +1113,5 @@ YAHOO.log(MOUSE_MOVE_TEST_WARNING, "warn", "TestRunner");
 YAHOO.log("Do not scroll the window during the test.", "warn", "TestRunner");    
 
 }, 100);</script>
-</body>
+</body> 
 </html>
