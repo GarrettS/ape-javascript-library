@@ -15,20 +15,101 @@ APE.namespace("APE.widget");
 
     function scrollerCreatePrototype() {
     
-        // Private static methods -------------------------------------------------.
         function getMoveScroller(scroller) {
             return moveScroller;
             function moveScroller() {
-              scroller.move();
+              move(scroller);
             }
         }
-        /**
-         * onclick callback for Left/Right buttons.
-         */
+        
+        /** onclick callback for Left/Right buttons. */
         function handleButtonClick() {
             var dir = this.id.match(/(\w+)(Next|Prev)$/),
-                c = widget.Scroller.getById(dir[1]);
-            c.moveStart(dir[2] === "Next");
+                scroller = widget.Scroller.getById(dir[1]);
+            moveStart(scroller, dir[2] === "Next");
+        }
+
+        /** @param {boolean} [isNext] true moves "next", false "prev" */ 
+         function moveStart(scroller, isNext) {
+            // add to queue.
+            if(scroller.timerId) {
+                scroller._queue += isNext ? 1 : -1;
+                return;
+            }
+    
+            var doc = document,
+                id = scroller.id,
+                d = doc.getElementById(id + "Frame")[scroller.clientDimension],
+                prev, next;
+    
+            // If the Scroller is not wide enough to scroll, exit.
+            if(scroller.scrollDistance <= d) return;
+    
+            scroller.style = doc.getElementById(id).style;
+            if(isNext) {
+                d = -d;
+            }
+
+            scroller.newPos = scroller.pos + d;
+            prev = doc.getElementById(id + "Prev");
+            next = doc.getElementById(id + "Next");        
+
+            if(!isNext) {
+                dom.removeClass(next, "scrollerButton-disabled");
+                if(scroller.newPos >= 0) {
+                    d = -scroller.pos;
+                    scroller.newPos = 0;
+                    dom.addClass(prev, "scrollerButton-disabled");
+                }
+            } else {
+                // disable the "Prev" button if we're at 0.
+                if(scroller.pos === 0 && scroller.newPos ) {
+                    dom.removeClass(prev, "scrollerButton-disabled");
+                }
+                // disable the "Next" button if we're at end.
+                if(scroller.newPos <= scroller.frameSize - scroller.scrollDistance) {
+                    dom.addClass(next, "scrollerButton-disabled");
+    
+                    var r = scroller.scrollDistance + scroller.pos - scroller.frameSize;  // Negative.
+    
+                    d = -r;
+                    scroller.newPos = scroller.pos - r;
+                }
+            }
+            // If the remainder is smaller than the distance,
+            // only move by that much.
+            scroller.startTime = +new Date;
+            scroller.startPos = scroller.pos;
+            scroller.dx = d;
+            scroller.timerId = self.setInterval(getMoveScroller(scroller), 12);
+        }
+
+        function move(scroller) { 
+            var elapsed = new Date - scroller.startTime,
+                rationalValue = elapsed/scroller.timeDuration,
+                effectedValue = (Math.atan(1.4*(2*rationalValue-1))/Math.atan(1.4)+1)/2;
+            if(rationalValue >= 1) {
+                return moveEnd(scroller);
+            }
+            // floor off the decimal ToInt32.
+            scroller.style[scroller.stylePos] = 
+              (scroller.pos = 0|scroller.startPos + scroller.dx * effectedValue) + "px";
+        }
+    
+        function moveEnd(scroller) {
+            scroller.timerId = self.clearInterval(scroller.timerId);
+            scroller.style[scroller.stylePos] = (scroller.pos = scroller.newPos) + "px";
+            // take out of cue.
+            if(scroller._queue !== 0) {
+                var isNext = scroller._queue > 0;
+                scroller._queue += isNext ? -1 : 1;
+                moveStart(scroller, isNext);
+            } else {
+                if(typeof scroller.onend == "function") {
+                    scroller.onend();
+                }
+                scroller.style = null;
+            }
         }
 
         return {
@@ -73,91 +154,14 @@ APE.namespace("APE.widget");
                 }
             },
         
-            /**
-             *
-             * @param {boolean} [isNext] "next" or "prev"
-             */
-            moveStart : function(isNext) {
-                // add to queue.
-                if(this.timerId) {
-                    this._queue += isNext ? 1 : -1;
-                    return;
-                }
-        
-                var doc = document,
-                    id = this.id,
-                    d = doc.getElementById(id + "Frame")[this.clientDimension],
-                    prev, next;
-        
-                // If the Scroller is not wide enough to scroll, exit.
-                if(this.scrollDistance <= d) return;
-        
-                this.style = doc.getElementById(id).style;
-                if(isNext) {
-                    d = -d;
-                }
-                this.newPos = this.pos + d;
-                prev = doc.getElementById(id + "Prev");
-                next = doc.getElementById(id + "Next");        
-
-                if(!isNext) {
-                    dom.removeClass(next, "scrollerButton-disabled");
-                    if(this.newPos >= 0) {
-                        d = -this.pos;
-                        this.newPos = 0;
-                        dom.addClass(prev, "scrollerButton-disabled");
-                    }
-                } else {
-                    // disable the "Prev" button if we're at 0.
-                    if(this.pos === 0 && this.newPos ) {
-                        dom.removeClass(prev, "scrollerButton-disabled");
-                    }
-                    // disable the "Next" button if we're at end.
-                    if(this.newPos <= this.frameSize - this.scrollDistance) {
-                        dom.addClass(next, "scrollerButton-disabled");
-        
-                        var r = this.scrollDistance + this.pos - this.frameSize;  // Negative.
-        
-                        d = -r;
-                        this.newPos = this.pos - r;
-                    } 
-                }
-                // If the remainder is smaller than the distance,
-                // only move by that much.
-        
-                this.startTime = new Date().valueOf();
-                this.startPos = this.pos;
-                this.dx = d;
-                this.timerId = self.setInterval(getMoveScroller(this), 12);
+            next : function(){
+                moveStart(this, true);
+                return this;
             },
-        
-            move : function() {
-                var elapsed = new Date - this.startTime,
-                    rationalValue = elapsed/this.timeDuration,
-                    effectedValue = (Math.atan(1.4*(2*rationalValue-1))/Math.atan(1.4)+1)/2;
-                if(rationalValue >= 1) {
-                    return this.moveEnd();
-                }
-                // floor off the decimal ToInt32.
-                this.style[this.stylePos] = (this.pos = 0|this.startPos + this.dx * effectedValue) + "px";
-            },
-        
-            moveEnd : function() {
-                self.clearInterval(this.timerId);
-                this.timerId = null;
-                this.style[this.stylePos] = (this.pos = this.newPos) + "px";
-        
-                // take out of cue.
-                if(this._queue !== 0) {
-                    var isNext = this._queue > 0;
-                    this._queue += isNext ? -1 : 1;
-                    this.moveStart(isNext);
-                } else {
-                    if(typeof this.onend == "function") {
-                        this.onend();
-                    }
-                    this.style = null;
-                }
+            
+            prev: function(){
+                moveStart(this, false);
+                return this;
             }
         };
     }

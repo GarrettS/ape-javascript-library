@@ -13,7 +13,7 @@
 <ul>
     <li class="d"><a href="ajax/ajax-test.html">ajax/ajax-test.html</a></li>
     <li class="d"><a href="anim/">anim/</a></li>
-    <li class="d"><a href="dom/index.html">dom</a></li>
+    <li class="d"><a href="dom/">dom</a></li>
     <li>drag/
         <ul>
             <li class="d"><a href="drag/slider">drag/slider</a></li>
@@ -29,6 +29,8 @@
         </ul>
     </li>
 </ul>
+
+<jsp:include page="/ape/nav.jsp"/>
 
 </body>
 </html>

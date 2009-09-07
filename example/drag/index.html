@@ -15,7 +15,7 @@
 <ul>
     <li><a href="table/">table reorder</a></li>
     <li><a href="droptarget/">drop target</a></li>
-    <li><a href="slider">Slider</a></li>
+    <li><a href="Slider">Slider</a></li>
 </ul>
 
 <h2>Tutorial Overview</h2>

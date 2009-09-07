@@ -5,10 +5,12 @@
       margin: 0;
       padding: 0;
 }
-    
+
 .scrollerFrame {
       overflow: hidden;
       float: left;
+      /* IE6/7 need this for overflow. */
+      position: relative; 
       margin-left: 2px;
 }
     
