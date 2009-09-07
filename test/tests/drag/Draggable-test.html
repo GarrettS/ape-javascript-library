@@ -14,6 +14,7 @@
     <script type="text/javascript" src="../../yui-test/build/yuitest/yuitest-beta.js"></script>
 
     <!-- script type="text/javascript" src="../../../build/ape-ep-dom.js"></script-->
+    
     <script type="text/javascript" src="../../../build/APE.js"></script>
     <script type="text/javascript" src="../../../build/EventPublisher.js"></script>
     <script type="text/javascript" src="../../../build/dom/dom.js"></script>
@@ -21,6 +22,7 @@
     <script type="text/javascript" src="../../../build/dom/getContainingBlock.js"></script>
     <script type="text/javascript" src="../../../build/dom/getPixelCoords.js"></script>
     <script type="text/javascript" src="../../../build/drag/Draggable.js"></script>
+    <!--  included dynamically, below script type="text/javascript" src="../../../build/anim/Animation.js"></script -->
 </head>
 <body style="position:relative;">
 <div id="testLogger"></div>
@@ -101,7 +103,8 @@ var draggableTestCase = new YAHOO.tool.TestCase({
         testNode.className = "orig";
         
         var d = Draggable.getByNode( testNode ),
-            gotFocus = gotMousedown = false;
+            gotFocus = false,
+            gotMousedown = false;
         d.activeDragClassName = aClass;
         d.selectedClassName = sClass;
 
@@ -435,7 +438,6 @@ var draggableTestCase = new YAHOO.tool.TestCase({
     },
 
     testSelectGroup : function() {
-        test = 'testSelectGroup'
         var d = Draggable.getByNode( testNode ),
         d2 = Draggable.getByNode( testNode2 );
 
@@ -535,7 +537,7 @@ var draggableTestCase = new YAHOO.tool.TestCase({
     
             this.wait(function(){
                 Assert.isTrue(glided, "d did not fire onglide");
-            }, 120);
+            }, 20);
         }, 78);
     },
     
@@ -549,6 +551,7 @@ var draggableTestCase = new YAHOO.tool.TestCase({
         var d = Draggable.getByNode( testNode ),
             d2 = Draggable.getByNode( testNode2 ),
             glidended = false,
+            glided = false,
             testNode3 = document.getElementById("testNode3");
 
         d2.onglide = function() {
@@ -592,10 +595,32 @@ var draggableTestCase = new YAHOO.tool.TestCase({
 	            Assert.areEqual("-20px", testNode2.style.top);
 	            Assert.isTrue(glidended, "d did not fire onglideend");
 	            StringAssert.doesNotContain("DOC", dt.el.className);
-	        }, 200);
+	        }, 20);
         }, 78);
     },
 
+    testGlideEndOnce : function() {
+        var d = Draggable.getByNode( testNode ),
+            gcount = 0;
+        d.dragMultiple = true; // does add to group?
+        d.onglideend = function() {
+            gcount++;
+        };
+
+        Action.mousedown(testNode);
+        // Opera and Chrome need duplicate coords here.
+        var coords = {clientX: 10, clientY: 40};
+        Action.mousemove( document, coords);
+        this.wait(function(){
+            Action.mousemove(document, coords);
+            Action.keydown( document, {keyCode: ESC} );
+            this.wait(function(){
+                Assert.areEqual(1, gcount, "glidend fired wrong number of times.");
+            }, 20);
+        }, 78);
+        
+    },
+    
     testKeepInContainerFail : function() {
 
         var container = document.createElement('container'),
@@ -660,7 +685,7 @@ var draggableTestCase = new YAHOO.tool.TestCase({
             Action.mousemove( document, coords);
             Assert.areEqual( "180px", testNode.style.top, "testNode.style.top wrong");
             Assert.areEqual( "150px", testNode.style.left, "testNode.style.left wrong");
-        }, 26);
+        }, 78);
 
         Action.mouseup( document );
     },
@@ -763,14 +788,13 @@ var draggableTestCase = new YAHOO.tool.TestCase({
             Action.mousemove( document, {clientX : 20, clientY : 20 } );
 
             this.wait(function(){
-                var ESC = 27;
                 Action.keydown( document, {keyCode: ESC} );
 
                 // Mouseup occurs right on the bottom edge of testNode3.
                 Action.mouseup( document , {clientX : 20, clientY : 20} );
                 this.wait(function(){
                     Assert.isFalse(gotDrop, "testNode2 did not get drop event");
-                }, 100); // let it glide back, so to avoid odd state.
+                }, 20); 
             }, 78);
         }, 78);
     },
@@ -788,6 +812,15 @@ var draggableTestCase = new YAHOO.tool.TestCase({
         d.removeDropTarget( dt );
     },
 
+    testOptions : function(){
+        var options = {
+                dragMultiple : true,
+                noAnim : true
+        };
+                
+        var d = Draggable.getByNode( testNode );
+    },
+    
     testGrab : function(){
         var dO = Draggable.getByNode( testNode ),
             testNode3 = document.getElementById('testNode3'),
@@ -810,6 +843,238 @@ var draggableTestCase = new YAHOO.tool.TestCase({
     }
 });
 
+var animatedDragTestCase = new YAHOO.tool.TestCase({
+
+    name : "Animated Draggable Test",
+
+    // pageX broken, so all tests test target from 0, 0.
+	
+    tearDown : function() {
+        Draggable.instanceDestructor();
+        Draggable.instanceDestructor.call(APE.drag.DropTarget);
+        testNode.className = "";
+        template.innerHTML = templateHTML;
+        document.body.style.cssText = oldBodyCssText;
+
+        // otherwise the test puts the Draggable into 
+        // a weird state.
+        Action.mousedown(document, {clientX: 330, clientY: 330});
+        Action.mouseup(document, {clientX: 330, clientY: 330});
+        testNode = document.getElementById('testNode');
+        testNode2 = document.getElementById('testNode2');
+
+        document.documentElement.style.cssText = "";
+    },
+
+    testOnglide : function() {
+        
+        if(APE.anim) {
+            testOnGlide.call(this);
+        }
+        else {
+            // Wait until anim is loaded.
+            var _pollStart = +new Date,
+                tid = setInterval(checkAnimLoaded, 100);
+	        testRunner.wait(function(){
+                clearInterval(tid);
+                YAHOO.log("APE.anim did not load. Proceeding anyway.", "warn", "TestRunner");
+	        }, 3000);
+        }
+
+        var testRunner = this;
+        function checkAnimLoaded() {
+            if(APE.anim) {
+                clearInterval(tid);
+                YAHOO.log("APE.anim loaded in " + (+new Date-_pollStart) + "ms", "info", "TestRunner");
+                testRunner.resume(testOnGlide);
+            }
+        }
+        
+        function testOnGlide(){ 
+            // because it is in-flow, offset by it's prev sibling (testNode).
+            testNode2.style.top = "-20px";
+            testNode.style.height = "20px";
+        
+            document.body.style.height = "900px"
+        
+            var d = Draggable.getByNode( testNode ),
+                d2 = Draggable.getByNode( testNode2 ),
+                glided = false;
+        
+            d.dragMultiple = d2.dragMultiple = true;
+        
+            d2.onglide = function() {
+                glided = true;
+            };
+        
+            Action.mousedown( testNode );
+        
+            Action.mouseup( document );
+            Action.mousedown( testNode2, {ctrlKey:true, metaKey:true} );
+        
+            // Opera and Chrome need duplicate coords here.
+            var coords = {clientX: 110, clientY: 140};
+            Action.mousemove( document, coords);
+        
+            this.wait(function(){
+                Action.mousemove( document, coords);
+                            
+                Assert.areEqual("110px", testNode.style.left);
+                Assert.areEqual("120px", testNode2.style.top);
+        
+                Action.keydown( document, {keyCode:ESC} );
+        
+                this.wait(function(){
+                    Assert.isTrue(glided, "d did not fire onglide");
+                }, 320);
+            }, 178);
+        }
+	},
+
+
+    testOnglideUseAnimFalse : function() {
+        // because it is in-flow, offset by it's prev sibling (testNode).
+        testNode.style.height = "20px";
+
+        var d = Draggable.getByNode( 
+                testNode,
+                { useAnim : false } 
+        );
+
+        var glided = false;
+        d.onglide = function() {
+            glided = true;
+        };
+
+        Action.mousedown( testNode );
+
+        // Opera and Chrome need duplicate coords here.
+        var coords = {clientX: 110, clientY: 140};
+        Action.mousemove( document, coords);
+
+        this.wait(function(){
+            Action.mousemove( document, coords);    
+            Action.keydown( document, {keyCode:ESC} );
+    
+            this.wait(function(){
+                Assert.isTrue(glided, "d did not fire onglide");
+            }, 40);
+        }, 78);
+    },
+    
+	testReleaseGroup : function() {
+	    // because it is in-flow, offset by it's prev sibling (testNode).
+	    testNode2.style.top = "-20px";
+	    testNode.style.height = "20px";
+	
+	    document.body.style.height = "900px"
+	
+	    var d = Draggable.getByNode( testNode ),
+	        d2 = Draggable.getByNode( testNode2 ),
+	        glidended = false,
+	        glided = false,
+	        testNode3 = document.getElementById("testNode3");
+	
+	    d2.onglide = function() {
+	        glided = true;
+	    };
+	
+	    d.dragMultiple = d2.dragMultiple = true;
+	
+	    var dt = d2.addDropTarget(testNode3);
+	
+	    dt.dragOverClassName = "DOC";
+	
+	    testNode3.style.left = "9px";
+	    testNode3.style.top = "-1px";
+	
+	    d.onglideend = function() {
+	        glidended = true;
+	    };
+	
+	
+	    Action.mousedown( testNode );
+	
+	    Action.mouseup( document );
+	    Action.mousedown( testNode2, {ctrlKey:true, metaKey:true} );
+	
+	    // Opera and Chrome need duplicate coords here.
+	    var coords = {clientX: 10, clientY: 40};
+	    Action.mousemove( document, coords);
+	    this.wait(function(){
+	        Action.mousemove( document, coords);
+	                    
+	        Assert.areEqual("10px", testNode.style.left);
+	        Assert.areEqual("20px", testNode2.style.top);
+	
+	        StringAssert.contains("DOC", dt.el.className);
+	        Action.keydown( document, {keyCode:ESC} );
+	
+	        this.wait(function(){
+	            Assert.areEqual("0px", testNode.style.left);
+	            Assert.areEqual("-20px", testNode2.style.top);
+	            Assert.isTrue(glidended, "d did not fire onglideend");
+	            StringAssert.doesNotContain("DOC", dt.el.className);
+	        }, 350);
+	    }, 78);
+	},
+	
+	testGlideEndOnce : function() {
+	    var d = Draggable.getByNode( testNode ),
+	        gcount = 0;
+	    d.dragMultiple = true; // does add to group?
+	    d.onglideend = function() {
+	        gcount++;
+	    };
+	
+	    Action.mousedown(testNode);
+	    // Opera and Chrome need duplicate coords here.
+	    var coords = {clientX: 10, clientY: 40};
+	    Action.mousemove( document, coords);
+	    this.wait(function(){
+	        Action.mousemove(document, coords);
+	        Action.keydown( document, {keyCode: ESC} );
+	        this.wait(function(){
+	            Assert.areEqual(1, gcount, "glidend fired wrong number of times.");
+	        }, 350);
+	    }, 78);
+	    
+	},
+
+    testReleaseOverDropTarget : function() {
+        return;
+        var d = Draggable.getByNode( testNode ),
+            testNode3 = document.getElementById('testNode3'),
+            gotDrop = false;
+
+        testNode3.style.position = "absolute";
+        testNode3.style.top = "100px";
+        testNode3.style.height = "20px";
+
+        var dt = d.addDropTarget( testNode3);
+
+        dt.ondrop = function(e) {
+            gotDrop = true;
+        };
+
+        Action.mousedown( testNode );
+        Action.mousemove( document, {clientX : 20, clientY : 20 } );
+
+        this.wait(function(){
+            Action.mousemove( document, {clientX : 20, clientY : 20 } );
+
+            this.wait(function(){
+                Action.keydown( document, {keyCode: ESC} );
+
+                // Mouseup occurs right on the bottom edge of testNode3.
+                Action.mouseup( document , {clientX : 20, clientY : 20} );
+                this.wait(function(){
+                    Assert.isFalse(gotDrop, "testNode2 did not get drop event");
+                }, 350); // let it glide back, so to avoid odd state.
+            }, 78);
+        }, 78);
+    }
+});
 // Set the TestRunner's logger by invoking a constructor
 new YAHOO.tool.TestLogger("testLogger");
 
@@ -822,13 +1087,28 @@ new YAHOO.tool.TestLogger("testLogger");
 //}
 
 TestRunner.add( draggableTestCase );
+TestRunner.add( animatedDragTestCase );
+TestRunner.subscribe("testcasebegin", addAnim);
 
-if (parent && parent != window) {
+function addAnim(testEvent) {
+    if(testEvent.testCase === animatedDragTestCase) {
+        var script = document.createElement("script");
+        script.src = "../../../build/anim/Animation.js";
+        script.type = "text/javascript";
+        document.getElementsByTagName("head")[0].appendChild(script);
+        YAHOO.log("Added " + script.src, "info", "TestRunner");    
+    }
+}
+
+if (parent && parent != self && 
+        parent.YAHOO && 
+        parent.YAHOO.tool) {
     YAHOO.tool.TestManager.load();
 } else {
     YAHOO.tool.TestRunner.run();
 }
 YAHOO.log(MOUSE_MOVE_TEST_WARNING, "warn", "TestRunner");    
+YAHOO.log("Do not scroll the window during the test.", "warn", "TestRunner");    
 
 }, 100);</script>
 </body>

@@ -6,20 +6,6 @@ APE.namespace("APE.drag" );
  * contains: APE.drag.Draggable, APE.drag.DropTarget
  *
  * @requires APE.EventPublisher, APE.dom
- * 
- * classNames:
- * <ul>
- *   <li>activeDragClassName</li>
- *   <li>selectedClaslusName</li>
- *   <li>dragOverClassName (for dropTarget)</li>
- * </ul>
- *
- * APE.drag.Draggable Features:
- * <ul>
- *   <li>dragCopy</li>
- *   <li>dragMultiple</li>
- *   <li>setHandle(handle, useTree)</li>
- * </ul>
  *
  * @example Create a Draggable:
  *<pre>
@@ -55,10 +41,19 @@ APE.namespace("APE.drag" );
     
     Draggable.instanceDestructor = instanceDestructor;
     
-    /* @param {HTMLElement} el the element to drag. */
-    function Drag(id) {
+    /* @constructor
+     * @param {HTMLElement} el the element to drag. 
+     * @param {Object} [options] {
+     *   - activeDragClassName 
+     *   - selectedClaslusName
+     *   - dragCopy {boolean}
+     *   - dragMultiple {boolean}
+     *   - useAnim {boolean} 
+     */
+    function Drag(id, options) {
         var d = document, 
-            el = d.getElementById(id);
+            el = d.getElementById(id),
+            p;
         this.id = id;
         this.el = this.origEl = el;
         this.style = el.style;
@@ -72,6 +67,9 @@ APE.namespace("APE.drag" );
         this.dropTargets = [];
         this.handle = el;
         this.onbeforeexitcontainer = beforeExitContainer;
+        for(p in options) {
+            this[p] = options[p];
+        }
         el.style.zIndex = parseInt(dom.getStyle(el, "zIndex"), 10) || highestZIndex++;
     }
     
@@ -89,7 +87,6 @@ APE.namespace("APE.drag" );
             delete this.instances[x];
         }
         draggableList = {};
-        dO = null;
     }
     
     function createDraggablePrototype(){
@@ -120,6 +117,7 @@ APE.namespace("APE.drag" );
              * - a hoverClassName
              */
             dragOverTargets = false,
+            hasGroupSelection = false,
             
             /* Keep CPUs to a minimum. */
             MOUSE_MOVE_THRESHOLD = 25,
@@ -233,17 +231,9 @@ APE.namespace("APE.drag" );
             for(var id in draggableList) {
                 select(draggableList[id], false);
             }
+            hasGroupSelection = false;
         }
-        
-        /** 
-         * returns true if there are any selected items.
-         */
-        function hasGroupSelection() {
-            for(var id in draggableList)
-                return true;
-            return false;
-        }
-       
+               
         /**
          * When a draggable has been released (by ESC), it calls dragout from the relevant 
          * droptargets and resets any active over droptargets.
@@ -360,6 +350,7 @@ APE.namespace("APE.drag" );
         * called on mousemove 
          */
         function carryGroup(distX, distY) {
+            if(!hasGroupSelection) return;
             var o, id;
             for(id in draggableList) {
                 o = draggableList[id];
@@ -507,7 +498,7 @@ APE.namespace("APE.drag" );
         function dragObjGrabbed(e, dObj) {
             if(typeof dObj.onbeforedragstart == FUNCTION 
                 && dObj.onbeforedragstart(e) == false) return true;
-
+            
             var eventCoords = getEventCoords(e),
                 elementPixelCoords;
             
@@ -545,10 +536,12 @@ APE.namespace("APE.drag" );
             // Initiate dragging.
             if(dO.isBeingDragged === false) {
                 dragStart(dO, e);
+                // is not part of selection.
+                delete draggableList[dO.id];
                 
                 for(id in draggableList) {
+                    hasGroupSelection = true;
                     dragStart(draggableList[id], e);
-             
                 }
             }
     
@@ -577,8 +570,8 @@ APE.namespace("APE.drag" );
                             dO.ondrag(e);
                         dO.isAtRight = false;
                         dO.isAtLeft = true;
-                        planesStopped += 1;
                     }
+                    planesStopped += 1;
                 } else if(isRight) {
                     if(!dO.isAtRight) {
                         dO.moveToX( dO.maxX );
@@ -588,8 +581,8 @@ APE.namespace("APE.drag" );
                             dO.ondrag(e);
                         dO.isAtRight = true;
                         dO.isAtLeft = false;
-                        planesStopped += 1;
                     }
+                    planesStopped += 1;
                 } else {
                     dO.isAtLeft = dO.isAtRight = false;
                     dO.moveToX( newX );
@@ -604,8 +597,8 @@ APE.namespace("APE.drag" );
                             dO.ondrag(e);
                         dO.isAtTop = true;
                         dO.isAtBottom = false;
-                        planesStopped += 1;
                     }
+                    planesStopped += 1;
                 } else if(isBelow) {
                     if(!dO.isAtBottom) {
                         if( dO.maxY > 0 )
@@ -616,8 +609,8 @@ APE.namespace("APE.drag" );
                             dO.ondrag(e);
                         dO.isAtTop = false;
                         dO.isAtBottom = true;
-                        planesStopped += 1;
                     }
+                    planesStopped += 1;
                 } else {
                     dO.isAtTop = dO.isAtBottom = false;
                     dO.moveToY( newY );
@@ -640,102 +633,57 @@ APE.namespace("APE.drag" );
                 carryGroup(distX, distY);
                 if(hasOnDrag)
                     dO.ondrag(e);
-            }
-           
+            }  
             // Handle dropTarget dragOver    
             if(dragOverTargets !== false)  {
-                var coords = { x:ePageX, y:ePageY },
-                    i = 0, 
-                    j = dragOverTargets.length,
-                    dt,
-                    isInTarget,
-                    dragEvent = {domEvent:e, dragObj:dO};
-               for(; i < j; i++) {
-                    dt = dragOverTargets[i];
-                    isInTarget = dt.containsCoords(coords);
-                    // Did we just move over this dropTarget?
-    
-                    if(!dt.hasDropTargetOver && isInTarget) {
-                        dt.hasDropTargetOver = true;
-    
-                       if(typeof dt.ondragover == FUNCTION)
-                            dt.ondragover(dragEvent); // typeof check now needed.
-                        if(dt.dragOverClassName)
-                            dom.addClass(dt.el, dt.dragOverClassName);
-                    } else { // Were we previously over this dropTarget?
-                        if(dt.hasDropTargetOver && !isInTarget) { 
-                            if(typeof dt.ondragout == FUNCTION)
-                                dt.ondragout(dragEvent);
-                            if(dt.dragOverClassName)
-                                dom.removeClass(dt.el, dt.dragOverClassName);
-                            dt.hasDropTargetOver = false;
-                        }
-                    }
-                }
+                handleDragOver(dO, e, ePageX, ePageY);
             }
             return false;
         }
         
         function mouseUp(e) {
             grabbed = false;
-            var isRandomMouseMoveEvent = (dO && dO.isBeingDragged && !dO.hasBeenDragged);
-            if(!dO || !dO.hasBeenDragged && !isRandomMouseMoveEvent) {
+            if(!dO) return;
+            var isRandomMouseMoveEvent = (dO.isBeingDragged && !dO.hasBeenDragged),
+                id, item, o, x, y;
+            if(!dO.hasBeenDragged && !isRandomMouseMoveEvent) {
                 if(!keepUserSelection){
                     dO = null;
                 }
                 return;
             }
+            draggableList[dO.id] = dO;
             keepUserSelection = false;
-            e = e || self.event;
             
-            var id, item;
             if(dO.copyEl) 
                 retireClone(dO);
-            for(id in draggableList) {
-                item = draggableList[id];
-                if(item.copyEl) 
-                    retireClone(item);
-            }
-            
-            // if it's been dragged onto a dropTarget, fire that event.
-            var targets = dO.dropTargets,
-                len = targets.length, o, x, y;
-            if(len > 0) {
-                var coords = getEventCoords(e),
-                    dropTarget, i = 0;
-                for(; i < len; i++) {
-                    dropTarget = targets[i];
-    
-                    if(dropTarget.containsCoords(coords)) {        
-                        if(typeof dropTarget.ondrop == FUNCTION) {
-                            dropTarget.ondrop({domEvent:e, dragObj:dO, dropTarget:dropTarget});
-                        }
-                        for(id in draggableList)  { // Assume that draggable groups share dropTargets.
-                            if(id === dropTarget.id) continue;
-                            if(typeof dropTarget.ondrop == FUNCTION) {
-                                o = draggableList[id];
-                                dropTarget.ondrop({domEvent:e, dragObj:o, dropTarget:dropTarget}); 
-                            }
-                        }
-                        if(dropTarget.dragOverClassName)
-                            dom.removeClass(dropTarget.el, dropTarget.dragOverClassName);
-                        break;
-                    }
+            if(hasGroupSelection) {
+                for(id in draggableList) {
+                    item = draggableList[id];
+                    if(item.copyEl) 
+                        retireClone(item);
                 }
-            }
-            for(id in draggableList) {
-                o = draggableList[id], 
-                    x = o.x, y = o.y;
-                if(x < o.minX)
-                    o.moveToX(o.minX);
-                else if(x > o.maxX)
-                    o.moveToX(o.maxX);
-                if(y < o.minY)
-                    o.moveToY(o.minY);
-                else if(y > o.maxY)
-                    o.moveToY(o.maxY);
-                if(o.hasBeenDragged)
-                    dragDone(o, e);
+            }            
+            e = e || self.event;
+            // if it's been dragged onto a dropTarget, fire that event.
+            handleDrops(e);
+            
+            if(hasGroupSelection) {
+                for(id in draggableList) {
+                    o = draggableList[id];
+                    x = o.x;
+                    y = o.y;
+                    if(x < o.minX)
+                        o.moveToX(o.minX);
+                    else if(x > o.maxX)
+                        o.moveToX(o.maxX);
+                    if(y < o.minY)
+                        o.moveToY(o.minY);
+                    else if(y > o.maxY)
+                        o.moveToY(o.maxY);
+                    if(o.hasBeenDragged)
+                        dragDone(o, e);
+                }
             }
             dragDone(dO, e);
             dO = null;
@@ -753,86 +701,147 @@ APE.namespace("APE.drag" );
                     dO.release(e);
                 }
             }
-        }    
-
-        function glideStart(dObj, x, y) {
-             if(dObj.animTimer) return;
-
-             dObj.startX = x||0;
-             dObj.startY = y||0;
-     
-             var dx = dObj.startX - dObj.grabX,
-                 dy = dObj.startY - dObj.grabY;
-     
-             // Calculate Hypoteneuse.
-             dObj.glideDist = Math.ceil(Math.sqrt((dx * dx) + (dy * dy)));
-     
-             if(dObj.glideDist === 0) return;
-             dObj.rx = Math.abs(dx)/dObj.glideDist;
-             dObj.ry = Math.abs(dy)/dObj.glideDist;
-             if(dObj.x > dObj.grabX)
-                 dObj.rx = -dObj.rx;
-             if(dObj.y > dObj.grabY)
-                 dObj.ry = -dObj.ry;
-             
-             dObj.startTime = +new Date;
-             dObj.animTimer = self.setInterval(
-                  function(){
-                      glide(dObj, typeof dObj.onglide == FUNCTION);
-                  }, 10);
-         }
-     
-        function glide(dObj, hasOnglide) {
-            var t = new Date - dObj.startTime,
-            // 2px per 10ms slight acceleration 10px/s
-                d = Math.ceil(2 * t + .5 * .01 * t*t);
-            if(d >= dObj.glideDist) {
-               
-                dObj.animTimer = self.clearInterval(dObj.animTimer);
-                dObj.moveToX( dObj.grabX );
-                dObj.moveToY( dObj.grabY );
-                if(dObj.copyEl) {
-                    dObj.el = dObj.origEl;
-                    dObj.style = dObj.origEl.style;
-                    dObj.copyEl.style.display = "none";
+        }
+         
+        function handleDragOver(dO, e, ePageX, ePageY){
+            var coords = { x:ePageX, y:ePageY },
+            i = 0,
+            j = dragOverTargets.length,
+            dt,
+            isInTarget,
+            dragEvent = {domEvent:e, dragObj:dO};
+           for(; i < j; i++) {
+                dt = dragOverTargets[i];
+                isInTarget = dt.containsCoords(coords);
+                // Did we just move over this dropTarget?
+                      if(!dt.hasDropTargetOver && isInTarget) {
+                    dt.hasDropTargetOver = true;
+                          if(typeof dt.ondragover == FUNCTION){
+                        dt.ondragover(dragEvent); // typeof check now needed.
+                    }
+                    if(dt.dragOverClassName) {
+                        dom.addClass(dt.el, dt.dragOverClassName);
+                    }
+                } else { // Were we previously over this dropTarget?
+                    if(dt.hasDropTargetOver && !isInTarget) { 
+                        if(typeof dt.ondragout == FUNCTION) {
+                            dt.ondragout(dragEvent);
+                        }
+                        if(dt.dragOverClassName) {
+                            dom.removeClass(dt.el, dt.dragOverClassName);
+                        }
+                        dt.hasDropTargetOver = false;
+                    }
                 }
-                if(typeof dObj.onglideend == FUNCTION) 
-                    dObj.onglideend();
-                dragDone(dObj, {});
-            } else {
-                if(hasOnglide) { // useful for Slider.
-                    dObj.onglide();
-                }
-                dObj.moveToX(dObj.startX + d * dObj.rx);
-                dObj.moveToY(dObj.startY + d * dObj.ry);
             }
         }
         
+        /** fires ondrop for each dropTarget */
+        function handleDrops(ev){
+            var targets = dO.dropTargets,
+                dropTarget,
+                coords,
+                len = targets.length, i, 
+                id, o;
+            if(len > 0) {
+                coords = getEventCoords(ev);
+                for(i = 0; i < len; i++) {
+                    dropTarget = targets[i];
+    
+                    if(dropTarget.containsCoords(coords)) {        
+                        if(typeof dropTarget.ondrop == FUNCTION) {
+                            dropTarget.ondrop({domEvent:ev, dragObj:dO, dropTarget:dropTarget});
+                        }
+                        if(hasGroupSelection) {
+                            for(id in draggableList)  { // Assume that draggable groups share dropTargets.
+                                if(id === dropTarget.id) continue;
+                                if(typeof dropTarget.ondrop == FUNCTION) {
+                                    o = draggableList[id];
+                                    dropTarget.ondrop({domEvent:ev, dragObj:o, dropTarget:dropTarget}); 
+                                }
+                            }
+                        }
+                        if(dropTarget.dragOverClassName) {
+                            dom.removeClass(dropTarget.el, dropTarget.dragOverClassName);
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+        
+        function glideStart(dObj) {
+            var anim = APE.anim;
+            dObj.startX = dObj.x;
+            dObj.startY = dObj.y;
+            
+            var a = new anim.Animation(.2);
+            a.transition = anim.Transitions.accel;
+            a.run = glide;
+            a.dObj = dObj;
+            a.onplay = dObj.onglide;
+            a.onend = animOnEnd;
+            a.start();
+        }
+        
+        function glide(rationalValue) {
+            var dObj = this.dObj,
+                dx = dObj.startX - dObj.grabX,
+                dy = dObj.startY - dObj.grabY;
+            
+            rationalValue = Math.pow(rationalValue, 3); // accel.
+            dObj.moveToX(dObj.startX - (dx * rationalValue));
+            dObj.moveToY(dObj.startY - (dy * rationalValue));
+        }
+        
+        function animOnEnd(){
+            glideEnd(this.dObj);          
+        }
+        
         function glideEnd(dObj) {
-            if(typeof dObj.onglideend == FUNCTION) 
+            if(typeof dObj.onglideend == FUNCTION) {
                 dObj.onglideend();
+            }
+            if(dObj.copyEl) {
+                dObj.el = dObj.origEl;
+                dObj.style = dObj.origEl.style;
+                dObj.copyEl.style.display = "none";
+            }
             dragDone(dObj, {});
         }
         
-        /** Starts gliding the draggable back to its original x,y coords. 
-         * @param {Number} [x] x coordinate to start gliding from.
-         * @param {Number} [y] y coordinate to start gliding from.
-         */
-        function animateBack(dObj, x, y) {
-           glideStart(dObj, dObj.x||x, dObj.y||x);
+        /** Starts gliding the draggable back to its original x,y coords. */
+        function animateBack(dObj) {          
+             if(APE.anim && dObj.useAnim) {
+                 glideStart(dObj);
+             } else {
+                 dObj.moveToX(dObj.grabX);
+                 dObj.moveToY(dObj.grabY);
+                 if(typeof dObj.onglide == FUNCTION) {
+                     dObj.onglide();
+                 }
+                 glideEnd(dObj, {});
+             }
         }
 
         return {
-            /** @type {boolean} 
-             * @description set to true to make a temporary "ghost" copy dragged.
-             */
+            
+            /** set to true to make a temporary "ghost" copy dragged. */
             dragCopy : false,
         
-            /** @type {boolean} 
-             * @description set to true to allow this to be dragged as a group.
-             */
+            useAnim : true,
+            
+            /** set to true to allow this to be dragged as a group. */
             dragMultiple : false,
          
+            /** className to add when selected. */
+            selectedClassName : "",
+            
+            /** className to add before being dragged. */
+            activeDragClassName : "",
+
+            useHandleTree : true,
+
             isSelected : false,
         
             /** @event Is about to move. */
@@ -855,7 +864,6 @@ APE.namespace("APE.drag" );
             /** @event Dragging completed (as a result of mouseup). */
             ondragend : undef,
          
-        
             /* current x position*/
             x : 0,
             /* current y position*/
@@ -874,28 +882,20 @@ APE.namespace("APE.drag" );
             
             /* drag object can be disabled by setting to this to false */
             isDragEnabled : true,
-            
-            /* className to add when selected. */
-            selectedClassName : "",
-            
-            /* className to add before being dragged. */
-            activeDragClassName : "",
-
-            useHandleTree : true,
-        
+                    
             hasHandleSet : false,
         
             /** Sets a handle on a draggable 
              * @param {HTMLElement} el the element to use as a handle.
              * By default, the handle is the draggable.
-             * @param {boolean} [setHandleTree] if true, the draggable can use anything in the 
+             * @param {boolean} [useHandleTree] if true, the draggable can use anything in the 
              * handle's subtree for dragging.
              */
-            setHandle : function(el, setHandleTree){
+            setHandle : function(el, useHandleTree){
                 this.handle = el;
                 this.hasHandleSet = true;
                 // Make sure caller didn't forget the secondParam and expect true.
-                this.useHandleTree = setHandleTree != false;
+                this.useHandleTree = useHandleTree != false;
             },
             
             /** 
@@ -918,27 +918,31 @@ APE.namespace("APE.drag" );
              * @param {int} [xOffset] amount of vertical adjustment to apply.
              */
             grab : function(e, xOffset, yOffset) {
-                if(!e) e = self.event;
+                e = e || self.event;
+                var target = Event.getTarget(e),
+                    grabCoords;
                 
-                var target = Event.getTarget(e);
-                
-                if(e.preventDefault) e.preventDefault();
-                e.returnValue = false;
+                if(e.preventDefault) {
+                    e.preventDefault();
+                } else {
+                    e.returnValue = false;
+                }
                 
                 if(dom.contains(this.el, target)) return;
                     
-                var grabCoords = dom.getPixelCoords(this.el);        
+                grabCoords = dom.getPixelCoords(this.el);        
                 this.grabX = grabCoords.x;
                 this.grabY = grabCoords.y;
                 
                 // Get the container's offset.
                 var eventCoords = getEventCoords(e),
+                    handle = this.handle,
                     offsetCoords = dom.getOffsetCoords(dom.getContainingBlock(this.el)),
                     offsetX = eventCoords.x - offsetCoords.x,
-                    newX = offsetX - (0|this.handle.offsetWidth/2);
+                    newX = offsetX - (0|handle.offsetWidth/2),
                     offsetY = eventCoords.y - offsetCoords.y,
-                    newY = (offsetY - (0|this.handle.offsetHeight/2)),
-                    handleOffsetCoords = dom.getOffsetCoords(this.handle, this.el);
+                    newY = (offsetY - (0|handle.offsetHeight/2)),
+                    handleOffsetCoords = dom.getOffsetCoords(handle, this.el);
                 
                 if(this.keepInContainer) {
                     newX = Math.max(newX, 0);
@@ -955,13 +959,17 @@ APE.namespace("APE.drag" );
             },
             
             /**
-             * releases the draggable, as if the mouse had been released.
+             * releases the draggable.
              * @param {Event} [e] the event that triggered release
              */
             release : function(e) {
                 dragObjReleased(e, this);
                 if(typeof this.onrelease == FUNCTION) 
                     this.onrelease(e);
+                // Put back into selection.
+                if(this.dragMultiple) {
+                    draggableList[this.id] = this;
+                }
             },        
         
             moveToX : function(x) {
@@ -1006,14 +1014,13 @@ APE.namespace("APE.drag" );
             dragOverClassName : "",
         
             initCoords : function() {
-                if(!this.coords) this.coords = {};
+                this.coords = this.coords || {};
                 dom.getOffsetCoords(this.el, document, this.coords);
                 this.coords.w = this.el.clientWidth;
                 this.coords.h = this.el.clientHeight;
             },
         
-            /** checks to see if the coordinates 
-             *  x and y are both inside dropTarget
+            /** returns true if x and y are both inside dropTarget
              * @param {Object} curs {x,y} coordinates of the event.
              */
             containsCoords : function(curs) {
