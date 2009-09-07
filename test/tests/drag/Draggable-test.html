@@ -23,14 +23,23 @@
     <script type="text/javascript" src="../../../build/dom/getPixelCoords.js"></script>
     <script type="text/javascript" src="../../../build/drag/Draggable.js"></script>
     <!--  included dynamically, below script type="text/javascript" src="../../../build/anim/Animation.js"></script -->
+<style type="text/css">
+#template div {
+    position: relative;
+    width: 200px;
+    height: 20px;
+    font-size: 14px;
+    line-height: 1.1em;
+}
+</style>
 </head>
 <body style="position:relative;">
 <div id="testLogger"></div>
-<div id="template" style="height: 100%; width: 100%;">
-    <div id="testNode" style="position: relative; width: 200px" tabIndex="0">drag me.</div>
-    <div id="testNode2" style="position: relative; width: 200px" tabIndex="0">drag me.</div>
-    <div id="testNode3" style="position: relative; width: 200px" tabIndex="0">drag me.</div>
-</div>
+<div id="template" style="height: 100%; width: 100%;font-size: 0;line-height:0"
+    ><div id="testNode" tabIndex="0">drag me.</div
+    ><div id="testNode2" tabIndex="0">drag me.</div
+    ><div id="testNode3" tabIndex="0">drag me.</div
+></div>
 <script type="text/javascript">
 setTimeout(function(){
 
