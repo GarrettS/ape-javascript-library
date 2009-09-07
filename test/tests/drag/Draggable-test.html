@@ -867,7 +867,8 @@ var animatedDragTestCase = new YAHOO.tool.TestCase({
     },
 
     testOnglide : function() {
-        
+
+        var testRunner = this;
         if(APE.anim) {
             testOnGlide.call(this);
         }
@@ -875,9 +876,10 @@ var animatedDragTestCase = new YAHOO.tool.TestCase({
             // Wait until anim is loaded.
             var _pollStart = +new Date,
                 tid = setInterval(checkAnimLoaded, 100);
-	        testRunner.wait(function(){
+	        this.wait(function(){
                 clearInterval(tid);
                 YAHOO.log("APE.anim did not load. Proceeding anyway.", "warn", "TestRunner");
+                testOnGlide.call(testRunner);
 	        }, 3000);
         }
 
@@ -1093,7 +1095,7 @@ TestRunner.subscribe("testcasebegin", addAnim);
 function addAnim(testEvent) {
     if(testEvent.testCase === animatedDragTestCase) {
         var script = document.createElement("script");
-        script.src = "../../../build/anim/Animation.js";
+        script.src = "../../../build/anim/Animation.js?";//+ Math.random();
         script.type = "text/javascript";
         document.getElementsByTagName("head")[0].appendChild(script);
         YAHOO.log("Added " + script.src, "info", "TestRunner");    
