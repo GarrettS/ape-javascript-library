@@ -56,7 +56,6 @@ APE.mixin(EventPublisher, {
 
 function EventPublisher(src, type) {
     this.src = src;
-    // Really could use a List of bound methods here. 
     this._callStack = [];
     this.type = type;
 }
@@ -152,7 +151,7 @@ EventPublisher.prototype = {
  * @static
  * @memberOf {APE.EventPublisher}
  * called onunload, automatically onunload. 
- * This is only called for if window.CollectGarbage is 
+ * This is only called for if jscript version <= 5.6 is detected
  * supported. IE has memory leak problems; other browsers have fast forward/back,
  * but that won't work if there's an onunload handler.
  */
@@ -165,6 +164,7 @@ function cleanUp() {
             publisher.src[publisher.type] = null;
         }
     }
+    Registry = {};
 }
 
 /** 
@@ -255,6 +255,7 @@ function get(src, sEvent) {
     return publisher;
 }
 
-if(self.CollectGarbage)
+var isMaybeLeak/*@cc_on=(@_jscript_version<5.7)@*/;
+if(isMaybeLeak)
     EventPublisher.get( self, "onunload" ).addAfter( cleanUp, EventPublisher );
 })();

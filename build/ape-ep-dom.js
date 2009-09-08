@@ -283,7 +283,6 @@ APE.mixin(EventPublisher, {
 
 function EventPublisher(src, type) {
     this.src = src;
-    // Really could use a List of bound methods here. 
     this._callStack = [];
     this.type = type;
 }
@@ -379,7 +378,7 @@ EventPublisher.prototype = {
  * @static
  * @memberOf {APE.EventPublisher}
  * called onunload, automatically onunload. 
- * This is only called for if window.CollectGarbage is 
+ * This is only called for if jscript version <= 5.6 is detected
  * supported. IE has memory leak problems; other browsers have fast forward/back,
  * but that won't work if there's an onunload handler.
  */
@@ -392,6 +391,7 @@ function cleanUp() {
             publisher.src[publisher.type] = null;
         }
     }
+    Registry = {};
 }
 
 /** 
@@ -482,7 +482,8 @@ function get(src, sEvent) {
     return publisher;
 }
 
-if(self.CollectGarbage)
+var isMaybeLeak/*@cc_on=(@_jscript_version<5.7)@*/;
+if(isMaybeLeak)
     EventPublisher.get( self, "onunload" ).addAfter( cleanUp, EventPublisher );
 })();/**dom.js rollup: constants.js, viewport-f.js, position-f.js, classname-f.js,  traversal-f.js, Event.js, Event-coords.js, style-f.js */
 APE.namespace("APE.dom" );
@@ -1403,11 +1404,8 @@ APE.namespace("APE.dom.Event");
 (function(){
 
     var dom = APE.dom;
-    
-    APE.mixin(dom, /** @scope APE.dom */{
-        getStyle : getStyle,
-        setOpacity : setOpacity
-    });
+    dom.getStyle = getStyle;
+    dom.setOpacity = setOpacity;
 
     var getCS = "getComputedStyle",
         IS_COMPUTED_STYLE = dom.IS_COMPUTED_STYLE,
@@ -1420,9 +1418,11 @@ APE.namespace("APE.dom.Event");
         multiLengthPropExp = /^(?:margin|(border)(Width|Color|Style)|padding)$/,
         alphaOpExp = /\Wopacity\s*=\s*([\d]+)/i,
         autoPercentExp = /^auto|\d%$/,
-        f = "cssFloat",
-        floatProp = f in document.documentElement[STYLE] ? f : "styleFloat",
+        floatProp = "cssFloat",
         props = ["Top", "Right", "Bottom", "Left"];
+    if(!(floatProp in document.documentElement[STYLE])) {
+        floatProp = "styleFloat";
+    }
     
     /** 
      * Special method for a browser that supports el.filters and not style.opacity.
@@ -1524,7 +1524,8 @@ APE.namespace("APE.dom.Event");
     }
     
     function getCurrentStyleValueFromAutoOrPercent(el, p) {
-        var s = el[STYLE], v, pp, borderWidth, doc = el[dom.OWNER_DOCUMENT];
+        var s = el[STYLE], v, pp, borderWidth, 
+            clientTop, clientLeft, paddingWidth;
         if("pixelWidth"in s && /width|height|top|left/.test(p)) {
             pp = "pixel" + (p.charAt(0).toUpperCase()) + p.substring(1);
             v = s[pp];
@@ -1532,22 +1533,22 @@ APE.namespace("APE.dom.Event");
         if(v) {
             return v + PX;
         }
-        var clientTop = el.clientTop||0,
-            clientLeft = el.clientLeft||0;
         if(p === "width") {
+            clientLeft = el.clientLeft||0;
             borderWidth = parseFloat(getStyle(el, "borderRightWidth"))||clientLeft;
             paddingWidth = parseFloat(getStyle(el, "paddingLeft"))||0
                 + parseFloat(getStyle(el, "paddingRight"))||0;
 
             return el.offsetWidth - clientLeft - borderWidth - paddingWidth + PX;
         } else if(p === "height") {
+            clientTop = el.clientTop||0;
             borderWidth = parseFloat(getStyle(el, "borderBottomWidth"))||clientTop;
             paddingWidth = parseFloat(getStyle(el, "paddingTop"))||0
                 + parseFloat(getStyle(el, "paddingBottom"))||0;
             return el.offsetHeight - clientTop - borderWidth + PX;
         } else if(p == "margin" && el[CURRENT_STYLE].position != "absolute") {
             v = parseFloat(getStyle(el.parentNode, 'width')) - el.offsetWidth;
-            if(v == 0) return"0px";
+            if(v === 0) return"0px";
             v = "0px " + v;
             return v + " " + v;
         }

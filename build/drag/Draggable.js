@@ -49,7 +49,7 @@ APE.namespace("APE.drag");
      *   - dragMultiple {boolean}
      *   - useAnim {boolean} 
      */
-    function Drag(id, options) {
+    function Drag(id, options, win) {
         var d = document, 
             el = d.getElementById(id),
             p;
