@@ -1,0 +1,22 @@
+Overview:
+APE JavaScript Library is a Framework for building widgets
+
+Supports standards mode HTML DOM, not quirks.
+
+Code Guidelines:
+ * Unit Test your code.
+ * Validate the Unit Test HTML.
+ * Use spaces (four) not tabs.
+
+Tested Browsers:
+ - Safari 2.0.4 up, mac/win
+ - Firefox 2, 3, 3.5 and Seamonkey
+ - IE 6 up
+ - Opera 9.5 up
+ - Chrome 2 up
+ 
+Other browsers:
+Safari 2.0.4 has many test failures due to limitation in YUI Test's UserAction (pageX)
+Many tests will unofficially pass in Safari 2.0 and IE 5.5.
+
+TODO: Test in BlackBerry and recent NetFront browser.
