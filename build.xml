@@ -11,19 +11,18 @@
     <!-- concat all dom-f.js files, EXCEPT the first (style-f.js).
          Remove the APE.namespace(APE.dom) from each file (except the first)
     -->
-        <property name='files' value='constants.js, viewport-f.js, position-f.js, classname-f.js, 
+        <property name='domFiles' value='constants.js, viewport-f.js, position-f.js, classname-f.js, 
 traversal-f.js, Event.js, Event-coords.js, style-f.js'/>
         <concat destfile="${build}/dom/dom.js">
-            <filelist dir="${build}/dom"
-                 files="${files}"/>
+            <filelist dir="${build}/dom" files="${domFiles}"/>
             <filterchain>
                 <tokenfilter>
                     <replacestring from='APE.namespace("APE.dom");' to=""/>
                     <replacestring from="APE.namespace('APE.dom');" to=""/>
                 </tokenfilter>
             </filterchain>
-            <header>/**dom.js rollup: ${files} */
-APE.namespace("APE.dom"<!--necessary space --> );</header>
+            <header>/**dom.js rollup: ${domFiles} */
+APE.namespace("APE.dom"<!--necessary space for filterchain. --> );</header>
         </concat>
 
         <!-- build ape-ep-dom.js rollup -->
@@ -33,15 +32,18 @@ APE.namespace("APE.dom"<!--necessary space --> );</header>
         </concat>
 
         <!-- build anim.js rollup -->
+        <property name='animFiles' value='Animation.js, StyleTransition.js'/>
         <concat destfile="${build}/anim/anim.js">
-            <filelist dir="${build}/anim"
-                 files="Animation.js, StyleTransition.js"/>
+            <filelist dir="${build}/anim" files="${animFiles}"/>
             <filterchain>
                 <tokenfilter>
                     <replacestring from='APE.namespace("APE.anim");' to=""/>
                     <replacestring from="APE.namespace('APE.anim');" to=""/>
                 </tokenfilter>
             </filterchain>
+            <header>/**anim.js rollup: ${animFiles} */
+APE.namespace("APE.anim"<!--necessary space, or filterchain will remove this! --> );
+</header>
         </concat>
 
         <!-- build anim.js rollup -->

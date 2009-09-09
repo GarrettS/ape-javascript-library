@@ -26,7 +26,6 @@ APE.namespace("APE.drag" );
     var APE = self.APE,
         dom = APE.dom,
         drag = APE.drag,
-        EventPublisher = APE.EventPublisher,
         Event = dom.Event,
         highestZIndex = 1000,
         draggableList = { },
@@ -93,6 +92,7 @@ APE.namespace("APE.drag" );
         
         // Static initializer code.
         var d = self.document,
+            EventPublisher = APE.EventPublisher,
             DOC_EL = "documentElement",
             ds = d[DOC_EL].style,
             serSelect = "serSelect", 
@@ -147,8 +147,9 @@ APE.namespace("APE.drag" );
             var allow = !dO;
             if(userSelectType) {
                 this[DOC_EL].style[userSelectType] = allow ? "" : "none";
-            } else if(!ev) {
-                self.event.returnValue = allow;
+            } else {
+                ev = ev||self.event;
+                ev.returnValue = allow;
             }
         }
         

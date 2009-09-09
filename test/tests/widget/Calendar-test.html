@@ -1,5 +1,5 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-"http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html>
+<!--  HTML 5 doctype for input type="date" -->
 <html lang="en">
 <head>
     <meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
@@ -13,20 +13,19 @@
     <script type="text/javascript" src="../../yui-test/build/yuitest/yuitest-beta.js"></script>
 
     <script type="text/javascript" src="../../../build/ape-ep-dom.js"></script>
-    <script type="text/javascript" src="../../../build/widget/calendar/Calendar_en.js"></script>
-    <script type="text/javascript" src="../../../build/widget/calendar/Calendar.js"></script>
+    <script type="text/javascript" src="../../../build/widget/Calendar/Calendar_en.js"></script>
+    <script type="text/javascript" src="../../../build/widget/Calendar/Calendar.js"></script>
 </head>
 <body>
 
 <div id='template'>
     <label for="start" id='sf'>Start <input id="start" type="date" size="18"/></label>
-
     <input id='blah'/>
 </div>
 
 <div id="testLogger"></div>
 <script type="text/javascript">
-setTimeout(function(){
+window.onload = function(){
     var Calendar = APE.widget.Calendar,
         Assert = YAHOO.util.Assert,
         DateAssert = YAHOO.util.DateAssert,
@@ -236,7 +235,5 @@ setTimeout(function(){
         YAHOO.tool.TestRunner.run();
     }
  
-}, 20);</script>
-
- 
+};</script>
 </body>

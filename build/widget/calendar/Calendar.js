@@ -12,7 +12,9 @@ APE.namespace("APE.widget");
 
 (function(){
     
-    var widget = APE.widget;
+    var APE = self.APE,
+        widget = APE.widget, 
+        dom = APE.dom;
     widget.Calendar = APE.createFactory(Calendar, createCalendarPrototype);
 
     /**
@@ -37,36 +39,41 @@ APE.namespace("APE.widget");
         
     inputTypeDate = null;
     
+    function readDateFromInput(calendar) {
+        var input = document.getElementById(calendar.id),
+            iso8601Exp = /(?:^|\s+)(\d{4})-(\d\d)-(\d\d)(?:$|\s+)/,
+            split = iso8601Exp.exec(input.value);
+        if(!split) {
+            calendar.displayDate = new Date;
+        } else {
+            calendar.displayDate = new Date(0);
+            calendar.displayDate.setFullYear(split[1], split[2]-1, split[3]);
+        }
+    }
+
     function createCalendarPrototype(){
-        return {
-                
-            /** 
-             * @type {boolean} 
-             * @description set to <code>true</code> to hide the calendar when a
-             * date is selected.
-             */
+        return {     
+            /** set to <code>true</code> to hide the calendar when a date is selected. */
             hideOnSelect : true,
         
-            /**
-             * This can generally be ignored.
-             * Initializes events for calendar. If Calendar's html is regenerated (via innerHTML)
-             * then call this method when calendar HTML is generated. 
+            /** call initEvents if/when calendar HTML is Calendar's html is regenerated (via innerHTML). 
              */
             initEvents : function() {
                 if(IS_NATIVE) return;
                 
-                var d = document, input = d.getElementById(this.id),
-                    EventPublisher = APE.EventPublisher;
+                var d = document, 
+                    input = d.getElementById(this.id),
+                    addCallback = EventPublisher = APE.EventPublisher.add;
                     
-                EventPublisher.add(input, "onfocus", calendarFocusHandler);
-                EventPublisher.add(input, "onblur", calendarBlurHandler);
+                addCallback(input, "onfocus", calendarFocusHandler);
+                addCallback(input, "onblur", calendarBlurHandler);
         
                 if(!IS_NATIVE) {
                     // IE needs this because if calendar is 
                     // not shown at pg load time, and input has focus,
                     // onfocus won't fire when user clicks input.
-                    EventPublisher.add(input, "onclick", calendarFocusHandler);
-                    EventPublisher.add(d, "onmousedown", calendarDocumentMouseDownHandler);
+                    addCallback(input, "onclick", calendarFocusHandler);
+                    addCallback(d, "onmousedown", calendarDocumentMouseDownHandler);
                }
             },
         
@@ -78,19 +85,7 @@ APE.namespace("APE.widget");
             /** @internal */
             _isHidden : undefined,
                 
-            /** Positions the calendar just below the 
-             * input using APE.dom.getOffsetCoords.
-             * @param {CSSStyleDeclaration} calStyle the caledar element's style.
-             */
-            position : function(calStyle) {
-                var input = document.getElementById(this.id),
-                    coords = APE.dom.getOffsetCoords(input);
-                calStyle.left = coords.x + "px";
-                calStyle.top = coords.y + input.offsetHeight + "px";
-            },
-        
-            /**
-             * Shows the calendar by setting visibility to 'visible'.
+            /** Shows the calendar by setting visibility to 'visible'.
              * @param {CSSStyleDeclaration} calStyle the caledar element's style.
              * Used internally, but may be overridden.
              */
@@ -108,25 +103,19 @@ APE.namespace("APE.widget");
                 calStyle.visibility = "hidden";
             },
         
-            /** 
-             * @event 
-             * @description fires immediately after visibility has been set to "visible" 
-             * in show();
+            /** @event 
+             * @description fires immediately after visibility has been set to "visible" in show();
              */
-            onshow : function(){},
+            onshow : noop,
         
-            /** 
-             * @event 
-             * @description fires immediately after visibility has been set to "hidden" 
-             * in hide();
+            /** @event 
+             * @description fires immediately after visibility has been set to "hidden" in hide();
              */
-            onhide : function(){},
+            onhide : noop,
         
-            /** 
-             * @event 
-             * @description a date was selected.
-             */
-            onselect : function(){},
+            /**@event 
+             * @description a date was selected. */
+            onselect : noop,
         
             /**
              * @return {Date} a copy of the internal Date 
@@ -136,8 +125,7 @@ APE.namespace("APE.widget");
                 return new Date(this.displayDate);
             },
                 
-            /**
-             * Sets the internal date object represented by the calendar.
+            /** Sets the internal date object represented by the calendar.
              * @internal
              */
             setDate : function(date) {
@@ -155,8 +143,7 @@ APE.namespace("APE.widget");
         // Private static prototype methods---------------------------------------------.
         
         function updateCalendarWidget(calendar, date) {
-            var APE = window.APE,
-                CalendarLocale = APE.widget.CalendarLocale;
+            var CalendarLocale = widget.CalendarLocale;
             if(!CalendarLocale) throw Error("Missing Resource: APE.widget.CalendarLocale");
                     
             createCalendarOnDemand(calendar); 
@@ -172,11 +159,9 @@ APE.namespace("APE.widget");
                 j = 0,
                 isLeapYear = (0 == (year%4)) && ( (0 != (year%100)) || (0 == (year%400))),
                 calendarEl = d.getElementById(calendar.calendarId),
-                tbody = calendarEl.getElementsByTagName("table")[0].tBodies[0],
-                dayElements = tbody.getElementsByTagName("b"),
+                dayElements = calendarEl.getElementsByTagName("tbody")[0].getElementsByTagName("b"),
                 textContent = "textContent"in calendarEl ? "textContent" : "innerText",
                 calendarHeader = d.getElementById(calendar.calendarId+"-header"),
-                dom = APE.dom,
                 dayElement;
         
             firstDayOfMonth = new Date(date);
@@ -242,7 +227,6 @@ APE.namespace("APE.widget");
                 join = Array.prototype.join,
                 td = join.call({length:7+1}, "<td><b>&nbsp;</b></td>"),
                 trs = join.call({length:6+1}, "<tr>"+td+"</tr>\n"),
-                widget = APE.widget,
                 Locale = widget.CalendarLocale,
                 dayNames = Locale.days.abbr, 
                 calendarBody = "<tbody>" + trs + "</tbody>",
@@ -275,6 +259,7 @@ APE.namespace("APE.widget");
          * @description called when the input receives focus or click events.
          */
         function calendarFocusHandler(e) {
+            e = e||self.event;
             var calendar = widget.Calendar.getById(this.id);
             _showCalendar(calendar, e);
         }
@@ -318,7 +303,7 @@ APE.namespace("APE.widget");
          */
         function position(calendar, calStyle) {
             var input = document.getElementById(calendar.id),
-                coords = APE.dom.getOffsetCoords(input);
+                coords = dom.getOffsetCoords(input);
             calStyle.left = coords.x + "px";
             calStyle.top = coords.y + input.offsetHeight + "px";
         }
@@ -347,68 +332,80 @@ APE.namespace("APE.widget");
          */
         function calendarMousedownHandler(e) {
             e = e||event;
-            var dom = APE.dom,
-                target = dom.Event.getTarget(e),
+            var target = dom.Event.getTarget(e),
                 calendarDiv = this,
                 calendarObject,
                 calId,
-                tbody,
-                selectedId;
+                targetId = target.id,
+                selectedId,
+                selectedIndex;
                 
             calendarObject = widget.Calendar.getById(calendarDiv.id.replace(/-calendar$/,""));
             calId = calendarObject.id;
 
-            window.clearTimeout(calendarObject.hideTimer);
+            self.clearTimeout(calendarObject.hideTimer);
         
             selectedId = calId + "-selected-day";
             calendarObject._hasFocus = true;
             
             if(/^b$/i.test(target.tagName)) {
-               if(target.id !== selectedId) {
-        
-                    var selectedIndex = +target.firstChild.data,
-                        selected;
-                        
+                if(targetId !== selectedId) {
+                    selectedIndex = +target.firstChild.data;
                     // Days are 1-31.
-                    if(!selectedIndex) return;
-                    
-        
-                    // Canceled the hide action that will be caused by blur().
-                    calendarObject._hasFocus = !calendarObject.hideOnSelect;
-                    selected = document.getElementById(selectedId);
-                    
-                    if(selected) {
-                        dom.removeClass(selected, "ape-calendar-selected-day");
-                        selected.id = "";
+                    if(selectedIndex){
+                        selectDay(calendarObject, selectedIndex, target, selectedId);
                     }
-                    target.id = selectedId;
-                    dom.addClass(target, "ape-calendar-selected-day");
-                    setDateOfMonth(calendarObject, selectedIndex);
-                
-                    calendarObject.onselect();
-                    if(calendarObject.hideOnSelect) {
-                        setTimeout(function(){
-                            _hideCalendar(calendarObject, e);
-                            calendarObject._hasFocus = false;
-                            calendarObject = null;
-                        }, 115);
-                    }
-               }
-            } else {
-                var newDate = new Date(calendarObject.displayDate);
-                if(target.id === calId + "-next-year") {
-                    newDate.setFullYear(newDate.getFullYear() + 1);
-                    calendarObject.setDate(newDate);
-                } else if(target.id === calId + "-prev-year") {
-                    newDate.setFullYear(newDate.getFullYear() - 1);
-                    calendarObject.setDate(newDate);
-                } else if(target.id === calId + "-next-month") {
-                    newDate.setMonth(newDate.getMonth() + 1);
-                    calendarObject.setDate(newDate);
-                } else if(target.id === calId + "-prev-month") {
-                    newDate.setMonth(newDate.getMonth() - 1);
-                    calendarObject.setDate(newDate);
                 }
+            } else {
+                selectMonthOrYear(calendarObject, targetId, calId);
+            }
+        }
+        
+        /**
+         * Sets the className on the day the user selected.
+         *  @param {int] selectedIndex day selected
+         *  @param {HTMLElement} target the element the user clicked.
+         *  @param (string} selectedId new id to give to target.
+         */
+        function selectDay(calendarObject, selectedIndex, target, selectedId, e){
+            var selected;            
+
+            // Canceled the hide action that will be caused by blur().
+            calendarObject._hasFocus = !calendarObject.hideOnSelect;
+            selected = document.getElementById(selectedId);
+            
+            if(selected) {
+                dom.removeClass(selected, "ape-calendar-selected-day");
+                selected.id = "";
+            }
+            target.id = selectedId;
+            dom.addClass(target, "ape-calendar-selected-day");
+            setDateOfMonth(calendarObject, selectedIndex);
+        
+            calendarObject.onselect();
+            if(calendarObject.hideOnSelect) {
+                setTimeout(function(){
+                    _hideCalendar(calendarObject, e);
+                    calendarObject._hasFocus = false;
+                    calendarObject = null;
+                }, 115);
+            }
+        }
+
+        function selectMonthOrYear(calendarObject, targetId, calId) {
+            var newDate = new Date(calendarObject.displayDate),
+                selected;
+            if(targetId === calId + "-next-year") {
+                selected = newDate.setFullYear(newDate.getFullYear() + 1);
+            } else if(targetId === calId + "-prev-year") {
+                selected = newDate.setFullYear(newDate.getFullYear() - 1);
+            } else if(targetId === calId + "-next-month") {
+                selected = newDate.setMonth(newDate.getMonth() + 1);
+            } else if(targetId === calId + "-prev-month") {
+                selected = newDate.setMonth(newDate.getMonth() - 1);
+            }
+            if(selected) {
+                calendarObject.setDate(newDate);
             }
         }
         
@@ -422,6 +419,8 @@ APE.namespace("APE.widget");
         }
         
         function returnFalse() {return false;}
+        function noop(){}
+        
          /** 
          * formats the date in default of MM dd, yyyy. Looks like 
          * January 4, 2009.
@@ -438,6 +437,7 @@ APE.namespace("APE.widget");
             for (var i = s.length; i++ < size; s = ch + s);
             return s;
         }
+        
         /**
          * @param {Event} e event parameter for blur event.
          * @description called when the document receives a mousedown event.
@@ -450,15 +450,14 @@ APE.namespace("APE.widget");
             // and that actually works in Mozilla! But it doesn't 
             // work in any other browsers. Even IE's toElement 
             // doesn't contain the non-focusable toElement for blur.
-            calendar.hideTimer = window.setTimeout(blurHandler, 10);
+            calendar.hideTimer = self.setTimeout(blurHandler, 10);
             function blurHandler(){
-                _hideCalendar(calendar, e||window.event);
+                _hideCalendar(calendar, e||self.event);
             }
         }
 
         function calendarDocumentMouseDownHandler(e){
-            var dom = APE.dom,
-                target = dom.Event.getTarget(e),
+            var target = dom.Event.getTarget(e),
                 calendarEl;
             if(activeCalendar !== null) {
                 calendarEl = document.getElementById(activeCalendar.calendarId);
@@ -475,19 +474,5 @@ APE.namespace("APE.widget");
                 _hideCalendar(activeCalendar, e);
             }
         }    
-    }
-    
-    // Private static shared methods---------------------------------------------------
-    
-    function readDateFromInput(calendar) {
-        var input = document.getElementById(calendar.id),
-            iso8601Exp = /(?:^|\s+)(\d{4})-(\d\d)-(\d\d)(?:$|\s+)/,
-            split = iso8601Exp.exec(input.value);
-        if(!split) {
-            calendar.displayDate = new Date;
-        } else {
-            calendar.displayDate = new Date(0);
-            calendar.displayDate.setFullYear(split[1], split[2]-1, split[3]);
-        }
-    }
+    }    
 })();
