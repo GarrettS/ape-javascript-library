@@ -229,7 +229,9 @@ window.onload = function(){
     //run the tests
     YAHOO.tool.TestRunner.add( calendarTest );
      //run the tests
-    if (parent && parent != window) {
+    if (parent !== self 
+            && "YAHOO" in parent
+            && parent.YAHOO.tool ) {
         YAHOO.tool.TestManager.load();
     } else {
         YAHOO.tool.TestRunner.run();
