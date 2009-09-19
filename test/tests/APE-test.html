@@ -1,12 +1,12 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
-        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
 <head>
-    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
     <title>APE Core Test</title>
-    <link rel="stylesheet" type="text/css" href="../yui-test/build/logger/assets/logger.css" />
-    <link rel="stylesheet" type="text/css" href="../yui-test/build/yuitest/assets/yuitest.css" />
-    <link rel="stylesheet" type="text/css" href="../yui-test/assets/testlogger.css" />
+    <link rel="stylesheet" type="text/css" href="../yui-test/build/logger/assets/logger.css">
+    <link rel="stylesheet" type="text/css" href="../yui-test/build/yuitest/assets/yuitest.css">
+    <link rel="stylesheet" type="text/css" href="../yui-test/assets/testlogger.css">
 
     <script type="text/javascript" src="../yui-test/build/yahoo-dom-event/yahoo-dom-event.js"></script>
     <script type="text/javascript" src="../yui-test/build/logger/logger.js"></script>
@@ -239,36 +239,39 @@ var creationalTest = new YAHOO.tool.TestCase({
     },
 
     testDeferError: function() {
-
     // this will fail in Webkit (false fail), due to:
     // https://bugs.webkit.org/show_bug.cgi?id=8519
         var caughtError = false,
             msg = "hey hey.";
 
-//            http://bugs.webkit.org/show_bug.cgi?id=8519
-        if(!window.onerror) 
-            YAHOO.log(navigator.appName +" doesn't support onerror", "info", "TestRunner");
-
+// http://bugs.webkit.org/show_bug.cgi?id=8519
         var onerror = window.onerror;
-        // Next, wrap the error, so we can see if EventPublisher.fire 
-        // caught it and passed it to deferError.
-        window.onerror = function(argMsg) {
-            caughtError = msg == argMsg;
+
+        // Next, wrap the error, so we can see if APE.deferError caught it.
+        window.onerror = deferErrorTestHandler;
+
+        function deferErrorTestHandler(argMsg) {
+            YAHOO.log("onerror caught message: " + argMsg, 
+                    "info", "TestRunner");
+            caughtError = argMsg;
             return true;
         };
         
-        YAHOO.log("deferError fails falsely in IE w/o Internet Option: \"Disable Script Debugging.\"", "info", "TestRunner");
+        YAHOO.log("deferError fails falsely in IE w/o Internet Option: \"Disable Script Debugging.\"", 
+                "info", "TestRunner");
         // Now, fire the event, to run the above.
         APE.deferError( Error( msg ) );
-        
-        this.wait(function(){
+
+        this.wait(deferredSegment, 10);
+
+        function deferredSegment(){
             window.onerror = onerror;
+            YAHOO.log("using setTimeout for deferred error.", "info", "TestRunner");
             // Make sure we caught the error and all callbacks fired.
-            Assert.isTrue(caughtError);
-        }, 10);
+            Assert.areSame(msg, caughtError);
+        }
     }
 });
-
 
 var logger = new YAHOO.tool.TestLogger("testLogger");
 

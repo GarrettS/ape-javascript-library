@@ -23,16 +23,8 @@ var Assert = YAHOO.util.Assert,
 
 var eventPublisherTest = new YAHOO.tool.TestCase({
 
-    //name of the test case - if not provided, one is auto-generated
     name : "EventPublisher tests",
     
-    //---------------------------------------------------------------------
-    // setUp and tearDown methods - optional
-    //---------------------------------------------------------------------
-    
-    /*
-     * Sets up data that is needed by each test.
-     */
     setUp : function() {
         testObject = {
             fire : function( ev ) {}
@@ -232,25 +224,9 @@ var eventPublisherTest = new YAHOO.tool.TestCase({
     testCleanUp : function() {
         
         var regItems = [];
-
-        var bodyClick = APE.EventPublisher.get( document.body, "onclick" );
-        bodyClick.add( function() { setTimeout('showTestResult( "s" )', 500); } );
-        bodyClick.add( function() { throw Error("bad (expected error)"); } );
-        bodyClick.add( function() { setResult('s'); } );
-
-        bodyClick.addBefore( function() { setTimeout('showTestResult( "sBefore" )', 500); } );
-        bodyClick.addBefore( function() { throw Error("bad before (expected error)"); } );
-        bodyClick.addBefore( function() { setResult('sBefore'); } );
-
-        bodyClick.addAfter( function() { setTimeout('showTestResult( "sAfter" )', 500); } );
-        bodyClick.addAfter( function() { throw Error("bad after (expected error)"); } );
-        bodyClick.addAfter( function(){ setResult("sAfter"); } );
-
         // unregister all callbacks.
-        APE.EventPublisher.cleanUp();
-        
-        Assert.isNull(document.body.onclick);
-    },
+        APE.EventPublisher.cleanUp();       
+   },
 
     // Test to make sure all event callbacks fire,
     // even after an error occurred.
@@ -301,7 +277,7 @@ var eventPublisherTest = new YAHOO.tool.TestCase({
             YAHOO.util.ArrayAssert.itemsAreEqual([cb, errBack, cb2], order);
         }
         this.wait(deferredSegment, 10);
-     }
+     }        
 });
 
 // 
