@@ -1,30 +1,22 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
-        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
-<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
 <title>DOM positioning Test</title>
+<link rel="stylesheet" type="text/css" href="../../yui-test/build/logger/assets/logger.css">
+<link rel="stylesheet" type="text/css" href="../../yui-test/assets/testlogger.css">
 
-<link rel="stylesheet" type="text/css"
-	href="../../yui-test/build/logger/assets/logger.css" />
-<link rel="stylesheet" type="text/css"
-	href="../../yui-test/build/yuitest/assets/yuitest.css" />
-<link rel="stylesheet" type="text/css"
-	href="../../yui-test/assets/testlogger.css" />
-
-<script type="text/javascript"
-	src="../../yui-test/build/yahoo-dom-event/yahoo-dom-event.js"></script>
-<script type="text/javascript"
-	src="../../yui-test/build/logger/logger.js"></script>
-<script type="text/javascript"
-	src="../../yui-test/build/yuitest/yuitest-beta.js"></script>
+<script type="text/javascript" src="../../yui-test/build/yahoo-dom-event/yahoo-dom-event.js"></script>
+<script type="text/javascript" src="../../yui-test/build/logger/logger.js"></script>
+<script type="text/javascript" src="../../yui-test/build/yuitest/yuitest-beta.js"></script>
 
 <script type="text/javascript" src="../../../build/APE.js"></script>
 <script type="text/javascript" src="../../../build/aop/Advice.js"></script>
 <script type="text/javascript" src="../../../build/dom/constants.js"></script>
 <script type="text/javascript" src="../../../build/dom/position-f.js"></script>
-
 </head>
+
 <body style="position: relative; margin: 0; padding: 0;">
 <div id="testLogger" style="position: absolute"></div>
 <!-- In IE, a relatively positioned descendant gets position offset by font-size! -->
@@ -94,931 +86,947 @@ scrollbars to appear on scrolledInner.parentNode</div>
 			</div>
 			</div>
 			<script type="text/javascript">
-setTimeout(function(){
-
-var el = document.getElementById('scrolledInner');
-el.parentNode.scrollLeft = 10;
-document.body.style.position = "static";
-//alert(el.parentNode.scrollLeft); // => 0.
-
-
-var container = document.getElementById("container"),
-	target = document.getElementById("target"),
-	c1 = document.getElementById("c1"),
-
-	// Save original state in template.
-    template = container.innerHTML,
-    containerCssText = container.style.cssText,
-    htmlCssText = document.documentElement.style.cssText,
-    bodyCssText = document.body.style.cssText;
-
-var Assert = YAHOO.util.Assert,
-    dom = APE.dom;
-
-// This test is special in that it's copied, then the setUp method is 
-// AOPized with after advice to scroll the window.
-var positionTestCase = new YAHOO.tool.TestCase({
-
-    name : "getOffsetCoords Test",
-    
-    setUp : function () {
-	    scrollTo(0, 0);
-    },
-
-    _should : {
-
-        ignore : {
-        // This is a case that is not currently supported. 
-        // I'd like to add support for it, but don't know how.
-            testTargetRelativeContainerStatic : true,
-
-        // This test should be ignored because Webkit and FF3 
-        // use device pixels, not CSS Pixel.
-        // http://lists.w3.org/Archives/Public/www-style/2008Jul/0020.html
-            testGetOffsetLeftFloatingPointEM : true,
-
-        // target is positioned from the top/left of it's parent's line-box text area;
-        // excluding parent's leading, which CANNOT BE CALCULATED.
-            testTargetInlineRel : true,
-
-        // testFixedTarget Fails in chrome when viewport has scroll. 
-        // Why ignore? If the element is fixed position, 
-        // find its position with getStyle(target, "top").
-            testFixedTarget : true
-        }
-    },
-
-    tearDown : function () {
-        document.body.style.cssText = bodyCssText;
-        document.documentElement.style.cssText = htmlCssText;
-        // Mozilla needs this before setting cssText.
-        container.scrollLeft = container.scrollTop = 0; 
-        container.style.cssText = containerCssText;
-        container.innerHTML = template;
-
-        // Update view for Safari 2.0.4 
-        // (or other browsers that may exhibit bug).
-        try {
-            resizeBy(1,0);
-            resizeBy(-1,0);
-        } catch(ex){}
-    },
-    
-    //Test methods ---------------------------------------------------------------------
-    
-    testIsInsideElement : function() {
-        var target = document.getElementById("target");
-        var c1 = document.getElementById("c1");
-        Assert.isTrue( APE.dom.isInsideElement(target, c1) );
-    },
-    
-    testIsInsideElementFail : function() {
-        var target = document.getElementById("target");
-
-        // target is top: 6; height: 1;
-        target.style.top = "6px";
-        var c1 = document.getElementById("c1");
-        Assert.isFalse( APE.dom.isInsideElement(target, c1) );
-    },
-    
-    isAboveElement : function() {
-        var target = document.getElementById("target");
-        target.style.top = "2px";
-        var c1 = document.getElementById("c1");
-        Assert.isTrue( APE.dom.isAboveElement(target, c1) );
-    },
-    
-    isAboveElementFail : function() {
-        var target = document.getElementById("target");
-        target.style.top = "3px";
-        var c1 = document.getElementById("c1");
-        Assert.isFalse( APE.dom.isAboveElement(target, c1) );
-    },
-    
-    isBelowElement : function() {
-        var target = document.getElementById("target");
-        target.style.top = "4px";
-        var c1 = document.getElementById("c1");
-        Assert.isTrue( APE.dom.isAboveElement(target, c1) );
-    },
-    
-    isBelowElementFail : function() {
-        var target = document.getElementById("target");
-        target.style.top = "3px";
-        var c1 = document.getElementById("c1");
-        Assert.isFalse( APE.dom.isAboveElement(target, c1) );
-    },
-    
-    testGetOffsetTop : function() {
-        var target = document.getElementById("target");
-        var offsetTop = dom.getOffsetCoords( target, container ).y;
-        // 5: adds c1 + target.
-        Assert.areEqual( 5, offsetTop );
-    },
-    
-    // Make sure we can pass in coords to 
-    // have them become updated.
-    testGetOffsetTopCachedCoords : function() {
-        var target = document.getElementById("target");
-        var coords = {x: 0, y:0};
-        dom.getOffsetCoords( target, container, coords );
-        // 5: adds c1 + target.
-        Assert.areEqual( 5, coords.y );
-    },
-    
-    testGetBottomRight : function() {
-        var target = document.getElementById("target");
-        var c1 = document.getElementById("c1");
-        target.style.bottom = target.style.right = 
-            target.style.margin = "0";
-        target.style.width = target.style.height = "10px";
-        target.style.left = target.style.top = "auto";
-        target.style.position = "absolute";
-
-        var ps = c1.style;
-        ps.height = ps.width = "100px";
-        ps.position = "absolute";
-
-        var coords = dom.getOffsetCoords( target, c1 );
-        
-        Assert.areEqual(90, coords.x, 'x was wrong');
-        Assert.areEqual(90, coords.y, 'y was wrong');
-
-    },
-
-    testGetOffsetTopRel : function() {
-        var target = document.getElementById("target");
-        target.style.position = "relative";
-        var offsetTop = dom.getOffsetCoords( target, container ).y;
-        // 5: adds c1 + target.
-        Assert.areEqual( 5, offsetTop );
-    },
-    
-    testBodyRelContainerRel : function() {
-        container.style.position = "relative";
-        container.style.top = "12px";
-        container.style.left = "3px";
-
-        var ds = document.body.style;
-        ds.position = "relative";
-        ds.margin = "11px";
-
-        var offsetCoords = dom.getOffsetCoords( container, container.parentNode );
-
-        Assert.areEqual( 12, offsetCoords.y );
-        Assert.areEqual( 3, offsetCoords.x );
-    },
-    
-    testGetOffsetLeftFloatingPointEM : function() {
-        var target = document.getElementById("target");
-        var c1 = document.getElementById("c1");
-
-        // Any larger and Opera will fail.
-        var fontSize = 77,
-            emSize = 1.18;
-        document.documentElement.style.fontSize = 
-        document.body.style.fontSize = 
-            c1.style.fontSize = 
-            container.style.fontSize = 
-            target.style.fontSize = fontSize + "px";
-
-        container.style.borderLeft = 
-        c1.style.borderLeft = emSize + "em solid red";
-        
-        var expectedBorderWidth = (fontSize * emSize);
-        var borderLeftWidth = parseFloat(c1.clientLeft || getComputedStyle(c1,'').borderLeftWidth);
-
-        // This is an assertion of the browser, not getOffsetCoords.
-        // The purpose is to show that some browsers miscalculate EM units.
-        if(Math.round(borderLeftWidth) - Math.round(expectedBorderWidth) > 0) {// allow off by less than 1.
-            Assert.areEqual(expectedBorderWidth, borderLeftWidth, 'This browser miccalculated ems.');
-        }
-        target.style.marginLeft = emSize + "em";
-        target.style.left = 0;
-        var expected = Math.round(expectedBorderWidth * 3);
-        var actual = dom.getOffsetCoords(target);
-        if(expected === actual.x + 3)
-            YAHOO.log("your browser floored the value for border width when set in em units. (loss of precision).", 
-            'warn', "TestLogger");
-        Assert.areEqual(expected, actual.x, "getting computed coords from EM values failed.");
-    },
-
-    testGetOffsetLeft : function() {
-        document.body.style.width="1000px";
-        var target = document.getElementById("target");
-        var offsetLeft = dom.getOffsetCoords( target, container ).x;
-        Assert.areEqual( 1, offsetLeft );
-    },
-
-    testGetOffsetCoords : function() {
-        var target = document.getElementById("target");
-        var coords = dom.getOffsetCoords( target );
-        Assert.areEqual( 1 , coords.x );
-        Assert.areEqual( 3 + 2, coords.y );
-    },
-
-    testScrolledInner : function() {
-        var inner = document.getElementById("scrolledInner");
-        inner.parentNode.scrollLeft = 10;
-        inner.parentNode.scrollTop = 20;
-
-        // IE needs update view after setting scrollXXX, before checking.
-        this.wait(function(){      
-            var coords = dom.getOffsetCoords( inner, container );
-            Assert.areEqual( -10 + (2 + 3) , coords.x, "coords.x was wrong" );
-            Assert.areEqual( -20 + (1 + 2), coords.y, "coords.y was wrong" );
-        }, 40);
-    },
-
-    testBodyRelMargin : function() {
-        var target = document.getElementById("target");
-        var bs = document.body.style;
-        bs.margin = "21px";
-        bs.position = "relative";
-
-        var coords = dom.getOffsetCoords( target );
-        Assert.areEqual( 1 + 21 , coords.x );
-        Assert.areEqual( 3 + 2 + 21, coords.y );
-    },
-
-    testDocumentElementPaddingContainerDocument : function() {
-        var ds = document.documentElement.style;
-        ds.padding = "10px";
-        document.body.style.position = "static";
-
-        var c = document.getElementById('container');
-        c.style.top = c.style.left = '2px';
-        c.style.position = 'relative';
-
-        var coords = dom.getOffsetCoords(c);
-        Assert.areEqual(12, coords.x);
-    },
-
-    testDocumentElementPaddingContainerDocumentBodyRelative : function() {
-        var ds = document.documentElement.style;
-        ds.padding = "10px";
-        document.body.style.position = "relative";
-
-        var c = document.getElementById('container');
-        c.style.top = c.style.left = '2px';
-        c.style.position = 'relative';
-
-        var coords = dom.getOffsetCoords(c);
-        Assert.areEqual(12, coords.x);
-    },
-
-// Everyone needs attention here.
-    testDocumentElementPaddingContainerBody : function() {
-        var ds = document.documentElement.style;
-        ds.padding = "10px";
-        document.body.style.position = "static";
-
-        var c = document.getElementById('container');
-        c.style.top = c.style.left = '2px';
-        c.style.position = 'relative';
-
-        var coords = dom.getOffsetCoords(c, document.body);
-        Assert.areEqual(2, coords.x);
-    },
-
-    testBodyPaddingContainerBody : function() {
-        document.body.style.position = "static";
-        document.body.style.padding = "10px";
-
-        var c = document.getElementById('container');
-        c.style.top = c.style.left = '2px';
-        c.style.position = 'relative';
-
-        var coords = dom.getOffsetCoords(c, document.body);
-        Assert.areEqual(12, coords.x);
-    },
-
-    testBodyPaddingContainerBodyRelative : function() {
-        document.body.style.position = "relative";
-        document.body.style.padding = "10px";
-
-        var c = document.getElementById('container');
-        c.style.top = c.style.left = '2px';
-        c.style.position = 'relative';
-
-        var coords = dom.getOffsetCoords(c, document.body);
-        Assert.areEqual(12, coords.x);
-    },
-
-    testBodyPaddingContainerDocumentBodyRelative : function() {
-        document.body.style.position = "relative";
-        document.body.style.padding = "10px";
-
-        var c = document.getElementById('container');
-        c.style.top = c.style.left = '2px';
-        c.style.position = 'relative';
-
-        var coords = dom.getOffsetCoords(c, document.body);
-        Assert.areEqual(12, coords.x);
-    },
-
-    testBodyPaddingTargetAbsoluteContainerDocument : function() {
-        document.body.style.position = "relative";
-        document.body.style.padding = "10px";
-
-        var c = document.getElementById('container');
-        c.style.top = c.style.left = '2px';
-
-        var coords = dom.getOffsetCoords(c, document.body);
-        Assert.areEqual(2, coords.x);
-    },
-
-    testDocumentElementPaddingContainerDocumentElement : function() {
-        var ds = document.documentElement.style;
-
-        ds.padding = "10px";
-        document.body.style.position = "static";
-
-        var c = document.getElementById('container');
-        c.style.top = c.style.left = '2px';
-        c.style.position = 'relative';
-
-        var coords = dom.getOffsetCoords(c, document.documentElement);
-        Assert.areEqual(12, coords.x);
-    },
-
-    testDocumentElementPaddingContainer : function() {
-        document.documentElement.stylepadding = "10px";
-        document.body.style.position = "static";
-
-        var c = document.getElementById('container');
-        c.style.top = c.style.left = '2px';
-        c.style.position = 'relative';
-
-        // IE needs to wait a millisecond.
-        this.wait(function(){
-            var c1 = document.getElementById('c1');
-            c1.style.position = "relative";
-            c1.style.top = "8px";
-            c.style.lineHeight = "0";
-            c1.style.left = "3px";
-
-            var coords = dom.getOffsetCoords(c1, c);
-            Assert.areEqual(3, coords.x);
-            Assert.areEqual(8, coords.y);
-        },1);
-    },
-
- // Opera needs attention here.
-    testDocumentElementPaddingContainerBodyRelative : function() {
-        var ds = document.documentElement.style;
-        ds.padding = "10px";
-        document.body.style.position = "relative";
-
-        var c = document.getElementById('container');
-        c.style.top = c.style.left = '2px';
-        c.style.position = 'relative';
-
-        var coords = dom.getOffsetCoords(c, document.body);
-        Assert.areEqual(2, coords.x);
-    },
-
-    testDocumentElementMarginContainerBody : function() {
-        var ds = document.documentElement.style;
-        ds.margin = "10px";
-        document.body.style.position = "static";
-
-        var c = document.getElementById('container');
-        c.style.top = c.style.left = '2px';
-        c.style.position = 'relative';
-
-        var coords = dom.getOffsetCoords(c, document.body);
-        Assert.areEqual(2, coords.x);
-    },
-    
-    testBodyRelMarginRelLastParentRel : function() {
-        var container = document.getElementById("container");
-        var c1 = document.getElementById("c1");
-        var target = document.getElementById("target");
-        var bs = document.body.style;
-        bs.margin = "21px";
-        bs.position = "relative";
-        container.style.position = "relative";
-
-        var coords = dom.getOffsetCoords( container );
-
-        Assert.areEqual( 21 , coords.x );
-        Assert.areEqual( 21, coords.y );
-    },
-
-    testTargetRelativeContainerStatic : function() {
-        var target = document.getElementById("target");
-        target.style.top = "7px";
-        target.style.margin = "0";
-        target.style.position = "relative";
-        var c1 = document.getElementById("c1");
-        c1.style.position = "static";
-
-        document.body.style.fontSize = document.body.style.lineHeight =
-            c1.style.padding = c1.style.fontSize = c1.style.lineHeight = "0";
-
-        c1.style.margin='10px';
-
-        var coords = dom.getOffsetCoords( target, c1 );
-        Assert.areEqual(  7 , coords.y );
-    },
-
-    testBodyRelMarginNestedLastParentStatic : function() {
-        var target = document.getElementById("target");
-        target.style.top = "7px";
-        target.style.margin = "0";
-
-        var c1 = document.getElementById("c1");
-        c1.style.position = "relative";
-        c1.style.margin = c1.style.top = "0";
-
-        var container = document.getElementById("container");
-        var cs = container.style;
-        container.style.lineHeight = 0;
-        cs.position = "static";
-        cs.top = "0";
-
-        var bs = document.body.style;
-        bs.position = "relative";
-        bs.marginTop = "11px";
-
-        var coords = dom.getOffsetCoords( target );
-        Assert.areEqual(  18 , coords.y );
-    },
-
-    testBodyRelNestedChildAbsoluteContainer : function() {
-        var container = document.getElementById('container');
-        container.style.top = "0";
-        document.body.style.position = "relative";
-        document.body.style.margin = "12px";
-
-        var c1 = document.getElementById('c1');
-        c1.style.top = c1.style.left = "6px";
-
-        var coords = dom.getOffsetCoords( c1, container );
-        Assert.areEqual(  6 , coords.x );
-        Assert.areEqual(  6 , coords.y );
-    },
-
-    testBodyRelChildStatic : function() {
-        var container = document.getElementById('container');
-        container.style.position = "static";
-        document.body.style.position = "relative";
-        document.body.style.margin = "12px";
-
-        var coords = dom.getOffsetCoords( container );
-        Assert.areEqual(  12 , coords.x );
-        Assert.areEqual(  12 , coords.y );
-    },
-
-    testContainerPadding : function() {
-        var container = document.getElementById('container');
-        container.style.padding = "12px";
-        container.style.lineHeight = "0";
-
-        var c1 = document.getElementById('c1');
-        c1.style.position = "relative";
-        c1.style.top = c1.style.left = "0";
-        
-        var coords = dom.getOffsetCoords( c1, container );
-        Assert.areEqual(  12 , coords.x );
-        Assert.areEqual(  12 , coords.y );
-    },
-
-    testBodyAbsMargin : function() {
-        var target = document.getElementById("target");
-        target.style.position="relative";
-        var bs = document.body.style;
-
-        // computed font size: 10px * 2.1 = 21px;
-        bs.fontSize = "10px";
-        bs.left = "2.1em";
-        bs.top = "2.1em";
-
-        bs.position = "absolute";
-
-        // Cause IE to pause so scroll is updated.
-        // Otherwise, IE may scroll the window asynchronously,
-        // which can result in inaccurate results.
-        this.wait(function(){
-            var coords = dom.getOffsetCoords( target  );
-            Assert.areEqual( 1 + 21 , coords.x );
-            Assert.areEqual( 3 + 2 + 21, coords.y );
-        }, 40); 
-    },
-
-    testBodyStatMargin : function() {
-        var target = document.getElementById("target");
-
-        // Target is in normal flow; it's parentNode, c1, is not,
-        // so body's margin's are irrelevant here;
-        target.style.position="relative";
-        target.style.color='red';
-        var bs = document.body.style;
-
-        // computed font size: 10px * 2.1 = 21px;
-        bs.fontSize = "10px";
-        bs.marginLeft = "2.1em";
-        bs.marginTop = "2.1em";
-
-        bs.position = "static";
-        var coords = dom.getOffsetCoords( target  );
-        Assert.areEqual( 1, coords.x );
-        Assert.areEqual( 3 + 2, coords.y );
-    },
-
-    testBodyStatMarginFirstChild : function() {
-        var container = document.getElementById("container");
-
-        // Target is in normal flow; it's parentNode, c1, is not,
-        // so body's margin's are irrelevant here;
-        container.style.position="relative";
-        container.style.color='red';
-        var bs = document.body.style;
-
-        // computed font size: 10px * 2.1 = 21px;
-        bs.fontSize = "10px";
-        bs.marginLeft = "2.1em";
-        bs.marginTop = "2.1em";
-
-        bs.position = "static";
-        var coords = dom.getOffsetCoords( container );
-        Assert.areEqual( 21, coords.x );
-        Assert.areEqual( 21, coords.y );
-    },
-
-    testTargetC1Border : function() {
-        
-        var target = document.getElementById("target");
-        target.style.position="relative";
-        var c1 = document.getElementById("c1");
-        c1.style.border="10px solid red";
-
-        var coords = dom.getOffsetCoords( target, undefined, {}  );
-        Assert.areEqual( 10 + 3 + 2, coords.y );
-    },
-
-    testAbsinRel : function() {
-        var target = document.getElementById("target");
-        target.style.top = "100px";
-        var c1 = document.getElementById("c1");
-        c1.style.position="relative";
-        c1.style.border="10px solid red";
-
-        c1.parentNode.style.fontSize=c1.parentNode.style.lineHeight = "0";
-        var coords = dom.getOffsetCoords( target, undefined, {}  );
-        Assert.areEqual( 100 + 10 + 2, coords.y );
-    },
-
-    testStaticBodyAbsChildAuto : function() {
-        var container = document.getElementById("container");
-
-        container.style.cssText = "position:absolute; height: 12px; width: 100px;";
-        var bs = document.body.style;
-        bs.cssText = "position: static; border: 5px solid; margin:0; font-size:0; height: 600px; padding: 10px;";
-        var ls = document.getElementById('testLogger').style;
-        var lsp = ls.position;
-        ls.position="absolute";
-        var coords = dom.getOffsetCoords( container );
-        ls.position = lsp;
-        Assert.areEqual(15, coords.y);
-    },
-
-    testTargetC1Overflow : function() {
-        var target = document.getElementById("target");
-        target.style.position="relative";
-
-        var c1 = document.getElementById("c1");
-        c1.style.overflow="hidden";
-
-        var coords = dom.getOffsetCoords( target, document, {}  );
-        Assert.areEqual( 3 + 2, coords.y );
-
-        container.style.overflow="scroll";
-        var coords = dom.getOffsetCoords( target, document, coords  );
-        Assert.areEqual( 3 + 2, coords.y, "container was overflow: scroll");
-    },
-
-    testNestedScrolledDivs : function() {
-        var target = document.getElementById("target");
-        target.style.position="relative";
-
-        target.style.height = "500px";
-        target.style.width = "500px";
-        var c1 = document.getElementById("c1");
-        c1.style.overflow="scroll";
-        c1.style.height = "200px";
-        c1.style.width = "200px";
-        
-        var container = document.getElementById('container');
-        container.style.overflow = "scroll";
-        container.style.height = "100px";
-        container.style.width = "100px";
-
-        container.scrollTop = 10;
-        container.scrollLeft = 10;
-
-        c1.scrollTop = 30;
-        c1.scrollLeft = 30;
-
-        // IE needs update view after setting scrollXXX, before checking.
-        this.wait(function(){
-            var coords = dom.getOffsetCoords( target, document, {}  );
-            Assert.areEqual( 3 + 2 + -10 + -30 , coords.y, "y coords wrong." );
-            Assert.areEqual( 1 + -10 + -30 , coords.x, "x wrong" );
-        }, 50);
-    },
-
-    testTargetInlineRel : function() {
-
-        // XXX Fails in Firefox 3.
-        // http://meyerweb.com/eric/thoughts/2008/05/06/line-height-abnormal/
-
-        var target = document.getElementById("target");
-        
-        // target is positioned from the top/left of it's parent's line-box text area;
-        // excluding leading, which CANNOT BE CALCULATED.
-        target.parentNode.style.cssText = 
-          "position:absolute; top: 2px;left: 1px; height: 100px;padding:0;line-height: 0;font-size: 12px;";
-        target.style.cssText = "position: relative; display: inline; top: 3px;font-size: 12px";
-
-        // Cause Mozilla to pause so target's offsetTop is updated.
-        // Otherwise, it's offsetTop won't update soon enough.
-        this.wait(function(){
-            var coords = dom.getOffsetCoords( target, document, coords  );
-            Assert.areEqual( 3 + 2, coords.y, "target was display: inline; position: relative");
-        }, 40); 
-    },
-
-    testTargetInlineAbs : function() {
-
-        // XXX Fails in Firefox 3.
-        // http://meyerweb.com/eric/thoughts/2008/05/06/line-height-abnormal/
-
-        var target = document.getElementById("target");
-        
-        target.parentNode.style.cssText = 
-          "position:absolute; top: 2px;left: 1px; height: 100px;padding:0;line-height: 0;font-size: 12px;";
-        target.style.cssText = "position:absolute; display: inline; top: 3px;font-size: 12px";
-
-        // Cause Mozilla to pause so target's offsetTop is updated.
-        // Otherwise, it's offsetTop won't update soon enough.
-        this.wait(function(){
-            var coords = dom.getOffsetCoords( target, document, coords  );
-            Assert.areEqual( 3 + 2, coords.y, "target was display: inline; position: relative");
-        }, 40); 
-    },
-
-    testTargetBodyBorder : function() {
-        var target = document.getElementById("target");
-        target.style.position="relative";
-        target.style.color="green";
-
-        document.body.style.position="relative";
-        document.body.style.border="10px solid red";
-
-        var coords = dom.getOffsetCoords( target, undefined, {}  );
-        Assert.areEqual( 10 + 3 + 2, coords.y );
-    },
-
-    testTargetBodyTop : function() {                
-        var target = document.getElementById("target");
-        target.style.position="relative";
-
-        document.body.style.position="relative";
-        document.body.style.top="10px";
-
-        var coords = dom.getOffsetCoords( target, document, {}  );
-        Assert.areEqual( 10 + 3 + 2, coords.y );
-    },
-
-    testTargetBodyTopToBody : function() {        
-        var target = document.getElementById("target");
-        target.style.position="relative";
-
-        document.body.style.top="10px";
-        var coords = dom.getOffsetCoords( target, document.body, {}  );
-        Assert.areEqual(  3 + 2, coords.y );
-    },
-
-    testFloat : function() {
-        var target = document.getElementById("target");
-        var c1 = document.getElementById("c1");
-        c1.style.width = "400px";
-        c1.style.padding="0";
-        target.style.width = "200px";
-        target.style.padding = target.style.margin = target.style.border = "0";
-        target.style.position="";
-        target.style.cssFloat = "right";
-        target.style.styleFloat = "right";
-        var coords = dom.getOffsetCoords(target);
-        YAHOO.log("left: " + target.offsetLeft, "info", "TestLogger");
-        Assert.areEqual(200, coords.x);
-    },
- 
-    testContainerRelativeBodyStaticBorder : function() {        
-        document.body.style.position = "static";
-        document.body.style.border = "10px solid red";
-        
-        var cont = document.getElementById('container');
-        var cs = cont.style;
-        cs.position = "relative";
-        cs.top = '11px';
-        cs.left = '3px';
-
-        var coords = dom.getOffsetCoords( container, undefined, {}  );
-        YAHOO.log("offsetTop: " + cont.offsetTop, "info", "TestLogger");
-        Assert.areEqual( 21, coords.y );
-        Assert.areEqual( 13, coords.x );
-    },
-
-    testFixedTarget : function() {
-        var target = document.getElementById('target');
-        target.style.position = 'fixed';
-        var coords = dom.getOffsetCoords( target );
-        Assert.areEqual( 3 + document.documentElement.scrollTop, coords.y );
-    },
-    
-    testFixedContainer : function() {
-        var target = document.getElementById('target'),
-            container = document.getElementById('container');
-        container.style.position = 'fixed';
-        container.style.top = "10px";
-        var coords = dom.getOffsetCoords( target, container );
-        Assert.areEqual( 5, coords.y );
-    },
-
-    testContainerBodyStaticBorder : function() {        
-        document.body.style.position="static";
-        document.body.style.border = "10px solid red";
-        
-        var cont = document.getElementById('container');
-        var cs = cont.style;
-        cs.position = "absolute";
-        cs.top = '11px';
-        cs.left = '3px';
-
-        var coords = dom.getOffsetCoords( container, undefined, {}  );
-        YAHOO.log("offsetTop: " + cont.offsetTop, "info", "TestLogger");
-        Assert.areEqual( 11, coords.y );
-        Assert.areEqual( 3, coords.x );
-    },
-
-    testThroughStaticContainer : function() {
-        var cont = document.getElementById('container');
-        var target = document.getElementById('target');
-        var c1 = document.getElementById('c1');
-        target.style.cssText = c1.style.cssText = cont.style.cssText = "";
-
-        // XXX Fails in Firefox 3 if display is inline.
-        // http://meyerweb.com/eric/thoughts/2008/05/06/line-height-abnormal/
-
-        target.style.display = "block";
-        c1.style.position = target.style.position = "static";
-        cont.style.position = "absolute";
-        c1.style.border = "10px solid";
-
-        document.getElementById('overlapping').style.display = 'none';
-        var coords = dom.getOffsetCoords( target, cont );
-        Assert.areEqual(10, coords.y, 'y');
-        Assert.areEqual(10, coords.x, 'x');
-    },
-
-    testTargetToParentBorder : function(){
-        var target = document.getElementById('target');
-        var c1 = document.getElementById('c1');
-        
-        // XXX Fails in Firefox 3 if display is inline.
-        // http://meyerweb.com/eric/thoughts/2008/05/06/line-height-abnormal/
-
-        target.style.display = "block";
-        target.style.top = "0";
-        target.style.left = "-2px";
-        c1.style.border = "10px solid";
-
-        document.getElementById('overlapping').style.display = 'none';
-        var coords = dom.getOffsetCoords( target, c1 );
-        Assert.areEqual(0, coords.y, 'y coord wrong');
-        Assert.areEqual(-2, coords.x, 'x coord wrong');
-    },
-    
-    testDivInTD : function() {
-        var div = document.getElementById("testdiv");
-        var coords = dom.getOffsetCoords( div, undefined, {}  );
-        var tableWidth = 400;
-        var tableLeft = 100;
-        var tdPadding = 5;
-
-        Assert.areEqual( tableLeft + tableWidth/2 + tdPadding, coords.x );
-    },
-
-    testDivInTDinScrolledDivInTD : function() {
-
-        var div = document.getElementById("innerDiv");
-        div.borderSpacing="0";
-        div.padding="0";
-        div.style.border="1px solid red";
-        div.style.width="100px";
-        div.style.height="100px";
-
-        var testdiv = document.getElementById("testdiv");
-        testdiv.style.height = "20px";
-        testdiv.style.width = "20px";
-        testdiv.style.overflow = "scroll";
-        testdiv.style.position = "relative";
-
-        // xxx Mozilla needs this to be set 
-        // after there is overflow-able content.
-        // otherwise, setting scrollLeft will fail.
-        testdiv.scrollLeft = 10;
-        // alert(testdiv.scrollLeft)        
-		this.wait(function(){
-        var coords = dom.getOffsetCoords( div, null, {}  );
-        var tableWidth = 400;
-        var tableLeft = 100;
-        var tdPadding = 5;
-        Assert.areEqual( -10 + tdPadding + (tableLeft + tableWidth/2), coords.x );
-        }, 50);
-    },
-
-    testTD : function() {
-        var div = document.getElementById("testcell");
-        var coords = dom.getOffsetCoords( div, undefined, {}  );
-        var tableWidth = 400;
-        var tableLeft = 100;
-
-        Assert.areEqual( tableLeft + tableWidth/2, coords.x );
-    },
-
-    testTableInScrolledContainer : function() {
-        var div = document.getElementById("testcell");
-        var tableContainer = document.getElementById('tableContainer');
-
-        var divTop = dom.getOffsetCoords( div, undefined, {}  ).y;
-
-        tableContainer.style.overflow = "scroll";
-        tableContainer.scrollLeft = 30;
-        tableContainer.scrollTop = 30;
-
-        var coords = dom.getOffsetCoords( div, undefined, {}  );
-        var tableWidth = 400;
-        var tableLeft = 100;
-
-        Assert.areEqual( -30 + (tableLeft + tableWidth/2), coords.x );
-
-        // make sure we get a value that is -30 of before.
-        Assert.areEqual( -30 + (divTop), coords.y );
-    },
-
-    testInlineTableIfSupported : function() {
-        var div = document.getElementById("testcell");
-        var tableContainer = document.getElementById('tableContainer');
-        var table = tableContainer.getElementsByTagName("table")[0];
-
-        try {
-            tableContainer.style.overflow = "scroll";
-            tableContainer.scrollLeft = 20;
-            table.style.display  = "inline-table";
-        }
-        catch(ex) {
-            YAHOO.log("this browser doesn't support display: inline-table", 'warn', 'TestRunner');
-        }
-
-        var coords = dom.getOffsetCoords( div, undefined, {}  );
-        var tableWidth = 400;
-        var tableLeft = 100
-
-        Assert.areEqual( -20 + (tableLeft + tableWidth/2), coords.x );
-    }
-});
-
-// Copy of test case.
-var scrolledPositionTestCase = new YAHOO.tool.TestCase(positionTestCase);
-// After setUp(), scroll the window.
-APE.aop.Advice.addAfter(scrolledPositionTestCase, "setUp", function() {
-    scrollTo(10, 100);
-    // Logger does not save state, so I hack it here. 
-    if(location.search.indexOf("info") >= 0) 
-    YAHOO.log("scrollTo(10, 100)", "info", "TestRunner");
-});
-APE.aop.Advice.addBefore(window, "scrollTo", function() {
-    if(location.search.indexOf("info") >= 0) 
-        YAHOO.log("scrollTo(" + Array.prototype.join.call(arguments) + ")", "info", "TestRunner");
-});
-scrolledPositionTestCase.name = "Scrolled Position Test Case";
-
-//create the logger.
-var logger = new YAHOO.tool.TestLogger("testLogger");
-YAHOO.tool.TestRunner.add( positionTestCase );
-YAHOO.tool.TestRunner.add( scrolledPositionTestCase );
-
-// run the tests, or put them in the TestRunner.
-if (parent && parent != window) {
-    YAHOO.tool.TestManager.load();
-} else {
-    YAHOO.tool.TestRunner.run();
-}
-}, 200);
+onload = function(){
+
+	var el = document.getElementById('scrolledInner');
+	el.parentNode.scrollLeft = 10;
+	document.body.style.position = "static";
+	//alert(el.parentNode.scrollLeft); // => 0.
+	
+	
+	var container = document.getElementById("container"),
+		target = document.getElementById("target"),
+		c1 = document.getElementById("c1"),
+	
+		// Save original state in template.
+	    template = container.innerHTML,
+	    containerCssText = container.style.cssText,
+	    htmlCssText = document.documentElement.style.cssText,
+	    bodyCssText = document.body.style.cssText;
+	
+	var Assert = YAHOO.util.Assert,
+	    dom = APE.dom,
+	    IGNORE_SCROLL_TESTCASES = !dom.IS_SCROLL_SUPPORTED;
+	
+	// This test is special in that it's copied, then the setUp method is 
+	// AOPized with after advice to scroll the window.
+	var positionTestCase = new YAHOO.tool.TestCase({
+	
+	    name : "getOffsetCoords Test",
+	    
+	    setUp : function () {
+		    scrollTo(0, 0);
+	    },
+	
+	    _should : {
+	
+	        ignore : {
+	        // This is a case that is not currently supported. 
+	        // I'd like to add support for it, but don't know how.
+	            testTargetRelativeContainerStatic : true,
+	
+	        // This test should be ignored because Webkit and FF3 
+	        // use device pixels, not CSS Pixel.
+	        // http://lists.w3.org/Archives/Public/www-style/2008Jul/0020.html
+	            testGetOffsetLeftFloatingPointEM : true,
+	
+	        // target is positioned from the top/left of it's parent's line-box text area;
+	        // excluding parent's leading, which CANNOT BE CALCULATED.
+	            testTargetInlineRel : true,
+	
+	        // testFixedTarget Fails in chrome when viewport has scroll. 
+	        // Why ignore? If the element is fixed position, 
+	        // find its position with getStyle(target, "top").
+	            testFixedTarget : true,
+
+	            // Many mobile browsers do not support overflow.
+	            // Blackberry9000 does not, and does not support 
+	            // scrollLeft, scrollTop.
+	            testScrolledInner : IGNORE_SCROLL_TESTCASES,
+	            testNestedScrolledDivs : IGNORE_SCROLL_TESTCASES,
+	            testTargetC1Overflow : IGNORE_SCROLL_TESTCASES,
+	            testNestedScrolledDivs : IGNORE_SCROLL_TESTCASES,
+	            testDivInTDinScrolledDivInTD : IGNORE_SCROLL_TESTCASES,
+	            testTableInScrolledContainer : IGNORE_SCROLL_TESTCASES,
+	            testInlineTableIfSupported : IGNORE_SCROLL_TESTCASES
+	        }
+	    },
+	
+	    tearDown : function () {
+	        document.body.style.cssText = bodyCssText;
+	        document.documentElement.style.cssText = htmlCssText;
+	        // Mozilla needs this before setting cssText.
+	        container.scrollLeft = container.scrollTop = 0; 
+	        container.style.cssText = containerCssText;
+	        container.innerHTML = template;
+	
+	        // Update view for Safari 2.0.4 
+	        // (or other browsers that may exhibit bug).
+	        try {
+	            resizeBy(1,0);
+	            resizeBy(-1,0);
+	        } catch(ex){}
+	    },
+	    
+	    //Test methods ---------------------------------------------------------------------
+	    
+	    testIsInsideElement : function() {
+	        var target = document.getElementById("target");
+	        var c1 = document.getElementById("c1");
+	        Assert.isTrue( APE.dom.isInsideElement(target, c1) );
+	    },
+
+	    testIsScrollSupported : function() {
+		    Assert.areSame("boolean", typeof dom.IS_SCROLL_SUPPORTED);
+	    },
+	    
+	    testIsInsideElementFail : function() {
+	        var target = document.getElementById("target");
+	
+	        // target is top: 6; height: 1;
+	        target.style.top = "6px";
+	        var c1 = document.getElementById("c1");
+	        Assert.isFalse( APE.dom.isInsideElement(target, c1) );
+	    },
+	    
+	    isAboveElement : function() {
+	        var target = document.getElementById("target");
+	        target.style.top = "2px";
+	        var c1 = document.getElementById("c1");
+	        Assert.isTrue( APE.dom.isAboveElement(target, c1) );
+	    },
+	    
+	    isAboveElementFail : function() {
+	        var target = document.getElementById("target");
+	        target.style.top = "3px";
+	        var c1 = document.getElementById("c1");
+	        Assert.isFalse( APE.dom.isAboveElement(target, c1) );
+	    },
+	    
+	    isBelowElement : function() {
+	        var target = document.getElementById("target");
+	        target.style.top = "4px";
+	        var c1 = document.getElementById("c1");
+	        Assert.isTrue( APE.dom.isAboveElement(target, c1) );
+	    },
+	    
+	    isBelowElementFail : function() {
+	        var target = document.getElementById("target");
+	        target.style.top = "3px";
+	        var c1 = document.getElementById("c1");
+	        Assert.isFalse( APE.dom.isAboveElement(target, c1) );
+	    },
+	    
+	    testGetOffsetTop : function() {
+	        var target = document.getElementById("target");
+	        var offsetTop = dom.getOffsetCoords( target, container ).y;
+	        // 5: adds c1 + target.
+	        Assert.areEqual( 5, offsetTop );
+	    },
+	    
+	    // Make sure we can pass in coords to 
+	    // have them become updated.
+	    testGetOffsetTopCachedCoords : function() {
+	        var target = document.getElementById("target");
+	        var coords = {x: 0, y:0};
+	        dom.getOffsetCoords( target, container, coords );
+	        // 5: adds c1 + target.
+	        Assert.areEqual( 5, coords.y );
+	    },
+	    
+	    testGetBottomRight : function() {
+	        var target = document.getElementById("target");
+	        var c1 = document.getElementById("c1");
+	        target.style.bottom = target.style.right = 
+	            target.style.margin = "0";
+	        target.style.width = target.style.height = "10px";
+	        target.style.left = target.style.top = "auto";
+	        target.style.position = "absolute";
+	
+	        var ps = c1.style;
+	        ps.height = ps.width = "100px";
+	        ps.position = "absolute";
+	
+	        var coords = dom.getOffsetCoords( target, c1 );
+	        
+	        Assert.areEqual(90, coords.x, 'x was wrong');
+	        Assert.areEqual(90, coords.y, 'y was wrong');
+	
+	    },
+	
+	    testGetOffsetTopRel : function() {
+	        var target = document.getElementById("target");
+	        target.style.position = "relative";
+	        var offsetTop = dom.getOffsetCoords( target, container ).y;
+	        // 5: adds c1 + target.
+	        Assert.areEqual( 5, offsetTop );
+	    },
+	    
+	    testBodyRelContainerRel : function() {
+	        container.style.position = "relative";
+	        container.style.top = "12px";
+	        container.style.left = "3px";
+	
+	        var ds = document.body.style;
+	        ds.position = "relative";
+	        ds.margin = "11px";
+	
+	        var offsetCoords = dom.getOffsetCoords( container, container.parentNode );
+	
+	        Assert.areEqual( 12, offsetCoords.y );
+	        Assert.areEqual( 3, offsetCoords.x );
+	    },
+	    
+	    testGetOffsetLeftFloatingPointEM : function() {
+	        var target = document.getElementById("target");
+	        var c1 = document.getElementById("c1");
+	
+	        // Any larger and Opera will fail.
+	        var fontSize = 77,
+	            emSize = 1.18;
+	        document.documentElement.style.fontSize = 
+	        document.body.style.fontSize = 
+	            c1.style.fontSize = 
+	            container.style.fontSize = 
+	            target.style.fontSize = fontSize + "px";
+	
+	        container.style.borderLeft = 
+	        c1.style.borderLeft = emSize + "em solid red";
+	        
+	        var expectedBorderWidth = (fontSize * emSize);
+	        var borderLeftWidth = parseFloat(c1.clientLeft || getComputedStyle(c1,'').borderLeftWidth);
+	
+	        // This is an assertion of the browser, not getOffsetCoords.
+	        // The purpose is to show that some browsers miscalculate EM units.
+	        if(Math.round(borderLeftWidth) - Math.round(expectedBorderWidth) > 0) {// allow off by less than 1.
+	            Assert.areEqual(expectedBorderWidth, borderLeftWidth, 'This browser miccalculated ems.');
+	        }
+	        target.style.marginLeft = emSize + "em";
+	        target.style.left = 0;
+	        var expected = Math.round(expectedBorderWidth * 3);
+	        var actual = dom.getOffsetCoords(target);
+	        if(expected === actual.x + 3)
+	            YAHOO.log("your browser floored the value for border width when set in em units. (loss of precision).", 
+	            'warn', "TestLogger");
+	        Assert.areEqual(expected, actual.x, "getting computed coords from EM values failed.");
+	    },
+	
+	    testGetOffsetLeft : function() {
+	        document.body.style.width="1000px";
+	        var target = document.getElementById("target");
+	        var offsetLeft = dom.getOffsetCoords( target, container ).x;
+	        Assert.areEqual( 1, offsetLeft );
+	    },
+	
+	    testGetOffsetCoords : function() {
+	        var target = document.getElementById("target");
+	        var coords = dom.getOffsetCoords( target );
+	        Assert.areEqual( 1 , coords.x );
+	        Assert.areEqual( 3 + 2, coords.y );
+	    },
+	
+	    testScrolledInner : function() {
+	        var inner = document.getElementById("scrolledInner");
+	        inner.parentNode.scrollLeft = 10;
+	        inner.parentNode.scrollTop = 20;
+	
+	        // IE needs update view after setting scrollXXX, before checking.
+	        this.wait(function(){      
+	            var coords = dom.getOffsetCoords( inner, container );
+	            Assert.areEqual( -10 + (2 + 3) , coords.x, "coords.x was wrong" );
+	            Assert.areEqual( -20 + (1 + 2), coords.y, "coords.y was wrong" );
+	        }, 40);
+	    },
+	
+	    testBodyRelMargin : function() {
+	        var target = document.getElementById("target");
+	        var bs = document.body.style;
+	        bs.margin = "21px";
+	        bs.position = "relative";
+	
+	        var coords = dom.getOffsetCoords( target );
+	        Assert.areEqual( 1 + 21 , coords.x );
+	        Assert.areEqual( 3 + 2 + 21, coords.y );
+	    },
+	
+	    testDocumentElementPaddingContainerDocument : function() {
+	        var ds = document.documentElement.style;
+	        ds.padding = "10px";
+	        document.body.style.position = "static";
+	
+	        var c = document.getElementById('container');
+	        c.style.top = c.style.left = '2px';
+	        c.style.position = 'relative';
+	
+	        var coords = dom.getOffsetCoords(c);
+	        Assert.areEqual(12, coords.x);
+	    },
+	
+	    testDocumentElementPaddingContainerDocumentBodyRelative : function() {
+	        var ds = document.documentElement.style;
+	        ds.padding = "10px";
+	        document.body.style.position = "relative";
+	
+	        var c = document.getElementById('container');
+	        c.style.top = c.style.left = '2px';
+	        c.style.position = 'relative';
+	
+	        var coords = dom.getOffsetCoords(c);
+	        Assert.areEqual(12, coords.x);
+	    },
+	
+	// Everyone needs attention here.
+	    testDocumentElementPaddingContainerBody : function() {
+	        var ds = document.documentElement.style;
+	        ds.padding = "10px";
+	        document.body.style.position = "static";
+	
+	        var c = document.getElementById('container');
+	        c.style.top = c.style.left = '2px';
+	        c.style.position = 'relative';
+	
+	        var coords = dom.getOffsetCoords(c, document.body);
+	        Assert.areEqual(2, coords.x);
+	    },
+	
+	    testBodyPaddingContainerBody : function() {
+	        document.body.style.position = "static";
+	        document.body.style.padding = "10px";
+	
+	        var c = document.getElementById('container');
+	        c.style.top = c.style.left = '2px';
+	        c.style.position = 'relative';
+	
+	        var coords = dom.getOffsetCoords(c, document.body);
+	        Assert.areEqual(12, coords.x);
+	    },
+	
+	    testBodyPaddingContainerBodyRelative : function() {
+	        document.body.style.position = "relative";
+	        document.body.style.padding = "10px";
+	
+	        var c = document.getElementById('container');
+	        c.style.top = c.style.left = '2px';
+	        c.style.position = 'relative';
+	
+	        var coords = dom.getOffsetCoords(c, document.body);
+	        Assert.areEqual(12, coords.x);
+	    },
+	
+	    testBodyPaddingContainerDocumentBodyRelative : function() {
+	        document.body.style.position = "relative";
+	        document.body.style.padding = "10px";
+	
+	        var c = document.getElementById('container');
+	        c.style.top = c.style.left = '2px';
+	        c.style.position = 'relative';
+	
+	        var coords = dom.getOffsetCoords(c, document.body);
+	        Assert.areEqual(12, coords.x);
+	    },
+	
+	    testBodyPaddingTargetAbsoluteContainerDocument : function() {
+	        document.body.style.position = "relative";
+	        document.body.style.padding = "10px";
+	
+	        var c = document.getElementById('container');
+	        c.style.top = c.style.left = '2px';
+	
+	        var coords = dom.getOffsetCoords(c, document.body);
+	        Assert.areEqual(2, coords.x);
+	    },
+	
+	    testDocumentElementPaddingContainerDocumentElement : function() {
+	        var ds = document.documentElement.style;
+	
+	        ds.padding = "10px";
+	        document.body.style.position = "static";
+	
+	        var c = document.getElementById('container');
+	        c.style.top = c.style.left = '2px';
+	        c.style.position = 'relative';
+	
+	        var coords = dom.getOffsetCoords(c, document.documentElement);
+	        Assert.areEqual(12, coords.x);
+	    },
+	
+	    testDocumentElementPaddingContainer : function() {
+	        document.documentElement.stylepadding = "10px";
+	        document.body.style.position = "static";
+	
+	        var c = document.getElementById('container');
+	        c.style.top = c.style.left = '2px';
+	        c.style.position = 'relative';
+	
+	        // IE needs to wait a millisecond.
+	        this.wait(function(){
+	            var c1 = document.getElementById('c1');
+	            c1.style.position = "relative";
+	            c1.style.top = "8px";
+	            c.style.lineHeight = "0";
+	            c1.style.left = "3px";
+	
+	            var coords = dom.getOffsetCoords(c1, c);
+	            Assert.areEqual(3, coords.x);
+	            Assert.areEqual(8, coords.y);
+	        },1);
+	    },
+	
+	 // Opera needs attention here.
+	    testDocumentElementPaddingContainerBodyRelative : function() {
+	        var ds = document.documentElement.style;
+	        ds.padding = "10px";
+	        document.body.style.position = "relative";
+	
+	        var c = document.getElementById('container');
+	        c.style.top = c.style.left = '2px';
+	        c.style.position = 'relative';
+	
+	        var coords = dom.getOffsetCoords(c, document.body);
+	        Assert.areEqual(2, coords.x);
+	    },
+	
+	    testDocumentElementMarginContainerBody : function() {
+	        var ds = document.documentElement.style;
+	        ds.margin = "10px";
+	        document.body.style.position = "static";
+	
+	        var c = document.getElementById('container');
+	        c.style.top = c.style.left = '2px';
+	        c.style.position = 'relative';
+	
+	        var coords = dom.getOffsetCoords(c, document.body);
+	        Assert.areEqual(2, coords.x);
+	    },
+	    
+	    testBodyRelMarginRelLastParentRel : function() {
+	        var container = document.getElementById("container");
+	        var c1 = document.getElementById("c1");
+	        var target = document.getElementById("target");
+	        var bs = document.body.style;
+	        bs.margin = "21px";
+	        bs.position = "relative";
+	        container.style.position = "relative";
+	
+	        var coords = dom.getOffsetCoords( container );
+	
+	        Assert.areEqual( 21 , coords.x );
+	        Assert.areEqual( 21, coords.y );
+	    },
+	
+	    testTargetRelativeContainerStatic : function() {
+	        var target = document.getElementById("target");
+	        target.style.top = "7px";
+	        target.style.margin = "0";
+	        target.style.position = "relative";
+	        var c1 = document.getElementById("c1");
+	        c1.style.position = "static";
+	
+	        document.body.style.fontSize = document.body.style.lineHeight =
+	            c1.style.padding = c1.style.fontSize = c1.style.lineHeight = "0";
+	
+	        c1.style.margin='10px';
+	
+	        var coords = dom.getOffsetCoords( target, c1 );
+	        Assert.areEqual(  7 , coords.y );
+	    },
+	
+	    testBodyRelMarginNestedLastParentStatic : function() {
+	        var target = document.getElementById("target");
+	        target.style.top = "7px";
+	        target.style.margin = "0";
+	
+	        var c1 = document.getElementById("c1");
+	        c1.style.position = "relative";
+	        c1.style.margin = c1.style.top = "0";
+	
+	        var container = document.getElementById("container");
+	        var cs = container.style;
+	        container.style.lineHeight = 0;
+	        cs.position = "static";
+	        cs.top = "0";
+	
+	        var bs = document.body.style;
+	        bs.position = "relative";
+	        bs.marginTop = "11px";
+	
+	        var coords = dom.getOffsetCoords( target );
+	        Assert.areEqual(  18 , coords.y );
+	    },
+	
+	    testBodyRelNestedChildAbsoluteContainer : function() {
+	        var container = document.getElementById('container');
+	        container.style.top = "0";
+	        document.body.style.position = "relative";
+	        document.body.style.margin = "12px";
+	
+	        var c1 = document.getElementById('c1');
+	        c1.style.top = c1.style.left = "6px";
+	
+	        var coords = dom.getOffsetCoords( c1, container );
+	        Assert.areEqual(  6 , coords.x );
+	        Assert.areEqual(  6 , coords.y );
+	    },
+	
+	    testBodyRelChildStatic : function() {
+	        var container = document.getElementById('container');
+	        container.style.position = "static";
+	        document.body.style.position = "relative";
+	        document.body.style.margin = "12px";
+	
+	        var coords = dom.getOffsetCoords( container );
+	        Assert.areEqual(  12 , coords.x );
+	        Assert.areEqual(  12 , coords.y );
+	    },
+	
+	    testContainerPadding : function() {
+	        var container = document.getElementById('container');
+	        container.style.padding = "12px";
+	        container.style.lineHeight = "0";
+	
+	        var c1 = document.getElementById('c1');
+	        c1.style.position = "relative";
+	        c1.style.top = c1.style.left = "0";
+	        
+	        var coords = dom.getOffsetCoords( c1, container );
+	        Assert.areEqual(  12 , coords.x );
+	        Assert.areEqual(  12 , coords.y );
+	    },
+	
+	    testBodyAbsMargin : function() {
+	        var target = document.getElementById("target");
+	        target.style.position="relative";
+	        var bs = document.body.style;
+	
+	        // computed font size: 10px * 2.1 = 21px;
+	        bs.fontSize = "10px";
+	        bs.left = "2.1em";
+	        bs.top = "2.1em";
+	
+	        bs.position = "absolute";
+	
+	        // Cause IE to pause so scroll is updated.
+	        // Otherwise, IE may scroll the window asynchronously,
+	        // which can result in inaccurate results.
+	        this.wait(function(){
+	            var coords = dom.getOffsetCoords( target  );
+	            Assert.areEqual( 1 + 21 , coords.x );
+	            Assert.areEqual( 3 + 2 + 21, coords.y );
+	        }, 40); 
+	    },
+	
+	    testBodyStatMargin : function() {
+	        var target = document.getElementById("target");
+	
+	        // Target is in normal flow; it's parentNode, c1, is not,
+	        // so body's margin's are irrelevant here;
+	        target.style.position="relative";
+	        target.style.color='red';
+	        var bs = document.body.style;
+	
+	        // computed font size: 10px * 2.1 = 21px;
+	        bs.fontSize = "10px";
+	        bs.marginLeft = "2.1em";
+	        bs.marginTop = "2.1em";
+	
+	        bs.position = "static";
+	        var coords = dom.getOffsetCoords( target  );
+	        Assert.areEqual( 1, coords.x );
+	        Assert.areEqual( 3 + 2, coords.y );
+	    },
+	
+	    testBodyStatMarginFirstChild : function() {
+	        var container = document.getElementById("container");
+	
+	        // Target is in normal flow; it's parentNode, c1, is not,
+	        // so body's margin's are irrelevant here;
+	        container.style.position="relative";
+	        container.style.color='red';
+	        var bs = document.body.style;
+	
+	        // computed font size: 10px * 2.1 = 21px;
+	        bs.fontSize = "10px";
+	        bs.marginLeft = "2.1em";
+	        bs.marginTop = "2.1em";
+	
+	        bs.position = "static";
+	        var coords = dom.getOffsetCoords( container );
+	        Assert.areEqual( 21, coords.x );
+	        Assert.areEqual( 21, coords.y );
+	    },
+	
+	    testTargetC1Border : function() {
+	        
+	        var target = document.getElementById("target");
+	        target.style.position="relative";
+	        var c1 = document.getElementById("c1");
+	        c1.style.border="10px solid red";
+	
+	        var coords = dom.getOffsetCoords( target, undefined, {}  );
+	        Assert.areEqual( 10 + 3 + 2, coords.y );
+	    },
+	
+	    testAbsinRel : function() {
+	        var target = document.getElementById("target");
+	        target.style.top = "100px";
+	        var c1 = document.getElementById("c1");
+	        c1.style.position="relative";
+	        c1.style.border="10px solid red";
+	
+	        c1.parentNode.style.fontSize=c1.parentNode.style.lineHeight = "0";
+	        var coords = dom.getOffsetCoords( target, undefined, {}  );
+	        Assert.areEqual( 100 + 10 + 2, coords.y );
+	    },
+	
+	    testStaticBodyAbsChildAuto : function() {
+	        var container = document.getElementById("container");
+	
+	        container.style.cssText = "position:absolute; height: 12px; width: 100px;";
+	        var bs = document.body.style;
+	        bs.cssText = "position: static; border: 5px solid; margin:0; font-size:0; height: 600px; padding: 10px;";
+	        var ls = document.getElementById('testLogger').style;
+	        var lsp = ls.position;
+	        ls.position="absolute";
+	        var coords = dom.getOffsetCoords( container );
+	        ls.position = lsp;
+	        Assert.areEqual(15, coords.y);
+	    },
+	
+	    testTargetC1Overflow : function() {
+	        var target = document.getElementById("target");
+	        target.style.position="relative";
+	
+	        var c1 = document.getElementById("c1");
+	        c1.style.overflow="hidden";
+	
+	        var coords = dom.getOffsetCoords( target, document, {}  );
+	        Assert.areEqual( 3 + 2, coords.y );
+	
+	        container.style.overflow="scroll";
+	        var coords = dom.getOffsetCoords( target, document, coords  );
+	        Assert.areEqual( 3 + 2, coords.y, "container was overflow: scroll");
+	    },
+	
+	    testNestedScrolledDivs : function() {
+	        var target = document.getElementById("target");
+	        target.style.position="relative";
+	
+	        target.style.height = "500px";
+	        target.style.width = "500px";
+	        var c1 = document.getElementById("c1");
+	        c1.style.overflow="scroll";
+	        c1.style.height = "200px";
+	        c1.style.width = "200px";
+	        
+	        var container = document.getElementById('container');
+	        container.style.overflow = "scroll";
+	        container.style.height = "100px";
+	        container.style.width = "100px";
+	
+	        container.scrollTop = 10;
+	        container.scrollLeft = 10;
+	
+	        c1.scrollTop = 30;
+	        c1.scrollLeft = 30;
+	
+	        // IE needs update view after setting scrollXXX, before checking.
+	        this.wait(function(){
+	            var coords = dom.getOffsetCoords( target, document, {}  );
+	            Assert.areEqual( 3 + 2 + -10 + -30 , coords.y, "y coords wrong." );
+	            Assert.areEqual( 1 + -10 + -30 , coords.x, "x wrong" );
+	        }, 50);
+	    },
+	
+	    testTargetInlineRel : function() {
+	
+	        // XXX Fails in Firefox 3.
+	        // http://meyerweb.com/eric/thoughts/2008/05/06/line-height-abnormal/
+	
+	        var target = document.getElementById("target");
+	        
+	        // target is positioned from the top/left of it's parent's line-box text area;
+	        // excluding leading, which CANNOT BE CALCULATED.
+	        target.parentNode.style.cssText = 
+	          "position:absolute; top: 2px;left: 1px; height: 100px;padding:0;line-height: 0;font-size: 12px;";
+	        target.style.cssText = "position: relative; display: inline; top: 3px;font-size: 12px";
+	
+	        // Cause Mozilla to pause so target's offsetTop is updated.
+	        // Otherwise, it's offsetTop won't update soon enough.
+	        this.wait(function(){
+	            var coords = dom.getOffsetCoords( target, document, coords  );
+	            Assert.areEqual( 3 + 2, coords.y, "target was display: inline; position: relative");
+	        }, 40); 
+	    },
+	
+	    testTargetInlineAbs : function() {
+	
+	        // XXX Fails in Firefox 3.
+	        // http://meyerweb.com/eric/thoughts/2008/05/06/line-height-abnormal/
+	
+	        var target = document.getElementById("target");
+	        
+	        target.parentNode.style.cssText = 
+	          "position:absolute; top: 2px;left: 1px; height: 100px;padding:0;line-height: 0;font-size: 12px;";
+	        target.style.cssText = "position:absolute; display: inline; top: 3px;font-size: 12px";
+	
+	        // Cause Mozilla to pause so target's offsetTop is updated.
+	        // Otherwise, it's offsetTop won't update soon enough.
+	        this.wait(function(){
+	            var coords = dom.getOffsetCoords( target, document, coords  );
+	            Assert.areEqual( 3 + 2, coords.y, "target was display: inline; position: relative");
+	        }, 40); 
+	    },
+	
+	    testTargetBodyBorder : function() {
+	        var target = document.getElementById("target");
+	        target.style.position="relative";
+	        target.style.color="green";
+	
+	        document.body.style.position="relative";
+	        document.body.style.border="10px solid red";
+	
+	        var coords = dom.getOffsetCoords( target, undefined, {}  );
+	        Assert.areEqual( 10 + 3 + 2, coords.y );
+	    },
+	
+	    testTargetBodyTop : function() {                
+	        var target = document.getElementById("target");
+	        target.style.position="relative";
+	
+	        document.body.style.position="relative";
+	        document.body.style.top="10px";
+	
+	        var coords = dom.getOffsetCoords( target, document, {}  );
+	        Assert.areEqual( 10 + 3 + 2, coords.y );
+	    },
+	
+	    testTargetBodyTopToBody : function() {        
+	        var target = document.getElementById("target");
+	        target.style.position="relative";
+	
+	        document.body.style.top="10px";
+	        var coords = dom.getOffsetCoords( target, document.body, {}  );
+	        Assert.areEqual(  3 + 2, coords.y );
+	    },
+	
+	    testFloat : function() {
+	        var target = document.getElementById("target");
+	        var c1 = document.getElementById("c1");
+	        c1.style.width = "400px";
+	        c1.style.padding="0";
+	        target.style.width = "200px";
+	        target.style.padding = target.style.margin = target.style.border = "0";
+	        target.style.position="";
+	        target.style.cssFloat = "right";
+	        target.style.styleFloat = "right";
+	        var coords = dom.getOffsetCoords(target);
+	        YAHOO.log("left: " + target.offsetLeft, "info", "TestLogger");
+	        Assert.areEqual(200, coords.x);
+	    },
+	 
+	    testContainerRelativeBodyStaticBorder : function() {        
+	        document.body.style.position = "static";
+	        document.body.style.border = "10px solid red";
+	        
+	        var cont = document.getElementById('container');
+	        var cs = cont.style;
+	        cs.position = "relative";
+	        cs.top = '11px';
+	        cs.left = '3px';
+	
+	        var coords = dom.getOffsetCoords( container, undefined, {}  );
+	        YAHOO.log("offsetTop: " + cont.offsetTop, "info", "TestLogger");
+	        Assert.areEqual( 21, coords.y );
+	        Assert.areEqual( 13, coords.x );
+	    },
+	
+	    testFixedTarget : function() {
+	        var target = document.getElementById('target');
+	        target.style.position = 'fixed';
+	        var coords = dom.getOffsetCoords( target );
+	        Assert.areEqual( 3 + document.documentElement.scrollTop, coords.y );
+	    },
+	    
+	    testFixedContainer : function() {
+	        var target = document.getElementById('target'),
+	            container = document.getElementById('container');
+	        container.style.position = 'fixed';
+	        container.style.top = "10px";
+	        var coords = dom.getOffsetCoords( target, container );
+	        Assert.areEqual( 5, coords.y );
+	    },
+	
+	    testContainerBodyStaticBorder : function() {        
+	        document.body.style.position="static";
+	        document.body.style.border = "10px solid red";
+	        
+	        var cont = document.getElementById('container');
+	        var cs = cont.style;
+	        cs.position = "absolute";
+	        cs.top = '11px';
+	        cs.left = '3px';
+	
+	        var coords = dom.getOffsetCoords( container, undefined, {}  );
+	        YAHOO.log("offsetTop: " + cont.offsetTop, "info", "TestLogger");
+	        Assert.areEqual( 11, coords.y );
+	        Assert.areEqual( 3, coords.x );
+	    },
+	
+	    testThroughStaticContainer : function() {
+	        var cont = document.getElementById('container');
+	        var target = document.getElementById('target');
+	        var c1 = document.getElementById('c1');
+	        target.style.cssText = c1.style.cssText = cont.style.cssText = "";
+	
+	        // XXX Fails in Firefox 3 if display is inline.
+	        // http://meyerweb.com/eric/thoughts/2008/05/06/line-height-abnormal/
+	
+	        target.style.display = "block";
+	        c1.style.position = target.style.position = "static";
+	        cont.style.position = "absolute";
+	        c1.style.border = "10px solid";
+	
+	        document.getElementById('overlapping').style.display = 'none';
+	        var coords = dom.getOffsetCoords( target, cont );
+	        Assert.areEqual(10, coords.y, 'y');
+	        Assert.areEqual(10, coords.x, 'x');
+	    },
+	
+	    testTargetToParentBorder : function(){
+	        var target = document.getElementById('target');
+	        var c1 = document.getElementById('c1');
+	        
+	        // XXX Fails in Firefox 3 if display is inline.
+	        // http://meyerweb.com/eric/thoughts/2008/05/06/line-height-abnormal/
+	
+	        target.style.display = "block";
+	        target.style.top = "0";
+	        target.style.left = "-2px";
+	        c1.style.border = "10px solid";
+	
+	        document.getElementById('overlapping').style.display = 'none';
+	        var coords = dom.getOffsetCoords( target, c1 );
+	        Assert.areEqual(0, coords.y, 'y coord wrong');
+	        Assert.areEqual(-2, coords.x, 'x coord wrong');
+	    },
+	    
+	    testDivInTD : function() {
+	        var div = document.getElementById("testdiv");
+	        var coords = dom.getOffsetCoords( div, undefined, {}  );
+	        var tableWidth = 400;
+	        var tableLeft = 100;
+	        var tdPadding = 5;
+	
+	        Assert.areEqual( tableLeft + tableWidth/2 + tdPadding, coords.x );
+	    },
+	
+	    testDivInTDinScrolledDivInTD : function() {
+	
+	        var div = document.getElementById("innerDiv");
+	        div.borderSpacing="0";
+	        div.padding="0";
+	        div.style.border="1px solid red";
+	        div.style.width="100px";
+	        div.style.height="100px";
+	
+	        var testdiv = document.getElementById("testdiv");
+	        testdiv.style.height = "20px";
+	        testdiv.style.width = "20px";
+	        testdiv.style.overflow = "scroll";
+	        testdiv.style.position = "relative";
+	
+	        // xxx Mozilla needs this to be set 
+	        // after there is overflow-able content.
+	        // otherwise, setting scrollLeft will fail.
+	        testdiv.scrollLeft = 10;
+	        // alert(testdiv.scrollLeft)        
+			this.wait(function(){
+	        var coords = dom.getOffsetCoords( div, null, {}  );
+	        var tableWidth = 400;
+	        var tableLeft = 100;
+	        var tdPadding = 5;
+	        Assert.areEqual( -10 + tdPadding + (tableLeft + tableWidth/2), coords.x );
+	        }, 50);
+	    },
+	
+	    testTD : function() {
+	        var div = document.getElementById("testcell");
+	        var coords = dom.getOffsetCoords( div, undefined, {}  );
+	        var tableWidth = 400;
+	        var tableLeft = 100;
+	
+	        Assert.areEqual( tableLeft + tableWidth/2, coords.x );
+	    },
+	
+	    testTableInScrolledContainer : function() {
+	        var div = document.getElementById("testcell");
+	        var tableContainer = document.getElementById('tableContainer');
+	
+	        var divTop = dom.getOffsetCoords( div, undefined, {}  ).y;
+	
+	        tableContainer.style.overflow = "scroll";
+	        tableContainer.scrollLeft = 30;
+	        tableContainer.scrollTop = 30;
+	
+	        var coords = dom.getOffsetCoords( div, undefined, {}  );
+	        var tableWidth = 400;
+	        var tableLeft = 100;
+	
+	        Assert.areEqual( -30 + (tableLeft + tableWidth/2), coords.x );
+	
+	        // make sure we get a value that is -30 of before.
+	        Assert.areEqual( -30 + (divTop), coords.y );
+	    },
+	
+	    testInlineTableIfSupported : function() {
+	        var div = document.getElementById("testcell");
+	        var tableContainer = document.getElementById('tableContainer');
+	        var table = tableContainer.getElementsByTagName("table")[0];
+	
+	        try {
+	            tableContainer.style.overflow = "scroll";
+	            tableContainer.scrollLeft = 20;
+	            table.style.display  = "inline-table";
+	        }
+	        catch(ex) {
+	            YAHOO.log("this browser doesn't support display: inline-table", 'warn', 'TestRunner');
+	        }
+	
+	        var coords = dom.getOffsetCoords( div, undefined, {}  );
+	        var tableWidth = 400;
+	        var tableLeft = 100
+	
+	        Assert.areEqual( -20 + (tableLeft + tableWidth/2), coords.x );
+	    }
+	});
+	
+	// Copy of test case.
+	var scrolledPositionTestCase = new YAHOO.tool.TestCase(positionTestCase);
+	// After setUp(), scroll the window.
+	APE.aop.Advice.addAfter(scrolledPositionTestCase, "setUp", function() {
+	    scrollTo(10, 100);
+	    // Logger does not save state, so I hack it here. 
+	    if(location.search.indexOf("info") >= 0) 
+	    YAHOO.log("scrollTo(10, 100)", "info", "TestRunner");
+	});
+	APE.aop.Advice.addBefore(window, "scrollTo", function() {
+	    if(location.search.indexOf("info") >= 0) 
+	        YAHOO.log("scrollTo(" + Array.prototype.join.call(arguments) + ")", "info", "TestRunner");
+	});
+	scrolledPositionTestCase.name = "Scrolled Position Test Case";
+	
+	//create the logger.
+	var logger = new YAHOO.tool.TestLogger("testLogger");
+	YAHOO.tool.TestRunner.add( positionTestCase );
+	YAHOO.tool.TestRunner.add( scrolledPositionTestCase );
+	
+	// run the tests, or put them in the TestRunner.
+	if (parent && parent != window) {
+	    YAHOO.tool.TestManager.load();
+	} else {
+	    YAHOO.tool.TestRunner.run();
+	}
+};
 </script>
 </body>
 </html>

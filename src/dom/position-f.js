@@ -8,26 +8,30 @@
 APE.namespace("APE.dom");
 (function() {
     
-    var dom = APE.dom;
+    var dom = APE.dom,
+    	IS_SCROLL = typeof document.createElement("p").scrollLeft == "number";
     APE.mixin(
-        dom,
-            /** @scope APE.dom */ {
+        dom, {
             getOffsetCoords : getOffsetCoords,
             isAboveElement : isAboveElement,
             isBelowElement : isBelowElement,
-            isInsideElement: isInsideElement
+            isInsideElement: isInsideElement,
+            
+            // Blackberry9000 does not, and does not support scrollLeft, scrollTop.
+            IS_SCROLL_SUPPORTED : IS_SCROLL
     });
 
     var doc = this.document,
         inited,
         documentElement = doc.documentElement,
         round = Math.round, max = Math.max,
+        parseFloat = self.parseFloat,
         GET_COMPUTED_STYLE = "getComputedStyle",
         DEFAULT_VIEW = "defaultView",
         
     // Load-time constants.
         IS_BODY_ACTING_ROOT = documentElement && documentElement.clientWidth === 0,
-
+        
     // IE, Safari, and Opera support clientTop. FF 2 doesn't
         IS_CLIENT_TOP_SUPPORTED = 'clientTop'in documentElement,
 
@@ -166,12 +170,11 @@ APE.namespace("APE.dom");
     // Crawling up the tree.
         else if(IS_COMPUTED_STYLE_SUPPORTED) {
             if(!inited) init();
-
             var offsetLeft = el.offsetLeft,
                 offsetTop = el.offsetTop,
                 defaultView = doc[DEFAULT_VIEW],
                 cs = defaultView[GET_COMPUTED_STYLE](el, '');
-            if(cs.position == "fixed") {
+            if(cs.position == "fixed" && IS_SCROLL) {
                 coords.x = offsetLeft + documentElement.scrollLeft;
                 coords.y = offsetTop + documentElement.scrollTop;
                 return coords;
@@ -187,7 +190,7 @@ APE.namespace("APE.dom");
             // when we get to a parent that's an offsetParent, update
             // the current offsetParent marker.
             for( ; parent && parent !== container; parent = parent.parentNode) {
-                if(parent !== body && parent !== documentElement) {
+                if(parent !== body && parent !== documentElement && IS_SCROLL) {
                     offsetLeft -= parent.scrollLeft;
                     offsetTop -= parent.scrollTop;
                 }
@@ -438,7 +441,7 @@ APE.namespace("APE.dom");
 
         // xs.position = "fixed";
         // FIXED_HAS_OFFSETPARENT = x.offsetParent != null;
-
+debugger;
         body.removeChild(x);
         s.cssText = bCssText||"";
         ds.cssText = dCssText||"";
