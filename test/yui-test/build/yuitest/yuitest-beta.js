@@ -2355,7 +2355,7 @@ YAHOO.util.UserAction = {
         var doc = target.ownerDocument || target.document || target,
             win = doc.parentWindow;
             
-        if(!win) {
+        if(!win && doc.createElement) {
             var scriptElement = doc.createElement('script'),
                 head;
             scriptElement.innerHTML = 'document.parentWindow=window';
@@ -3262,29 +3262,5 @@ YAHOO.lang.extend(YAHOO.tool.TestLogger, YAHOO.widget.LogReader, {
     }
     
 });
-(function(){
-
-    if(typeof MouseEvent == "undefined") return
-    
-    var expected = 10,
-        actual;
-    function cb(ev){
-        ev = ev||event;
-        actual = ev.pageX;
-        document.onmousemove = m;
-    }
-    var m = document.onmousemove;
-    document.onmousemove = cb;
-    YAHOO.util.UserAction.mousemove(document, {clientX: expected});
-    if(expected !== actual) {
-
-        MouseEvent.prototype.__defineGetter__('pageX', function() {
-            return this.clientX + window.pageXOffset;
-        });
-        MouseEvent.prototype.__defineGetter__('pageY', function() {
-            return this.clientY + window.pageYOffset;
-        });
-    }
-})();
 
 YAHOO.register("yuitest", YAHOO.tool.TestRunner, {version: "2.4.0", build: "733"});

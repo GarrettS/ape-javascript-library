@@ -46,9 +46,9 @@
             name = packages[i];
 
             // Internet Explorer does not support
-            // hasOwnProperty window (or Host obj), so call Object.prototype.hasOwnProperty.
+            // hasOwnProperty on window (or Host obj). Use internal hasOwnProp.
             // Opera does not support the global object or [[Put]] properly (see below)
-            if(!hasOwnProperty(pkg, name)) {
+            if(!hasOwnProp(pkg, name)) {
                 pkg[name] = new Package((pkg.qualifiedName||"APE")+"."+name);
             }
             pkg = pkg[name];
@@ -58,7 +58,7 @@
 
     /**
      * Shallow copy of properties; does not look up prototype chain.
-     * Copies all properties in s to r, using hasOwnProperty.
+     * Copies all properties in s to r, using hasOwnProp.
      * @param {Object} r the receiver of properties.
      * @param {Object} s the supplier of properties.
      * Accounts for JScript DontEnum bug for valueOf and toString.
@@ -69,14 +69,14 @@
             i = 0,
             skipped;
         for(prop in s) {
-            if(hasOwnProperty(s, prop)) {
+            if(hasOwnProp(s, prop)) {
                 r[prop] = s[prop];
             }
         }
         // JScript DontEnum bug.
         for( ; i < jscriptSkips.length; i++) {
             skipped = jscriptSkips[i];
-            if(hasOwnProperty(s, skipped))
+            if(hasOwnProp(s, skipped))
                 r[skipped] = s[skipped];
         }
         return r;
@@ -138,7 +138,7 @@
     function getOrCreate(ctor, args) {
         var id = args[0];
         // Public instances property, for purge or cleanup.
-        if(!hasOwnProperty(this, INSTANCES)) this[INSTANCES] = {};
+        if(!hasOwnProp(this, INSTANCES)) this[INSTANCES] = {};
         return this[INSTANCES][id] || (this[INSTANCES][id] = newApply(ctor, args));
     }
     
@@ -198,9 +198,9 @@
      * This fails in Safari 2 in one case:
      * function X(){ this.t = 1; }
      * X.prototype.t = 1;
-     * hasOwnProperty(new X, "t"); // False in Safari 2.
+     * hasOwnProp(new X, "t"); // False in Safari 2.
      */   
-    function hasOwnProperty(o, p) { 
+    function hasOwnProp(o, p) { 
         if(p in o) {
             if(opHap) {
                 return opHap.call(o, p);
