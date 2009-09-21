@@ -251,7 +251,7 @@ var creationalTest = new YAHOO.tool.TestCase({
         window.onerror = deferErrorTestHandler;
 
         function deferErrorTestHandler(argMsg) {
-            YAHOO.log("onerror caught message: " + argMsg, 
+            YAHOO.log("onerror caught message: " + argMsg,
                     "info", "TestRunner");
             caughtError = argMsg;
             return true;
