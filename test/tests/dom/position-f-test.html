@@ -163,8 +163,9 @@ onload = function(){
 	        // Update view for Safari 2.0.4 
 	        // (or other browsers that may exhibit bug).
 	        try {
-	            resizeBy(1,0);
-	            resizeBy(-1,0);
+		        // This breaks BlackBerry.
+	            //resizeBy(1,0);
+	            //resizeBy(-1,0);
 	        } catch(ex){}
 	    },
 	    

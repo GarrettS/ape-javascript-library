@@ -441,7 +441,6 @@ APE.namespace("APE.dom");
 
         // xs.position = "fixed";
         // FIXED_HAS_OFFSETPARENT = x.offsetParent != null;
-debugger;
         body.removeChild(x);
         s.cssText = bCssText||"";
         ds.cssText = dCssText||"";

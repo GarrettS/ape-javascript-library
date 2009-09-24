@@ -9,14 +9,13 @@ Code Guidelines:
  * Use spaces (four) not tabs.
 
 Tested Browsers:
- - Safari 2.0.4 up, mac/win
- - Firefox 2, 3, 3.5 and Seamonkey
+ - Safari 2.0.4 up, mac/win, iPhone
+ - Gecko (Firefox 2, 3, 3.5, Seamonkey, Fennec)
  - IE 6 up
  - Opera 9.5 up
  - Chrome 2 up
- 
-Other browsers:
-Safari 2.0.4 has many test failures due to limitation in YUI Test's UserAction (pageX)
-Many tests will unofficially pass in Safari 2.0 and IE 5.5.
+ - BlackBerry9000 4.6
 
-TODO: Test in BlackBerry and recent NetFront browser.
+Other browsers:
+Safari 2.0.4 has many test failures due to limitation in YUI Test's UserAction (pageX).
+Many tests will unofficially pass in Safari 2.0 and IE 5.5.
