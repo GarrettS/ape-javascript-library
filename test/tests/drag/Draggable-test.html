@@ -68,13 +68,12 @@ var Assert = YAHOO.util.Assert,
     testNode2 = document.getElementById('testNode2'),
     template = document.getElementById('template'),
     templateHTML = template.innerHTML,
+    IS_TOUCH_EVENT = 'ontouchstart' in document,
     oldBodyCssText = document.body.style.cssText;
 
+alert(IS_TOUCH_EVENT);
+
 var draggableTestCase = new YAHOO.tool.TestCase({
-
-    name : "Draggable Test Case",
-
-    // pageX broken, so all tests test target from 0, 0.
 
     tearDown : function() {
         Draggable.instanceDestructor();
@@ -92,6 +91,51 @@ var draggableTestCase = new YAHOO.tool.TestCase({
 
         document.documentElement.style.cssText = "";
     },
+
+    testToString : function() {
+        var d = Draggable.getByNode( testNode );
+        Assert.isString(d.toString());
+    },
+
+    testOptions : function(){
+        var options = {
+                dragMultiple : true,
+                useAnim : false
+        };
+        var d = Draggable.getByNode( testNode, options );
+        Assert.areSame(true, d.dragMultiple);
+        Assert.areSame(false, d.useAnim);
+    },
+    
+    testGrab : function(){
+        var dO = Draggable.getByNode( testNode ),
+            testNode3 = document.getElementById('testNode3'),
+            actualX, actualY,
+            grabbled = false;
+        testNode.style.left = testNode.style.top = "20px";
+        testNode.style.height = "20px";
+        testNode.style.width = "100px";
+        testNode3.style.cssText = "position: absolute; top: 0px; left: 0px;";
+        testNode3.onmousedown = grabIt;
+        Action.mousedown(testNode3, {clientX:0, clientY:0});
+        function grabIt(ev) {
+            dO.grab(ev, 10, 10);
+            actualX = dO.x;
+            actualY = dO.y;
+        }
+        // should be centered on cursor.
+        Assert.areEqual(10 - 50, dO.x, "x wrong");
+        Assert.areEqual(10 - 10, dO.y, "y wrong");
+    }
+});
+
+var draggableMouseTestCase = new YAHOO.tool.TestCase({
+
+    name : "Draggable Test Case",
+
+    // pageX broken, so all tests test target from 0, 0.
+
+    tearDown : draggableTestCase.tearDown,
     
     testMouseup : function() {
         // should not throw error.
@@ -103,7 +147,7 @@ var draggableTestCase = new YAHOO.tool.TestCase({
     _should : {
         ignore : {
         // Safari 2 issue: pageX.
-            testYuiTestMouseMove : true
+            testYuiTestMouseMove : true,
         }        
     },
     
@@ -166,9 +210,9 @@ var draggableTestCase = new YAHOO.tool.TestCase({
         if(testNode.focus)
             testNode.focus();
 
-        Assert.isFalse( ds, "drag start should not have fired." );
+        Assert.isFalse( ds, "dragstart should not have fired." );
         Action.mousedown( testNode );
-        Assert.isTrue( bds, "onbeforedrag start should not have fired." );
+        Assert.isTrue( bds, "onbeforedragstart should have fired." );
 
         Assert.isFalse( ds, "drag start <em>still<\/em> should not have fired." );
 
@@ -226,12 +270,6 @@ var draggableTestCase = new YAHOO.tool.TestCase({
         Assert.areEqual(top, testNode.style.top);
         StringAssert.doesNotContain( aClass, testNode.className );        
         Action.mouseup(document);
-    },
-
-
-    testToString : function() {
-        var d = Draggable.getByNode( testNode );
-        Assert.isString(d.toString());
     },
 
     testYuiTestMouseMove : function(){
@@ -627,7 +665,6 @@ var draggableTestCase = new YAHOO.tool.TestCase({
                 Assert.areEqual(1, gcount, "glidend fired wrong number of times.");
             }, 20);
         }, 78);
-        
     },
     
     testKeepInContainerFail : function() {
@@ -820,36 +857,6 @@ var draggableTestCase = new YAHOO.tool.TestCase({
         var dt = d.addDropTarget( testNode3 );
         d.removeDropTarget( dt );
     },
-
-    testOptions : function(){
-        var options = {
-                dragMultiple : true,
-                noAnim : true
-        };
-                
-        var d = Draggable.getByNode( testNode );
-    },
-    
-    testGrab : function(){
-        var dO = Draggable.getByNode( testNode ),
-            testNode3 = document.getElementById('testNode3'),
-            actualX, actualY,
-	        grabbled = false;
-        testNode.style.left = testNode.style.top = "20px";
-        testNode.style.height = "20px";
-        testNode.style.width = "100px";
-        testNode3.style.cssText = "position: absolute; top: 0px; left: 0px;";
-        testNode3.onmousedown = grabIt;
-        Action.mousedown(testNode3, {clientX:0, clientY:0});
-        function grabIt(ev) {
-            dO.grab(ev, 10, 10);
-            actualX = dO.x;
-            actualY = dO.y;
-        }
-        // should be centered on cursor.
-        Assert.areEqual(10 - 50, dO.x, "x wrong");
-        Assert.areEqual(10 - 10, dO.y, "y wrong");
-    }
 });
 
 var animatedDragTestCase = new YAHOO.tool.TestCase({
@@ -1098,7 +1105,12 @@ new YAHOO.tool.TestLogger("testLogger");
 //}
 
 TestRunner.add( draggableTestCase );
-TestRunner.add( animatedDragTestCase );
+
+if(!IS_TOUCH_EVENT) {
+    TestRunner.add( draggableMouseTestCase );
+    TestRunner.add( animatedDragTestCase );
+}
+
 TestRunner.subscribe("testcasebegin", addAnim);
 
 function addAnim(testEvent) {

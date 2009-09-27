@@ -30,6 +30,7 @@ APE.namespace("APE.drag" );
         highestZIndex = 1000,
         draggableList = { },
         undef,
+        parseInt = self.parseInt,
         grabbed,
         FUNCTION = "function",
         Draggable = APE.createFactory(Drag, createDraggablePrototype),
@@ -49,8 +50,8 @@ APE.namespace("APE.drag" );
      *   - dragMultiple {boolean}
      *   - useAnim {boolean} 
      */
-    function Drag(id, options, win) {
-        var d = document, 
+    function Drag(id, options) {
+        var d = document, // not cross-frame.
             el = d.getElementById(id),
             p;
         this.id = id;
@@ -91,7 +92,7 @@ APE.namespace("APE.drag" );
     function createDraggablePrototype(){
         
         // Static initializer code.
-        var d = self.document,
+        var d = document,
             EventPublisher = APE.EventPublisher,
             DOC_EL = "documentElement",
             ds = d[DOC_EL].style,
@@ -123,9 +124,21 @@ APE.namespace("APE.drag" );
             MOUSE_MOVE_THRESHOLD = 25,
 
             lastMouseMoveTime = -1,
-            docMouseDown = EventPublisher.get(d, "onmousedown");
+            EV_DRAG_START = "onmousedown", 
+            EV_DRAG = "onmousemove",
+            EV_DRAG_END  = "onmouseup",
+            IS_TOUCH_EVENT,
+            docMouseDown;
             getEventCoords = Event.getCoords;
 
+        if('ontouchstart' in d) {
+        	IS_TOUCH_EVENT = true;
+        	EV_DRAG_START = "ontouchstart";
+        	EV_DRAG = "ontouchmove";
+        	EV_DRAG_END = "ontouchend";
+        }
+        docMouseDown = EventPublisher.get(d, EV_DRAG_START);
+        
         // prevent text selection while dragging.
         if('onselectstart' in d) {
             EventPublisher.add(d, "onselectstart", guardUserSelection);
@@ -139,8 +152,8 @@ APE.namespace("APE.drag" );
         }
         docMouseDown.add(mouseDown).addAfter(setUpDragOver);
         EventPublisher.add(d, "onkeydown", keyDown);
-        EventPublisher.add(d, "onmousemove", mouseMove);
-        EventPublisher.add(d, "onmouseup", mouseUp);
+        EventPublisher.add(d, EV_DRAG, mouseMove);
+        EventPublisher.add(d, EV_DRAG_END, mouseUp);
         d = ds = null;
         
         function guardUserSelection(ev) {
@@ -148,7 +161,7 @@ APE.namespace("APE.drag" );
             if(userSelectType) {
                 this[DOC_EL].style[userSelectType] = allow ? "" : "none";
             } else {
-                ev = ev||self.event;
+                ev = ev||event;
                 ev.returnValue = allow;
             }
         }
@@ -182,7 +195,7 @@ APE.namespace("APE.drag" );
         }
         
         /* Called from dragStart. Sets initial x/y position values. */
-        function setUpCoords(e, newDo) {
+        function setUpCoords(newDo) {
             var container = newDo.container,
                 el = newDo.el,
                 d = document,
@@ -224,7 +237,6 @@ APE.namespace("APE.drag" );
                 newDo.maxX = cWidth - el.offsetWidth - inFlowOffsetX;
                 newDo.minY = 0 - inFlowOffsetY;
                 newDo.maxY = cHeight - el.offsetHeight - inFlowOffsetY;
-
             }
         }
         
@@ -347,9 +359,7 @@ APE.namespace("APE.drag" );
                 dom.removeClass(dObj.el, dObj.origClassName);
         }
 
-        /** 
-        * called on mousemove 
-         */
+        /* called on mousemove */
         function carryGroup(distX, distY) {
             if(!hasGroupSelection) return;
             var o, id;
@@ -374,7 +384,7 @@ APE.namespace("APE.drag" );
             if(dObj.activeDragClassName) 
                 dom.addClass(dObj.el, dObj.activeDragClassName);
             // Check the coords after making the copyEl here.
-            setUpCoords(e, dObj);
+            setUpCoords(dObj);
             dObj.isBeingDragged = true; 
         }
 
@@ -384,9 +394,10 @@ APE.namespace("APE.drag" );
                 return;
             }
             
-            e = e || self.event;
-                
-            var target = Event.getTarget(e),
+            evOrig = e || event;
+        	e = getPointerEvent(e, "changedTouches");
+            var evOrig,
+                target = Event.getTarget(e),
                 instances = Draggable.instances,
                 dOTarg,
                 testNode = target,
@@ -458,6 +469,7 @@ APE.namespace("APE.drag" );
             
             // Sets up dropTargets that have dragOverClassName | ondragover 
             dO = dOTarg;
+            Event.preventDefault(evOrig);
             dragObjGrabbed(e, dOTarg);
            
             for(var id in draggableList) {
@@ -514,17 +526,21 @@ APE.namespace("APE.drag" );
             dObj.isBeingDragged = false;
         }
 
-        /**
-         * mousemove callback handler.
-         */
         function mouseMove(e) {
                 
             if(!dO) return;
             
-            var now = +new Date;
+            var now = +new Date,
+             	evOrig;
             if(now - lastMouseMoveTime < MOUSE_MOVE_THRESHOLD) return;
             lastMouseMoveTime = now;
-            e = e || self.event;
+            evOrig = e = e || event;
+            if(IS_TOUCH_EVENT) {
+            	// Finger drag, not resize not scroll.
+                Event.preventDefault(evOrig);
+            	e = e.touches && e.touches[0];
+            	if(!e) return;
+            }
             var eventCoords = getEventCoords(e),
                 ePageX = eventCoords.x, ePageY = eventCoords.y,
                 distX = ePageX - mousedownX,
@@ -533,7 +549,7 @@ APE.namespace("APE.drag" );
                 newX = dO.origX + distX,
                 newY = dO.origY + distY,
                 id;
-            
+//            document.title=([eventCoords.x, eventCoords.y])
             // Initiate dragging.
             if(dO.isBeingDragged === false) {
                 dragStart(dO, e);
@@ -664,8 +680,8 @@ APE.namespace("APE.drag" );
                     if(item.copyEl) 
                         retireClone(item);
                 }
-            }            
-            e = e || self.event;
+            }
+            e = getPointerEvent(e, "changedTouches");
             // if it's been dragged onto a dropTarget, fire that event.
             handleDrops(e);
             
@@ -696,7 +712,7 @@ APE.namespace("APE.drag" );
          * draggables are released.
          */
         function keyDown(e) {
-            e=e||self.event;
+            e=e||event;
             if(e.keyCode == 27) { // esc key.
                 if(dO) {
                     dO.release(e);
@@ -748,7 +764,6 @@ APE.namespace("APE.drag" );
                 coords = getEventCoords(ev);
                 for(i = 0; i < len; i++) {
                     dropTarget = targets[i];
-    
                     if(dropTarget.containsCoords(coords)) {        
                         if(typeof dropTarget.ondrop == FUNCTION) {
                             dropTarget.ondrop({domEvent:ev, dragObj:dO, dropTarget:dropTarget});
@@ -769,6 +784,10 @@ APE.namespace("APE.drag" );
                     }
                 }
             }
+        }
+        
+        function getPointerEvent(e, p){
+         	return e && e[p] && e[p][0] || e || event;
         }
         
         function glideStart(dObj) {
@@ -919,7 +938,7 @@ APE.namespace("APE.drag" );
              * @param {int} [xOffset] amount of vertical adjustment to apply.
              */
             grab : function(e, xOffset, yOffset) {
-                e = e || self.event;
+                e = e || event;
                 var target = Event.getTarget(e),
                     grabCoords;
                 
@@ -953,7 +972,7 @@ APE.namespace("APE.drag" );
                 }
                 this.moveToX(newX- handleOffsetCoords.x + (xOffset||0));
                 this.moveToY(newY - handleOffsetCoords.y + (yOffset||0));
-                    
+                
                 dragObjGrabbed(e, this); 
                 grabbed = true;
                 dO = this;
@@ -1020,17 +1039,17 @@ APE.namespace("APE.drag" );
                 this.coords.w = this.el.clientWidth;
                 this.coords.h = this.el.clientHeight;
             },
-        
+            
             /** returns true if x and y are both inside dropTarget
              * @param {Object} curs {x,y} coordinates of the event.
              */
             containsCoords : function(curs) {
                  // check for x, then y.
-                var dt_x = this.coords.x, dt_y = this.coords.y;
+            	var coords = this.coords, dt_x = coords.x, dt_y = coords.y;
                 
-                return (curs.x >= dt_x && curs.x <= dt_x + this.coords.w)
+                return (curs.x >= dt_x && curs.x <= dt_x + coords.w)
                     && // now check for y.
-                    (curs.y >= dt_y && curs.y <= dt_y + this.coords.h);
+                    (curs.y >= dt_y && curs.y <= dt_y + coords.h);
             },
         
             /** @event Dragged over a droptarget */

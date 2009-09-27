@@ -173,8 +173,10 @@ APE.namespace("APE.dom");
             var offsetLeft = el.offsetLeft,
                 offsetTop = el.offsetTop,
                 defaultView = doc[DEFAULT_VIEW],
-                cs = defaultView[GET_COMPUTED_STYLE](el, '');
-            if(cs.position == "fixed" && IS_SCROLL) {
+                // Blackbery9000 cs is null sometimes. Needs reduction. 
+                cs = defaultView[GET_COMPUTED_STYLE](el, '') || el.style;
+            
+             if(cs.position == "fixed" && IS_SCROLL) {
                 coords.x = offsetLeft + documentElement.scrollLeft;
                 coords.y = offsetTop + documentElement.scrollTop;
                 return coords;
@@ -245,10 +247,13 @@ APE.namespace("APE.dom");
             // If the lastOffsetParent is document,
             // it is not positioned (and hence, not absolute).
             if(lastOffsetParent != doc) {
-                lastOffsetPosition = defaultView[GET_COMPUTED_STYLE](lastOffsetParent,'').position;
-                isLastElementAbsolute = absoluteExp.test(lastOffsetPosition);
-                isLastOffsetElementPositioned = isLastElementAbsolute ||
-                    positionedExp.test(lastOffsetPosition);
+            	cs = defaultView[GET_COMPUTED_STYLE](lastOffsetParent,'');
+            	if(cs) {
+	                lastOffsetPosition = cs.position;
+	                isLastElementAbsolute = absoluteExp.test(lastOffsetPosition);
+	                isLastOffsetElementPositioned = isLastElementAbsolute ||
+	                    positionedExp.test(lastOffsetPosition);
+            	}
             }
 
             // do we need to add margin?
