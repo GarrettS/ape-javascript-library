@@ -90,10 +90,10 @@ YAHOO.tool.TestCase.prototype = {
      */
     tearDown: function () /*:Void*/ {    
     },
-	
-	setTemplate : function(el) {
-		this.template = el.innerHTML;
-	}
+    
+    setTemplate : function(el) {
+        this.template = el.innerHTML;
+    }
 };
 
 /**
@@ -613,7 +613,7 @@ YAHOO.tool.TestRunner = (function(){
         },
         
         _resumeTest : function (segment /*:Function*/) /*:Void*/ {
-			
+            
             //get relevant information
             var node /*:TestNode*/ = this._cur;
             var testName /*:String*/ = node.testObject; 
@@ -689,7 +689,7 @@ YAHOO.tool.TestRunner = (function(){
                         
                         }                    
                     }
-				}
+                }
             }
             
             //fireEvent appropriate event
@@ -1171,7 +1171,7 @@ YAHOO.util.Assert = {
      * @param {Object} actualValue The actual value to test.
      * @param {String} message (Optional) The message to display if the assertion fails.
      * @method isTypeOf
-	 * @author gsmith
+     * @author gsmith
      * @static
      */
     isTypeOf : function (expectedType /*:String*/, actualValue /*:Object*/, message /*:String*/) /*:Void*/{
@@ -1433,18 +1433,18 @@ YAHOO.util.UnexpectedError = function (cause /*:Object*/){
      */
     this.cause /*:Error*/ = cause;
     
-	this.stack = cause.stack || (function() {
-		var stack = [ ];
-		try {
-			var toString = Function.prototype.toString;
-			for(var p in cause ) {
-				stack.push(p + ": " + cause[p]);
-			}
-		} catch(ex) {
-		} finally {
-			return stack.join('\n ');
-		}
-	})();
+    this.stack = cause.stack || (function() {
+        var stack = [ ];
+        try {
+            var toString = Function.prototype.toString;
+            for(var p in cause ) {
+                stack.push(p + ": " + cause[p]);
+            }
+        } catch(ex) {
+        } finally {
+            return stack.join('\n ');
+        }
+    })();
 
     /**
      * The name of the error that occurred.
@@ -1455,10 +1455,10 @@ YAHOO.util.UnexpectedError = function (cause /*:Object*/){
 
 //inherit methods
 YAHOO.lang.extend(YAHOO.util.UnexpectedError, YAHOO.util.AssertionError, {
-	name /*:String*/ : "UnexpectedError",
-	getMessage : function() {
-		return this.message + '\nstack trace:\n ' + this.stack;
-	}
+    name /*:String*/ : "UnexpectedError",
+    getMessage : function() {
+        return this.message + '\nstack trace:\n ' + this.stack;
+    }
 });
 
 //-----------------------------------------------------------------------------
@@ -1951,12 +1951,12 @@ YAHOO.util.ObjectAssert = {
      * @method hasProperty
      * @static
      */ 
-	// Garrett: another patch.
+    // Garrett: another patch.
     hasProperty : function (propertyName /*:String*/, object /*:Object*/, message /*:String*/) /*:Void*/ {
         if (
-			// broken: YAHOO.lang.isUndefined(object[propertyName])
-			!(propertyName in object)
-		){
+            // broken: YAHOO.lang.isUndefined(object[propertyName])
+            !(propertyName in object)
+        ){
             YAHOO.util.Assert.fail(message || 
                     "Property " + propertyName + " not found on object.");
         }    
@@ -1970,12 +1970,12 @@ YAHOO.util.ObjectAssert = {
      * @method hasProperty
      * @static
      */ 
-	// Garrett: another patch.
+    // Garrett: another patch.
     doesNotHaveProperty : function (propertyName /*:String*/, object /*:Object*/, message /*:String*/) /*:Void*/ {
         if (
-			// broken: YAHOO.lang.isUndefined(object[propertyName])
-			(propertyName in object)
-		){
+            // broken: YAHOO.lang.isUndefined(object[propertyName])
+            (propertyName in object)
+        ){
             YAHOO.util.Assert.fail(message || 
                     "Property " + propertyName + " found on object.");
         }    
@@ -2000,29 +2000,29 @@ YAHOO.util.ObjectAssert = {
         }     
     },
 
-	/**  
-	 * Assert that (typeof object) and typeofString are equal.
-	 * @param {String} typeofString expected type.
-	 * @param {Object} object to typecheck.
-	 * @param {String} [message] The message to display if the assertion fails.
+    /**  
+     * Assert that (typeof object) and typeofString are equal.
+     * @param {String} typeofString expected type.
+     * @param {Object} object to typecheck.
+     * @param {String} [message] The message to display if the assertion fails.
      * @author gsmith
-	 */
-	isTypeof : function(typeofString /*:String*/, object /*:Object*/, message /*:String*/) {
+     */
+    isTypeof : function(typeofString /*:String*/, object /*:Object*/, message /*:String*/) {
         YAHOO.util.Assert.areEqual(typeofString, typeof object, message||"object was not of the expected type.");
-	},
+    },
 
-	/**  
-	 * Assert that object is an instanceof constructor.
-	 * @param {Object} constructor expected type.
-	 * @param {Object} object to typecheck.
-	 * @param {String} [message] The message to display if the assertion fails.
+    /**  
+     * Assert that object is an instanceof constructor.
+     * @param {Object} constructor expected type.
+     * @param {Object} object to typecheck.
+     * @param {String} [message] The message to display if the assertion fails.
      * @author gsmith
-	 */
-	isInstanceof : function(constructor /*:String*/, instance /*:Object*/, message /*:String*/) {
-		if(!(instance instanceof constructor)) {
-			YAHOO.util.Assert.fail(message||"object was not an instanceof supplied constructor.");
+     */
+    isInstanceof : function(constructor /*:String*/, instance /*:Object*/, message /*:String*/) {
+        if(!(instance instanceof constructor)) {
+            YAHOO.util.Assert.fail(message||"object was not an instanceof supplied constructor.");
         }     
-	}
+    }
 };
 
 //-----------------------------------------------------------------------------
@@ -2090,6 +2090,43 @@ YAHOO.namespace("util");
  * @class UserAction
  * @static
  */
+
+function createTouchList(touchObjectDataArray) {
+    var defaultTouchList = document.createTouchList(document.createTouch(window, null, 0, 0, 0, 0, 0));
+
+    if(!touchObjectDataArray) {
+        return defaultTouchList;
+    }
+    var i, 
+        len = touchObjectDataArray.length,
+        doc,
+        target,
+        touches = [];
+    if(!len) {
+        if("target" in touchObjectDataArray) {
+            target = touchObjectDataArray.target,
+            len = 1;
+        } else {
+            throw TypeError("createTouchList called with incompatible argument.")
+        }
+    }
+    for(i = 0; i < len; i++) {
+        touchObjectData = touchObjectDataArray[i];
+        target = touchObjectData.target;
+        doc = target.ownerDocument;
+        var touch = doc.createTouch(
+                target.parentWindow,
+                target,
+                touchObjectData.pageX||0,
+                touchObjectData.pageY||0,
+                touchObjectData.screenX||0,
+                touchObjectData.screenY||0);
+        touches.push(touch);
+    }
+    // Not sure which document, so assume any document will work.
+    doc.createTouchList.apply(doc, touches);
+}
+
 YAHOO.util.UserAction = {
 
     //--------------------------------------------------------------------------
@@ -2534,7 +2571,38 @@ YAHOO.util.UserAction = {
             throw new Error("simulateMouseEvent(): No event simulation framework present.");
         }
     },
-   
+    
+    simulateTouchEvent : function(target, type, canBubble, cancelable, view, detail, 
+                            screenX, screenY, clientX, clientY, ctrlKey, altKey, 
+                            shiftKey, metaKey, touches, targetTouches, changedTouches, 
+                            scale, rotation) {
+        if (!target){
+            throw TypeError("simulateTouchEvent(): Invalid target.");
+        }
+        var doc = target.ownerDocument || target.document || target,
+            win = doc.parentWindow,
+            canceled = false,
+            touchEvent;
+            
+        //check event type
+        type = "" + type.toLowerCase();
+        if(!/^touch/.test(type)) {
+            throw TypeError("simulateTouchEvent(): Event type '" + type + "' not supported.");
+        }
+        
+        touchEvent = doc.createEvent("TouchEvent");
+        if (typeof touchEvent.initTouchEvent == "function"){
+            touchEvent.initTouchEvent(type, canBubble, cancelable, view, detail,
+                                     screenX, screenY, clientX, clientY, 
+                                     ctrlKey, altKey, shiftKey, metaKey, 
+                                     touches, targetTouches, changedTouches, 
+                                     scale, rotation);
+            //fire the event
+            canceled = target.dispatchEvent(touchEvent);
+        }
+        return canceled;
+    },
+
     //--------------------------------------------------------------------------
     // Mouse events
     //--------------------------------------------------------------------------
@@ -2706,9 +2774,51 @@ YAHOO.util.UserAction = {
      */
     keyup : function (target /*:HTMLElement*/, options /*Object*/) /*:Void*/ {
         this.fireKeyEvent("keyup", target, options);
-    }
+    },
     
+    fireTouchEvent : function(type, target, options){
+        options = options || {};
+        target = YAHOO.util.Dom.get(target);
 
+        var doc = target.ownerDocument || document;
+        //setup default values.
+        return this.simulateTouchEvent(
+                target,
+                type,
+                !!options.canBubble, 
+                !!options.cancelable,
+                options.view || doc.defaultView,
+                +options.detail||1,  // Not sure what this does in "touch" event.
+                +options.screenX||0,
+                +options.screenY||0,
+                +options.clientX||0,
+                +options.clientY||0,
+                !!options.ctrlKey,
+                !!options.altKey,
+                !!options.shiftKey,
+                !!options.metaKey,
+                createTouchList(options.touches),
+                createTouchList(options.targetTouches),
+                createTouchList(options.changedTouches),
+                +options.scale||1,
+                +options.rotation||0);
+    },
+    
+    touchstart : function (target /*:HTMLElement*/, options /*Object*/) {
+        return this.fireTouchEvent("touchstart", target, options);
+    },
+    
+    touchmove : function (target /*:HTMLElement*/, options /*Object*/) {
+        return this.fireTouchEvent("touchmove", target, options);
+    },
+    
+    touchend : function (target /*:HTMLElement*/, options /*Object*/) {
+        return this.fireTouchEvent("touchend", target, options);
+    },
+
+    touchcancel : function (target /*:HTMLElement*/, options /*Object*/) {
+        return this.fireTouchEvent("touchcancel", target, options);
+    }
 };
 
 YAHOO.namespace("tool");

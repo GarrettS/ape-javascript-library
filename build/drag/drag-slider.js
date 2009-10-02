@@ -94,6 +94,7 @@ APE.namespace("APE.drag" );
         // Static initializer code.
         var d = document,
             EventPublisher = APE.EventPublisher,
+            preventDefault = Event.preventDefault,
             DOC_EL = "documentElement",
             ds = d[DOC_EL].style,
             serSelect = "serSelect", 
@@ -136,7 +137,9 @@ APE.namespace("APE.drag" );
         	EV_DRAG_START = "ontouchstart";
         	EV_DRAG = "ontouchmove";
         	EV_DRAG_END = "ontouchend";
+            EventPublisher.add(d, "ontouchcancel", dragCancel);
         }
+        
         docMouseDown = EventPublisher.get(d, EV_DRAG_START);
         
         // prevent text selection while dragging.
@@ -151,8 +154,9 @@ APE.namespace("APE.drag" );
             TSTYLE = "pixelTop";
         }
         docMouseDown.add(mouseDown).addAfter(setUpDragOver);
-        EventPublisher.add(d, "onkeydown", keyDown);
+        EventPublisher.add(d, "onkeydown", dragCancel);
         EventPublisher.add(d, EV_DRAG, mouseMove);
+        EventPublisher.add(self, EV_DRAG, function(ev){ev.preventDefault();});
         EventPublisher.add(d, EV_DRAG_END, mouseUp);
         d = ds = null;
         
@@ -394,8 +398,12 @@ APE.namespace("APE.drag" );
                 return;
             }
             
+            // 1-finger drag for iPhone.
+            if(IS_TOUCH_EVENT && dO) return;
+            
             evOrig = e || event;
-        	e = getPointerEvent(e, "changedTouches");
+
+        	e = getPointerEvent(e, "touches");
             var evOrig,
                 target = Event.getTarget(e),
                 instances = Draggable.instances,
@@ -465,11 +473,11 @@ APE.namespace("APE.drag" );
             dOTarg.style.zIndex = ++highestZIndex;
     
             // User tried to drag a group and still had metaKey down.
-            if(metaKey) { }
+            // if(metaKey) { }
             
             // Sets up dropTargets that have dragOverClassName | ondragover 
             dO = dOTarg;
-            Event.preventDefault(evOrig);
+            preventDefault(evOrig);
             dragObjGrabbed(e, dOTarg);
            
             for(var id in draggableList) {
@@ -488,10 +496,9 @@ APE.namespace("APE.drag" );
             // subset for ondragover, to help speed up dragging 
             // with multiple drop targets.
             dragOverTargets = [];
-
             var dropTargets = dO.dropTargets,
                 dt, i = 0, len = dropTargets.length;
-           
+            
             for(; i < len; i++) {
                 dt = dropTargets[i];
                 dt.initCoords();
@@ -537,9 +544,9 @@ APE.namespace("APE.drag" );
             evOrig = e = e || event;
             if(IS_TOUCH_EVENT) {
             	// Finger drag, not resize not scroll.
-                Event.preventDefault(evOrig);
             	e = e.touches && e.touches[0];
             	if(!e) return;
+                preventDefault(evOrig);
             }
             var eventCoords = getEventCoords(e),
                 ePageX = eventCoords.x, ePageY = eventCoords.y,
@@ -711,15 +718,15 @@ APE.namespace("APE.drag" );
          * When ESC key is pressed, 
          * draggables are released.
          */
-        function keyDown(e) {
+        function dragCancel(e) {
             e=e||event;
-            if(e.keyCode == 27) { // esc key.
+            if(e.keyCode == 27 || e.type === "touchcancel") { // esc key = 27.
                 if(dO) {
                     dO.release(e);
                 }
             }
         }
-         
+                
         function handleDragOver(dO, e, ePageX, ePageY){
             var coords = { x:ePageX, y:ePageY },
             i = 0,
@@ -918,6 +925,7 @@ APE.namespace("APE.drag" );
                 this.useHandleTree = useHandleTree != false;
             },
             
+            dropTargets : false,
             /** 
              * Adds a drop target.
              * @param {HTMLElement|APE.drag.DropTarget} dropTarget either an element or a DropTarget.
@@ -942,11 +950,7 @@ APE.namespace("APE.drag" );
                 var target = Event.getTarget(e),
                     grabCoords;
                 
-                if(e.preventDefault) {
-                    e.preventDefault();
-                } else {
-                    e.returnValue = false;
-                }
+                preventDefault(e);
                 
                 if(dom.contains(this.el, target)) return;
                     

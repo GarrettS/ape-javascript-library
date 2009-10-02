@@ -71,8 +71,6 @@ var Assert = YAHOO.util.Assert,
     IS_TOUCH_EVENT = 'ontouchstart' in document,
     oldBodyCssText = document.body.style.cssText;
 
-alert(IS_TOUCH_EVENT);
-
 var draggableTestCase = new YAHOO.tool.TestCase({
 
     tearDown : function() {
@@ -86,6 +84,10 @@ var draggableTestCase = new YAHOO.tool.TestCase({
         // a weird state.
         Action.mousedown(document, {clientX: 330, clientY: 330});
         Action.mouseup(document, {clientX: 330, clientY: 330});
+        if(IS_TOUCH_EVENT) {
+            Action.touchstart(document);
+            Action.touchend(document);
+        }
         testNode = document.getElementById('testNode');
         testNode2 = document.getElementById('testNode2');
 
@@ -137,6 +139,13 @@ var draggableMouseTestCase = new YAHOO.tool.TestCase({
 
     tearDown : draggableTestCase.tearDown,
     
+    _should : {
+        ignore : {
+        // Safari 2 issue: pageX.
+            testYuiTestMouseMove : true
+        }        
+    },
+    
     testMouseup : function() {
         // should not throw error.
         Draggable.getByNode( testNode ); // to kick off "init events in Draggable".
@@ -144,13 +153,6 @@ var draggableMouseTestCase = new YAHOO.tool.TestCase({
         Action.mouseup( document.body, {clientX: 330, clientY: 330} );
     },
 
-    _should : {
-        ignore : {
-        // Safari 2 issue: pageX.
-            testYuiTestMouseMove : true,
-        }        
-    },
-    
     testSelect : function() {
         
         testNode.className = "orig";
@@ -856,7 +858,7 @@ var draggableMouseTestCase = new YAHOO.tool.TestCase({
 
         var dt = d.addDropTarget( testNode3 );
         d.removeDropTarget( dt );
-    },
+    }
 });
 
 var animatedDragTestCase = new YAHOO.tool.TestCase({
@@ -1093,6 +1095,8 @@ var animatedDragTestCase = new YAHOO.tool.TestCase({
         }, 78);
     }
 });
+
+
 // Set the TestRunner's logger by invoking a constructor
 new YAHOO.tool.TestLogger("testLogger");
 
@@ -1104,11 +1108,26 @@ new YAHOO.tool.TestLogger("testLogger");
 //    }
 //}
 
+
 TestRunner.add( draggableTestCase );
 
 if(!IS_TOUCH_EVENT) {
     TestRunner.add( draggableMouseTestCase );
     TestRunner.add( animatedDragTestCase );
+} else {
+    var touchTestCase = new YAHOO.tool.TestCase({
+        name : "touch drag tests",
+
+        tearDown : draggableTestCase.tearDown,
+        
+        testTouchStart : function() { 
+            // should not throw error.
+            Draggable.getByNode( testNode ); // to kick off "init events in Draggable".
+            Action.touchstart( document.body, {clientX: 330, clientY: 330} );
+            Action.touchend( document.body, {clientX: 330, clientY: 330} );            
+        }
+    });
+    TestRunner.add( touchTestCase );
 }
 
 TestRunner.subscribe("testcasebegin", addAnim);
