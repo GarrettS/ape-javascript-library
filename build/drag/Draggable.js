@@ -397,14 +397,14 @@ APE.namespace("APE.drag");
                 return;
             }
             
+            evOrig = e || event;
             // 1-finger drag for iPhone.
             if(IS_TOUCH_EVENT && dO) return;
             
-            evOrig = e || event;
 
         	e = getPointerEvent(e, "touches");
             var evOrig,
-                target = Event.getTarget(e),
+                target = Event.getTarget(evOrig),
                 instances = Draggable.instances,
                 dOTarg,
                 testNode = target,
@@ -415,7 +415,6 @@ APE.namespace("APE.drag");
                 testNode = dom.findAncestorWithAttribute(testNode, "id");
             }
             if(dOTarg) { // found. 
-            
                 if(!dOTarg.isDragEnabled) {
                     
                     if(!metaKey) {
@@ -567,7 +566,7 @@ APE.namespace("APE.drag");
                     dragStart(draggableList[id], e);
                 }
             }
-    
+            
             dO.hasBeenDragged = (dO.hasBeenDragged || (distX || distY));
             
             var isLeft = newX < dO.minX,
@@ -687,6 +686,7 @@ APE.namespace("APE.drag");
                         retireClone(item);
                 }
             }
+            
             e = getPointerEvent(e, "changedTouches");
             // if it's been dragged onto a dropTarget, fire that event.
             handleDrops(e);

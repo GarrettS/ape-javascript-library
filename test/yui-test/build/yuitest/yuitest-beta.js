@@ -2091,40 +2091,67 @@ YAHOO.namespace("util");
  * @static
  */
 
-function createTouchList(touchObjectDataArray) {
-    var defaultTouchList = document.createTouchList(document.createTouch(window, null, 0, 0, 0, 0, 0));
 
-    if(!touchObjectDataArray) {
-        return defaultTouchList;
+/* Create own copy of event options, validating values. */
+function TouchEventData(target, options) {
+    if(options) {
+        YAHOO.lang.augmentObject(this, options);
     }
+    var doc = target.ownerDocument || target.document || target;
+    this.target = target;
+    this.canBubble = ("canBubble" in this) ? !!this.canBubble : true; 
+    this.cancelable = ("cancelable" in this) ? !!this.cancelable : true;
+    this.view = this.view|| doc.defaultView;
+    this.detail = +this.detail||1;  // Not sure what this does in "touch" event.
+    this.screenX = +this.screenX||0;
+    this.screenY = +this.screenY||0;
+    this.pageX = +this.pageX||0;
+    this.pageY = +this.pageY||0;
+    this.ctrlKey = "ctrlKey" in this && !!this.ctrlKey;
+    this.altKey = "altKey" in this && !!this.altKey;
+    this.shiftKey = "shiftKey" in this && !!this.shiftKey;
+    this.metaKey = "metaKey" in this && !!this.metaKey;
+    this.scale = +this.scale||1;
+    this.rotation = +this.rotation||0;
+    this.touches = createTouchList(this.touches||this);
+    this.targetTouches = createTouchList(this.targetTouches||this);
+    this.changedTouches = createTouchList(this.changedTouches||this);
+}
+
+function createTouchList(touchObjectDataArray) {
     var i, 
         len = touchObjectDataArray.length,
         doc,
         target,
-        touches = [];
+        touches = [],
+        touchList;
     if(!len) {
         if("target" in touchObjectDataArray) {
-            target = touchObjectDataArray.target,
+            target = touchObjectDataArray.target;
+            touchObjectDataArray = [touchObjectDataArray];
             len = 1;
         } else {
-            throw TypeError("createTouchList called with incompatible argument.")
+            throw TypeError("createTouchList called with incompatible argument.");
         }
     }
     for(i = 0; i < len; i++) {
         touchObjectData = touchObjectDataArray[i];
         target = touchObjectData.target;
-        doc = target.ownerDocument;
+        doc = target.ownerDocument || target.document || target;
         var touch = doc.createTouch(
-                target.parentWindow,
+                doc.defaultView,
                 target,
+                touchObjectData.identifier||0,
                 touchObjectData.pageX||0,
                 touchObjectData.pageY||0,
                 touchObjectData.screenX||0,
                 touchObjectData.screenY||0);
         touches.push(touch);
     }
-    // Not sure which document, so assume any document will work.
-    doc.createTouchList.apply(doc, touches);
+
+    // [[Call]] document.createTouchList indirectly (Host object).
+    touchList = doc.createTouchList.apply.apply(doc.createTouchList, [doc, touches]);
+    return touchList;
 }
 
 YAHOO.util.UserAction = {
@@ -2390,7 +2417,7 @@ YAHOO.util.UserAction = {
             throw new Error("simulateMouseEvent(): Invalid target.");
         }
         var doc = target.ownerDocument || target.document || target,
-            win = doc.parentWindow;
+            win = doc.defaultView || doc.parentWindow;
             
         if(!win && doc.createElement) {
             var scriptElement = doc.createElement('script'),
@@ -2573,14 +2600,14 @@ YAHOO.util.UserAction = {
     },
     
     simulateTouchEvent : function(target, type, canBubble, cancelable, view, detail, 
-                            screenX, screenY, clientX, clientY, ctrlKey, altKey, 
+                            screenX, screenY, pageX, pageY, ctrlKey, altKey, 
                             shiftKey, metaKey, touches, targetTouches, changedTouches, 
                             scale, rotation) {
         if (!target){
             throw TypeError("simulateTouchEvent(): Invalid target.");
         }
         var doc = target.ownerDocument || target.document || target,
-            win = doc.parentWindow,
+            win = doc.defaultView || doc.parentWindow,
             canceled = false,
             touchEvent;
             
@@ -2593,7 +2620,7 @@ YAHOO.util.UserAction = {
         touchEvent = doc.createEvent("TouchEvent");
         if (typeof touchEvent.initTouchEvent == "function"){
             touchEvent.initTouchEvent(type, canBubble, cancelable, view, detail,
-                                     screenX, screenY, clientX, clientY, 
+                                     screenX, screenY, pageX, pageY, 
                                      ctrlKey, altKey, shiftKey, metaKey, 
                                      touches, targetTouches, changedTouches, 
                                      scale, rotation);
@@ -2777,31 +2804,32 @@ YAHOO.util.UserAction = {
     },
     
     fireTouchEvent : function(type, target, options){
-        options = options || {};
+        var c = new TouchEventData(target, options);
         target = YAHOO.util.Dom.get(target);
 
         var doc = target.ownerDocument || document;
         //setup default values.
+
         return this.simulateTouchEvent(
                 target,
                 type,
-                !!options.canBubble, 
-                !!options.cancelable,
-                options.view || doc.defaultView,
-                +options.detail||1,  // Not sure what this does in "touch" event.
-                +options.screenX||0,
-                +options.screenY||0,
-                +options.clientX||0,
-                +options.clientY||0,
-                !!options.ctrlKey,
-                !!options.altKey,
-                !!options.shiftKey,
-                !!options.metaKey,
-                createTouchList(options.touches),
-                createTouchList(options.targetTouches),
-                createTouchList(options.changedTouches),
-                +options.scale||1,
-                +options.rotation||0);
+                c.canBubble, 
+                c.cancelable,
+                c.view,
+                +c.detail,  // Not sure what this does in "touch" event.
+                +c.screenX,
+                +c.screenY,
+                +c.pageX,
+                +c.pageY,
+                c.ctrlKey,
+                c.altKey,
+                c.shiftKey,
+                c.metaKey,
+                c.touches,
+                c.targetTouches,
+                c.changedTouches,
+                +c.scale||1,
+                +c.rotation||0);
     },
     
     touchstart : function (target /*:HTMLElement*/, options /*Object*/) {

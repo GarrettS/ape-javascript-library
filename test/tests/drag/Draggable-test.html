@@ -41,7 +41,7 @@
     ><div id="testNode3" tabIndex="0">drag me.</div
 ></div>
 <script type="text/javascript">
-setTimeout(function(){
+window.onload = function(){
 
 // window.focus() seems to fix false failures 
 // with testNode.focus() not taking effect.
@@ -128,6 +128,45 @@ var draggableTestCase = new YAHOO.tool.TestCase({
         // should be centered on cursor.
         Assert.areEqual(10 - 50, dO.x, "x wrong");
         Assert.areEqual(10 - 10, dO.y, "y wrong");
+    },
+
+    testFromBottom : function() {
+
+        document.body.style.height="300px";
+        document.body.style.width ="500px";
+        document.documentElement.style.fontSize = "0";
+        document.documentElement.style.letterSpacing = "-10px";
+        
+        testNode.style.bottom = testNode.style.right = "0";
+        testNode.style.position = "absolute";
+        testNode.style.width = "120px";
+
+        
+        // Simple way to set top/left.
+        testNode.style.top= testNode.offsetTop + "px";
+        testNode.style.left= testNode.offsetLeft +"px";
+        
+        var d = Draggable.getByNode( testNode );
+
+        var coords = dom.getOffsetCoords( testNode ),
+            expectedTop = 300 - testNode.offsetHeight,
+            expectedLeft = document.body.offsetWidth - testNode.offsetWidth;
+
+        // Make sure the coords are correct.
+        Assert.areEqual( expectedTop, coords.y, 'coords y was wrong' );
+        Assert.areEqual( expectedLeft, coords.x, 'coords x was wrong' );
+
+        var dv = document.defaultView,
+            el = testNode,
+            s = el.style,
+            cs = (dv && dv.getComputedStyle && dv.getComputedStyle(el,"")) 
+                || el.currentStyle,
+
+            // If this throws an error in IE, it means failure of _setIeTopLeft();
+            top = testNode.style.top || cs.top,
+            left = testNode.style.left || cs.left;
+        Assert.areEqual( expectedTop, parseInt(top), 'style.top was wrong' );
+        Assert.areEqual( expectedLeft, parseInt(left), 'style.left was wrong' );       
     }
 });
 
@@ -158,7 +197,6 @@ var draggableMouseTestCase = new YAHOO.tool.TestCase({
         testNode.className = "orig";
         
         var d = Draggable.getByNode( testNode ),
-            gotFocus = false,
             gotMousedown = false;
         d.activeDragClassName = aClass;
         d.selectedClassName = sClass;
@@ -330,45 +368,6 @@ var draggableMouseTestCase = new YAHOO.tool.TestCase({
 	        Assert.areEqual( 111, coords2.y, "y coords wrong" );
 	        Assert.areEqual( coords.x, coords2.x, "x pos should not have changed." );
 	    }, 78);
-    },
-
-    testFromBottom : function() {
-
-        document.body.style.height="300px";
-        document.body.style.width ="500px";
-        document.documentElement.style.fontSize = "0";
-        document.documentElement.style.letterSpacing = "-10px";
-        
-        testNode.style.bottom = testNode.style.right = "0";
-        testNode.style.position = "absolute";
-        testNode.style.width = "120px";
-
-        
-        // Simple way to set top/left.
-        testNode.style.top= testNode.offsetTop + "px";
-        testNode.style.left= testNode.offsetLeft +"px";
-        
-        var d = Draggable.getByNode( testNode );
-
-        var coords = dom.getOffsetCoords( testNode ),
-            expectedTop = 300 - testNode.offsetHeight,
-            expectedLeft = document.body.offsetWidth - testNode.offsetWidth;
-
-        // Make sure the coords are correct.
-        Assert.areEqual( expectedTop, coords.y, 'coords y was wrong' );
-        Assert.areEqual( expectedLeft, coords.x, 'coords x was wrong' );
-
-        var dv = document.defaultView,
-            el = testNode,
-            s = el.style,
-            cs = (dv && dv.getComputedStyle && dv.getComputedStyle(el,"")) 
-                || el.currentStyle,
-
-            // If this throws an error in IE, it means failure of _setIeTopLeft();
-            top = testNode.style.top || cs.top,
-            left = testNode.style.left || cs.left;
-        Assert.areEqual( expectedTop, parseInt(top), 'style.top was wrong' );
-        Assert.areEqual( expectedLeft, parseInt(left), 'style.left was wrong' );       
     },
 
     testSetHandle : function() {
@@ -889,8 +888,7 @@ var animatedDragTestCase = new YAHOO.tool.TestCase({
         var testRunner = this;
         if(APE.anim) {
             testOnGlide.call(this);
-        }
-        else {
+        } else {
             // Wait until anim is loaded.
             var _pollStart = +new Date,
                 tid = setInterval(checkAnimLoaded, 100);
@@ -1125,6 +1123,241 @@ if(!IS_TOUCH_EVENT) {
             Draggable.getByNode( testNode ); // to kick off "init events in Draggable".
             Action.touchstart( document.body, {clientX: 330, clientY: 330} );
             Action.touchend( document.body, {clientX: 330, clientY: 330} );            
+        },
+
+        testSelect : function() {
+            
+            testNode.className = "orig";
+            
+            var d = Draggable.getByNode( testNode ),
+                gotTouchstart = false;
+            d.activeDragClassName = aClass;
+            d.selectedClassName = sClass;
+
+            EventPublisher.add( testNode, "ontouchstart", function(){
+                gotTouchstart = true;
+            });
+
+            Action.touchstart( testNode );
+            Action.touchend( testNode );
+
+            this.wait(function(){
+                
+                Assert.isTrue( gotTouchstart, "testNode didn't get touchstart" );
+
+                // in case focus was somehow lost.
+                Action.touchstart( testNode );
+                StringAssert.contains( sClass, testNode.className, 
+                        'should not have selection for touch events' );
+                StringAssert.doesNotContain( aClass, testNode.className );
+            }, 78);
+        },
+
+        testDragStart : function() {
+            
+            var d = Draggable.getByNode( testNode ),
+                ds = false,
+                bds = false;
+
+            d.activeDragClassName = aClass;
+            d.ondragstart = function() {
+                ds = true;
+            };
+
+            d.onbeforedragstart = function() {
+                bds = true;
+            };
+            if(testNode.focus)
+                testNode.focus();
+
+            Assert.isFalse( ds, "dragstart should not have fired." );
+            Action.touchstart( testNode );
+            Assert.isTrue( bds, "onbeforedragstart should have fired." );
+            Assert.isFalse( ds, "drag start <em>still<\/em> should not have fired." );
+
+            //screenX, screenY, clientX, clientY, altKey, ctrlKey, shiftKey, metaKey
+            Action.touchmove( document );
+            Draggable.f = 1;
+            Action.touchmove( document, {clientX:101} );
+
+            delete Draggable.f; 
+            Assert.isTrue( ds, "now drag start should have fired." );
+            StringAssert.contains( aClass, testNode.className );
+            Action.touchend(document);
+        },
+
+        testDragClone : function() {
+            var d = Draggable.getByNode( testNode ),
+                ds = false,
+                bds = false,
+                left = testNode.style.left,
+                top = testNode.style.top;
+
+            d.activeDragClassName = aClass;
+            d.dragCopy = true;
+
+            Action.touchstart( testNode );
+
+            Action.touchmove( document, {clientX:101} );
+            this.wait(function(){
+    	        Action.touchmove( document, {clientX:101} );
+    	
+    	        Assert.areEqual(left, testNode.style.left);
+    	        Assert.areEqual(top, testNode.style.top);
+    	        StringAssert.doesNotContain( aClass, testNode.className );        
+    	        StringAssert.contains( aClass, d.el.className );        
+    	        Action.touchend(document);
+            }, 78);
+        },
+
+        testDisable : function() {
+            var d = Draggable.getByNode( testNode ),
+                ds = false,
+                bds = false,
+                left = testNode.style.left,
+                top = testNode.style.top;
+
+            d.isDragEnabled = false;
+
+            if(testNode.focus)
+                testNode.focus();
+
+            Action.touchstart( testNode );
+            
+            Action.touchmove( document );
+            Action.touchmove( document, {clientX:101} );
+
+            Assert.areEqual(left, testNode.style.left);
+            Assert.areEqual(top, testNode.style.top);
+            StringAssert.doesNotContain( aClass, testNode.className );        
+            Action.touchend(document);
+        },
+        
+        testConstraintHorz : function() {
+
+            var d = Draggable.getByNode( testNode );
+            d.moveToY = function(){};
+            
+            var coords = dom.getOffsetCoords( testNode ),
+                moveToCoords = {pageX:83, pageY:111};
+            
+            Action.touchstart( testNode, {pageX: 0, pageY: 0} );
+            Action.touchmove( document, moveToCoords );
+
+            // Threshold is 25ms (so wait for it to kick in).
+            this.wait(function() {
+                Action.touchmove( document, moveToCoords );
+                this.wait(function(){
+                    Draggable.v = 1;
+                    Action.touchmove( document, moveToCoords );
+                    delete Draggable.v;
+    	            var coords2 = dom.getOffsetCoords( testNode );
+    	            Assert.areEqual( 83, coords2.x, "x wrong" );
+    	            Assert.areEqual( coords.y, coords2.y, 
+    	                    "y pos should not have changed." );
+    	        }, 78);
+            }, 110);
+        },
+
+        testConstraintVert : function() {
+
+            document.body.style.height="300px";
+            var d = Draggable.getByNode( testNode );
+            d.moveToX = function(){};
+            
+            var coords = dom.getOffsetCoords( testNode );
+            
+            Action.touchstart( testNode, {pageX: 0, pageY: 0} );
+
+            
+            Action.touchmove( document, {pageX:1, pageY:1} );
+            this.wait(function() {
+    	        Action.touchmove( document, {pageX:221, pageY:111} );
+
+    	        var coords2 = dom.getOffsetCoords( testNode );
+    	    
+    	        Assert.areEqual( 111, coords2.y, "y coords wrong" );
+    	        Assert.areEqual( coords.x, coords2.x, "x pos should not have changed." );
+    	    }, 78);
+        },
+
+        testSetHandle : function() {
+            
+            var handle = document.createElement("div");
+            
+            testNode.appendChild( handle );
+
+            var ts = testNode.style;
+            ts.width = ts.height = "440px";
+            ts.left = ts.top = '0';
+
+            document.body.style.width = "900px";
+            document.body.style.height = "900px";
+            
+            handle.style.height = "20px";
+            handle.id = "handle";
+
+            var d = Draggable.getByNode( testNode );
+            
+            d.setHandle( handle );
+
+            Action.touchstart(handle);
+
+            if(testNode.focus)
+                testNode.focus();
+            var coords = {pageX: 33, pageY: 55};
+            Action.touchmove(document, coords);
+            this.wait(function(){
+    	        Action.touchmove( document, coords);
+    	
+    	        Assert.areEqual( 33, parseInt(testNode.style.left), "left was wrong");
+    	        Assert.areEqual( 55, parseInt(testNode.style.top), "top was wrong");
+            }, 40);
+        },
+
+        testSetHandleFail : function() {
+            
+            var handle = document.createElement("div");
+            
+            testNode.appendChild( handle );
+
+            var ts = testNode.style;
+            ts.width = ts.height = "440px";
+            ts.left = ts.top = '0';
+
+            document.body.style.width = "900px";
+            document.body.style.height = "900px";
+            
+            handle.style.height = "20px";
+            handle.style.top = "20px";
+
+            var d = Draggable.getByNode( testNode );
+            
+            d.setHandle( handle );
+
+            Action.touchstart(testNode);
+            Action.touchmove(document);
+            Action.touchmove( document, {pageX: 33, pageY: 55} );
+
+            Assert.areEqual( 0, parseInt(testNode.style.left), "left was not 0");
+            Assert.areEqual( 0, parseInt(testNode.style.top), "top was not 0");
+        },
+
+        testAutomaticDeselection : function() {
+            var d = Draggable.getByNode( testNode ),
+            d2 = Draggable.getByNode( testNode2 );
+            d.dragMultiple = true;
+            d.selectedClassName = d2.selectedClassName = sClass;
+
+            Action.touchstart( testNode );
+
+            Assert.areEqual( sClass, testNode.className, 'testNode class should be "' + sClass +'"' );
+            Action.touchend( testNode );
+
+            this.wait(function(){
+                Action.touchstart( testNode2 );
+                StringAssert.isEmpty( testNode.className, 'testNode class should be empty' );
+            }, 78);
         }
     });
     TestRunner.add( touchTestCase );
@@ -1152,6 +1385,6 @@ if (parent && parent != self
 YAHOO.log(MOUSE_MOVE_TEST_WARNING, "warn", "TestRunner");    
 YAHOO.log("Do not scroll the window during the test.", "warn", "TestRunner");    
 
-}, 100);</script>
+};</script>
 </body> 
 </html>
