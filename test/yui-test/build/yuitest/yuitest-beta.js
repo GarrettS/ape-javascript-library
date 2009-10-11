@@ -2350,6 +2350,29 @@ YAHOO.util.UserAction = {
         }
     },
 
+    simulateHTMLEvent : function(target, type, bubbles, cancelable) {
+        var ev;
+        bubbles = typeof bubbles === "undefined" ? true : !!bubbles;
+        cancelable = typeof cancelable === "undefined" ? true : !!cancelable;
+        if(document.createEvent) {
+            try {
+                ev = document.createEvent("Events");
+                ev.initEvent(type, bubbles, cancelable);
+            } catch(ex) {
+                // Safari 2.x here.
+                ev = document.createEvent("UIEvents");
+                ev.initEvent(type, bubbles, cancelable, 1);                
+            }
+            return ev ? target.dispatchEvent(ev) : false;
+        } else {
+            ev = document.createEventObject();
+            ev.srcElement = target;
+            ev.type = "on" + type;
+            ev.cancelBubble = !bubbles;
+            return target.fireEvent("on" + type, ev);
+        }
+    },
+    
     /**
      * Simulates a mouse event using the given event information to populate
      * the generated event object. This method does browser-equalizing
@@ -2655,6 +2678,11 @@ YAHOO.util.UserAction = {
             options.relatedTarget);        
     },
 
+    fireHTMLEvent : function(target, type, options) {
+        if(!options) options = {};
+        this.simulateHTMLEvent(target, type, options.bubbles, options.cancelable);
+    },
+    
     /**
      * Simulates a click on a particular element.
      * @param {HTMLElement} target The element to click on.
@@ -2748,6 +2776,18 @@ YAHOO.util.UserAction = {
     // Key events
     //--------------------------------------------------------------------------
 
+    change : function(target, options) {
+        this.fireHTMLEvent(target, "change", options);
+    },
+
+    focus : function(target, options) {
+        this.fireHTMLEvent(target, "focus", options);
+    },
+
+    blur : function(target, options) {
+        this.fireHTMLEvent(target, "blur", options);
+    },
+    
     /**
      * Fires an event that normally would be fired by the keyboard (keyup,
      * keydown, keypress). Make sure to specify either keyCode or charCode as
@@ -2804,32 +2844,16 @@ YAHOO.util.UserAction = {
     },
     
     fireTouchEvent : function(type, target, options){
-        var c = new TouchEventData(target, options);
-        target = YAHOO.util.Dom.get(target);
-
-        var doc = target.ownerDocument || document;
+        var c = new TouchEventData(target, options),
+            doc = target.ownerDocument || target.document || target;
+        
         //setup default values.
-
         return this.simulateTouchEvent(
-                target,
-                type,
-                c.canBubble, 
-                c.cancelable,
-                c.view,
-                +c.detail,  // Not sure what this does in "touch" event.
-                +c.screenX,
-                +c.screenY,
-                +c.pageX,
-                +c.pageY,
-                c.ctrlKey,
-                c.altKey,
-                c.shiftKey,
-                c.metaKey,
-                c.touches,
-                c.targetTouches,
-                c.changedTouches,
-                +c.scale||1,
-                +c.rotation||0);
+                target, type, c.canBubble, c.cancelable, c.view,
+                c.detail,  // Not sure what this does in "touch" event.
+                c.screenX, c.screenY, c.pageX, c.pageY, c.ctrlKey,
+                c.altKey, c.shiftKey, c.metaKey, c.touches, c.targetTouches,
+                c.changedTouches, c.scale, c.rotation);
     },
     
     touchstart : function (target /*:HTMLElement*/, options /*Object*/) {
