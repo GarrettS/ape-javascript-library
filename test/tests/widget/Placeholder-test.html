@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<!--  HTML 5 doctype for <input placeholder="placeholder text"> -->
+<html lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+    <title>Placeholder Test</title>
+    <link rel="stylesheet" type="text/css" href="../../yui-test/build/logger/assets/logger.css">
+    <link rel="stylesheet" type="text/css" href="../../yui-test/build/yuitest/assets/yuitest.css">
+    <link rel="stylesheet" type="text/css" href="../../yui-test/assets/testlogger.css">
+
+    <script type="text/javascript" src="../../yui-test/build/yahoo-dom-event/yahoo-dom-event.js"></script>
+    <script type="text/javascript" src="../../yui-test/build/logger/logger.js"></script>
+    <script type="text/javascript" src="../../yui-test/build/yuitest/yuitest-beta.js"></script>
+
+    <script type="text/javascript" src="../../../build/ape-ep-dom.js"></script>
+    <script type="text/javascript" src="../../../build/widget/Placeholder/Placeholder.js"></script>
+</head>
+<body>
+
+<div id='template'>
+    <label for="search" id='sf'>Search:</label>
+    <input id="search" type="text" placeholder="search">
+    <input id="first" type="text" placeholder="placeholder text" value="first name">
+    <input id="dummy" type="text">
+</div>
+
+<div id="testLogger"></div>
+<script type="text/javascript">
+window.onload = function(){
+    var Placeholder = APE.widget.Placeholder,
+        Assert = YAHOO.util.Assert,
+        Action = YAHOO.util.UserAction,
+        template = document.getElementById('template'),
+        search, 
+        first,
+        templateHTML = template.innerHTML;
+ 
+    var placeholderEmptyTest = new YAHOO.tool.TestCase({
+ 
+        //name of the test case - if not provided, one is auto-generated
+        name : "Placeholder test",
+        
+        setUp : function () {
+            template.innerHTML = templateHTML;
+            search = document.getElementById('search');
+            first = document.getElementById('first');
+            self.focus();
+        },
+        
+        tearDown : function () {
+            var instances = Placeholder.instances;
+            for(var id in instances) {
+                instances[id].detachEvents();
+            }
+            Placeholder.instances = {};
+            document.getElementById("dummy").focus();
+            template.innerHTML = "";
+            // draw focus elsewhere.
+            search = first = null;
+        },
+
+        _should : {
+            ignore : {
+                testDefaultState : Placeholder.IS_NATIVE,
+                testBlur : Placeholder.IS_NATIVE,
+                testFocusBlurFocus : Placeholder.IS_NATIVE,
+                testDetachEvents : Placeholder.IS_NATIVE,
+                testInit :  Placeholder.IS_NATIVE
+            }
+        },
+
+        testGetById : function(){
+            var ph = Placeholder.getById("search");
+        },
+        
+        testDefaultState: function() {
+            var ph = Placeholder.getById("search");
+            Assert.isNotNull(ph);
+            Assert.areSame("search", search.value);
+        },
+
+        testBlur : function() {
+            var ph = Placeholder.getById("search");
+            Action.focus(search);
+            Action.blur(search);
+            Assert.areSame("search", search.value);
+        },
+
+        testFocusBlurFocus : function() {
+            var ph = Placeholder.getById("search");
+            Action.focus(search);
+            Action.blur(search);
+            Action.focus(search);
+            Assert.areSame("", search.value);
+        },
+
+        testDrop : function() {
+            var ph = Placeholder.getById("search");
+            Action.fireHTMLEvent(search, "drop", {
+                dataTransfer : {
+                    getData : function(){
+                        return "dropped text";
+                    }
+            };
+        },
+        
+        testDetachEvents : function() {
+            var ph = Placeholder.getById("search");
+            ph.detachEvents();
+            search.value = "10";
+            Action.focus(search);
+            // Events were detached, so no callback should fire.
+            Assert.areSame("10", search.value);
+        },
+
+        testInit : function() {
+            var ph = Placeholder.getById("search");
+            ph.detachEvents();
+            ph.initEvents();
+            search.value = "10";
+            Action.focus(search);
+            // Events were detached, so no callback should fire.
+            Assert.areSame("10", search.value);
+        }
+    });
+
+    var placeholderHasValueTest = new YAHOO.tool.TestCase({
+        setUp : placeholderEmptyTest.setUp,
+        tearDown : placeholderEmptyTest.tearDown,
+        
+        testDefaultState: function() {
+            var ph = Placeholder.getById("first");
+            Assert.isNotNull(ph);
+            Assert.areSame("first name", first.value);
+        },
+    
+        testBlur : function() {
+            var ph = Placeholder.getById("first");
+            Action.focus(first);
+            Action.blur(first);
+            Assert.areSame("first name", first.value);
+        },
+    
+        testFocusBlurFocus : function() {
+            var ph = Placeholder.getById("first");
+            Action.focus(first);
+            Action.blur(first);
+            Action.focus(first);
+            Assert.areSame("first name", first.value);
+        },
+    
+        testDetachEvents : function() {
+            var ph = Placeholder.getById("first");
+            ph.detachEvents();
+            first.value = "10";
+            Action.focus(first);
+            // Events were detached, so no callback should fire.
+            Assert.areSame("10", first.value);
+        }
+    });
+    
+    //create the logger
+    new YAHOO.tool.TestLogger("testLogger");
+ 
+    //run the tests
+    YAHOO.tool.TestRunner.add( placeholderEmptyTest );
+    YAHOO.tool.TestRunner.add( placeholderHasValueTest );
+     //run the tests
+    if (parent !== self 
+            && "YAHOO" in parent
+            && parent.YAHOO.tool ) {
+        YAHOO.tool.TestManager.load();
+    } else {
+        YAHOO.tool.TestRunner.run();
+    }
+ 
+};</script>
+</body>
