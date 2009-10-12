@@ -12,7 +12,48 @@ onload = function(){
         "typeof: " + (typeof document.documentElement.ownerDocument)
         ].join("; ");
 };
+
+function gitHubSource() {
+    var ID = "gTestFrame",
+        node = document.getElementById(ID);
+    if (node) {
+        node.parentNode.removeChild(node);
+    }
+    var code = document.getElementById("LC1").parentNode;
+    code = code.cloneNode(true);
+    var divs = code.getElementsByTagName("div");
+    var tn = document.createTextNode(" \n");
+    for (var i = 0; i < divs.length; i++) {
+        code.insertBefore(tn.cloneNode(false), divs[i]);
+    }
+    code = code.textContent || code.innerText;
+    var s = location.pathname,
+    lastPath = /\/[^\/]+$/,
+    relUrlAttr = /((href|src)=['|"])(?:\.)/;
+    s = s.replace("blob/", "raw/");
+    s = s.replace(lastPath, "/") + ".";
+    j = 0;
+    while (relUrlAttr.test(code)) {
+        code = code.replace(relUrlAttr, RegExp.$1 + s);
+    }
+    console.log(code);
+    var iframe = document.createElement("iframe");
+    iframe.setAttribute("style", "width: 90%; height: 300px; margin-bottom: 4px");
+    iframe.id = ID;
+    iframe.src = "about:blank";
+    document.body.appendChild(iframe);
+    var win = iframe.contentWindow;
+    win.document.write(code);
+    win.document.close();
+    iframe.focus();
+    location.hash = "#" + iframe.id;
+}
 </script>
 </head>
-<body style="white-space: pre">-</body>
+<body style="white-space: pre">-
+<p>
+<a href="#" 
+  onclick=''>gitHubSource()</a>  
+</p>
+</body>
 </html>
