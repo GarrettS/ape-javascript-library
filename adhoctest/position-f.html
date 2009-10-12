@@ -1,0 +1,18 @@
+<!doctype html>
+<html>
+<head>
+<title>test activation object</title>
+<script src="../build/APE.js" type="text/javascript"></script>
+<script src="../build/dom/constants.js" type="text/javascript"></script>
+<script src="../build/dom/position-f.js" type="text/javascript"></script>
+</head>
+<body style="white-space: pre">
+<div style="width: 400px; height: 1200px;">stretcher</div>
+<div id="x" style="position: absolute; top: 10px;left: 2px"></div>
+<script type="text/javascript">
+onload = function(){
+    var d = APE.dom.getOffsetCoords(document.getElementById("x"));
+};
+</script>
+</body>
+</html>

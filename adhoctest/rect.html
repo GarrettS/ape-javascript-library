@@ -1,0 +1,29 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+<title>getBoundingClientRect test</title>
+<script type="text/javascript">
+onload = function(ev){
+  var tn = document.getElementById("testNode"),
+  // not in BB 9000.
+      coords = tn.getBoundingClientRect(),
+      dv = document.defaultView,
+      cs = (dv ? dv.getComputedStyle(tn, "") : tn.currentStyle),
+      topPos = cs.top,
+      result = [
+                "style.top (20px): " + tn.style.top,
+                "coords.top: " + coords.top,
+                "getComputedStyle top: " + topPos
+      ],
+      m = document.getElementById("m");
+  m.firstChild.data = result.join("\n");
+};
+</script>
+</head>
+<body style="position: relative; margin: 0; padding:0">&nbsp;<!-- why is this needed? -->
+<div id="testNode" 
+  style="top: 20px; left: 20px; background: #CC6;position: absolute">tN</div>
+<pre id="m">-</pre>
+</body>
+</html>

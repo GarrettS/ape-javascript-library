@@ -1,0 +1,18 @@
+<!doctype html>
+<html>
+<head>
+<title>test "ownerDocument" in document</title>
+<script type="text/javascript">
+onload = function(){
+    document.body.firstChild.data = 
+        [
+        "ownerDocument" in document.documentElement,
+        "ownerDocument" in document.body,
+        "ownerDocument" in document.createElement("div"),
+        "typeof: " + (typeof document.documentElement.ownerDocument)
+        ].join("; ");
+};
+</script>
+</head>
+<body style="white-space: pre">-</body>
+</html>

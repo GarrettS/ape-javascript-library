@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+<head>
+<title>test activation object</title>
+</head>
+<body style="white-space: pre">
+<script type="text/javascript">
+var hasOwnProperty = 12;
+this.hasOwnProperty = 14;
+this.gProp = "g";
+
+(function(){
+	function hasOwnProperty(a){return 1;}
+	var constructor = 123;
+	function toString() { return "local"; }
+function testThis(){
+	document.write([
+	            	hasOwnProperty("gProp"),
+	            	constructor,
+	            	toString(),
+	            	this.toString()]);
+}
+
+return testThis;
+})()();
+</script>
+</body>
+</html>

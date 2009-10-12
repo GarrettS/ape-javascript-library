@@ -1,0 +1,19 @@
+<!doctype html>
+<head><title>onmousemove event</title>
+</head>
+<body>
+<h1>onmousemove on document</h1>
+<pre id="m" style="font-size: 70px">-</pre>
+<script type="text/javascript">
+document.body.onmousemove = function(ev) {
+    var r = [];
+    for(var p in ev) {
+        r.push(p + ": " + ev[p]);
+    }
+    document.getElementById('m').firstChild.data = r.join("\n");
+};
+
+</script>
+<div>bottom of page</div>
+</body>
+</html>

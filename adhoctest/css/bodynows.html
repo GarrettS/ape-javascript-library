@@ -1,0 +1,44 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+<title>text node in BODY test</title>
+<script type="text/javascript">
+function selectChanged(select){
+    var m = document.getElementById('m'),
+        s;
+    m.style.fontSize = select.value;
+    var testNode = document.getElementById("testNode");
+
+    // show "top" value to user.
+    if("getBoundingClientRect" in testNode) {
+        s = "rect.top: " + testNode.getBoundingClientRect().top;
+    } else {
+        s = "offsetTop: " + testNode.offsetTop;
+    }
+    testNode.firstChild.data = s;
+}
+</script>
+</head>
+<body style="position: relative; margin: 0;"><!-- &nbsp; --> 
+<div id="testNode" 
+  style="top: 0px; left: 0px; background: #CC6;position: absolute">tN</div>
+<pre id="m"></pre>
+<div>
+<button type="button" onclick="document.body.style.border='1px solid'">add border</button>
+or 
+<button type="button" onclick="document.body.style.position='static'">body static</button>
+or
+<button type="button" onclick="document.body.style.position='absolute'">body absolute</button>
+set <code>PRE</code> font size:
+<select onchange="selectChanged(this);">
+<option disabled selected>--</option>
+<option value="0px">0px</option>
+<option value="20px">20px</option>
+<option value="40px">40px</option>
+<option value="60px">60px</option>
+<option value="80px">80px</option>
+</select>
+</div>
+</body>
+</html>

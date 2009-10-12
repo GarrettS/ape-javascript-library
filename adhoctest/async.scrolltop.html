@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+<head>
+<title>async scroll</title>
+<script type="text/javascript">
+onload = function(){
+  var x = document.getElementById("x"),
+      m = document.getElementById("m"),
+      t = document.getElementById("t");
+  x.scrollIntoView();
+  
+  m.innerHTML = (t.getBoundingClientRect().top);
+  setTimeout(function(){
+  m.innerHTML += " \n" +(t.getBoundingClientRect().top);
+  }, 100);
+};
+</script>
+</head>
+<body>
+<pre id="m">-</pre>
+<div id="x" style="height: 100px;position:relative; overflow: auto;">asdfasdf;
+<div style="height: 10000px">long...</div>
+<div id="t" style="position:absolute; top 9000px">tttttt</div>
+</div>
+</body>
+</html>

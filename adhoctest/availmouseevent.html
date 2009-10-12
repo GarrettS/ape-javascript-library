@@ -1,0 +1,21 @@
+<!doctype html>
+<head><title>available mouse events</title>
+ </head>
+<body>
+<h1>available mouse events</h1>
+<pre id="m" style="font-size: 42px;margin-bottom: 2em;overflow: auto">-</pre>
+<script type="text/javascript">
+onload = function() {
+    var types = ["onmousemove", "ondrag", "onmousedrag",
+                 "ontouchmove", "onmousedown", "onmouseup"],
+        d = document,
+        r = [];
+    for(var i = 0; i < types.length; i++) {
+        r.push(types[i] + ": " + d[types[i]]);
+    }
+    document.getElementById('m').textContent = r.sort().join("\n");
+};
+onunload = function(){document.write(Math.random());};
+</script>
+</body>
+</html>

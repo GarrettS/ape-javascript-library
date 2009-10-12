@@ -1,0 +1,17 @@
+<!doctype html>
+<head><title>onmousedown event</title>
+</head>
+<body>
+<h1>onmousedown on page</h1>
+<pre id="m" style="font-size: 70px">-</pre>
+<script type="text/javascript">
+document.onmousedown = function(ev) {
+    var r = [];
+    for(var p in ev) {
+        r.push(p + ": " + ev[p]);
+    }
+    document.getElementById('m').firstChild.data = r.join("\n");
+};
+</script>
+</body>
+</html>

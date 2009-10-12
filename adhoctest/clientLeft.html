@@ -1,0 +1,15 @@
+<!doctype html>
+<html>
+<head>
+<title>test activation object</title>
+</head>
+<body>
+<div style="border: 10px solid" id="xx">asdf</div>
+<script type="text/javascript">
+onload = function(){
+    var cl = document.getElementById("xx").clientLeft;
+    alert([typeof cl, cl].join(","));
+};
+</script>
+</body>
+</html>

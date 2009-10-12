@@ -1,0 +1,25 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+<title>setTimeout test</title>
+</head>
+<body>
+<p id="testNode">Script says:</p>
+<script type="text/javascript">
+var testNode = document.getElementById("testNode");
+if(setTimeout) {
+  var start = +new Date;
+  setTimeout(function() {
+    testNode.innerHTML += " Helloooooo! from setTimeout(fun 10), delay=" + 
+      (new Date-start);
+  }, 10);
+} else {
+  testNode.innerHTML + [
+    "setTimeout = " + setTimeout,
+     "typeof setTimeout = " + typeof setTimeout
+  ],join("; ");
+}
+</script>
+</body>
+</html>

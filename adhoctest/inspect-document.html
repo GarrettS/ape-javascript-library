@@ -1,0 +1,23 @@
+<!doctype html>
+<head><title>inspect window</title>
+ </head>
+<body>
+<h1>inspect document</h1>
+<pre id="m" style="font-size: 42px;margin-bottom: 2em;overflow: auto">-</pre>
+<script type="text/javascript">
+onload = function() {
+    var r = [],
+        d = document;
+    for(var p in d) {
+        try{
+            r.push(p + ": " + d[p]);
+        } catch(ex) { 
+            r.push(p + " " + ex.toString());
+        }
+    }
+    document.getElementById('m').textContent = r.sort().join("\n");
+};
+onunload = function(){document.write(Math.random());};
+</script>
+</body>
+</html>

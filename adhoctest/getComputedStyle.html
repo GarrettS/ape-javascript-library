@@ -1,0 +1,32 @@
+<!doctype html>
+<html>
+<head>
+<title>test getComputedStyle</title>
+</head>
+<body>
+<div style="border: 10px solid" id="xx">asdf</div>
+<div id="c1"
+    style="position: absolute; top: 2px; height: 6px; background: #00c; left: 0;">
+<a id="target"
+    style='position: absolute; top: 3px; left: 1px; display: block; height: 1px; background: #FF0;'>a</a>
+</div>
+
+<script type="text/javascript">
+onload = function(){
+    var target = document.getElementById("target");
+
+    // target is top: 6; height: 1;
+    target.style.top = "6px";
+    var c1 = document.getElementById("c1");
+    var cs = document.defaultView.getComputedStyle(target, "");
+    document.documentElement.style.cssText = "color: #111";
+    setTimeout(function(){
+        alert([typeof cs, cs.position].join(","));
+        setTimeout(function(){
+            alert([typeof cs, cs.position].join(","));
+        }, 10);
+    }, 10);        
+};
+</script>
+</body>
+</html>

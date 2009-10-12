@@ -1,0 +1,17 @@
+<!doctype html>
+<html>
+<head>
+<title>Test offsetTop Updated</title>
+</head>
+<body >
+<div id="x" style="position: absolute">xxx</div>
+<script type="text/javascript">
+ var x = document.getElementById("x");
+ x.style.top = "20px";
+ alert(x.offsetTop);
+ setTimeout(function(){
+   alert(x.offsetTop);
+   }, 0);
+</script>
+</body>
+</html>
