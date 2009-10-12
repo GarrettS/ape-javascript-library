@@ -93,16 +93,6 @@ window.onload = function(){
             Action.focus(search);
             Assert.areSame("", search.value);
         },
-
-        testDrop : function() {
-            var ph = Placeholder.getById("search");
-            Action.fireHTMLEvent(search, "drop", {
-                dataTransfer : {
-                    getData : function(){
-                        return "dropped text";
-                    }
-            };
-        },
         
         testDetachEvents : function() {
             var ph = Placeholder.getById("search");

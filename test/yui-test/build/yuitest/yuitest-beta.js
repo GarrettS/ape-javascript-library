@@ -2787,7 +2787,7 @@ YAHOO.util.UserAction = {
     blur : function(target, options) {
         this.fireHTMLEvent(target, "blur", options);
     },
-    
+
     /**
      * Fires an event that normally would be fired by the keyboard (keyup,
      * keydown, keypress). Make sure to specify either keyCode or charCode as
