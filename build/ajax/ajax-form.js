@@ -73,26 +73,24 @@ APE.namespace("APE.ajax");
          * @private for internal use only.
          */
         function setUpReadyStateChangeHandler(ar) {
-            ar._pollId = setInterval( readyStateChangePoll, 50 );
+            ar.req.onreadystatechange = readyStateChangePoll;
             if(ar.timeoutMillis > 0) {
-    
                 var userTimeout = function() {
                     ar.ontimeout(/* Should we pass anything here? */);
                     ar.req.abort(); // Directly abort the request, don't fire "onabort".
                     oncomplete(ar);
                 };
                 ar.timeoutID = setTimeout( userTimeout, ar.timeoutMillis );
-            }
-
-            /** Called repeatedly until readyState i== 4, then calls processResponse. */
-            function readyStateChangePoll() {
-                if( ar.req.readyState === 4 ) {
-                    processResponse(ar);
-                }
-            }
-    
+            }    
         }
-    
+
+         /** Called repeatedly until readyState i== 4, then calls processResponse. */
+         function readyStateChangePoll() {
+             if( this.req.readyState === 4 ) {
+                 processResponse(this);
+             }
+         }
+
         /** processes a response after readyState == 4. */
         function processResponse(asyncRequest) {
             var httpStatus = asyncRequest.req.status,
@@ -190,7 +188,6 @@ APE.namespace("APE.ajax");
     
                 // Clear the timeout timer.
                 clearTimeout(this.timeoutID);
-    
                 this.onabort(this.req); // others can know.
                 oncomplete(this, false);
             },
