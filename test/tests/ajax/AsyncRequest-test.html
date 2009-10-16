@@ -1,13 +1,12 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
-        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
 <head>
-    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
     <title>ajax.AsyncRequest Test</title>
 
-    <link rel="stylesheet" type="text/css" href="../../yui-test/build/logger/assets/logger.css" />
-    <link rel="stylesheet" type="text/css" href="../../yui-test/build/yuitest/assets/yuitest.css" />
-    <link rel="stylesheet" type="text/css" href="../../yui-test/assets/testlogger.css" />
+    <link rel="stylesheet" type="text/css" href="../../yui-test/build/logger/assets/logger.css">
+    <link rel="stylesheet" type="text/css" href="../../yui-test/assets/testlogger.css">
 
     <script type="text/javascript" src="../../yui-test/build/yahoo-dom-event/yahoo-dom-event.js"></script>
     <script type="text/javascript" src="../../yui-test/build/logger/logger.js"></script>
@@ -55,9 +54,6 @@ var Assert = YAHOO.util.Assert,
 
         req.onsucceed = function(e) {
             succeeded = true;
-            Assert.isTrue(completed, "completed");
-            Assert.isTrue(succeeded, "succeeded");
-
         };
 
         // send the request.
@@ -78,49 +74,81 @@ var Assert = YAHOO.util.Assert,
 
         // When the request is done, resume the test.
         req.oncomplete = function(doneEvent) {
-            Assert.isFalse(doneEvent.successful);
             completed = true;
         };
 
         // send the request.
         req.send();
 
-        function didNotComplete() {
-            if(!completed)
-                Assert.fail("xhr did not complete. (this may be a server issue)");
+        function maybeLongEnough() {
+            Assert.isTrue(completed, "xhr did not complete. (this may be a server issue)");
         }
-        this.wait(didNotComplete, 2000);
+        this.wait(maybeLongEnough, 2000);
     },
 
     // make sure that onsucceed fires when it should.
-    testSuccess : function(){
+    testOnsucceed : function(){
         var req = AsyncRequest.getById("", {action:"data.json.txt", method:"GET"} );
 
         var succeeded = false;
-
         // When the request is done, resume the test.
         req.onsucceed = function(actualRequest) {
-            var data = eval("("+actualRequest.responseText +")");
-            Assert.areEqual( data.name, "Garrett" );
             succeeded = true;
-        };
-
-        req.onabort = function(){
-            Assert.fail("onabort() was called, but should not have been");
-        };
-
-        req.onfail = function() {
-            Assert.fail("onfail() was called, but should not have been");
         };
 
         // send the request.
         req.send(null, 2400);
 
-        function didNotComplete() {
-            if(!succeeded)
-                Assert.fail("xhr did not complete.");
+        function probablyDone() {
+            Assert.isTrue(succeeded, "xhr did not succeed.");
         }
-        this.wait(didNotComplete, 2500);
+        this.wait(probablyDone, 2500);
+    },
+
+    testSuccessResponseData : function() {
+        var req = AsyncRequest.getById("", {action:"data.json.txt", method:"GET"} ),
+            data = {};
+        req.send(null, 2400);
+        req.onsucceed = function(actualRequest){
+            data = eval("("+actualRequest.responseText +")");
+        };
+        
+        function probablyDone(){
+            Assert.areEqual( "Garrett", data.name );
+        }
+        this.wait(probablyDone, 2500);
+    },
+    
+    // make sure that onfail doesn't fire.
+    testSuccessNoOnfail : function(){
+        var req = AsyncRequest.getById("", {action:"data.json.txt", method:"GET"} ),
+            failed = false;
+
+        req.onfail = function() {
+            failed = true;
+        };
+        // send the request.
+        req.send(null, 2400);
+        function probablyLongEnough() {
+            Assert.isFalse(failed, "onfail fired, but should not have.");
+        }
+        this.wait(probablyLongEnough, 2500);
+    },
+
+    // make sure that onfail doesn't fire.
+    testSuccessNoOnabort : function(){
+        var req = AsyncRequest.getById("", {action:"data.json.txt", method:"GET"} ),
+            aborted = false;
+
+        req.onabort = function() {
+            aborted = true;
+        };
+        // send the request.
+        req.send(null, 2400);
+        function probablyLongEnough() {
+            Assert.isFalse(aborted, "onabort fired, but should not have.");
+        }
+        this.wait(probablyLongEnough, 2500);
     },
 
     // onsucceed should not fire with a bad URI.
@@ -244,10 +272,6 @@ var Assert = YAHOO.util.Assert,
         }, 100);
     },
 
-    testConstructorToString : function() {
-        Assert.isTypeOf("string", APE.ajax.AsyncRequest.toString());
-    },
-
     testToString : function() {
         var req = AsyncRequest.getById("", {action:"data.json.txt", method:"POST" });
         Assert.isTypeOf("string", req.toString());
@@ -272,12 +296,11 @@ new YAHOO.tool.TestLogger("testLogger");
 YAHOO.tool.TestRunner.add(asyncTestCase );
 
 // run the tests, or put them in the TestRunner.
-if (parent && parent != window) {
+if (parent != window && parent.YAHOO && parent.YAHOO.tool) {
     YAHOO.tool.TestManager.load();
 } else {
     YAHOO.tool.TestRunner.run();
 }
 })();</script>
 </body>
-
 </html>

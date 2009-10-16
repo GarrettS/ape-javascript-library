@@ -61,18 +61,7 @@ APE.namespace("APE.ajax");
     function getXHR() {
         return isNative ? new self[type] : new self[type]('Microsoft.XMLHTTP');
     }
-        
-    /**
-     * cancels the readyState poll.
-     * @private
-     * setTimeout calling object's context is always self, and
-     * this is needed by abort.
-     *
-     */
-    function cancelPoll(pollId) {
-        self.clearInterval( pollId );
-    }
-
+    
     function createAsyncProto() {
         
         function F(){}
@@ -84,7 +73,7 @@ APE.namespace("APE.ajax");
          * @private for internal use only.
          */
         function setUpReadyStateChangeHandler(ar) {
-            ar._pollId = self.setInterval( readyStateChangePoll, 50 );
+            ar._pollId = setInterval( readyStateChangePoll, 50 );
             if(ar.timeoutMillis > 0) {
     
                 var userTimeout = function() {
@@ -92,7 +81,7 @@ APE.namespace("APE.ajax");
                     ar.req.abort(); // Directly abort the request, don't fire "onabort".
                     oncomplete(ar);
                 };
-                ar.timeoutID = self.setTimeout( userTimeout, ar.timeoutMillis );
+                ar.timeoutID = setTimeout( userTimeout, ar.timeoutMillis );
             }
 
             /** Called repeatedly until readyState i== 4, then calls processResponse. */
@@ -106,7 +95,6 @@ APE.namespace("APE.ajax");
     
         /** processes a response after readyState == 4. */
         function processResponse(asyncRequest) {
-            cancelPoll( asyncRequest._pollId );
             var httpStatus = asyncRequest.req.status,
                 succeeded = httpStatus >= 200 && httpStatus < 300 
                 || httpStatus == 304 || httpStatus == 1223;
@@ -122,7 +110,7 @@ APE.namespace("APE.ajax");
                 asyncRequest.onfail(asyncRequest.req);
             }
             // The call is complete, cancel the timeout..
-            self.clearInterval(asyncRequest.timeoutID);
+            clearTimeout(asyncRequest.timeoutID);
         }
     
         function oncomplete(ar, successful) {
@@ -200,11 +188,8 @@ APE.namespace("APE.ajax");
             abort : function() {
                 this.req.abort();
     
-                // cancel the readyState poll.
-                cancelPoll(this._pollId);
-    
                 // Clear the timeout timer.
-                self.clearInterval(this.timeoutID);
+                clearTimeout(this.timeoutID);
     
                 this.onabort(this.req); // others can know.
                 oncomplete(this, false);
