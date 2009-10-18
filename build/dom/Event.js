@@ -72,9 +72,7 @@ APE.namespace("APE.dom");
         return bound;
     }
 
-    /**
-     * @param {Event}
-     */
+    /** @param {Event} */
     function preventDefault(ev) {
         ev = ev || window.event;
         if("preventDefault" in ev) {

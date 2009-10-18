@@ -23,9 +23,10 @@ APE.namespace("APE.widget");
         }
         
         /** onclick callback for Left/Right buttons. */
-        function handleButtonClick() {
+        function handleButtonClick(ev) {
             var dir = this.id.match(/(\w+)(Next|Prev)$/),
                 scroller = widget.Scroller.getById(dir[1]);
+            dom.Event.preventDefault(ev);
             moveStart(scroller, dir[2] === "Next");
         }
 
@@ -152,7 +153,7 @@ APE.namespace("APE.widget");
                 if(next !== null) {
                     addCallback(next, "click", handleButtonClick);
                 }
-            },
+             },
         
             next : function(){
                 moveStart(this, true);

@@ -19,7 +19,7 @@
 </head>
 <body>
 <div class="scrollerContainer" id="s1Container">
-<div id="s1Prev" class="scrollerButton scrollerButton-disabled">&laquo;</div>
+<a id="s1Prev" class="scrollerButton scrollerButton-disabled" href="#prev">&laquo;</a>
 <div id="s1Frame" class="scrollerFrame">
     <ul id="s1" class="scroller">
     <li><div>item 0</div></li>
@@ -34,12 +34,12 @@
     <li><div>item 9</div></li>
     </ul>
 </div>
-<div id="s1Next" class="scrollerButton scrollerButtonNext">&raquo;</div>
+<a id="s1Next" class="scrollerButton scrollerButtonNext" href="#next">&raquo;</a>
 </div>
 <script type="text/javascript" src="../../../build/APE.js"></script>
 <script type="text/javascript" src="../../../build/dom/Event.js"></script>
 <script type="text/javascript" src="../../../build/dom/classname-f.js"></script>
-<script type="text/javascript" src="../../../build/widget/scroller/Scroller.js"></script>
+<script type="text/javascript" src="../../../build/widget/Scroller/Scroller.js"></script>
 <script type="text/javascript">
   var s1 = document.getElementById('s1');
   var scroller = APE.widget.Scroller.getById('s1', 1000);

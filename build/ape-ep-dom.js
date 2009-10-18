@@ -1359,9 +1359,7 @@ function normalizeString(s) { return s.replace(STRING_TRIM_EXP,'').replace(WS_MU
         return bound;
     }
 
-    /**
-     * @param {Event}
-     */
+    /** @param {Event} */
     function preventDefault(ev) {
         ev = ev || window.event;
         if("preventDefault" in ev) {
