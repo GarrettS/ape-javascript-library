@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<title>test mouseup</title>
+</head>
+<body>
+<div id="testNode1"></div>
+<div id="testNode2"></div>
+<pre id="m">-</pre>
+<script type="text/javascript">
+onload = function(ev) {
+    simulateEvent(document.getElementById("testNode1"), "mousedown");
+    simulateEvent(document.getElementById("testNode2"), "mousedown");
+};
+
+
+document.onmouseup = dUp;
+document.onmousedown = dDown;
+var m = document.getElementById("m");
+function dUp(ev) {
+  m.firstChild.data += "\n" + ev.type;
+}
+
+function dDown(ev) {
+  m.firstChild.data += "\n" + ev.type;
+}
+
+function simulateEvent(target, type) {
+  var ev = document.createEvent("MouseEvents");
+  ev.initMouseEvent(type, true, true, document.defaultView,
+    0, 0, 0, 0, 0, false, false, false, false, 0, null);
+  target.dispatchEvent(ev);
+}
+</script>
+</body>
+</html>

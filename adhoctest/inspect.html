@@ -1,0 +1,30 @@
+<!doctype html>
+<html>
+<head>
+</head>
+<body><!-- this is a comment -->
+<pre id="m">-
+</pre>
+<script type="text/javascript">
+onload = function(){
+    var node = prompt("node"),
+        m = document.getElementById("m"),
+        s = [];
+ try {
+     var obj = eval(node);
+     for(var p in obj) {
+        try {
+            s.push(node + "['" + p +"'] = " + obj[p]);
+        } catch(er) {
+            s.push("error: " + er.message + "; " + node + "['" + p +"'] = ");
+        }
+        m.firstChild.data=(s.join("\n"));
+
+     }
+ } catch(ex) {
+     m.firstChild.data = "error: " + ex.message;
+ }
+};
+</script>
+</body>
+</html>

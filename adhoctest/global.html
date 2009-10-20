@@ -1,0 +1,25 @@
+<!doctype html>
+<head>
+<title>
+Object.prototype in global object's prototype chain?
+</title>
+</head>
+<body>
+<h1>Object.prototype in global object's prototype chain?</h1>
+<pre>
+<script type="text/javascript">
+var eventTargetValue = this.EventTarget;
+document.writeln("this.EventTarget: ", eventTargetValue);
+if(typeof eventTargetValue != "undefined") {
+  if("this.hasOwnProperty") {
+    document.writeln(
+       "this.hasOwnProperty('EventTarget') : " 
+       + this.hasOwnProperty('EventTarget'));
+   }
+} else {
+  document.writeln("this.hasOwnProperty: ", this.hasOwnProperty);
+}
+</script>
+</pre>
+</body>
+</html>

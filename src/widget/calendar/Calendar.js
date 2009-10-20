@@ -1,3 +1,4 @@
+
 /**
  * @fileoverview Calendar Widget
  * @author Garrett Smith
@@ -83,7 +84,7 @@ APE.namespace("APE.widget");
             calendarClass : 'ape-calendar',
         
             /** @internal */
-            _isHidden : undefined,
+            _isHidden : 0,
                 
             /** Shows the calendar by setting visibility to 'visible'.
              * @param {CSSStyleDeclaration} calStyle the caledar element's style.
@@ -331,7 +332,7 @@ APE.namespace("APE.widget");
          * @description called when calendar is clicked.
          */
         function calendarMousedownHandler(e) {
-            e = e||event;
+            e = e||window.event;
             var target = dom.Event.getTarget(e),
                 calendarDiv = this,
                 calendarObject,
@@ -343,7 +344,7 @@ APE.namespace("APE.widget");
             calendarObject = widget.Calendar.getById(calendarDiv.id.replace(/-calendar$/,""));
             calId = calendarObject.id;
 
-            self.clearTimeout(calendarObject.hideTimer);
+            clearTimeout(calendarObject.hideTimer);
         
             selectedId = calId + "-selected-day";
             calendarObject._hasFocus = true;
@@ -426,16 +427,11 @@ APE.namespace("APE.widget");
          * January 4, 2009.
          * Override this to format <code>this.selectedDate</code>.
          */
-        function formatDate(date) {  
-            var yyyy = padLeft(date.getFullYear(), 4, "0"),
-                mm = padLeft(date.getMonth() + 1, 2, "0"),
-                dd =  padLeft(date.getDate(), 2, "0");
-            return yyyy + "-" + mm + "-" + dd;
-        }
-        function padLeft(s, size, ch) {
-            s += "";
-            for (var i = s.length; i++ < size; s = ch + s);
-            return s;
+         function formatDate(dateInRange) {
+             var yyyy = ("000" + dateInRange.getFullYear()).slice(-4);
+                 mm = ("0" + (dateInRange.getMonth() + 1)).slice(-2);
+                 dd = ("0" + (dateInRange.getDate())).slice(-2);
+             return yyyy + "-" + mm + "-" + dd;
         }
         
         /**
@@ -450,7 +446,7 @@ APE.namespace("APE.widget");
             // and that actually works in Mozilla! But it doesn't 
             // work in any other browsers. Even IE's toElement 
             // doesn't contain the non-focusable toElement for blur.
-            calendar.hideTimer = self.setTimeout(blurHandler, 10);
+            calendar.hideTimer = setTimeout(blurHandler, 10);
             function blurHandler(){
                 _hideCalendar(calendar, e||self.event);
             }
