@@ -269,7 +269,7 @@ Header.dragStartHandler = function(e) {
 }
 Header.dragEndHandler = function(e) {
     if(!this.enclosingDropTarget) {
-        this.animateBack();
+        this.release();
     }
     setZIndex(this.el, 0);
 };
