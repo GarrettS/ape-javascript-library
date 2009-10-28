@@ -1,11 +1,10 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
-        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
 <head>
-	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
 	<title>table reorder</title>
 	<style type="text/css" media="All">
-/* <![CDATA[ */
 
 html {
 	background: background;
@@ -160,8 +159,6 @@ div#statsDiv {
 	font: caption;
 	background: #FFFFE1;
 }
-
-/* ]]> */
 </style>
 </head>
 <body>
@@ -170,7 +167,7 @@ div#statsDiv {
 	<div id='statsDiv'>
 	<table id='stats'>
 		<caption>Customer Demographics</caption>
-        <col/><col/><col/><col/><col/>
+        <col><col><col><col><col>
         <tbody style="position:relative">
             <tr>
                 <th id="skip_me" style='visibility: collapse;border: 0;'>IE</th> 
@@ -212,15 +209,22 @@ esc         - cancel drag
 <script src="../../../build/ape-ep-dom.js" type="text/javascript"></script>
 <script src="../../../build/dom/getContainingBlock.js" type="text/javascript"></script>
 <script src="../../../build/dom/getPixelCoords.js" type="text/javascript"></script>
+<script src="../../../build/anim/Animation.js" type="text/javascript"></script>
 <script src="../../../build/drag/Draggable.js" type="text/javascript"></script>
 
 <script type="text/javascript">(function(){
 
-var table = document.getElementById("stats");
-var headers = table.getElementsByTagName("th");
+var table = document.getElementById("stats"),
+    headers = table.getElementsByTagName("th"),
+    focusedRow = null,
+    headerRow = headers[0].parentNode,
+    focusedCol = 0,
+    Draggable = APE.drag.Draggable,
+    dom = APE.dom,
+    dragObjArray = [];
 
-function Header(el) {
-    var dragObj = APE.drag.Draggable.getByNode(el);
+function createDraggableTD(el) {
+    var dragObj = Draggable.getByNode(el);
     dragObj.dragCopy = true;    
 	dragObj.hoverClassName = "dragHover";
 	dragObj.activeDragClassName = "dragActive";
@@ -229,14 +233,9 @@ function Header(el) {
     return dragObj;
 }
 
-Header.focusedElement = null;
-Header.focusedRow = null;
-Header.headerRow = headers[0].parentNode;
-Header.focusedCol = 0;
+init();
 
-var dragObjArray = new Array();
-
-Header.init = function() {
+function init() {
     for(var i = 0, c = 0, len = headers.length; i < len; i++) {
 
         var header = headers[i];
@@ -244,46 +243,44 @@ Header.init = function() {
 
         var draggableEl = headers[i].getElementsByTagName("div")[1];
         
-        var dragObj = dragObjArray[c++] = Header(draggableEl);
+        var dragObj = dragObjArray[c++] = createDraggableTD(draggableEl);
 
         // container = table.tBodies[0] won't work in safari. 
         // Safari thinks the offsetParent of a td is null, so if the 
         // getOffsetTop returns the td's offsetTop, but the tBody has an offsetTop, 
         // that won't be included and the dragObj will be positioned in respect to 
 
-        dragObj.ondragstart = Header.dragStartHandler;
-        dragObj.ondragend = Header.dragEndHandler;
-        dragObj.onfocus = Header.focusHandler;
+        dragObj.ondragstart = dragStartHandler;
+        dragObj.ondragend = dragEndHandler;
     }
-    Header.addDropTargets();
+    addDropTargets();
 
     
-    var ef = APE.drag.Draggable.getByNode(document.getElementById('statsDiv'));
+    var ef = Draggable.getByNode(document.getElementById('statsDiv'));
     ef.setHandle(document.getElementsByTagName("caption")[0])
     ef.activeDragClassName = "activeDrag";
  
 }
-Header.dragStartHandler = function(e) {
-    this.enclosingDropTarget = null;
+
+function dragStartHandler(e) {
     setZIndex(this.el, 10000);
 }
-Header.dragEndHandler = function(e) {
+
+function dragEndHandler(e) {
     if(!this.enclosingDropTarget) {
         this.release();
     }
     setZIndex(this.el, 0);
-};
-Header.focusHandler = function(e) {
-    Header.updateHighilight(this);
-};
-Header.addDropTargets = function(){
+}
+
+function addDropTargets(){
 	for(var i = 0; i < dragObjArray.length; i++)
 		for(var j = 0; j < dragObjArray.length; j++)
 			if(i != j) {
                 var dragObj = dragObjArray[j];
 				var x = dragObjArray[i].addDropTarget( dragObj.el );
                 x.dragOverClassName = "dropTargetHighlight";
-				x.ondrop = Header.dropEventReceived;
+				x.ondrop = dropEventReceived;
 			}
 }
 
@@ -295,14 +292,14 @@ function setZIndex(el, n) {
 }
 
 function hilightCol(table, iCol) {
-    APE.dom.addClass(table.getElementsByTagName("col")[iCol], 'colHighlight');
+    dom.addClass(table.getElementsByTagName("col")[iCol], 'colHighlight');
 }
 
 function unHilightCol(table, iCol) {
-    APE.dom.removeClass(table.getElementsByTagName("col")[iCol], 'colHighlight');
+    dom.removeClass(table.getElementsByTagName("col")[iCol], 'colHighlight');
 }
 
-Header.dropEventReceived = function(dropEvent) {
+function dropEventReceived(dropEvent) {
 
     var dragObject = dropEvent.dragObj,
         dropTarget = this.el,
@@ -328,53 +325,51 @@ Header.dropEventReceived = function(dropEvent) {
 	setZIndex(doCopy, 0);
 	setZIndex(dropTargetClone, 0);
 
-	APE.drag.Draggable.instances[dragObject.el.id].el = doCopy;
+	Draggable.instances[dragObject.el.id].el = doCopy;
 
-	APE.drag.Draggable.instances[dropTarget.id].el = dropTargetClone; 
+	Draggable.instances[dropTarget.id].el = dropTargetClone; 
 
 	dragObject.el = doCopy;
 		// hilight the row.	
-    Header.updateHighilight(dragObject);
-};
+    updateHighilight(dragObject);
+}
 
-Header.updateHighilight = function(dragObject) {
-	var thisRow = APE.dom.findAncestorWithTagName(dragObject.el, "tr");
+function updateHighilight(dragObject) {
+	var thisRow = dom.findAncestorWithTagName(dragObject.el, "tr");
 
-    if(Header.focusedCol && Header.focusedRow) {
-        var cell = Header.focusedRow.cells[Header.focusedCol];
+    if(focusedCol && focusedRow) {
+        var cell = focusedRow.cells[focusedCol];
         cell.innerHTML = '';
         cell.className = "";
      }
 
-    if(thisRow == Header.headerRow) { // header row.
-		unHilightCol(table, Header.focusedCol);
-		Header.focusedCol = 0;
+    if(thisRow == headerRow) { // header row.
+		unHilightCol(table, focusedCol);
+		focusedCol = 0;
 	// hilight the col's td's.
 		
 		var ths = thisRow.getElementsByTagName("th");
 		
 		for(var i = 1; i < ths.length; i++) {
-			if(APE.dom.contains(ths[i], dragObject.el)) {
-				Header.focusedCol = i;
+			if(dom.contains(ths[i], dragObject.el)) {
+				focusedCol = i;
             }
         }
-		hilightCol(table, Header.focusedCol);
+		hilightCol(table, focusedCol);
  	}
 	else {
-		if(Header.focusedRow)
-			APE.dom.removeClass(Header.focusedRow, "rowHighlight");
-        Header.focusedRow = thisRow;
+		if(focusedRow)
+			dom.removeClass(focusedRow, "rowHighlight");
+        focusedRow = thisRow;
         thisRow.className += ' rowHighlight';
 	}
 
-    if(Header.focusedCol && Header.focusedRow) {
-        var cell = Header.focusedRow.cells[Header.focusedCol];
+    if(focusedCol && focusedRow) {
+        var cell = focusedRow.cells[focusedCol];
         cell.innerHTML = Math.round(Math.random() * 100);
         cell.className = "intersect";
     }
-};
-
-Header.init();
+}
 })();</script>
 </body>
 </html>

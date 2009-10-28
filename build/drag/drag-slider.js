@@ -287,6 +287,7 @@ APE.namespace("APE.drag" );
             if(dObj.activeDragClassName)
                 dom.removeClass(dObj.el, dObj.activeDragClassName);
             if(typeof dObj.ondragend == FUNCTION && dObj.hasBeenDragged) {
+                dObj.hasBeenDragged = false; // avoid recursion.
                 dObj.ondragend(e);
             }
             if(dObj.copyEl) { // in case user does some appending of el, et c.
@@ -568,7 +569,7 @@ APE.namespace("APE.drag" );
                 }
             }
             
-            dO.hasBeenDragged = (dO.hasBeenDragged || (distX || distY));
+            dO.hasBeenDragged = (dO.hasBeenDragged || !!(distX || distY));
             
             var isLeft = newX < dO.minX,
                 isRight = newX > dO.maxX,
