@@ -8,17 +8,16 @@
 var hasOwnProperty = 12;
 this.hasOwnProperty = 14;
 this.gProp = "g";
-
 (function(){
-	function hasOwnProperty(a){return 1;}
-	var constructor = 123;
-	function toString() { return "local"; }
+  function hasOwnProperty(a){return 1;}
+  var constructor = 123;
+  function toString() { return "local"; }
 function testThis(){
-	document.write([
-	            	hasOwnProperty("gProp"),
-	            	constructor,
-	            	toString(),
-	            	this.toString()]);
+  document.write([
+                hasOwnProperty("gProp"),
+                constructor,
+                toString(),
+                this.toString()]);
 }
 
 return testThis;
