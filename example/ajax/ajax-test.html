@@ -44,7 +44,7 @@ var ajax = document.getElementById('ajax'),
     AsyncRequest = APE.ajax.AsyncRequest;
 
 function testGet(i) {
-    var req = new AsyncRequest( {action:"data.json?" + (i||0)} );
+    var req = AsyncRequest.getById(123, {action:"data.json?" + (i||0)} );
     consoleMessage('...');
     showBusyMessage();
     req.onsucceed = function( req ) {
@@ -60,7 +60,7 @@ function testGet(i) {
 }
 
 function testAbort() {
-    var req = new AsyncRequest( {action:"data.json", method:"POST"} );
+    var req = AsyncRequest.getById(234, {action:"data.json", method:"POST"} );
     consoleMessage('...');
     showBusyMessage();
     req.onsucceed = function( response ) {
@@ -104,7 +104,7 @@ function testFailure() {
 function testPost() {
     consoleMessage('...');
     var data = "first=Garrett&last=Smith",
-        req = new AsyncRequest( {action:"process.jsp", method:"POST"} );
+        req = AsyncRequest.getById(345, {action:"process.jsp", method:"POST"} );
     showBusyMessage();
     req.onsucceed = function( req ) {
         consoleMessage("req.responseText : " + req.responseText);

@@ -1,11 +1,10 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
-        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
-<html>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
 <head>
 <title>APE JavaScript Library</title>
-<link type="text/css" rel="stylesheet" href="../resources/ape.css"/>
-
-</html>
+<link type="text/css" rel="stylesheet" href="../resources/ape.css">
+</head>
 <body>
 
 <h1>Examples</h1>
@@ -13,10 +12,10 @@
 <ul>
     <li class="d"><a href="ajax/ajax-test.html">ajax/ajax-test.html</a></li>
     <li class="d"><a href="anim/">anim/</a></li>
-    <li class="d"><a href="dom/">dom</a></li>
+    <li class="d"><a href="dom/index.html">dom</a></li>
     <li>drag/
         <ul>
-            <li class="d"><a href="drag/slider">drag/slider</a></li>
+            <li class="d"><a href="drag/Slider">drag/slider</a></li>
             <li class="d"><a href="drag/droptarget">drag/droptarget</a></li>
             <li class="d"><a href="drag/table">drag/table</a></li>
         </ul>
@@ -25,12 +24,11 @@
     <li>widget/
         <ul>
             <li class="d"><a href="widget/calendar">widget/calendar</a></li>
+            <li class="d"><a href="widget/Scroller">widget/Scroller</a></li>
             <li class="d"><a href="widget/HSVPicker">widget/HSVPicker</a></li>
         </ul>
     </li>
 </ul>
-
 <jsp:include page="/ape/nav.jsp"/>
-
 </body>
 </html>
