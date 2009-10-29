@@ -1270,19 +1270,20 @@ function normalizeString(s) { return s.replace(STRING_TRIM_EXP,'').replace(WS_MU
         }
         return null;
     }
-   
+    
     function getChildElements(el) {
-        var i = 0, j, ret = [], len,
-            cn = el.childNodes, c;
-        
+        var i, j, ret = [],
+            cn = el.childNodes, len = cn.length, c;
+        ret.length = len;
         // IE throws error when calling 
         // Array.prototype.slice.call(el.children).
         // IE also includes comment nodes.
-        for(len = cn.length, j = 0; i < len; i++) {
+        for(i = j = 0; i < len; i++) {
             c = cn[i];
             if(c[NODE_TYPE] !== 1) continue;
             ret[j++] = c;
         }
+        ret.length = j;
         return ret;
     }
 })();/**

@@ -46,7 +46,7 @@ window.onload = function(){
 // window.focus() seems to fix false failures 
 // with testNode.focus() not taking effect.
 try {
-  self.focus();
+    self.focus();
 } catch(ex) { }
 // fix for broken pageX in initMouseEvent
 document.body.style.margin= "0";
@@ -55,6 +55,7 @@ var MOUSE_MOVE_TEST_WARNING = "Please keep your mouse offscreen and don't move i
     ESC = 27;
 
 var Assert = YAHOO.util.Assert,
+    ObjectAssert = YAHOO.util.ObjectAssert,
     StringAssert = YAHOO.util.StringAssert,
     ArrayAssert = YAHOO.util.ArrayAssert,
     dom = APE.dom,
@@ -126,8 +127,10 @@ var draggableTestCase = new YAHOO.tool.TestCase({
             actualY = dO.y;
         }
         // should be centered on cursor.
-        Assert.areEqual(10 - 50, dO.x, "x wrong");
-        Assert.areEqual(10 - 10, dO.y, "y wrong");
+        this.wait(function(){
+            Assert.areEqual(10 - 50, dO.x, "x wrong");
+            Assert.areEqual(10 - 10, dO.y, "y wrong");
+        }, 90);
     },
 
     testFromBottom : function() {
@@ -525,7 +528,39 @@ var draggableMouseTestCase = new YAHOO.tool.TestCase({
             }, 78);
         }, 78);
     },
-   
+    
+    testGroupActive : function() {
+
+        // because it is in-flow, offset by it's prev sibling (testNode).
+        testNode2.style.top = "-20px";
+        testNode.style.height = "20px";
+
+        document.body.style.height = "900px"
+
+        var config = {
+                activeDragClassName : aClass,
+                selectMultiple : true
+            },
+            coords = {clientX: 10, clientY: 40},
+            d = Draggable.getByNode( testNode, config ),
+            d2 = Draggable.getByNode( testNode2, config );
+
+        d.dragMultiple = d2.dragMultiple = true;
+
+        Action.mousedown( testNode );
+        Action.mouseup( document );
+        Action.mousedown( testNode2, {ctrlKey:true, metaKey:true} );
+        Action.mousemove( document, coords);
+        this.wait(function(){
+            Action.mousemove( document, coords);
+    
+            var testNodeClass = testNode.className.split(" "),
+                testNode2Class = testNode2.className.split(" ");
+            ArrayAssert.containsItems( [aClass], testNodeClass, 'testNode class incomplete' );
+            ArrayAssert.containsItems( [aClass], testNode2Class, 'testNode2 class incomplete' );
+        }, 90);
+    },
+
     testCarryGroup : function() {
 
         // because it is in-flow, offset by it's prev sibling (testNode).
@@ -672,6 +707,7 @@ var draggableMouseTestCase = new YAHOO.tool.TestCase({
 
         var container = document.createElement('container'),
             cstyle = container.style,
+            coords = {clientX : 300, clientY : 300},
             body = document.body;
 
         document.body.appendChild( container );
@@ -687,16 +723,15 @@ var draggableMouseTestCase = new YAHOO.tool.TestCase({
 
         d.container = body;
         body.style.height = body.style.width = "200px";
-
         Action.mousedown( testNode );
-        Action.mousemove( document, {clientX : 300, clientY : 300});
+        Action.mousemove( document, coords );
 
-    // We should be able to move an element outside its 
-    // container when keepInContainer is false (default)
-        Assert.areEqual( "300px", testNode.style.top, "testNode.style.top wrong");
-        Assert.areEqual( "300px", testNode.style.left, "testNode.style.left wrong");
-
-        Action.mouseup( document );
+        this.wait(function(){
+        // We should be able to move an element outside its 
+        // container when keepInContainer is false (default)
+            Assert.areEqual( "300px", testNode.style.top, "testNode.style.top wrong");
+            Assert.areEqual( "300px", testNode.style.left, "testNode.style.left wrong");
+        }, 90);
     },
 
     testKeepInContainer : function() {
@@ -779,6 +814,48 @@ var draggableMouseTestCase = new YAHOO.tool.TestCase({
         }, 78);
     },
 
+    testDragEnd : function(){ 
+        var config = { 
+                dragMultiple : true,
+                activeDragClassName : aClass,
+                ondragend : dragEnd
+            },
+            coords = {clientX : 120, clientY : 120 },
+            testNode3 = document.getElementById("testNode3"),
+            d = Draggable.getByNode( testNode, config ),
+            d2 = Draggable.getByNode( testNode2, config ),
+            draggableList = null,
+            d3 = Draggable.getByNode(testNode3, config );
+
+        // Try to select multiple items. This should succeed - dragMultiple = true.
+        Action.mousedown( testNode );
+        Action.mousedown( testNode2, {ctrlKey : true, metaKey : true} );
+        Action.mousedown( testNode3, {ctrlKey : true, metaKey : true} );
+
+        function dragEnd(dragEvent) {
+            draggableList = dragEvent.draggableList;
+        }
+        
+        Action.mousemove( document, coords );
+        this.wait(function(){
+            Action.mousemove( document, coords );
+            var tc = testNode.className.split(" ")
+            var tc2 = testNode2.className.split(" ");
+            var tc3 = testNode3.className.split(" ");
+            ArrayAssert.containsItems( [aClass], tc, 'tc class incomplete' );
+            ArrayAssert.containsItems( [aClass], tc2, 'tc2 class incomplete' );
+            ArrayAssert.containsItems( [aClass], tc3, 'tc3 class incomplete' );
+
+            // Verify dragend fired for main object only.
+            Action.mouseup( document , coords );
+            Assert.isNotNull(draggableList);
+            console.log(1, draggableList);
+            ObjectAssert.hasProperty("testNode", draggableList);
+            ObjectAssert.hasProperty("testNode2", draggableList);
+            ObjectAssert.hasProperty("testNode3", draggableList);
+        }, 78);
+    },
+    
     testDragOver : function() {
 
         var d = Draggable.getByNode( testNode ),
@@ -1382,6 +1459,9 @@ if (parent && parent != self
 } else {
     YAHOO.tool.TestRunner.run();
 }
+try {
+    scrollTo(0, 0);
+} catch(ex) { }
 YAHOO.log(MOUSE_MOVE_TEST_WARNING, "warn", "TestRunner");    
 YAHOO.log("Do not scroll the window during the test.", "warn", "TestRunner");    
 

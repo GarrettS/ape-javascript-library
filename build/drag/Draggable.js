@@ -52,6 +52,8 @@ APE.namespace("APE.drag");
     function Drag(id, options) {
         var d = document, // not cross-frame.
             el = d.getElementById(id),
+            constraint,
+            noop = Function.prototype,
             p;
         this.id = id;
         this.el = this.origEl = el;
@@ -66,10 +68,18 @@ APE.namespace("APE.drag");
         this.dropTargets = [];
         this.handle = el;
         this.onbeforeexitcontainer = beforeExitContainer;
-        for(p in options) {
-            this[p] = options[p];
+        if(options) {
+            for(p in options) {
+                this[p] = options[p];
+            }
+            constraint = options.constraint;
+            if(constraint == "y") { 
+                this.moveToX = noop;
+            } else if(constraint == "x") {
+                this.moveToY = noop;
+            }
+            el.style.zIndex = parseInt(dom.getStyle(el, "zIndex"), 10) || highestZIndex++;
         }
-        el.style.zIndex = parseInt(dom.getStyle(el, "zIndex"), 10) || highestZIndex++;
     }
     
     /* default "onbeforeexitcontainer" handler */
@@ -285,14 +295,9 @@ APE.namespace("APE.drag");
         function dragDone(dObj, e) {
             if(dObj.activeDragClassName)
                 dom.removeClass(dObj.el, dObj.activeDragClassName);
-            if(typeof dObj.ondragend == FUNCTION && dObj.hasBeenDragged) {
-                dObj.hasBeenDragged = false; // avoid recursion.
-                dObj.ondragend(e);
-            }
             if(dObj.copyEl) { // in case user does some appending of el, et c.
                 dObj.el.parentNode.insertBefore(dObj.copyEl, dObj.el);
             }
-            dObj.hasBeenDragged = false;
         }
 
         function setGroupSelection(dObj, hasMetaKey) {
@@ -667,7 +672,9 @@ APE.namespace("APE.drag");
         function mouseUp(e) {
             grabbed = false;
             if(!dO) return;
-            var isRandomMouseMoveEvent = (dO.isBeingDragged && !dO.hasBeenDragged),
+            var hasBeenDragged = dO.hasBeenDragged,
+                isRandomMouseMoveEvent = (dO.isBeingDragged && !hasBeenDragged),
+                eventDraggableList = {},
                 id, item, o, x, y;
             if(!dO.hasBeenDragged && !isRandomMouseMoveEvent) {
                 if(!keepUserSelection){
@@ -680,20 +687,16 @@ APE.namespace("APE.drag");
             
             if(dO.copyEl) 
                 retireClone(dO);
-            if(hasGroupSelection) {
-                for(id in draggableList) {
-                    item = draggableList[id];
-                    if(item.copyEl) 
-                        retireClone(item);
-                }
-            }
-            
-            e = getPointerEvent(e, "changedTouches");
             // if it's been dragged onto a dropTarget, fire that event.
+            e = getPointerEvent(e, "changedTouches");
             handleDrops(e);
             
-            if(hasGroupSelection) {
-                for(id in draggableList) {
+            for(id in draggableList) {
+                o = eventDraggableList[id] = draggableList[id];
+                if(hasGroupSelection) {
+                    if(o.copyEl) 
+                        retireClone(o);
+
                     o = draggableList[id];
                     x = o.x;
                     y = o.y;
@@ -705,13 +708,46 @@ APE.namespace("APE.drag");
                         o.moveToY(o.minY);
                     else if(y > o.maxY)
                         o.moveToY(o.maxY);
-                    if(o.hasBeenDragged)
+                    
+                    // ondragend does notfire for each object,
+                    // a related dragObjects collection is provided.
+                    if(hasBeenDragged)
                         dragDone(o, e);
                 }
             }
-            dragDone(dO, e);
+            
+            if(hasBeenDragged) {
+                dragDone(dO, e);
+                if(typeof dO.ondragend == FUNCTION) {
+                    dO.ondragend({
+                        domEvent: e,
+                        draggableList : eventDraggableList
+                    });
+                }
+            }
+            // finally.
+            dO.hasBeenDragged = false;
             dO = null;
         }
+
+        var sortBySourceOrder = function(a, b) {
+            var node = document.documentElement,
+                f;
+            if(typeof node.sourceIndex == "number") {
+                f = function(a, b){
+                    return a.sourceIndex - b.sourceIndex;
+                };
+            } else if("compareDocumentPosition" in node) {
+                f = function(a, b) {
+                    //http://www.w3.org/TR/DOM-Level-3-Core/core.html#Node-DOCUMENT_POSITION_PRECEDING
+                    //  DOCUMENT_POSITION_PRECEDING - 2
+                    //    2. The second node precedes the reference node.
+                        return b.compareDocumentPosition(a) - 3;
+                };
+            }
+            node = null;
+            return (sortBySourceOrder = f)(a, b);
+        };
 
         /** 
          * Key event callback handler. 
@@ -726,7 +762,11 @@ APE.namespace("APE.drag");
                 }
             }
         }
-                
+        function DragEvent(type, domEvent){
+            this.type = type;
+            this.domEvent = domEvent;
+        }
+        
         function handleDragOver(dO, e, ePageX, ePageY){
             var coords = { x:ePageX, y:ePageY },
             i = 0,
