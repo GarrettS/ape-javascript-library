@@ -80,9 +80,6 @@ APE.drag.SortList.getById("sortList", {
     constraint : "y",
     ondragstart : function(dragEvent) {
         document.getElementById(this.proxyId).firstChild.firstChild.data = dragEvent.count;
-    },
-    ondragend : function(de) {
-        return false;
     }
 });
 </script>
