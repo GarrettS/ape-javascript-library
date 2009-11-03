@@ -240,11 +240,13 @@ var draggableMouseTestCase = new YAHOO.tool.TestCase({
         
         var d = Draggable.getByNode( testNode ),
             ds = false,
-            bds = false;
+            bds = false,
+            dragEvent;
 
         d.activeDragClassName = aClass;
-        d.ondragstart = function() {
+        d.ondragstart = function(de) {
             ds = true;
+            dragEvent = de;
         };
 
         d.onbeforedragstart = function() {
@@ -264,8 +266,10 @@ var draggableMouseTestCase = new YAHOO.tool.TestCase({
         Action.mousemove( document, {clientX:101} );
 
         Assert.isTrue( ds, "now drag start should have fired." );
+
+        Assert.areSame(1, dragEvent.count, "count wrong")
+        ObjectAssert.hasProperty("testNode", dragEvent.draggableList, "draggableList wrong")
         StringAssert.contains( aClass, testNode.className );
-        Action.mouseup(document);
     },
 
     testDragClone : function() {
@@ -570,7 +574,8 @@ var draggableMouseTestCase = new YAHOO.tool.TestCase({
         document.body.style.height = "900px"
 
         var d = Draggable.getByNode( testNode ),
-            d2 = Draggable.getByNode( testNode2 );
+            d2 = Draggable.getByNode( testNode2 ),
+            coords = {clientX: 10, clientY: 40};
 
         d.dragMultiple = d2.dragMultiple = true;
 
@@ -578,10 +583,12 @@ var draggableMouseTestCase = new YAHOO.tool.TestCase({
         Action.mouseup( document );
         Action.mousedown( testNode2, {ctrlKey:true, metaKey:true} );
 
-        Action.mousemove( document, {clientX: 10, clientY: 40});
-
-        Assert.areEqual("10px", testNode.style.left);
-        Assert.areEqual("20px", testNode2.style.top);
+        Action.mousemove( document, coords);
+        this.wait(function(){
+            Action.mousemove( document, coords);
+            Assert.areEqual("10px", testNode.style.left);
+            Assert.areEqual("20px", testNode2.style.top);
+        }, 78);
     },
 
     testOnglide : function() {
@@ -849,7 +856,6 @@ var draggableMouseTestCase = new YAHOO.tool.TestCase({
             // Verify dragend fired for main object only.
             Action.mouseup( document , coords );
             Assert.isNotNull(draggableList);
-            console.log(1, draggableList);
             ObjectAssert.hasProperty("testNode", draggableList);
             ObjectAssert.hasProperty("testNode2", draggableList);
             ObjectAssert.hasProperty("testNode3", draggableList);
@@ -869,7 +875,8 @@ var draggableMouseTestCase = new YAHOO.tool.TestCase({
         testNode3.style.top = "100px";
         testNode3.style.height = "20px";
 
-        var dt = d.addDropTarget( testNode3 );
+        var dt = d.addDropTarget( testNode3 ),
+            coords = {clientX : 120, clientY : 120 };
 
         dt.dragOverClassName = "dragOver";
         dt.ondragover = function(e) {
@@ -882,8 +889,9 @@ var draggableMouseTestCase = new YAHOO.tool.TestCase({
         if(testNode.focus)
             testNode.focus();
         Action.mousedown( testNode );
-        Action.mousemove( document, {clientX : 120, clientY : 120 } );
+        Action.mousemove( document, coords );
         this.wait(function(){
+            Action.mousemove( document, coords );
             Assert.areEqual('dragOver', dt.dragOverClassName, "drag over className didn't happen.");
             Assert.isTrue( gotDragOver, "didn't get dragover.");
             Action.mouseup( document );
@@ -1171,6 +1179,83 @@ var animatedDragTestCase = new YAHOO.tool.TestCase({
     }
 });
 
+var proxyTestCase = new YAHOO.tool.TestCase({
+    name : "proxy test suite",
+    setUp : draggableTestCase.setUp,
+    tearDown : draggableTestCase.tearDown,
+
+    testProxyEl : function() {
+        var dObj = Draggable.getById("testNode", {
+                proxyId : "testNode2"
+            }),
+            coords = {clientX:101, clientY:100};
+            
+        Action.mousedown( testNode );
+        Action.mousemove( document, coords );
+        this.wait(function(){
+            Action.mousemove( document, coords );
+
+            Assert.areEqual("", testNode.style.left);
+            Assert.areEqual("", testNode.style.top);
+            Assert.areEqual(101, parseInt(testNode2.style.left, 10));
+            Assert.areEqual(100, parseInt(testNode2.style.top, 10));
+
+            StringAssert.doesNotContain( aClass, testNode.className );        
+            Action.mouseup(document);
+        }, 78);
+    },
+
+    testCount : function() {
+        var opts = {
+                proxyId : "testNode3",
+                dragMultiple : true
+            },
+            dObj = Draggable.getById("testNode", opts),
+            dObj2 = Draggable.getById("testNode2", opts),
+            testNode3 = document.getElementById('testNode3'),
+            count,
+            coords = {clientX:101, clientY:100};
+
+        dObj2.ondragstart = dragStarted;
+
+        function dragStarted(dragEvent) {
+            count = dragEvent.count;
+        }
+        
+        Action.mousedown( testNode );
+        Action.mousedown( testNode2, {ctrlKey: true, metaKey:true} );
+        Action.mousemove( document, coords );
+        this.wait(function(){
+            Action.mousemove( document, coords );
+            Assert.areSame(2, count);
+        }, 70);
+    },
+    
+    testGroupProxy : function() {
+        var opts = {
+                proxyId : "testNode3"
+            },
+            dObj = Draggable.getById("testNode", opts),
+            dObj2 = Draggable.getById("testNode2", opts),
+            testNode3 = document.getElementById('testNode3'),
+            coords = {clientX:101, clientY:100};
+        
+        Action.mousedown( testNode );
+        Action.mousedown( testNode2, {ctrlKey: true, metaKey:true} );
+        Action.mousemove( document, coords );
+        this.wait(function(){
+            Action.mousemove( document, coords );
+    
+            Assert.areEqual("", testNode.style.left);
+            Assert.areEqual("", testNode2.style.left);
+            Assert.areEqual(101, parseInt(testNode3.style.left, 10), "left wrong");
+            Assert.areEqual(100, parseInt(testNode3.style.top, 10), "top wrong");
+    
+            StringAssert.doesNotContain( aClass, testNode.className );        
+            Action.mouseup(document);
+        }, 78);
+    }
+});
 
 // Set the TestRunner's logger by invoking a constructor
 new YAHOO.tool.TestLogger("testLogger");
@@ -1187,8 +1272,9 @@ new YAHOO.tool.TestLogger("testLogger");
 TestRunner.add( draggableTestCase );
 
 if(!IS_TOUCH_EVENT) {
-    TestRunner.add( draggableMouseTestCase );
-    TestRunner.add( animatedDragTestCase );
+   TestRunner.add( draggableMouseTestCase );
+   TestRunner.add( animatedDragTestCase );
+    TestRunner.add( proxyTestCase );
 } else {
     var touchTestCase = new YAHOO.tool.TestCase({
         name : "touch drag tests",
@@ -1357,7 +1443,7 @@ if(!IS_TOUCH_EVENT) {
     	        Assert.areEqual( coords.x, coords2.x, "x pos should not have changed." );
     	    }, 78);
         },
-
+        
         testSetHandle : function() {
             
             var handle = document.createElement("div");

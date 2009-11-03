@@ -182,7 +182,6 @@ body {
 <script type="text/javascript">
 window.onload = function() {
 
-    
 //-----------------------------------------------------------------------------
 // The only drop-target element (Trash). We'll make this draggable, too, later.
 
@@ -218,44 +217,44 @@ window.onload = function() {
  *   can be dragged with other objects in the same container (dragMultiple = true)
  *   has trashDropTarget (addDropTarget(trashDropTarget))
  */
- var Draggable = APE.drag.Draggable;
- 	function Directory(id) {
- 		
- 		this.dragObj = Draggable.getByNode(document.getElementById(id));
- 		this.dragObj.keepInContainer = true; 
- 		this.dragObj.dragCopy = true;
- 		this.dragObj.dragMultiple = true;
- 		
-		this.dragObj.addDropTarget(trashDropTarget);
-		
-		// Event handlers for onfocus, ondragstart,onblur et c.
- 		this.dragObj.activeDragClassName = "folder-drag";
- 		this.dragObj.focusClassName = "folder-focus";
- 		this.dragObj.selectedClassName = "folder-selected";
-        //this.dragObj.setHandle(el.getElementsByTagName('span')[0]);
-	}
-	
+    var Draggable = APE.drag.Draggable,
+        dragConfig = {
+      		keepInContainer : true, 
+     		dragCopy : true,
+     		dragMultiple : true,
+     		
+    		addDropTarget(trashDropTarget),
+    		
+    		// Event handlers for onfocus, ondragstart,onblur et c.
+     		activeDragClassName : "folder-drag",
+     		focusClassName : "folder-focus",
+     		selectedClassName : "folder-selected"
+    };
 	// Let's instantiate some Directories.
-	new Directory("UntitledFolder");
-	new Directory("UntitledFolder2");
-	new Directory("MusicFolder");
-	new Directory("PicturesFolder");
-	new Directory("MP3Folder");
+	Draggable.getById("UntitledFolder", dragConfig);
+	Draggable.getById("UntitledFolder2", dragConfig);
+	Draggable.getById("MusicFolder", dragConfig);
+	Draggable.getById("PicturesFolder", dragConfig);
+	Draggable.getById("MP3Folder", dragConfig);
 
-    new Directory("trash");
+    Draggable.getById("trash", dragConfig);
 
-    var desktop = Draggable.getByNode(document.getElementById("desktop"));
-    desktop.moveToY = function(){};
-    
-    desktop.activeDragClassName = "desktop-drag";
-    desktop.keepInContainer = true;
-    desktop.isDragEnabled = false;
+    var desktop = Draggable.getById("desktop", {
+        constraint : "x",
+        activeDragClassName : "desktop-drag",
+        keepInContainer : true,
+        isDragEnabled : false
+    }
 
     var t = document.getElementById('desktopToggle').firstChild;
     t.checked = false;
-    t.onclick = function(){ desktop.isDragEnabled = !desktop.isDragEnabled; };
+    t.onclick = desktopToggleClickHandler;
+
+    function desktopToggleClickHandler(){ 
+        desktop.isDragEnabled = !desktop.isDragEnabled;
+    }
 	
-    var sticky = Draggable.getByNode(document.getElementById("sticky"));
+    var sticky = Draggable.getById("sticky");
     sticky.keepInContainer = true;	
 };
 </script>

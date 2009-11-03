@@ -1,0 +1,90 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+    <title>Sortable List</title>
+    <link rel="stylesheet" type="text/css" href="">
+<style type="text/css">
+#sortList, #sortList li {
+    margin: 0;
+    padding: 0;
+    position: relative;
+    cursor: default;
+    list-style: none;
+    border: 1px solid #eee;
+}
+
+#sortList {
+    width: 200px;
+}
+
+#sortList div {
+    padding: 2px 1em;
+}
+
+.drag-selected {
+    background: #ADF;
+}
+
+.hiddenSelection .drag-selected {
+    visibility: hidden;
+}
+#listProxyEl {
+    display: none;
+    background: #eee;
+    opacity: .65;
+    filter: alpha(opacity=65);
+    position: relative; /*for IE*/
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;    
+ }
+#sortList #listProxyEl div {
+    text-align: center;
+    width: 1.1em;
+    font-weight: 900;
+    background: #030;
+    margin: auto;
+    text-align: center;
+    color: #f3fff3;
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+}
+</style>
+</head>
+<body>
+    <ul id="sortList">
+        <li tabindex="0"><div>item 0</div></li>
+        <li tabindex="0"><div>item 1</div></li>
+        <li tabindex="0"><div>item 2</div></li>
+        <li tabindex="0"><div>item 3</div></li>
+        <li tabindex="0"><div>item 4</div></li>
+        <li tabindex="0"><div>item 5</div></li>
+        <li tabindex="0"><div>item 6</div></li>
+        <li tabindex="0"><div>item 7</div></li>
+        <li tabindex="0"><div>item 8</div></li>
+        <li tabindex="0"><div>item 9</div></li>
+        <li id="listProxyEl"><div>0</div></li>
+    </ul>
+    
+<script src="../../../build/ape-ep-dom.js" type="text/javascript"></script>
+<script src="../../../build/dom/getContainingBlock.js" type="text/javascript"></script>
+<script src="../../../build/dom/getPixelCoords.js" type="text/javascript"></script>
+<script src="../../../build/anim/Animation.js" type="text/javascript"></script>
+<script src="../../../build/drag/Draggable.js" type="text/javascript"></script>
+<script src="../../../build/drag/SortList.js" type="text/javascript"></script>
+<script type="text/javascript">
+APE.drag.SortList.getById("sortList", { 
+    proxyId : "listProxyEl",
+    dragMultiple : true,
+    selectedClassName : "drag-selected",
+    constraint : "y",
+    ondragstart : function(dragEvent) {
+        document.getElementById(this.proxyId).firstChild.firstChild.data = dragEvent.count;
+    },
+    ondragend : function(de) {
+        return false;
+    }
+});
+</script>
+</body>
+</html>

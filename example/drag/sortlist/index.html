@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+    <title>Sortable List</title>
+    <link rel="stylesheet" type="text/css" href="">
+<style type="text/css">
+#sortList, #sortList li {
+    margin: 0;
+    padding: 0;
+    position: relative;
+    top: 0;
+}
+
+#sortList {
+    width: 200px;
+}
+
+#sortList div {
+    padding: .1em 1em;
+}
+
+.drag-selected {
+    background: #FFC;
+}
+
+.hiddenSelection .drag-selected {
+    visibility: hidden;
+}
+</style>
+</head>
+<body>
+    <ul id="sortList">
+        <li><div>item 0</div></li>
+        <li><div>item 1</div></li>
+        <li><div>item 2</div></li>
+        <li><div>item 3</div></li>
+        <li><div>item 4</div></li>
+        <li><div>item 5</div></li>
+        <li><div>item 6</div></li>
+        <li><div>item 7</div></li>
+        <li><div>item 8</div></li>
+        <li><div>item 9</div></li>
+    </ul>
+    
+<script src="../../../build/ape-ep-dom.js" type="text/javascript"></script>
+<script src="../../../build/dom/getContainingBlock.js" type="text/javascript"></script>
+<script src="../../../build/dom/getPixelCoords.js" type="text/javascript"></script>
+<script src="../../../build/anim/Animation.js" type="text/javascript"></script>
+<script src="../../../build/drag/Draggable.js" type="text/javascript"></script>
+<script src="../../../build/drag/SortList.js" type="text/javascript"></script>
+<script type="text/javascript">
+APE.drag.SortList.getById("sortList", { 
+        dragMultiple : true,
+        selectedClassName : "drag-selected",
+        constraint : "y"
+});
+</script>
+</body>
+</html>

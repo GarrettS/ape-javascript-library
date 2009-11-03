@@ -428,8 +428,8 @@ APE.namespace("APE.widget");
          * Override this to format <code>this.selectedDate</code>.
          */
          function formatDate(dateInRange) {
-             var yyyy = ("000" + dateInRange.getFullYear()).slice(-4);
-                 mm = ("0" + (dateInRange.getMonth() + 1)).slice(-2);
+             var yyyy = ("000" + dateInRange.getFullYear()).slice(-4),
+                 mm = ("0" + (dateInRange.getMonth() + 1)).slice(-2),
                  dd = ("0" + (dateInRange.getDate())).slice(-2);
              return yyyy + "-" + mm + "-" + dd;
         }
