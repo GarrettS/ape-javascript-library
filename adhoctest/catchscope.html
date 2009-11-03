@@ -1,0 +1,19 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+    <title>catch scope</title>
+</head>
+<body>
+<script type="text/javascript">
+try {
+    throw Error("generic error");
+} catch(ex) { }
+if(typeof ex === "object") {
+    document.write("ex resolved outside catch: " + ex.message);
+} else {
+    document.write("PASS");
+}
+</script>
+</body>
+</html>

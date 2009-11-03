@@ -1,0 +1,2030 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" 
+"http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+<meta name="DCTERMS.language" content="en"><meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"><meta name="DCTERMS.language" scheme="RFC1766" content="en"><meta name="DC.format" content="text/html"><meta name="DC.type" content="Text"><meta name="DC.publisher" content="Garrett Smith"><meta name="DCTERMS.modified" content="2009-10-27"><meta name="DC.description" content="Javascript Frequently Asked Questions"><meta name="DC.source" content="http://www.ecma-international.org/publications/standards/Ecma-262.htm"><meta name="DC.source" content="news:comp.lang.javascript"><meta name="DC.source" content="https://developer.mozilla.org/en/JavaScript"><meta name="DC.source" content="http://msdn.microsoft.com/"><link rel="StyleSheet" href="faq.css" type="text/css" media="screen">
+<title> comp.lang.javascript FAQ</title>
+</head>
+ <body>
+<h1> comp.lang.javascript FAQ</h1>
+<p>Version 21, Updated 2009-10-27, by Garrett Smith</p><div id="nav"><a href="faq_notes/faq_notes.html">FAQ Notes</a></div>
+<ul id='faqList'>
+<li>1 <a href='#meta'>Meta-FAQ meta-questions</a>
+
+<ul>
+<li>1.1 <a href='#newsgroups'>Which newsgroups deal with javascript?</a></li>
+<li>1.2 <a href='#appropriateQuestions'>What questions are on-topic for comp.lang.javascript?</a></li>
+<li>1.3 <a href='#posting'>What should I do before posting to comp.lang.javascript?</a></li>
+<li>1.4 <a href='#noAnswer'>Why was my post not answered?</a></li>
+</ul></li><li>2 <a href='#tips'>Language Overview</a>
+
+<ul>
+<li>2.1 <a href='#ecma'>What is ECMAScript?</a></li>
+<li>2.2 <a href='#jScript'>What is JScript?</a></li>
+<li>2.3 <a href='#objectModels'>What are object models?</a></li>
+<li>2.4 <a href='#dom'>What is the Document Object Model (DOM)?</a></li>
+<li>2.5 <a href='#localization'>Internationalisation and Multinationalisation in javascript.</a></li>
+
+<li>2.6 <a href='#futureEcmaScript'>What does the future hold for ECMAScript?</a></li>
+</ul></li><li>3 <a href='#ecmascriptResources'>Javascript Resources</a>
+
+<ul>
+<li>3.1 <a href='#books'>What books are recommended for javascript?</a></li>
+<li>3.2 <a href='#onlineResources'>What online resources are available?</a></li>
+</ul></li><li>4 <a href='#dates'>Dates</a>
+
+<ul>
+<li>4.1 <a href='#formatDate'>How do I format a Date object with javascript?</a></li>
+<li>4.2 <a href='#parseDate'>How can I create a Date object from a String?</a></li>
+</ul></li><li>5 <a href='#numbers'>Numbers</a>
+
+<ul>
+<li>5.1 <a href='#formatNumber'>How do I format a Number as a String with exactly 2 decimal places?</a></li>
+<li>5.2 <a href='#binaryNumbers'>Why does simple decimal arithmetic give strange results?</a></li>
+
+<li>5.3 <a href='#parseIntBase'>Why does K = parseInt('09') set K to 0?</a></li>
+<li>5.4 <a href='#typeConvert'>Why does 1+1 equal 11? or How do I convert a string to a number?</a></li>
+<li>5.5 <a href='#randomNumber'>How do I generate a random integer from 1 to n?</a></li>
+</ul></li><li>6 <a href='#objects'>Objects</a>
+
+<ul>
+<li>6.1 <a href='#eval'>When should I use eval?</a></li>
+
+<li>6.2 <a href='#propertyAccessAgain'>How do I access a property of an object using a string?</a></li>
+</ul></li><li>7 <a href='#strings'>Strings and RegExp</a>
+
+<ul>
+<li>7.1 <a href='#trimString'>How do I trim whitespace?</a></li>
+</ul></li><li>8 <a href='#domRef'>DOM and Forms</a>
+
+<ul>
+<li>8.1 <a href='#formControlAccess'>How do I get the value of a form control?</a></li>
+
+<li>8.2 <a href='#propertyAccess'>My element is named myselect[], how do I access it?</a></li>
+<li>8.3 <a href='#globalPollution'>Why doesn't the global variable &quot;divId&quot; always refer to the element with id=&quot;divId&quot;?</a></li>
+<li>8.4 <a href='#imageCache'>Why are my rollovers so slow?</a></li>
+<li>8.5 <a href='#disableRightClick'>How do I disable the right mouse button?</a></li>
+
+<li>8.6 <a href='#detectBrowser'>How do I detect Opera/Safari/IE?</a></li>
+<li>8.7 <a href='#updateContent'>How do I modify the content of the current page?</a></li>
+<li>8.8 <a href='#accessElementBeforeDefined'>Why does my code fail to access an element?</a></li>
+<li>8.9 <a href='#testCookie'>How can I see in javascript if a web browser accepts cookies?</a></li>
+</ul></li><li>9 <a href='#windows'>Windows and Frames</a>
+
+<ul>
+
+<li>9.1 <a href='#disableBackButton'>How can I disable the back button in a web browser?</a></li>
+<li>9.2 <a href='#frameRef'>How do I access a frame's content?</a></li>
+<li>9.3 <a href='#getWindowSize'>How do I find the size of the window?</a></li>
+<li>9.4 <a href='#isWindowOpen'>How do I check to see if a child window is open, before opening another?</a></li>
+<li>9.5 <a href='#printFrame'>Why does framename.print() not print the correct frame in IE?</a></li>
+<li>9.6 <a href='#windowClose'>How do I close a window and why does it not work on the first one?</a></li>
+
+<li>9.7 <a href='#permissionDenied'>Why do I get permission denied when accessing a frame/window?</a></li>
+<li>9.8 <a href='#setTimeout'>How do I make a 10 second delay?</a></li>
+<li>9.9 <a href='#printSettings'>How do I change print settings for window.print()?</a></li>
+<li>9.10 <a href='#changeBrowserDialog'>How do I change the confirm box to say yes/no or default to cancel?</a></li>
+<li>9.11 <a href='#fileDownload'>How do I prompt a &quot;Save As&quot; dialog for an accepted mime type?</a></li>
+
+<li>9.12 <a href='#returnValue'>I have window.status="Moomin"; why doesn't the statusbar change?</a></li>
+<li>9.13 <a href='#modifyChrome'>How do I modify the current browser window?</a></li>
+<li>9.14 <a href='#target'>How do I POST a form to a new window?</a></li>
+<li>9.15 <a href='#openWindow'>How do I open a new window with javascript?</a></li>
+</ul></li><li>10 <a href='#ajaxRef'>Ajax and Server Communication</a>
+
+<ul>
+
+<li>10.1 <a href='#ajax'>What is Ajax?</a></li>
+<li>10.2 <a href='#downloadPage'>How do I download a page to a variable?</a></li>
+<li>10.3 <a href='#getServerVariable'>How do I get a jsp/php variable into client-side javascript?</a></li>
+<li>10.4 <a href='#sessionExpired'>How do I log-out a user when they leave my site?</a></li>
+<li>10.5 <a href='#runServerScript'>How do I run a server side script?</a></li>
+<li>10.6 <a href='#noCache'>How do I force a reload from the server/prevent caching?</a></li>
+
+<li>10.7 <a href='#ajaxCache'>Why is my Ajax page not updated properly when using an HTTP GET request in Internet Explorer?</a></li>
+</ul></li><li>11 <a href='#debugging'>Debugging</a>
+
+<ul>
+<li>11.1 <a href='#javascriptErrors'>How do I get my browser to report javascript errors?</a></li>
+</ul></li><li>12 <a href='#doNotTry'>Things not to attempt in a browser</a>
+
+<ul>
+<li>12.1 <a href='#preventAccess'>How can I prevent access to a web page by using javascript?</a></li>
+
+<li>12.2 <a href='#hideSource'>How do I protect my javascript code?</a></li>
+<li>12.3 <a href='#readFile'>How can I access the client-side filesystem?</a></li>
+<li>12.4 <a href='#javascriptURI'>I have &lt;a href=&quot;javascript:somefunction()&quot;&gt;  what ... ?</a></li>
+</ul></li><li>13 <a href='#comments'>Comments and Suggestions</a>
+
+<ul>
+<li>13.1 <a href='#FAQENTRY'>Why do some posts have &lt;FAQENTRY&gt; in them?</a></li>
+<li>13.2 <a href='#makeSuggestion'>How do I make a suggestion?</a></li>
+</ul></li></ul><div id='meta' class='section'><h2 id='FAQ1'>1 Meta-FAQ meta-questions</h2>
+<p>
+  
+This is the  <em>comp.lang.javascript</em> meta-FAQ, 21.  The latest
+version is available at <a href="http://jibbering.com/faq/" >http://jibbering.com/faq/</a> in HTML form.
+
+</p> <p>
+  
+Each day, one section of the FAQ is posted for review and questions,
+and as a reminder that the FAQ is available.
+</p> <p>
+  
+For additional explanation and detail relating to some aspects 
+of the FAQ, please see the 
+<a href="faq_notes/faq_notes.html" >FAQ Notes</a>. 
+It has been provided separately to avoid increasing the size of
+the FAQ to a point where it would be unreasonable to post it to
+the group.
+</p> <p>
+  
+Code examples in this FAQ use <a href="http://jsdoctoolkit.org/" >JSDoc Toolkit</a> comments.
+
+</p> </div><div id='newsgroups' class='section'><h3 id='FAQ2_1'>1.1 Which newsgroups deal with javascript?</h3><p>
+  
+The official Big 8 Usenet newsgroup dealing with javascript is
+ <a href="news:comp.lang.javascript">comp.lang.javascript</a>.
+Some "language" hierarchies also have *.comp.lang.javascript groups.
+    </p> <p>
+  
+c.l.js is an unmoderated newsgroup.
+     </p> </div>
+<div id='appropriateQuestions' class='section'><h3 id='FAQ2_2'>1.2 What questions are on-topic for comp.lang.javascript?</h3><p>
+  
+The comp.lang.javascript newsgroup deals with ECMAScript
+languages, so any questions about JavaScript or JScript are
+welcome. However, the majority of questions sent to this group
+relates to javascript in a web browser. If you are experiencing
+issues with a particular browser, or the host is not a browser
+at all, please make this information clear.
+    </p> <p>
+
+  
+Javascript and Java are two completely different languages.
+Java questions should be asked in one of the comp.lang.java.*
+newsgroups; they are not appropriate for c.l.js (as Java and
+javascript are distinct programming languages with only
+superficial similarities due to sharing a C-like syntax and
+some of the characters in their names).
+    </p> <p>
+  
+Questions dealing with other scripting languages, such as
+VBScript, PerlScript or CGI scripting are also off-topic,
+as are HTML-only or CSS-only questions.
+    </p> <p>
+  
+Questions that are specific to Microsoft's JScript may also
+be appropriately asked at:
+ <a href="news:microsoft.public.scripting.jscript">microsoft.public.scripting.jscript</a></p> <p>
+  
+The comp.lang.javascript newsgroup charter is included in
+<a href="faq_notes/cljs_charter.html" >faq_notes/cljs_charter.html</a>.
+    </p> </div>
+
+<div id='posting' class='section'><h3 id='FAQ2_3'>1.3 What should I do before posting to comp.lang.javascript?</h3><p>
+  
+Before posting to c.l.js, you should read this document.
+You should also check the <a href="#onlineResources" >Resources section</a>.
+    </p> 
+<h4 id='ask'>How to Ask a Question</h4>
+
+<ul>
+  <li> 
+State your question clearly and concisely.
+     </li>
+  <li> 
+
+Use the Subject: line to show the type of problem you have but
+include the question in the body as well.  
+     </li>
+  <li> 
+For a more detailed explanation of formatting, see 
+      <a href="faq_notes/clj_posts.html" >&quot;Posting Questions and Replies to comp.lang.javascript&quot;</a>.
+     </li></ul>
+<h4 id='reply'>Replying</h4>
+
+<ul>
+  <li> 
+Quote only relevant parts of earlier messages, and add your
+comments below each quoted section
+(<a href="http://www.ietf.org/rfc/rfc1855.txt" >FYI28/RFC1855</a>). 
+     </li>
+
+  <li> 
+Link to specific sections of the FAQ that are relevant.
+     </li>
+  <li> 
+Avoid being unnecessarily rude, but do not complain about other rude posts.
+     </li>
+  <li> 
+Don't quote signatures.
+     </li></ul>
+<h4 id='postCode'>Posting Code</h4>
+
+<ul>
+  <li> 
+
+Remove everything that does not contribute to the problem (images, 
+markup, other scripts, etc).
+     </li>
+  <li> 
+Validate the HTML and CSS <a href="http://validator.w3.org/" >http://validator.w3.org/</a>, <a href="http://jigsaw.w3.org/css-validator/" >http://jigsaw.w3.org/css-validator/</a>.
+     </li>
+  <li> 
+Make sure the code is executable as transmitted. 
+     </li>
+  <li> 
+Format lines to 72 characters; indent with 2-4 spaces (not tabs). 
+     </li>
+
+  <li> 
+State what you expect the code to do.
+     </li>
+  <li> 
+Mention the platforms, browsers, and versions.
+     </li>
+  <li> 
+See also the <a href="#debugging" >FAQ section on debugging</a>.
+     </li>
+  <li> 
+Post in plain-text only. Do not encode it. Do not attach files.
+     </li>
+
+  <li> 
+Do not multi-post; cross-post if necessary 
+(<a href="http://en.wikipedia.org/wiki/Cross-post" >Wikipedia description</a>).
+     </li></ul>
+<h4 id='doNotPost'>What Not to Post</h4>
+
+<ul>
+  <li> 
+Do not post job postings. Job postings should go to
+an appropriate regional jobs group. 
+     </li>
+  <li> 
+Do not post copyright material without permission 
+from the copyright holder.
+     </li></ul><p>
+
+  
+Relevant announcements are welcome, but no more often than once 
+per major release, as a short link to the product's webpage. 
+  </p> </div>
+<div id='noAnswer' class='section'><h3 id='FAQ2_4'>1.4 Why was my post not answered?</h3><p>
+  
+This could be for several reasons:
+      </p> 
+<ul> <li>  
+It was a variation of a frequently asked question and was 
+therefore ignored by everyone.
+        </li> 
+<li>  
+Nobody knows the answer.
+        </li> 
+<li>  
+
+The person with the answer has not seen the post.
+        </li> 
+<li>  
+It might not be possible to do what you want to do but perhaps 
+readers of c.l.js are reluctant to answer your post in the negative 
+when they are not convinced that it cannot be done.
+        </li> 
+<li>  
+The question was not asked clearly enough, or did not included 
+enough information to be answered.
+        </li> 
+<li>  
+The questioner did not realise the need to read the group, for a 
+few days, to see the answers posted there.
+        </li> 
+<li>  You ignored the <a href="#posting" >section on posting</a> </li> 
+</ul> 
+
+<p>
+If it is not one of these, then after a few days consider
+reposting after checking <a href="http://groups.google.com/group/comp.lang.javascript/topics" >http://groups.google.com/group/comp.lang.javascript/topics</a> 
+for replies. Make sure the post is phrased well, and everything
+needed to answer is correct, and the subject is appropriate.
+    </p> </div>
+<div id='tips' class='section'><h2 id='FAQ2'>2 Language Overview</h2>
+</div><div id='ecma' class='section'><h3 id='FAQ2_6'>2.1 What is ECMAScript?</h3><p>
+  <a href="http://www.ecma-international.org/publications/standards/Ecma-262.htm" >ECMA-262</a>
+is the international standard that current language implementations 
+(JavaScript&trade;, JScript etc.) are based on. 
+
+    </p> <p>
+
+  <a href="http://www.ecma-international.org/publications/standards/Ecma-262.htm" >ECMA-262</a>
+defines the language Syntax, Types, Keywords, Operators, and built-in 
+objects. The ECMAScript specification is the reference to determine the 
+expected behavior of a program. ECMAScript does not define any host 
+objects, such as <code>document</code>, <code>window</code>, or <code>ActiveXObject</code>. 
+    </p> <p>
+  
+ECMA-327 defines the Compact Profile of ECMAScript by 
+describing the features from ECMA 262 that may be omitted in some 
+resource-constrained environments.
+<a href="http://www.ecma-international.org/publications/standards/Ecma-327.htm" >http://www.ecma-international.org/publications/standards/Ecma-327.htm</a></p> <p>
+
+  
+The current edition of ECMA-262 is the 3rd Edition. There is some
+support for this edition in JScript 5.0 and JavaScript 1.3.
+JScript 5.5 and JavaScript&trade; 1.5, in Netscape 6.1 and later, 
+are somewhat compliant.
+    </p> <p>
+  
+The term "javascript" is used as a common name for all dialects of ECMAScript.
+    </p> </div>
+<div id='jScript' class='section'><h3 id='FAQ2_7'>2.2 What is JScript?</h3><p>
+  
+JScript is Microsoft's implementation of ECMAScript.
+     </p> <p>
+  
+
+Questions that are specific to Microsoft's JScript may also
+be appropriately asked at:
+ <a href="news:microsoft.public.scripting.jscript">microsoft.public.scripting.jscript</a>.    
+     </p> </div>
+<div id='objectModels' class='section'><h3 id='FAQ2_8'>2.3 What are object models?</h3><p>
+      
+Object models (OMs) are not part of the ECMAScript language; they
+are provided by the host to allow javascript (or other scripting
+language) to communicate with the host. An object model may allow
+javascript to access a file system or control a nuclear power
+station. The most common of all is the Document Object Model (DOM). 
+Other document types such as SVG also define scriptable DOMs, 
+mostly as extensions of the W3C Core DOM specification designed for use
+with XML documents.
+     </p> </div>
+<div id='dom' class='section'><h3 id='FAQ2_9'>2.4 What is the Document Object Model (DOM)?</h3><p>
+  
+The 
+<dfn>Document Object Model</dfn> (DOM) is a interface-based model for <code>Document</code> 
+
+objects. The DOM allows scripts to dynamically access and update a 
+document's content, style, and event handlers. 
+</p> <p>
+  
+The DOM is  <em>not</em> part of the ECMAScript programming language.
+</p> <p>
+  
+Official DOM standards are defined by the World Wide Web Consortium.
+Scriptable browsers also have 
+<dfn>proprietary</dfn> DOM features (<a href="http://msdn.microsoft.com/en-us/library/ms533050(VS.85).aspx" >MSDN</a>, <a href="https://developer.mozilla.org/en/DOM_Client_Object_Cross-Reference" >MDC</a>),
+such as <code>document.writeln()</code>.
+ </p> <p>
+
+  
+Also see the section on <a href="#domRef" >DOM and Forms</a>.
+</p><ul class='linkList'><li><a href="#onlineResources" >c.l.js DOM Resources</a></li>
+<li><a href="http://www.w3.org/DOM/faq.html" >W3C DOM FAQ</a></li>
+<li><a href="http://www.w3.org/DOM/" >W3C DOM </a></li>
+<li><a href="https://developer.mozilla.org/en/Gecko_DOM_Reference/Introduction#What_is_the_DOM.3F" >MDC: What is the DOM?</a></li>
+</ul> </div>
+<div id='localization' class='section'><h3 id='FAQ2_10'>2.5 Internationalisation and Multinationalisation in javascript.</h3><p>
+  
+
+Internationalisation means using one form which is everywhere both
+acceptable and understood.  Any international standard not supported by
+default can be coded for.
+    </p> <p>
+  
+For example, there is an International Standard for numeric Gregorian 
+date format; but none for decimal and thousands separators.
+    </p> <p>
+  
+Multinationalisation means using different forms for different 
+readers. It cannot work well in general, because it requires a 
+knowledge of all preferences and the ability to choose the right 
+one, in an environment where many systems are inappropriately 
+set anyway.
+    </p> <p>
+  
+Javascript has a few Multinationalisation features. The various 
+<code>toString()</code>methods are all implementation dependent, 
+but tend to use either UK or US settings (not necessarily correctly).
+ECMAScript Ed. 3 introduced some capabilities, including the 
+<code>toLocaleString()</code>method which should create a string 
+based on the host's locale.
+    </p> <p>
+
+  
+Much more support is expected in future versions of ECMAScript.
+     </p> </div>
+<div id='futureEcmaScript' class='section'><h3 id='FAQ2_12'>2.6 What does the future hold for ECMAScript?</h3><p>
+  
+The ECMAScript Technical Committee is now working on 
+ECMAScript, 5th Edition (the 4th edition was abandoned). 
+More information can be found at <a href="http://www.ecmascript.org/" >http://www.ecmascript.org/</a>.
+    </p> </div>
+<div id='ecmascriptResources' class='section'><h2 id='FAQ3'>3 Javascript Resources</h2>
+</div><div id='books' class='section'><h3 id='FAQ3_1'>3.1 What books are recommended for javascript?</h3><p>
+  
+
+Most javascript books have been found to contain so many technical 
+errors that consensus recommendations have not emerged from the group.
+    </p> <p>
+  
+The following books have been considered to have value by some
+individuals on c.l.js. The reviews of these books are provided: 
+    </p> 
+<ul>
+  <li>  <em>&quot;JavaScript: The Definitive Guide,&quot;</em> 5th Edition, by David Flanagan 
+     
+<ul> <li>  Published: 2006-08 </li> 
+<li>  Pages: 1018 </li> 
+
+<li>  Errata: <a href="http://oreilly.com/catalog/9780596101992/errata/" >http://oreilly.com/catalog/9780596101992/errata/</a> </li> 
+<li>  Discussed in:   
+           
+<ul> <li>  <a href="http://groups.google.com/group/comp.lang.javascript/browse_thread/thread/7283898f77fd2a66/9252aa024e058dea#c5f145ae807c918e" >FAQ Update 9.85 Dated 2007-08-31</a> </li> 
+</ul> 
+ </li> 
+</ul> 
+ </li>
+  <li>  <em>"JavaScript, The Good Parts,"</em> 1st Edition, by Douglas Crockford
+     
+
+<ul> <li>  Published: 2008-05 </li> 
+<li>  Pages: 170 </li> 
+<li>  Errata: <a href="http://oreilly.com/catalog/9780596517748/errata/" >http://oreilly.com/catalog/9780596517748/errata/</a> </li> 
+<li>  Discussed in:
+             
+<ul> <li>  <a href="http://groups.google.com/group/comp.lang.javascript/browse_thread/thread/d084d2109f7b4ec7#" >Crockford's 'The Good Parts': a short review</a> </li> 
+
+<li>  <a href="http://groups.google.com/group/comp.lang.javascript/browse_thread/thread/db1e49ab113aa05c/3987eac87ad27966#3987eac87ad27966" >FunctionExpression's and memory consumptions</a> </li> 
+<li>  <a href="http://groups.google.com/group/comp.lang.javascript/browse_thread/thread/6a41f7835ee728de/da5ccfc65e2df64a#da5ccfc65e2df64a" >FAQ Topic - What books are recommended for javascript? (2008-12-02)</a> </li> 
+<li>  <a href="http://groups.google.com/group/comp.lang.javascript/browse_thread/thread/3a08fb741525ab6d/" >Augmenting functions</a> </li> 
+<li>  <a href="http://groups.google.com/group/comp.lang.javascript/browse_thread/thread/bf26be6e63494ee2/acb733a1c35f6ce5#ee9e4ee29e658d5d" >Crockford's JavaScript, The Good Parts (a book review).</a> </li> 
+<li>  <a href="http://groups.google.com/group/comp.lang.javascript/browse_thread/thread/df602506ee48b400/e65e00f5cad07676#e65e00f5cad07676" >Closures Explained</a> </li> 
+
+<li>  <a href="http://groups.google.com/group/comp.lang.javascript/browse_thread/thread/acadf1b22b219433/4f69a95607d0b3ae#4f69a95607d0b3ae" >Javascript library development</a> </li> 
+</ul> 
+ </li> 
+</ul> 
+ </li></ul></div>
+<div id='onlineResources' class='section'><h3 id='FAQ3_2'>3.2 What online resources are available?</h3>
+<h4 id='ecmaResources'>ECMAScript</h4>
+
+<dl>
+  <dt> 
+The Official ECMAScript Specification
+     </dt>
+
+  <dd> <a href="http://www.ecma-international.org/publications/standards/Ecma-262.htm" >http://www.ecma-international.org/publications/standards/Ecma-262.htm</a> </dd>
+  <dt> 
+ISO/IEC 16262: ISO Standard of ECMA-262 r3 with Corrections 
+     </dt>
+  <dd> <a href="http://standards.iso.org/ittf/PubliclyAvailableStandards/c033835_ISO_IEC_16262_2002(E).zip" >http://standards.iso.org/ittf/PubliclyAvailableStandards/c033835_ISO_IEC_16262_2002(E).zip</a> </dd>
+  <dt> ECMAScript on Wikipedia
+     </dt>
+
+  <dd> <a href="http://en.wikipedia.org/wiki/ECMAScript" >http://en.wikipedia.org/wiki/ECMAScript</a> </dd></dl>
+<h4 id='domResources'>W3C DOM</h4>
+
+<dl>
+  <dt> 
+DOM Level 1 ECMAScript Binding
+     </dt>
+  <dd> <a href="http://www.w3.org/TR/REC-DOM-Level-1/ecma-script-language-binding.html" >http://www.w3.org/TR/REC-DOM-Level-1/ecma-script-language-binding.html</a> </dd>
+
+  <dt> 
+DOM Level 2 ECMAScript Binding
+     </dt>
+  <dd> <a href="http://www.w3.org/TR/DOM-Level-2-HTML/ecma-script-binding.html" >http://www.w3.org/TR/DOM-Level-2-HTML/ecma-script-binding.html</a> </dd>
+  <dt> 
+DOM Level 2 Events
+     </dt>
+  <dd> <a href="http://www.w3.org/TR/DOM-Level-2-Events/events.html" >http://www.w3.org/TR/DOM-Level-2-Events/events.html</a> </dd>
+
+  <dt> 
+DOM Level 2 Style
+     </dt>
+  <dd> <a href="http://www.w3.org/TR/DOM-Level-2-Style/" >http://www.w3.org/TR/DOM-Level-2-Style/</a> </dd>
+  <dt> 
+DOM Level 3 ECMAScript Binding
+     </dt>
+  <dd> <a href="http://www.w3.org/TR/DOM-Level-3-Core/ecma-script-binding.html" >http://www.w3.org/TR/DOM-Level-3-Core/ecma-script-binding.html</a> </dd></dl>
+
+<h4 id='browserResources'>Browser Documentation</h4>
+
+<dl>
+  <dt> 
+Mozilla JavaScript 1.5 reference
+     </dt>
+  <dd> <a href="http://developer.mozilla.org/en/docs/JavaScript" >http://developer.mozilla.org/en/docs/JavaScript</a> </dd>
+  <dt> 
+Online Gecko DOM Reference
+     </dt>
+
+  <dd> <a href="http://developer.mozilla.org/en/docs/Gecko_DOM_Reference" >http://developer.mozilla.org/en/docs/Gecko_DOM_Reference</a> </dd>
+  <dt> 
+Microsoft (D)HTML Reference
+     </dt>
+  <dd> <a href="http://msdn.microsoft.com/en-us/library/ms533050.aspx" >http://msdn.microsoft.com/en-us/library/ms533050.aspx</a> </dd>
+  <dt> 
+JScript Reference and Main Microsoft Script Site
+     </dt>
+
+  <dd> <a href="http://msdn.microsoft.com/en-us/library/hbxc2t98%28VS.85%29.aspx" >http://msdn.microsoft.com/en-us/library/hbxc2t98%28VS.85%29.aspx</a> </dd>
+  <dd> <a href="http://msdn.microsoft.com/en-us/library/ms950396.aspx" >http://msdn.microsoft.com/en-us/library/ms950396.aspx</a> </dd>
+  <dt> 
+Opera Documentation
+     </dt>
+  <dd> <a href="http://www.opera.com/docs/specs/#ecmascript" >http://www.opera.com/docs/specs/#ecmascript</a> </dd>
+
+  <dd> <a href="http://www.opera.com/docs/specs/js/" >http://www.opera.com/docs/specs/js/</a> </dd>
+  <dd> <a href="http://www.opera.com/docs/specs/js/ecma" >http://www.opera.com/docs/specs/js/ecma</a> </dd>
+  <dt> 
+BlackBerry JavaScript Reference
+     </dt>
+  <dd> <a href="http://docs.blackberry.com/en/developers/deliverables/8861/" >http://docs.blackberry.com/en/developers/deliverables/8861/</a> </dd>
+
+  <dt> 
+ICab's Inscript documentation
+     </dt>
+  <dd> <a href="http://www.muchsoft.com/inscript/" >http://www.muchsoft.com/inscript/</a> </dd>
+  <dt> 
+Safari JavaScriptCore documentation
+     </dt>
+  <dd> 
+(nothing)
+     </dd>
+
+  <dt> 
+Netscape 4 JavaScript (reproduced by Sun Microsystems, Inc.)
+     </dt>
+  <dd> <a href="http://docs.sun.com/source/816-6408-10/" >http://docs.sun.com/source/816-6408-10/</a> </dd>
+  <dt> 
+Archived documentation for MSIE 3.x
+     </dt>
+  <dd> <a href="http://members.tripod.com/%7Ehousten/download/" >http://members.tripod.com/%7Ehousten/download/</a> </dd></dl>
+
+<h4 id='libraryResources'>Javascript Library Groups (Google Groups)</h4>
+<p>
+  
+No javascript libraries are endorsed by this group. 
+If you are looking for help using a library, visit that library's 
+discussion group instead.
+    </p> 
+<dl>
+  <dt> 
+jQuery [English]
+     </dt>
+  <dd> <a href="http://groups.google.com/group/jquery-en" >http://groups.google.com/group/jquery-en</a> </dd>
+  <dt> 
+
+Prototype & Scriptaculous
+     </dt>
+  <dd> <a href="http://groups.google.com/group/prototype-scriptaculous" >http://groups.google.com/group/prototype-scriptaculous</a> </dd></dl>
+<h4 id='nonBrowserResources'>Non-Browser javascript Implementations</h4>
+
+<dl>
+  <dt> 
+Developing Dashboard Widgets
+     </dt>
+  <dd> <a href="http://developer.apple.com/macosx/dashboard.html" >http://developer.apple.com/macosx/dashboard.html</a> </dd>
+
+  <dt> 
+Win32 Scripting, Using Scripting to Automate Windows
+     </dt>
+  <dd> <a href="http://cwashington.netreach.net/" >http://cwashington.netreach.net/</a> </dd>
+  <dt> 
+Whitebeam Apache Module - Server Side JavaScript in Apache;
+     </dt>
+  <dd> <a href="http://www.whitebeam.org/" >http://www.whitebeam.org/</a> </dd>
+
+  <dt> 
+Digital Mars DMD Script, console and MS Active Script implementation of ECMAScript, 
+claimed to be faster than other implementations:
+     </dt>
+  <dd> <a href="http://www.digitalmars.com/dscript/" >http://www.digitalmars.com/dscript/</a> </dd>
+  <dt> 
+FESI - a free implementation of ECMAScript in Java
+     </dt>
+  <dd> <a href="http://www.lugrin.ch/fesi/index.html" >http://www.lugrin.ch/fesi/index.html</a> </dd></dl></div>
+
+<div id='dates' class='section'><h2>4 Dates</h2>
+<p>
+  
+ISO 8601 defines date and time formats. Some benefits include:
+</p> 
+<ul>
+  <li> language-independent and unambiguous world-wide </li>
+  <li> sortable with a trivial string comparison </li>
+  <li> easily readable and writable by software </li>
+
+  <li> compatible with standards ISO 9075 and <a href="http://www.ietf.org/rfc/rfc3339.txt" >rfc 3339</a> </li></ul><p>
+  
+The ISO Extended format for common date is <code>YYYY-MM-DD</code>, and for time is
+<code>hh:mm:ss</code>.
+</p> <p>
+  
+For an event with an offset from UTC, use <code>YYYY-MM-DDThh:mm:ss&#177;hh:mm</code>.
+
+</p> <p>
+  
+Never use a local date/time format for a non-local event. Instead, use
+UTC, as in <code>YYYY-MM-DDThh:mm:ssZ</code> (<code>Z</code> is the only letter suffix).
+</p> <p>
+  
+The <code>T</code> can be omitted where that would not cause ambiguity. For
+rfc 3339 compliance, it may be replaced by a space and for SQL,
+it  <em>must</em> be replaced by a single space. 
+
+</p> <p>
+  
+Year <code>0000</code> is unrecognized by some formats (XML Schema, <code>xs:date</code>).
+ </p><ul class='linkList'><li><a href="#onlineResources" >ECMA-262 Date.prototype, s. 15.9</a></li>
+<li><a href="http://www.cl.cam.ac.uk/~mgk25/iso-time.html" >A summary of the international standard date and time notation, by Markus Kuhn</a></li>
+<li><a href="http://en.wikipedia.org/wiki/ISO_8601" >http://en.wikipedia.org/wiki/ISO_8601</a></li>
+<li><a href="/faq/res/ISO_8601_2004_E.pdf" >ISO 8601:2004(E)</a></li>
+
+<li><a href="http://www.w3.org/QA/Tips/iso-date" >W3C QA Tip: Use international date format (ISO)</a></li>
+<li><a href="http://www.ietf.org/rfc/rfc3339.txt" >RFC 3339, Date and Time on the Internet: Timestamps
+</a></li>
+<li><a href="http://www.w3.org/TR/xmlschema-2/#dateTime" >http://www.w3.org/TR/xmlschema-2/#dateTime</a></li>
+</ul> </div><div id='formatDate' class='section'><h3 id='FAQ4_30'>4.1 How do I format a Date object with javascript?</h3><p>
+  
+A local <code>Date</code> object where <code>year &gt;= 0</code> can be 
+formatted to a common ISO 8601 format <code>YYYY-MM-DD</code> with:-
+    </p>
+
+<pre>
+  /** Formats a Date to YYYY-MM-DD (local time), compatible with both 
+   *  ISO 8601 and ISO/IEC 9075-2:2003 (E) (SQL 'date' type).
+   *  @param {Date} dateInRange year 0000 to 9999.
+   *  @throws {RangeError} if the year is not in range
+   */
+  function formatDate(dateInRange) {
+     var year = dateInRange.getFullYear(),
+         isInRange = year &gt;= 0 &amp;&amp; year &lt;= 9999, yyyy, mm, dd;
+     if(!isInRange) {
+       throw RangeError("formatDate: year must be 0000-9999");
+     }
+     yyyy = ("000" + year).slice(-4);
+     mm = ("0" + (dateInRange.getMonth() + 1)).slice(-2);
+     dd = ("0" + (dateInRange.getDate())).slice(-2);
+     return yyyy + "-" + mm + "-" + dd;
+  }
+  </pre>
+<ul class='linkList'><li><a href="http://www.merlyn.demon.co.uk/js-date9.htm" >http://www.merlyn.demon.co.uk/js-date9.htm</a></li>
+</ul> </div>
+<div id='parseDate' class='section'><h3>4.2 How can I create a Date object from a String?</h3><p>
+  
+An Extended ISO 8601 local Date format <code>YYYY-MM-DD</code> can be parsed to a 
+Date with the following:-
+
+</p>
+<pre>
+  /**Parses string formatted as YYYY-MM-DD to a Date object.
+   * If the supplied string does not match the format, an 
+   * invalid Date (value NaN) is returned.
+   * @param {string} dateStringInRange format YYYY-MM-DD, with year in
+   * range of 0000-9999, inclusive.
+   * @return {Date} Date object representing the string.
+   */
+  function parseISO8601(dateStringInRange) {
+    var isoExp = /^\s*([\d]{4})-(\d\d)-(\d\d)\s*$/,
+        date = new Date(NaN), month,
+        parts = isoExp.exec(dateStringInRange);
+
+    if(parts) {
+      month = +parts[2];
+      date.setFullYear(parts[1], month - 1, parts[3]);
+      if(month != date.getMonth() + 1) {
+        date.setTime(NaN);
+      } else {
+        date.setHours(0, 0, 0, 0);
+      }
+    }
+    return date;
+  }</pre>
+ </div>
+<div id='numbers' class='section'><h2>5 Numbers</h2>
+</div><div id='formatNumber' class='section'><h3 id='FAQ4_6'>5.1 How do I format a Number as a String with exactly 2 decimal places?</h3><p>
+  
+When formatting money for example, to format 6.57634 to
+6.58, 6.5 to 6.50, and 6 to 6.00?
+    </p> <p>
+  
+Rounding of x.xx5 is uncertain, as such numbers are not
+represented exactly. See also: 
+
+<a href="#binaryNumbers" >Why does simple decimal arithmetic give strange results?</a></p> <p>
+  
+The statement <code>n = Math.round(n * 100)/100</code> converts <code>n</code> to a <code>Number</code> value
+close to a multiple of <code>0.01</code>. However, there are some problems.
+Converting the number to a string <code>(n + "")</code>, does not give 
+trailing zeroes. Rounding numbers that are very close to <code>x.5</code>, for example, 
+
+<code>Math.round(0.49999999999999992)</code> results <code>1</code>.      
+    </p> <p>
+  
+ECMAScript Ed. 3.0 introduced <code>Number.prototype.toFixed</code>. 
+There are bugs in JScript's implementation with certain numbers, 
+for example <code>0.07</code>.
+    </p> <p>
+  
+Function <code>numberToFixed</code> returns accurate results that are 
+consistent across implementations where <code>n &gt; 0</code>.
+      </p>
+
+<pre>
+var numberToFixed = 
+(function() {
+  return toFixedString;
+  
+  function toFixedString(n, digits) {
+    var unsigned = toUnsignedString(Math.abs(n), digits);
+    return (n &lt; 0 ? "-" : "") + unsigned;
+  }
+  
+  function toUnsignedString(n, digits) {
+    var t, s = Math.round(n * Math.pow(10, digits)) + "",
+        start, end;
+    if (/\D/.test(s)) { 
+      return "" + n;
+    }
+    s = padLeft(s, 1 + digits, "0");
+    start = s.substring(0, t = (s.length - digits));
+    end = s.substring(t);
+    if(end) {
+      end = "." + end;
+    }
+    return start + end; // avoid "0."
+  }
+  /** 
+   * @param {string} input: input value converted to string.
+   * @param {number} size: desired length of output.
+   * @param {string} ch: single character to prefix to s.
+   */
+  function padLeft(input, size, ch) {
+    var s = input + "";
+    while(s.length &lt; size) {
+      s = ch + s;
+    }
+    return s;
+  }
+})();
+
+// Test results 
+document.writeln([
+  "numberToFixed(9e-3, 12) =&gt; " + numberToFixed(9e-3, 12),
+  "numberToFixed(1.255, 2) =&gt; " + numberToFixed(1.255, 2),
+  "numberToFixed(1.355, 2) =&gt; " + numberToFixed(1.355, 2),
+  "numberToFixed(0.1255, 3) =&gt; " + numberToFixed(0.1255, 3),
+  "numberToFixed(0.07, 2)   =&gt; " + numberToFixed(0.07, 2),
+  "numberToFixed(0.0000000006, 1) =&gt; " + numberToFixed(0.0000000006, 1),
+  "numberToFixed(0.0000000006, 0) =&gt; " + numberToFixed(0.0000000006, 0)
+].join("\n"));
+
+</pre>
+<ul class='linkList'><li><a href="http://www.merlyn.demon.co.uk/js-round.htm" >http://www.merlyn.demon.co.uk/js-round.htm</a></li>
+<li><a href="http://msdn.microsoft.com/en-us/library/sstyff0z%28VS.85%29.aspx" >http://msdn.microsoft.com/en-us/library/sstyff0z%28VS.85%29.aspx</a></li>
+</ul> </div>
+<div id='binaryNumbers' class='section'><h3 id='FAQ4_7'>5.2 Why does simple decimal arithmetic give strange results?</h3><p>
+  
+For example, <code>5 * 1.015</code> does not give exactly 
+<code>5.075</code> and <code>0.06+0.01</code> does 
+not give exactly <code>0.07</code> in javascript. 
+    </p> <p>
+
+  
+ECMAScript numbers are represented in binary as IEEE-754 (IEC 559)
+Doubles, with a resolution of 53 bits, giving an accuracy of
+15-16 decimal digits; integers up to just over <code>9e15</code> are 
+precise, but few decimal fractions are.  Given this, arithmetic 
+is as exact as possible, but no more.  Operations on integers 
+are exact if the true result and all intermediates are integers 
+within that range.
+    </p> <p>
+  
+In particular, non-integer results should not normally be
+compared for equality; and non-integer computed results
+commonly need rounding; see <a href="#formatNumber" >How do I format a Number as a String with exactly 2 decimal places?</a></p><ul class='linkList'><li><a href="http://msdn.microsoft.com/en-us/library/7wkd9z69%28VS.85%29.aspx" >http://msdn.microsoft.com/en-us/library/7wkd9z69%28VS.85%29.aspx</a></li>
+<li><a href="http://www.merlyn.demon.co.uk/js-misc0.htm#DW4" >http://www.merlyn.demon.co.uk/js-misc0.htm#DW4</a></li>
+</ul> <p>
+  
+
+Otherwise, use <code>Math.round</code> on the results of expressions which 
+should be of integer value.
+    </p> </div>
+<div id='parseIntBase' class='section'><h3 id='FAQ4_12'>5.3 Why does K = parseInt('09') set K to 0?</h3><p>
+  
+Method <code>parseInt</code> generally needs a
+second parameter, <code>radix</code>, for the base (value between 2 and 36).
+    </p> <p>
+
+  
+If <code>radix</code> is omitted, the base is determined by the contents of 
+the string. Any string beginning with <code>'0x'</code> or <code>'0X'</code> represents a 
+hexadecimal number. A string beginning with a leading <code>0</code> may be
+parsed as octal (octal digits are <code>0-7</code>). The string <code>'09'</code> 
+
+is converted to <code>0</code>. 
+    </p> <p>
+  
+To force use of a particular base, use the <code>radix</code> 
+parameter: <code>parseInt("09", base)</code>. 
+     
+     <!-- [omit]  
+     If base 10 is desired,
+     the unary <ICODE>+</ICODE> operator can be an option. Example:
+    <ICODE>
+var s = '-09.1'; // Input string.
+var j = +s;     // Convert to number. Result: -9.1
+var n = j|0;    // Chop off decimal (convert ToInt32). Result: -9
+</ICODE> 
+      [/omit] --></p> <p>
+  </p><ul class='linkList'><li><a href="http://developer.mozilla.org/en/Core_JavaScript_1.5_Reference/Global_Functions/parseInt" >http://developer.mozilla.org/en/Core_JavaScript_1.5_Reference/Global_Functions/parseInt</a></li>
+
+<li><a href="http://msdn.microsoft.com/en-us/library/x53yedee%28VS.85%29.aspx" >http://msdn.microsoft.com/en-us/library/x53yedee%28VS.85%29.aspx</a></li>
+<li><a href="http://docs.sun.com/source/816-6408-10/toplev.htm#1064173" >http://docs.sun.com/source/816-6408-10/toplev.htm#1064173</a></li>
+<li><a href="faq_notes/faq_notes.html#FAQN4_12" >faq_notes/faq_notes.html#FAQN4_12</a></li>
+</ul> </div>
+<div id='typeConvert' class='section'><h3>5.4 Why does 1+1 equal 11? or How do I convert a string to a number?</h3><p>
+  
+Variables are not typed; their values are. The conversion between a
+string and a number happens automatically. Since plus (<code>+</code>) is 
+also used as in string concatenation, <code>'1' + 1</code> is equal to <code>'11'</code>. 
+The string determines what <code>+</code> does. To overcome this, first convert the
+string to a number. For example: <code>+varname</code> or <code>Number(varname)</code> or 
+
+<code>parseInt(varname, 10)</code> or <code>parseFloat(varname)</code>.
+Form control values are strings, as is the result from a <code>prompt</code> 
+dialog. Convert these to numbers before performing addition by using 
+the unary <code>+</code> operator: <code>+'1' + 1</code> result is <code>2</code>.
+      </p><ul class='linkList'><li>
+
+Additional Notes: </li>
+<li><a href="faq_notes/type_convert.html" >faq_notes/type_convert.html</a></li>
+<li><a href="http://msdn.microsoft.com/en-us/library/67defydd%28VS.85%29.aspx" >http://msdn.microsoft.com/en-us/library/67defydd%28VS.85%29.aspx</a></li>
+</ul> </div>
+<div id='randomNumber' class='section'><h3 id='FAQ4_22'>5.5 How do I generate a random integer from 1 to n?</h3><p>
+  <code>Math.random()</code> returns a value <code>R</code> such that <code>0 &lt;= R &lt; 1.0</code>; therefore:
+     </p>
+
+<pre>
+  // positive integer expected
+  function getRandomNumber(n) { 
+    return Math.floor(n * Math.random());
+  }
+</pre>
+<p>
+- gives an evenly distributed random integer in the range from 
+      <code>0</code> to <code>n - 1</code> inclusive; use <code>getRandomNumber(n)+1</code> for <code>1</code> to <code>n</code>.
+      </p><ul class='linkList'><li><a href="http://msdn.microsoft.com/en-us/library/41336409%28VS.85%29.aspx" >http://msdn.microsoft.com/en-us/library/41336409%28VS.85%29.aspx</a></li>
+
+<li><a href="http://docs.sun.com/source/816-6408-10/math.htm" >http://docs.sun.com/source/816-6408-10/math.htm</a></li>
+<li>
+How to Deal and Shuffle, see in: </li>
+<li><a href="http://www.merlyn.demon.co.uk/js-randm.htm" >http://www.merlyn.demon.co.uk/js-randm.htm</a></li>
+</ul> </div>
+<div id='objects' class='section'><h2>6 Objects</h2>
+</div><div id='eval' class='section'><h3 id='FAQ4_40'>6.1 When should I use eval?</h3><p>
+  
+The <code>eval()</code> function should  <em>only</em> be used when it is necessary to
+evaluate a string supplied or composed at run-time; the string
+can be anything from a simple (but unpredictable) expression such
+as <code>"12 * 2.54"</code> to a substantial piece of javascript code.
+
+</p> <p>
+  
+When <code>eval( "{'key':value}" )</code>, is called, <code>"{"</code> is executed as a block
+of code instead of an object literal. Hence, the Grouping Operator (parentheses) 
+is used to force <code>eval</code> to treat the json-string as an object literal
+as <code>eval( "( + sCode + ")" );</code>.
+     </p><ul class='linkList'><li><a href="http://json.org/" >http://json.org/</a></li>
+<li><a href="#propertyAccessAgain" >How do I access a property of an object using a string?</a></li>
+
+<li><a href="faq_notes/square_brackets.html" >faq_notes/square_brackets.html</a></li>
+</ul> </div>
+<div id='propertyAccessAgain' class='section'><h3 id='FAQ4_39'>6.2 How do I access a property of an object using a string?</h3><p>
+  
+There are two ways to access properties: the dot notation and 
+the square bracket notation. What you are looking for is the square 
+bracket notation in which the dot, and the identifier to its right, 
+are replaced with a set of square brackets containing a string. The 
+value of the string matches the identifier. For example:-
+</p>
+<pre>
+  //dot notation
+  var bodyElement = document.body;
+
+  //square bracket notation, using an expression
+  var bodyElement = document[&quot;bo&quot;+&quot;dy&quot;];</pre>
+
+<ul class='linkList'><li><a href="faq_notes/square_brackets.html" >faq_notes/square_brackets.html</a></li>
+</ul> </div>
+<div id='strings' class='section'><h2>7 Strings and RegExp</h2>
+</div><div id='trimString' class='section'><h3 id='FAQ4_16'>7.1 How do I trim whitespace?</h3><p>
+  
+A 
+<dfn>regular expression</dfn> can be used:
+</p>
+<pre>
+  function trimString(s) {
+    return s.replace(/^\s+|\s+$/g,'');
+  } 
+
+</pre>
+<p>
+Implementations are inconsistent with <code>\s</code>. For example, 
+some implementations do not match <code>\xA0</code> (no-break space), 
+among others. 
+   </p> <p>
+  
+A more consistent approach would be to create a character class 
+that defines the characters to trim.
+   </p> <p>
+  
+ECMAScript 5 defines <code>String.prototype.trim</code>, but this is 
+not yet widely supported.
+
+</p><ul class='linkList'><li><a href="https://developer.mozilla.org/en/Core_JavaScript_1.5_Reference/Global_Objects/RegExp" >https://developer.mozilla.org/en/Core_JavaScript_1.5_Reference/Global_Objects/RegExp</a></li>
+<li><a href="http://thinkweb2.com/projects/prototype/whitespace-deviations/" >http://thinkweb2.com/projects/prototype/whitespace-deviations/</a></li>
+<li><a href="https://developer.mozilla.org/en/Firefox_3.1_for_developers" >https://developer.mozilla.org/en/Firefox_3.1_for_developers</a></li>
+<li><a href="http://docs.sun.com/source/816-6408-10/regexp.htm" >http://docs.sun.com/source/816-6408-10/regexp.htm</a></li>
+<li><a href="http://msdn.microsoft.com/en-us/library/6wzad2b2%28VS.85%29.aspx" >http://msdn.microsoft.com/en-us/library/6wzad2b2%28VS.85%29.aspx</a></li>
+<li><a href="http://groups.google.com/group/comp.lang.javascript/browse_frm/thread/c7010139217600c3/31092c5eb99625d0?#31092c5eb99625d0" >http://groups.google.com/group/comp.lang.javascript/browse_frm/thread/c7010139217600c3/31092c5eb99625d0?#31092c5eb99625d0</a></li>
+<li><a href="http://unicode.org/Public/UNIDATA/PropList.txt" >http://unicode.org/Public/UNIDATA/PropList.txt</a></li>
+</ul> </div>
+<div id='domRef' class='section'><h2>8 DOM and Forms</h2>
+
+</div><div id='formControlAccess' class='section'><h3 id='FAQ4_13'>8.1 How do I get the value of a form control?</h3><p>
+  
+In HTML documents, a form may be referred to as a property of the 
+<code>document.forms</code> collection, either by its ordinal index or by name 
+(if the <code>form</code> has a name). A <code>form</code>'s controls may be similarly referenced 
+from its <code>elements</code> collection:
+</p>
+<pre>
+
+  var frm = document.forms[0];
+  var contrl = frm.elements[&quot;elementname&quot;];
+</pre>
+<p>
+Once a reference to a control is obtained, its (string) <code>value</code> 
+property can be read:-
+</p>
+<pre>
+  var value = control.value;
+  value = +control.value; //string to number.
+</pre>
+<p>
+Some exceptions would be: 
+
+</p> <p>
+  
+First Exception: Where the control is a <code>SELECT</code> element, and 
+support for older browsers, such as NN4, is required:
+</p>
+<pre>
+  var value = control.options[contrl.selectedIndex].value;
+</pre>
+<p>
+Second Exception: Where several controls share the same name,
+such as radio buttons. These are made available as collections
+and require additional handling. For more information, see:-
+</p><ul class='linkList'><li><a href="faq_notes/form_access.html" >faq_notes/form_access.html</a></li>
+<li><a href="names/" >Unsafe Names for HTML Form Controls</a></li>
+
+</ul> <p>
+  
+Third Exception: File inputs. Most current browsers do not allow
+reading of <code>type="file"</code> input elements in a way that is useful.
+      </p> </div>
+<div id='propertyAccess' class='section'><h3 id='FAQ4_25'>8.2 My element is named myselect[], how do I access it?</h3><p>
+  
+Form controls with any &quot;illegal&quot; characters can be accessed with
+<code>formref.elements[&quot;myselect[]&quot;]</code> - The bracket characters,
+amongst others, are illegal in ID attributes and javascript
+identifiers, so you should try to avoid them as browsers may
+handle them incorrectly.
+
+</p><ul class='linkList'><li><a href="http://msdn.microsoft.com/en-us/library/ms537449%28VS.85%29.aspx" >http://msdn.microsoft.com/en-us/library/ms537449%28VS.85%29.aspx</a></li>
+<li><a href="http://docs.sun.com/source/816-6408-10/form.htm" >http://docs.sun.com/source/816-6408-10/form.htm</a></li>
+<li><a href="faq_notes/faq_notes.html#FAQN4_25" >faq_notes/faq_notes.html#FAQN4_25</a></li>
+</ul> </div>
+<div id='globalPollution' class='section'><h3 id='FAQ4_41'>8.3 Why doesn't the global variable &quot;divId&quot; always refer to the element with id=&quot;divId&quot;?</h3><p>
+  
+Microsoft introduced a shortcut that can be used to reference
+elements which include an <code>id</code> attribute where the 
+
+<code>id</code> becomes a globally-accessible property. Some browsers reproduce 
+this behavior. Some, most notably Gecko-based browsers (Netscape and Mozilla),
+do so only in "quirks" mode. The best approach is the <code>document.getElementById</code>
+method, which is part of the W3C DOM standard and implemented
+in modern browsers (including IE from version 5.0). So an
+element with <code>id=&quot;foo&quot;</code> can be referenced
+with:-
+     </p>
+<pre>
+  var el = document.getElementById(&quot;foo&quot;);
+</pre>
+
+<p>
+Note: make sure not to use the same <code>id</code> twice in the same document 
+and do not give an element a <code>name</code> that matches an <code>id</code> 
+of another in the same document or it will trigger bugs in MSIE &lt;= 7 with 
+<code>document.getElementsByName</code> and <code>document.getElementById</code>.
+
+</p><ul class='linkList'><li><a href="https://developer.mozilla.org/en/Using_Web_Standards_in_your_Web_Pages/Using_the_W3C_DOM#Accessing_Elements_with_the_W3C_DOM
+" >https://developer.mozilla.org/en/Using_Web_Standards_in_your_Web_Pages/Using_the_W3C_DOM#Accessing_Elements_with_the_W3C_DOM
+</a></li>
+<li><a href="faq_notes/faq_notes.html#FAQN4_41" >faq_notes/faq_notes.html#FAQN4_41</a></li>
+</ul> </div>
+<div id='imageCache' class='section'><h3 id='FAQ4_31'>8.4 Why are my rollovers so slow?</h3><p>
+  
+Images are cached by the browser depending on the headers sent by
+the server. If the server does not send sufficient information
+for the browser to decide the image is cacheable, the browser
+will check if the image has been updated every time you change the
+src of an image (in some user settings).  To overcome this you
+must send suitable headers.
+</p><ul class='linkList'><li><a href="http://www.mnot.net/cache_docs/" >http://www.mnot.net/cache_docs/</a></li>
+</ul> </div>
+<div id='disableRightClick' class='section'><h3 id='FAQ4_27'>8.5 How do I disable the right mouse button?</h3><p>
+  
+
+The nonstandard <code>contextmenu</code> event is not widely supported. 
+Browsers that do support it may configured to prevent scripts from 
+accessing that event.
+</p> <p>
+  Example:
+</p>
+<pre>&lt;body oncontextmenu=&quot;return false&quot;&gt;</pre>
+<p>
+Disables the context menu where supported. Note that this will not 
+prevent users from viewing your source code or copying images. To 
+discourage copying, provide a copyright notice. 
+</p> </div>
+<div id='detectBrowser' class='section'><h3 id='FAQ4_26'>8.6 How do I detect Opera/Safari/IE?</h3><p>
+
+  
+The short answer:  <em>Don't do that</em>.
+     </p> <p>
+  
+The <code>navigator</code> host object contains properties which 
+may identify the browser and version. These properties are historically 
+inaccurate. Some browsers allow the user to set <code>navigator.userAgent</code> to any value. For 
+example, Firefox, (type <code>about:config</code> and search <code>useragent</code> 
+
+or Safari, <code>Develop &gt; User Agent &gt; Other...</code>, IE, via Registry. 
+    </p> <p>
+  
+Other browsers, such as Opera, provide a list of user agents 
+for the user to select from. There are also at least 25 other 
+javascript capable browsers, with multiple versions, each 
+with their own string. 
+    </p> <p>
+  
+Browser detection is unreliable, at best. It usually causes 
+forwards-compatibility and maintenance problems. It is unrelated to the 
+problem or incompatiblity it is trying to solve and obscures the 
+problems it is used for, where it is used.
+    </p> <p>
+
+  
+Object detection is checking that the object in question exists.
+<a href="http://dev.opera.com/articles/view/using-capability-detection/" >Capability detection</a> goes one step further to actually test the object, 
+method, or property, to see if behaves in the desired manner. 
+    </p> <p>
+  
+Feature Test Example:
+      </p>
+<pre>
+/** 
+ * Returns the element/object the user targeted.
+ * If neither DOM nor IE event model is supported, returns undefined. 
+ * @throws TypeError if the event is not an object.
+ */
+function getEventTarget(e) {
+  e = e || window.event;
+  // First check for the existence of standard "target" property.
+  return e.target || e.srcElement;
+}</pre>
+<ul class='linkList'><li><a href="faq_notes/not_browser_detect.html" >faq_notes/not_browser_detect.html</a></li>
+<li><a href="http://dev.opera.com/articles/view/using-capability-detection/" >http://dev.opera.com/articles/view/using-capability-detection/</a></li>
+
+<li><a href="http://developer.apple.com/internet/webcontent/objectdetection.html" >http://developer.apple.com/internet/webcontent/objectdetection.html</a></li>
+<li><a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.43" >http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.43</a></li>
+</ul> </div>
+<div id='updateContent' class='section'><h3 id='FAQ4_15'>8.7 How do I modify the content of the current page?</h3><p>
+  
+Using the non-standard but widely implemented <code>innerHTML</code> property:
+<code>&lt;div id=&quot;anID&quot;&gt;Some Content&lt;/div&gt;</code> with script:
+      </p>
+
+<pre>
+  document.getElementById(&quot;anID&quot;).innerHTML = 
+    &quot;Some &lt;em&gt;new&lt;/em&gt; Content&quot;;
+</pre>
+<p>
+Where <code>&quot;anID&quot;</code> is the (unique on the HTML page) 
+
+<code>id</code> attribute value of the element to modify.
+    </p> <p>
+  
+If the new content is only text and does not need to replace existing HTML, 
+it is more efficient to modify the <code>data</code> property of a text node.
+      </p>
+<pre>
+  document.getElementById(&quot;anID&quot;).firstChild.data = &quot;Some new Text&quot;;
+
+</pre>
+ <p>
+  
+Compatibility Note: Implementations have been known to split long text 
+content among several adjacent text nodes, so replacing the data of the 
+first text node may not replace all the element's text. The <code>normalize</code> 
+method, where supported, will combine adjacent text nodes.
+</p> <p>
+  
+Note: Make sure the element exists in the document (has been parsed) before trying to 
+reference it.
+     </p><ul class='linkList'><li><a href="http://www.w3.org/TR/DOM-Level-2-Core/core.html#ID-FF21A306" >http://www.w3.org/TR/DOM-Level-2-Core/core.html#ID-FF21A306</a></li>
+<li><a href="http://msdn.microsoft.com/en-us/library/cc304097%28VS.85%29.aspx" >http://msdn.microsoft.com/en-us/library/cc304097%28VS.85%29.aspx</a></li>
+<li><a href="http://msdn.microsoft.com/en-us/library/ms533897%28VS.85%29.aspx" >http://msdn.microsoft.com/en-us/library/ms533897%28VS.85%29.aspx</a></li>
+
+<li><a href="http://developer.mozilla.org/en/Whitespace_in_the_DOM" >http://developer.mozilla.org/en/Whitespace_in_the_DOM</a></li>
+<li><a href="http://developer.mozilla.org/en/docs/DOM:element.innerHTML" >http://developer.mozilla.org/en/docs/DOM:element.innerHTML</a></li>
+<li><a href="faq_notes/alt_dynwrite.html" >An alternative DynWrite function (for old browsers)</a></li>
+</ul> </div>
+<div id='accessElementBeforeDefined' class='section'><h3>8.8 Why does my code fail to access an element?</h3><p>
+  
+An element can only be accessed after it exists in the document. 
+   </p> <p>
+  
+Either:
+A) include your script after the HTML element it refers to, or
+B) use the <code>"load"</code> event to trigger your script.
+   </p> <p>
+
+  
+Example A:
+</p>
+<pre>
+&lt;div id="snurgle"&gt;here&lt;/div&gt;
+&lt;script type="text/javascript"&gt;
+// Don't forget var.
+var snurgleEl = document.getElementById("snurgle");
+window.alert(snurgleEl.parentNode);
+&lt;/script&gt;
+</pre>
+ <p>
+  
+
+Example B:
+</p>
+<pre>
+// In the HEAD.
+&lt;script type="text/javascript"&gt;
+window.onload = function(){
+  var snurgleEl = document.getElementById("snurgle");
+};
+&lt;/script&gt;
+</pre>
+ 
+<h4>Other problems can include:</h4>
+  
+<ul>
+  <li> invalid HTML </li>
+
+  <li> two elements with the same <code>name</code> or <code>id</code> </li>
+  <li> use of an unsafe name: http://jibbering.com/faq/names/ </li></ul></div>
+<div id='testCookie' class='section'><h3 id='FAQ4_4'>8.9 How can I see in javascript if a web browser accepts cookies?</h3><p>
+  
+Write a cookie and read it back and check if it's the same.
+      </p><ul class='linkList'><li>
+
+Additional Notes:
+</li>
+<li><a href="http://www.ietf.org/rfc/rfc2965.txt" >http://www.ietf.org/rfc/rfc2965.txt</a></li>
+<li><a href="http://www.galasoft-lb.ch/myjavascript/consulting/2001012701/" >http://www.galasoft-lb.ch/myjavascript/consulting/2001012701/</a></li>
+<li><a href="http://www.cookiecentral.com/" >http://www.cookiecentral.com/</a></li>
+</ul> </div>
+<div id='windows' class='section'><h2>9 Windows and Frames</h2>
+<p>
+  
+The <code>window</code> object (also referred to by <code>self</code>) is "DOM Level 0". 
+No formal standard for it exists. 
+
+</p> </div><div id='disableBackButton' class='section'><h3 id='FAQ4_2'>9.1 How can I disable the back button in a web browser?</h3><p>
+  
+You can't. The browser's history cannot be modified. However, you
+can use <code>self.location.replace(url);</code> in some browsers to replace
+the current page in the history.
+      </p><ul class='linkList'><li><a href="http://msdn.microsoft.com/en-us/library/ms536712%28VS.85%29.aspx" >http://msdn.microsoft.com/en-us/library/ms536712%28VS.85%29.aspx</a></li>
+<li><a href="http://docs.sun.com/source/816-6408-10/location.htm#1194240" >http://docs.sun.com/source/816-6408-10/location.htm#1194240</a></li>
+</ul> </div>
+<div id='frameRef' class='section'><h3 id='FAQ4_8'>9.2 How do I access a frame's content?</h3><p>
+  
+
+To reference another frame on the  <em>same domain</em>:
+</p> <p>
+  
+A frame's 
+<dfn>content window</dfn> can be found from the <code>frames</code> collection.
+</p> <p>
+  
+Example:
+
+</p>
+<pre>
+var fwin;
+fwin = self.frames[0]; // or:
+fwin = self.frames["iframeName"];
+</pre>
+ <p>
+  or from the <code>IFRAME</code> or <code>FRAME</code> element:
+</p>
+<pre>
+var iframeEl = document.getElementById("myFrame");
+var fwin = iframeEl.contentWindow;
+
+</pre>
+ <p>
+  
+An identifier <code>moomin</code> in the the iframe's 
+<dfn>content window</dfn>, 
+is accessed as <code>fwin.moomin</code>.
+     </p> <p>
+  
+To communicate between frames on  <em>different</em> domains:
+
+</p> <p>
+  
+Where supported, (IE8, Firefox 3, Opera 9, Safari 4), use
+<code>window.postMessage( message[, port], otherDomain);</code>.
+</p> <p>
+  
+Example: 
+<a href="http://jibbering.com/faq/example/postMessage.html" >http://jibbering.com/faq/example/postMessage.html</a></p> <p>
+  
+Where <code>window.postMessage</code> is not supported, the <code>window.name</code> property 
+can be set on the other window, which can poll for updates to that 
+property using <code>setInterval(checkWinName, 100);</code> where <code>checkWinName</code> 
+
+is a function that polls to check the value of 
+<code>self.name</code>.
+</p><ul class='linkList'><li><a href="http://en.wikipedia.org/wiki/Same_origin_policy" >http://en.wikipedia.org/wiki/Same_origin_policy</a></li>
+<li><a href="http://www-archive.mozilla.org/docs/dom/domref/dom_frame_ref5.html" >http://www-archive.mozilla.org/docs/dom/domref/dom_frame_ref5.html</a></li>
+<li><a href="https://developer.mozilla.org/en/DOM/window.postMessage" >https://developer.mozilla.org/en/DOM/window.postMessage</a></li>
+<li><a href="http://msdn.microsoft.com/en-us/library/cc197015(VS.85).aspx" >http://msdn.microsoft.com/en-us/library/cc197015(VS.85).aspx</a></li>
+</ul> </div>
+<div id='getWindowSize' class='section'><h3 id='FAQ4_9'>9.3 How do I find the size of the window?</h3><p>
+  
+Here is a detailed explanation of a cross-browser strategy to 
+find the dimensions of the viewport, excepting all chrome 
+(excludes scrollbars, etc).
+    </p> <p>
+
+  
+We can consider various properties:
+    </p>
+<pre>
+  window.innerWidth
+  document.clientWidth
+  document.documentElement.clientWidth
+  document.body.clientWidth
+</pre>
+<p>
+
+Of the browsers that have an <code>innerWidth</code> property, most 
+include scrollbar dimensions. Some versions of KHTML browsers 
+(including Safari 2) do  <em>not</em> include scrollbar width.  
+    </p> <p>
+
+  
+The <code>window.inner*</code> properties are unreliable and not 
+useful here. We don't want scrollbar dimensions included.
+</p>
+<pre>  document.clientWidth</pre>
+ <p>
+  
+Certain versions of KHTML, including Safari 2, have 
+<code>document.clientHeight</code> and <code>document.clientWidth</code>
+
+properties. Where supported, these rare properties accurately 
+return the height and width of the viewport, without including 
+scrollbar dimensions.
+    </p>
+<pre>
+  document.documentElement.clientWidth
+  document.body.clientWidth
+</pre>
+<p>
+MSHTML (Trident), Firefox (Gecko), Opera (Presto), and Safari 
+(Webkit) all support <code>clientHeight</code> on <code>document.body</code> 
+and <code>document.documentElement</code>. The difficulty is figuring out 
+which one is reliable. In other words which object to get the 
+<code>clientHeight</code> property from:<code>documentElement</code> or <code>body</code>? 
+    </p> <p>
+
+  
+What the number returned from either of these properties 
+represents depends on the environment. The environment includes 
+the browser, its version, and the rendering mode of the document. 
+In quirks mode, we'll mostly want to use <code>body.clientHeight</code> 
+(except for in Safari 2).
+    
+    </p>
+<pre>  document.body.clientHeight</pre>
+<p>
+    
+Some environments will return the viewport height. Others will 
+return <code>0</code>. Yet others will return the <code>clientHeight</code> of 
+the <code>BODY</code> element. 
+    
+    </p>
+
+<pre>  document.documentElement.clientHeight</pre>
+<p>
+    
+This is the more "standard" property for getting the height of 
+the viewport. It usually "works" in modern browsers in 
+
+<dfn>standards mode</dfn>. Notable exceptions include Safari 2 and 
+Opera  &lt;= 9.25, both of which return the <code>clientHeight</code> 
+of the <code>html</code> <em>element</em>. (Oddly, Opera &lt;= 9.25 
+in standards mode returns the width of the viewport for 
+
+<code>documentElement.clientWidth</code>). 
+    </p> <p>
+  
+With the exception of Safari 2, <code>body.clientHeight</code> is reliable 
+where <code>documentElement.clientHeight</code> is found to be unreliable. 
+For example, in Safari 3+, Opera, and Mozilla, all in quirks mode, 
+<code>document.documentElement.clientHeight</code> returns the <code>clientHeight</code> 
+
+of the <code>html</code> element (this may seem unsurprising but 
+it is not what we want).
+    </p> <p>
+  
+Conversely, <code>document.body.clientHeight</code> will return 
+the height of the viewport in most cases where 
+<code>document.documentElement.clientHeight</code> does not. An exception
+to that is Safari 2, where <code>documentElement.clientHeight</code>
+and <code>body.clientHeight</code> both return the height of their 
+corresponding element (not what we want).
+    </p> <p>
+
+  
+By using a combination of 
+<dfn>Feature Testing</dfn> and 
+<dfn>Capability Testing</dfn>, 
+the dimensions of the viewport can be strategically retrieved 
+from  the property that works in the environment the script is 
+running in. The trick is determining which property will give us 
+the value we want.
+    </p> <p>
+  
+Since <code>document.clientHeight</code> is reliable where 
+(rarely) supported, and since browsers that support this property 
+don't return the viewport dimensions from 
+<code>document.body.clientHeight</code> or 
+
+<code>document.documentElement.clientHeight</code>, this should be the 
+very first condition:
+
+    </p>
+<pre>
+  // Safari 2 uses document.clientWidth (default).
+  if(typeof document.clientWidth == "number") {
+     // use document.clientWidth.
+  }
+</pre>
+<p>
+
+The next strategy is to determine if 
+<code>document.documentElement.clientHeight</code> property is unreliable. 
+It is deemed "unreliable" when it is either <code>0</code> or taller 
+than the viewport.
+     </p> <p>
+
+  
+       Determining if <code>documentElement.clientHeight</code> is <code>0</code> is easy. 
+       The result is stored in a variable <code>IS_BODY_ACTING_ROOT</code>.
+
+    </p>
+<pre>
+  var docEl = document.documentElement,
+    IS_BODY_ACTING_ROOT = docEl &amp;&amp; docEl.clientHeight === 0;
+  docEl = null; 
+</pre>
+
+<p>
+
+To determine if <code>documentElement.clientHeight</code> returns 
+a value taller than the viewport, we need a 
+<dfn>Capability Test.</dfn></p> <p>
+  
+If we can force <code>documentElement</code> to be very tall 
+(taller than a normal viewport) we can then check to see if 
+<code>documentElement.clientHeight</code> returns that "very tall" number. 
+If it does, then it is unreliable.
+    </p> <p>
+
+  
+We can force <code>documentElement</code> to be taller than the viewport 
+(or any "normal" viewport) by adding a <code>div</code> to the <code>body</code>,
+give that <code>div</code> a height larger than any normal monitor, 
+and then check to see if <code>documentElement.clientHeight</code> is 
+that high (or "almost" that high, to account for <code>documentElement</code> 
+
+having a border). 
+
+    </p>
+<pre>
+  // Used to feature test Opera returning wrong values 
+  // for documentElement.clientHeight. 
+  // The results of this function should be cached, 
+  // so it does not need to be called more than once.
+  function isDocumentElementHeightOff(){ 
+      var d = document,
+          div = d.createElement('div');
+      div.style.height = "2500px";
+      d.body.insertBefore(div, d.body.firstChild);
+      var r = d.documentElement.clientHeight &gt; 2400;
+      d.body.removeChild(div);
+      return r;
+  }
+</pre>
+<p>
+
+We can use this function to see if we should use 
+<code>body.clientHeight</code>, instead. (but only after checking if 
+<code>document.clientHeight</code> is supported).
+
+    </p>
+
+<pre>
+  // Safari 2 uses document.clientWidth (default).
+  if(typeof document.clientWidth == "number") {
+     // use document.clientHeight/Width.
+  }
+  else if(IS_BODY_ACTING_ROOT || isDocumentElementHeightOff()) {
+      // use document.body.clientHeight/Width.
+  } else {
+      // use document.documentElement.clientHeight/Width.
+  }
+</pre>
+<p>
+The preceding strategy was developed by Garrett Smith with input 
+from John David Dalton. A complete and tested example can be found 
+in APE Library under <code>APE.dom.getViewportDimensions</code>. 
+Source code:
+<a href="http://dhtmlkitchen.com/ape/build/dom/viewport-f.js" >http://dhtmlkitchen.com/ape/build/dom/viewport-f.js</a>.
+APE is publicly released under Academic Free License. 
+APE home: <a href="http://dhtmlkitchen.com/ape/" >http://dhtmlkitchen.com/ape/</a>.
+    </p> <p>
+  
+Note: The dimensions cannot be determined accurately until after 
+the document has finished loading. 
+</p><ul class='linkList'><li><a href="http://msdn.microsoft.com/en-us/library/ms533566%28VS.85%29.aspx" >http://msdn.microsoft.com/en-us/library/ms533566%28VS.85%29.aspx</a></li>
+
+<li><a href="http://developer.mozilla.org/en/DOM/window.innerWidth" >http://developer.mozilla.org/en/DOM/window.innerWidth</a></li>
+<li><a href="http://dev.opera.com/articles/view/using-capability-detection/" >http://dev.opera.com/articles/view/using-capability-detection/</a></li>
+</ul> </div>
+<div id='isWindowOpen' class='section'><h3 id='FAQ4_10'>9.4 How do I check to see if a child window is open, before opening another?</h3><p>
+  </p>
+<pre>
+  var myWin;
+  function openWin(aURL) {
+    if (!myWin || myWin.closed ) {
+      myWin = window.open(aURL,'myWin');
+    } else {
+      myWin.location.href = aURL;
+      myWin.focus();
+    }
+  }</pre>
+<p>
+Popup windows cause usability problems and are generally best avoided. 
+</p><ul class='linkList'><li><a href="https://developer.mozilla.org/en/DOM:window.open" >https://developer.mozilla.org/en/DOM:window.open</a></li>
+
+<li><a href="http://msdn.microsoft.com/en-us/library/ms533574%28VS.85%29.aspx" >http://msdn.microsoft.com/en-us/library/ms533574%28VS.85%29.aspx</a></li>
+<li><a href="http://docs.sun.com/source/816-6408-10/window.htm#1201877" >http://docs.sun.com/source/816-6408-10/window.htm#1201877</a></li>
+<li><a href="http://www.useit.com/alertbox/990530.html" >http://www.useit.com/alertbox/990530.html</a></li>
+</ul> </div>
+<div id='printFrame' class='section'><h3 id='FAQ4_11'>9.5 Why does framename.print() not print the correct frame in IE?</h3><p>
+  
+IE prints the frame that has focus when you call the print
+method <code>frameref.focus();frameref.print();</code></p><ul class='linkList'><li><a href="http://msdn.microsoft.com/en-us/library/ms976105.aspx" >http://msdn.microsoft.com/en-us/library/ms976105.aspx</a></li>
+</ul> </div>
+
+<div id='windowClose' class='section'><h3 id='FAQ4_14'>9.6 How do I close a window and why does it not work on the first one?</h3><p>
+  
+If a window was opened by javascript, then it can be closed
+without confirmation by using <code>windowRef.close()</code>. 
+</p> <p>
+  
+Before calling <code>windowRef.close()</code> (or other <code>window</code> methods), make
+sure the window reference is not null and its <code>closed</code> property is <code>false</code>. 
+
+</p> <p>
+  
+Popup windows cause usability problems and are generally best avoided.
+</p> <p>
+  </p><ul class='linkList'><li><a href="http://www.useit.com/alertbox/990530.html" >http://www.useit.com/alertbox/990530.html</a></li>
+<li><a href="http://jibbering.com/faq/#isWindowOpen " >http://jibbering.com/faq/#isWindowOpen </a></li>
+<li><a href="http://msdn.microsoft.com/en-us/library/ms536367%28VS.85%29.aspx" >http://msdn.microsoft.com/en-us/library/ms536367%28VS.85%29.aspx</a></li>
+<li><a href="https://developer.mozilla.org/en/DOM/window.close#Description" >https://developer.mozilla.org/en/DOM/window.close#Description</a></li>
+<li><a href="http://docs.sun.com/source/816-6408-10/window.htm#1201822" >http://docs.sun.com/source/816-6408-10/window.htm#1201822</a></li>
+
+</ul> </div>
+<div id='permissionDenied' class='section'><h3 id='FAQ4_19'>9.7 Why do I get permission denied when accessing a frame/window?</h3><p>
+  
+In the normal browser security model, it is impossible for a
+script from one domain to access the properties of pages served
+from another domain, or a different protocol. Any attempt to
+access a property in such cases will result in a &quot;Permission
+Denied&quot; error. Signed scripts or trusted ActiveX objects can
+overcome this in limited situations.
+</p><ul class='linkList'><li><a href="http://msdn.microsoft.com/en-us/library/ms533028%28VS.85%29.aspx" >http://msdn.microsoft.com/en-us/library/ms533028%28VS.85%29.aspx</a></li>
+<li><a href="https://developer.mozilla.org/En/Same_origin_policy_for_JavaScript" >https://developer.mozilla.org/En/Same_origin_policy_for_JavaScript</a></li>
+</ul> </div>
+<div id='setTimeout' class='section'><h3 id='FAQ4_20'>9.8 How do I make a 10 second delay?</h3><p>
+
+  
+There is no built-in way to pause execution in javascript such
+as a sleep function, but hosts usually provide a method of some
+form. Web browsers are designed for event driven programming and
+only provide the <code>setTimeout</code> and <code>setInterval</code> functions
+to facilitate timed delays. The delay before calling <code>getSnork</code> may
+exceed the second parameter to <code>setTimeout</code> and <code>setInterval</code>
+due to implementation differences among browsers.
+     </p> <p>
+
+  
+      To call the function <code>getSnork</code>, approximately 10 seconds
+      after the function <code>getMoomin()</code> completes, you would do this:
+      </p>
+<pre>
+  getMoomin();
+  setTimeout(getSnork, 10000); 
+</pre>
+<p>
+Script execution is not stopped, and adding <code>getSnufkin()</code> after the
+
+<code>setTimeout</code> line would immediately execute the function <code>getSnufkin</code>
+before <code>getSnork</code>.
+    </p> <p>
+  
+Achieving delays through running a loop of some sort for a pre-defined 
+period is a bad strategy, as that will inhibit whatever was supposed to 
+be happening during the delay, including blocking user interation.
+    </p> <p>
+  
+Other (less event driven) hosts have different wait functions,
+such as <code>WScript.Sleep()</code> in the Windows Script Host.
+
+</p><ul class='linkList'><li><a href="http://msdn.microsoft.com/en-us/library/ms536753%28VS.85%29.aspx" >http://msdn.microsoft.com/en-us/library/ms536753%28VS.85%29.aspx</a></li>
+<li><a href="http://docs.sun.com/source/816-6408-10/window.htm#1203758" >http://docs.sun.com/source/816-6408-10/window.htm#1203758</a></li>
+<li><a href="http://en.wikipedia.org/wiki/Event-driven_programming" >http://en.wikipedia.org/wiki/Event-driven_programming</a></li>
+<li><a href="faq_notes/misc.html#mtSetTI" >faq_notes/misc.html#mtSetTI</a></li>
+</ul> </div>
+<div id='printSettings' class='section'><h3 id='FAQ4_23'>9.9 How do I change print settings for window.print()?</h3><p>
+  
+In a normal security environment, you can't change anything.  
+</p> <p>
+  
+
+Print Stylesheet rules provide options. 
+</p> <p>
+  For IE, <code>ActiveX</code> or Plugin ScriptX and
+Neptune from Meadroid to give you more control for Windows
+versions of Internet Explorer, Netscape, and Opera.
+</p><ul class='linkList'><li><a href="http://www.meadroid.com/scriptx/" >http://www.meadroid.com/scriptx/</a></li>
+<li><a href="http://msdn.microsoft.com/en-us/library/ms976105.aspx" >http://msdn.microsoft.com/en-us/library/ms976105.aspx</a></li>
+</ul> </div>
+<div id='changeBrowserDialog' class='section'><h3 id='FAQ4_28'>9.10 How do I change the confirm box to say yes/no or default to cancel?</h3><p>
+  
+
+The buttons on a confirm box cannot be changed, nor can you
+specify a default button. However, you should be able to change
+the question so that "OK" is suitable as the default.
+e.g. change &quot;We will now buy ourselves a Porsche with your credit
+card, Do you want to continue with this transaction  <em>OK</em> Cancel&quot;
+to &quot;We will now buy ourselves a Porsche with your credit card,
+Would you like to abandon this transaction?  <em>OK</em> Cancel&quot;
+    </p> </div>
+<div id='fileDownload' class='section'><h3 id='FAQ4_33'>9.11 How do I prompt a &quot;Save As&quot; dialog for an accepted mime type?</h3><p>
+
+  
+It is not possible with client-side javascript.
+    </p> <p>
+  
+Some browsers accept the Content-Disposition header, but this 
+must be added by the server. Taking the form:-
+<code>Content-Disposition: attachment; filename=filename.ext</code></p><ul class='linkList'><li><a href="http://classicasp.aspfaq.com/general/how-do-i-prompt-a-save-as-dialog-for-an-accepted-mime-type.html" >http://classicasp.aspfaq.com/general/how-do-i-prompt-a-save-as-dialog-for-an-accepted-mime-type.html</a></li>
+<li><a href="http://support.microsoft.com/kb/q260519/" >http://support.microsoft.com/kb/q260519/</a></li>
+</ul> </div>
+<div id='returnValue' class='section'><h3 id='FAQ4_35'>9.12 I have window.status="Moomin"; why doesn't the statusbar change?</h3><p>
+  
+When changing the status in an event (e.g. <code>onmouseover</code>) you
+should return true from the event.  Also a number of browsers
+require a short delay before setting the status to overcome their
+default behaviour with the statusbar. 
+
+<code>onevent=&quot;setTimeout('window.status=\'Moomin\'',15);&quot;</code></p> <p>
+  
+Many browsers are configured, by default, to disallow scripts from setting
+the status bar text. Some browsers don't have such a bar, or don't have it by default.
+    </p> </div>
+<div id='modifyChrome' class='section'><h3 id='FAQ4_36'>9.13 How do I modify the current browser window?</h3><p>
+  
+In a default security environment you are very limited in how much
+you can modify the current browser window.  You can use
+<code>window.resizeTo</code> or <code>window.moveTo</code> to resize or move a
+window respectively, but that is it.  Normally you can only
+suggest chrome changes in a <code>window.open</code>.
+
+</p><ul class='linkList'><li><a href="http://msdn.microsoft.com/en-us/library/ms536651%28VS.85%29.aspx" >http://msdn.microsoft.com/en-us/library/ms536651%28VS.85%29.aspx</a></li>
+<li><a href="https://developer.mozilla.org/en/DOM:window.open" >https://developer.mozilla.org/en/DOM:window.open</a></li>
+</ul> </div>
+<div id='target' class='section'><h3 id='FAQ4_37'>9.14 How do I POST a form to a new window?</h3><p>
+  
+Use the target attribute on the form, opening a window with
+that name and your feature string in the onsubmit handler of the
+FORM.
+     </p>
+<pre>
+  &lt;form action=&quot;&quot; 
+      target=&quot;wndname&quot; onsubmit=&quot;window.open('',this.target,'features');return true;&quot;&gt;</pre>
+
+<ul class='linkList'><li><a href="http://www.htmlhelp.com/reference/html40/forms/form.html" >http://www.htmlhelp.com/reference/html40/forms/form.html</a></li>
+</ul> </div>
+<div id='openWindow' class='section'><h3 id='FAQ4_42'>9.15 How do I open a new window with javascript?</h3><p>
+  
+New windows can be opened on browsers that support the
+<code>window.open</code> function and are not subject to the action of any
+pop-up blocking mechanism with code such as:-
+     </p>
+<pre>
+  var wRef;
+  if(window.open){
+    wRef = window.open("http://example.com/page.html","windowName");
+  }</pre>
+<ul class='linkList'><li><a href="https://developer.mozilla.org/en/DOM:window.open" >https://developer.mozilla.org/en/DOM:window.open</a></li>
+
+<li><a href="http://www.infimum.dk/HTML/JSwindows.html" >http://www.infimum.dk/HTML/JSwindows.html</a></li>
+</ul> </div>
+<div id='ajaxRef' class='section'><h2>10 Ajax and Server Communication</h2>
+</div><div id='ajax' class='section'><h3 id='FAQ4_44'>10.1 What is Ajax?</h3><p>
+  
+<dfn title = 'Asynchronous JavaScript and XML'>Ajax</dfn>
+is shorthand for Asynchronous JavaScript and XML. The technology is 
+based on the <code>XMLHttpRequest</code> Object. At its simplest, 
+it is the sending/retrieving of new data from the server without 
+changing or reloading the window location.
+</p><ul class='linkList'><li>
+Mozilla Documentation:
+
+</li>
+<li><a href="http://developer.mozilla.org/en/docs/XMLHttpRequest" >http://developer.mozilla.org/en/docs/XMLHttpRequest</a></li>
+<li>
+MSDN Documention:
+</li>
+<li><a href="http://msdn.microsoft.com/en-us/library/ms535874%28VS.85%29.aspx" >http://msdn.microsoft.com/en-us/library/ms535874%28VS.85%29.aspx</a></li>
+<li><a href="http://msdn.microsoft.com/en-us/library/ms759148%28VS.85%29.aspx" >http://msdn.microsoft.com/en-us/library/ms759148%28VS.85%29.aspx</a></li>
+<li>
+Libraries and Tutorial Sites:
+</li>
+<li><a href="http://jibbering.com/2002/4/httprequest.html" >http://jibbering.com/2002/4/httprequest.html</a></li>
+<li><a href="http://www.ajaxtoolbox.com/" >http://www.ajaxtoolbox.com/</a></li>
+
+</ul><p>
+An alternative to the <code>XMLHttpRequest</code> Object is Remote Scripting:
+</p><ul class='linkList'><li><a href="http://www.ashleyit.com/rs/main.htm" >http://www.ashleyit.com/rs/main.htm</a></li>
+</ul> </div>
+<div id='downloadPage' class='section'><h3 id='FAQ4_38'>10.2 How do I download a page to a variable?</h3><p>
+        
+Although <code>XMLHttpRequest</code> can be used to download 
+entire pages, it is often used for downloading small pieces 
+of data that can be used to update the current page.
+     </p><ul class='linkList'><li><a href="http://jibbering.com/2002/4/httprequest.html" >http://jibbering.com/2002/4/httprequest.html</a></li>
+
+<li><a href="http://www.ajaxtoolbox.com/" >http://www.ajaxtoolbox.com/</a></li>
+</ul> </div>
+<div id='getServerVariable' class='section'><h3 id='FAQ4_18'>10.3 How do I get a jsp/php variable into client-side javascript?</h3><p>
+  
+Use the server-side language to generate the javascript:
+      </p>
+<pre>
+  // JSP
+  var jsvar = &quot;${ jspVar }&quot;;
+  // PHP
+  var jsvar = &quot;&lt;?php echo $phpVar ?&gt;&quot;;
+</pre>
+
+<p>
+If the string contains a quote mark, it will have to be escaped. 
+If the an inline-script tag is used, and the string must not 
+contains characters such as <code>&lt;</code>, <code>&gt;</code>,  <code>&amp;</code>. 
+    </p> </div>
+<div id='sessionExpired' class='section'><h3 id='FAQ4_29'>10.4 How do I log-out a user when they leave my site?</h3><p>
+  
+This cannot be done reliably. Here's why:
+     </p> 
+<ul> <li>  
+The user may disable javascript so the log-out script will
+never execute.
+       </li> 
+<li>  
+
+The user may not be on-line when they close your web page.
+       </li> 
+<li>  
+Javascript errors elsewhere in the page may prevent the script
+executing.
+       </li> 
+<li>  
+The browser may not support the onunload event, or may not fire
+it under certain circumstances, so the log-out function will
+not execute.
+       </li> 
+</ul> 
+<p>
+The URL below has more information.
+</p><ul class='linkList'><li><a href="http://groups.google.com/groups?selm=BlmZ7.55691%244x4.7344316%40news2-win.server.ntlworld.com" >http://groups.google.com/groups?selm=BlmZ7.55691%244x4.7344316%40news2-win.server.ntlworld.com</a></li>
+</ul> </div>
+<div id='runServerScript' class='section'><h3 id='FAQ4_34'>10.5 How do I run a server side script?</h3><p>
+
+  
+You trigger a server-side script by sending an HTTP request. 
+This can be acheived by setting the <code>src</code> of an <code>img</code>, 
+<code>Image</code>, <code>frame</code>, or <code>iframe</code>, 
+or by using 
+<dfn title = 'XMLHttpRequest or XMLHTTP'>XHR</dfn>.
+    </p> <p>
+
+  
+An image will also
+&quot;swallow&quot; the data sent back by the server, so that they will
+not be visible anywhere.
+</p> <p>
+  </p>
+<pre>
+  var dummyImage = new Image();
+  dummyImage.src = &quot;scriptURL.asp?param=&quot; + varName;
+</pre>
+ <p>
+
+  
+Mozilla, Opera 7.6+, Safari 1.2+, and Windows IE 7
+provide the <code>XMLHttpRequest</code> object
+(Windows IE versions 5+, provides ActiveX to acheive an analagous 
+effect). <code>XMLHttpRequest</code> can send HTTP requests to 
+the server, and provides access the <code>responseText</code> or <code>responseXML</code>
+(when the response is XML), and HTTP header information.
+</p><ul class='linkList'><li><a href="http://jibbering.com/2002/4/httprequest.html" >http://jibbering.com/2002/4/httprequest.html</a></li>
+<li><a href="http://www.w3.org/TR/XMLHttpRequest/" >http://www.w3.org/TR/XMLHttpRequest/</a></li>
+
+<li><a href="http://developer.mozilla.org/en/XMLHttpRequest" >http://developer.mozilla.org/en/XMLHttpRequest</a></li>
+<li><a href="http://msdn.microsoft.com/en-us/library/ms537505(VS.85).aspx" >http://msdn.microsoft.com/en-us/library/ms537505(VS.85).aspx</a></li>
+</ul> </div>
+<div id='noCache' class='section'><h3 id='FAQ4_17'>10.6 How do I force a reload from the server/prevent caching?</h3><p>
+  
+To reload a page, use <code>location.reload()</code>. However, this depends
+upon the cache headers that your server sends. To change this,
+you need to alter the server configuration. A quick fix on the
+client is to change the page URI so that it contains a unique
+element, such as the current time. For example:
+<code>location.replace(location.href+'?d='+new Date().valueOf())</code>
+If the <code>location.href</code> already contains a query String, use:
+
+<code>location.replace(location.href+'&amp;d='+new Date().valueOf())</code></p><ul class='linkList'><li><a href="http://www.mnot.net/cache_docs/" >http://www.mnot.net/cache_docs/</a></li>
+<li><a href="http://docs.sun.com/source/816-6408-10/date.htm" >http://docs.sun.com/source/816-6408-10/date.htm</a></li>
+</ul> </div>
+<div id='ajaxCache' class='section'><h3 id='FAQ4_45'>10.7 Why is my Ajax page not updated properly when using an HTTP GET request in Internet Explorer?</h3><p>
+  
+     Browsers cache the results of HTTP requests to reduces network traffic.
+     To force the browser to request the document from the server, either 
+     set the <code>EXPIRES</code> and/or <code>CACHE-CONTROL</code> response header(s) 
+     with a past date or use a unique query string. 
+     </p>
+
+<pre>
+  req.open("GET", "/example.jsp?date=" + (+new Date), true); 
+</pre>
+<p>
+
+Always use the appropriate HTTP method. Do not use <code>POST</code> 
+to prevent caching. See <a href="http://www.faqs.org/rfcs/rfc2616.html" >RFC 2616</a>.
+     
+</p><ul class='linkList'><li><a href="http://www.mnot.net/cache_docs/#EXPIRES" >http://www.mnot.net/cache_docs/#EXPIRES</a></li>
+<li><a href="http://www.mnot.net/javascript/xmlhttprequest/cache.html " >http://www.mnot.net/javascript/xmlhttprequest/cache.html </a></li>
+</ul> </div>
+
+<div id='debugging' class='section'><h2>11 Debugging</h2>
+</div><div id='javascriptErrors' class='section'><h3 id='FAQ4_43'>11.1 How do I get my browser to report javascript errors?</h3><p>
+  
+There are debugging tools for many browsers. Learn to use them all.
+     </p> 
+<dl>
+  <dt> Windows </dt>
+  <dd> <a href="http://www.fiddlertool.com/fiddler/" >Fiddler</a>. 
+Fiddler is an HTTP Debugging proxy (it won't find script 
+errors). Fiddler logs HTTP activity, like Firebug's Net 
+tab, but can be attached to any browser running on Windows. 
+      </dd>
+
+  <dt> Windows IE </dt>
+  <dd> Microsoft Script Editor. Included with Visual Studio or Microsoft 
+Word 2003 (discontinued in Office 2007).
+To enable,
+<code>Tools</code>, <code>Internet Options</code>, <code>Advanced</code>, and uncheck 
+<code>Disable Script Debugging</code>. After enabling Script Debugging, 
+a <code>Script Debugger</code> option will appear in the <code>View</code> menu. </dd>
+
+  <dd> <a href="http://www.my-debugbar.com/wiki/IETester/HomePage" >IETester</a> for testing IE 5.5- IE8. </dd>
+  <dd> <a href="http://www.my-debugbar.com/wiki/CompanionJS/HomePage" >CompanionJS</a><code>console</code> for IE. </dd>
+  <dd>  <em>Note:</em> For debugging scripts in IE, the Microsoft Script  <em>Editor</em> 
+
+is recommended. However, if not available, the <a href="http://www.microsoft.com/downloads/details.aspx?FamilyId=2F465BE0-94FD-4569-B3C4-DFFDF19CCD99&amp;displaylang=en" >Microsoft Script Debugger</a> may be somewhat helpful.
+      </dd>
+  <dd> <a href="http://www.microsoft.com/downloads/details.aspx?FamilyID=e59c3964-672d-4511-bb3e-2d5e1db91038&amp;displaylang=en" >Internet Explorer Developer Toolbar</a> </dd>
+  <dd> 
+To report errors: Wait until a little yellow
+triangle appears at the left end of the status bar, double click
+on it and, when the error dialog box appears, check the &quot;Always
+show errors&quot; checkbox it contains. 
+
+Or, <code>Internet Options</code>, <code>Advanced</code>, deselect <code>"Disable Script Debugging"</code>,
+select <code>"Display a notification ..."</code>.
+      </dd>
+
+  <dt> Firefox </dt>
+  <dd> <code>Tools &gt; Error console</code> (<code>Ctrl</code> + <code>Shift</code> + <code>j</code>).
+      </dd>
+
+  <dd> <a href="http://getfirebug.com/" >Firebug</a> </dd>
+  <dd> <a href="https://addons.mozilla.org/en-US/firefox/addon/5369" >YSlow</a>. 
+YSlow analyzes web pages and tells you why they're slow 
+based on Yahoo's rules for high performance web sites. 
+      </dd>
+  <dd> <a href="https://addons.mozilla.org/en-US/firefox/addon/1743" >Lori</a>
+<dfn>Lori</dfn> or Life-of-request info, is useful for troubleshooting 
+server response and page load time. 
+      </dd>
+
+  <dd> <a href="https://addons.mozilla.org/en-US/firefox/addon/60" >Web Developer Toolbar</a>.
+      </dd>
+  <dd> <a href="https://addons.mozilla.org/en-US/firefox/addon/1201" >Cookie Watcher</a>.
+      </dd>
+  <dd> <a href="https://addons.mozilla.org/en-US/firefox/addon/1192" >XPather</a>. 
+XPath generator, editor and inspector. 
+      </dd>
+  <dt> Opera </dt>
+
+  <dd> 
+Tools &gt; Advanced &gt; Error console
+      </dd>
+  <dd> <a href="http://dev.opera.com/articles/view/introduction-to-opera-dragonfly/" >Introduction to Opera Dragonfly</a> </dd>
+  <dt> Safari </dt>
+
+  <dd> 
+To display the <code>Develop</code> menu in Safari 3.1 or higher, select 
+the checkbox labeled "Show Develop menu in menu bar" in 
+Safari's <code>Advanced</code> Preferences panel.
+      </dd>
+  <dd> <a href="http://trac.webkit.org/wiki/Web%20Inspector " >Safari Web Inspector</a> </dd>
+  <dt> Chrome </dt>
+
+  <dd> 
+JavaScript Console: click the <code>Page</code> menu icon and select 
+<code>Developer &gt; JavaScript Console</code>. From here, you'll be 
+able to view errors in the JavaScript execution, and enter 
+additional javascript commands to execute.
+      </dd>
+  <dd> 
+JavaScript Debugger: available as <code>Page</code> menu icon &gt; <code>Developer</code> 
+
+&gt; Debug JavaScript, the debugger provides a command prompt from which you 
+can set breakpoints, backtrace, and more. Type <code>help</code> at the debugger 
+command line to get started.    
+      </dd>
+  <dd>  
+<ul> <li>  <a href="http://www.google.com/chrome/intl/en/webmasters-faq.html#jsexec" >Google Chrome Script Debugging</a> </li> 
+<li>  <a href="http://blog.chromium.org/2009/06/developer-tools-for-google-chrome.html" >Developer Tools for Google Chrome</a> </li> 
+
+<li>  <a href="http://blog.chromium.org/2009/08/google-chrome-developer-tools-for.html" >Tools for Eclipse Users</a> </li> 
+</ul> 
+ </dd>
+  <dt> Mac IE </dt>
+  <dd> 
+Use the Preferences dialog.
+      </dd></dl></div>
+<div id='doNotTry' class='section'><h2>12 Things not to attempt in a browser</h2>
+</div><div id='preventAccess' class='section'><h3 id='FAQ4_5'>12.1 How can I prevent access to a web page by using javascript?</h3><p>
+
+  
+In practice you can't. While you could create a suitable
+encryption system with a password in the page, the level of
+support you need to do this means it's always simpler to do it
+server-side. Anything that &quot;protects&quot; a page 
+other than the current one is definitely flawed.
+    </p> </div>
+<div id='hideSource' class='section'><h3 id='FAQ4_1'>12.2 How do I protect my javascript code?</h3><p>
+  
+With clientside javascript you can't as your code is distributed 
+in source form and is easily readable. With JScript, there is the 
+Script Encoder (see MSDN), but this is nothing more than obfuscation.
+Disabling the right mouse button also does nothing to protect
+your script in a Web browser. 
+     </p><ul class='linkList'><li>
+      Your code is likely protected under copyright laws. See: 
+      </li>
+<li><a href="http://www.wipo.int/about-ip/en/copyright.html" >http://www.wipo.int/about-ip/en/copyright.html</a></li>
+
+<li><a href="http://webdesign.about.com/od/copyright/Copyright_Issues_on_the_Web_Intellectual_Property.htm" >http://webdesign.about.com/od/copyright/Copyright_Issues_on_the_Web_Intellectual_Property.htm</a></li>
+</ul> </div>
+<div id='readFile' class='section'><h3 id='FAQ4_3'>12.3 How can I access the client-side filesystem?</h3><p>
+  
+Security means that by default you can't. In a more restricted 
+environment, there are options. For example, using LiveConnect
+to connect to Java with Netscape, and using the FileSystemObject
+in IE. Check <a href="http://groups.google.com/group/comp.lang.javascript/topics" >Google Groups archives</a> 
+for previous posts on the subject.
+      </p><ul class='linkList'><li><a href="http://msdn.microsoft.com/en-us/library/z9ty6h50%28VS.85%29.aspx" >http://msdn.microsoft.com/en-us/library/z9ty6h50%28VS.85%29.aspx</a></li>
+<li><a href="http://www.javaworld.com/javaworld/jw-10-1998/jw-10-apptowin32.html" >http://www.javaworld.com/javaworld/jw-10-1998/jw-10-apptowin32.html</a></li>
+</ul> </div>
+
+<div id='javascriptURI' class='section'><h3 id='FAQ4_24'>12.4 I have &lt;a href=&quot;javascript:somefunction()&quot;&gt;  what ... ?</h3><p>
+  
+Whatever the rest of your question, this is generally a very bad idea. 
+The <code>javascript:</code> pseudo protocol was designed to replace the
+current document with the value that is returned from the expression. 
+For example:
+      </p>
+<pre>
+  &lt;a href=&quot;javascript:'&amp;lt;h1&amp;gt;' + document.lastModified + '&amp;lt;/h1&amp;gt;'&quot;&gt;lastModified&lt;/a&gt;
+
+</pre>
+<p>
+will result in replacing the current document with the value 
+returned from <code>document.lastModified</code>, wrapped in an <code>&lt;h1&gt;</code> 
+tag. 
+    </p> <p>
+  
+When the expression used evaluates to an <code>undefined</code> value
+(as some function calls do), the contents of the current page are not 
+replaced. Regardless, some browsers (notably IE6) interpret this as 
+navigation and will enter into a 'navigation' state where GIF 
+animations and image swaps will stop working.
+    </p> <p>
+
+  
+It is also possible for IE to be configured such that it supports 
+javascript but not the <code>javascript:</code> protocol. This results 
+in the user seeing a protocol error for <code>javascript:</code> URIs.
+    </p> <p>
+  
+The <code>javascript:</code> pseudo protocol creates accessibility and 
+usability problems. It provides no fallback for when the script is not 
+supported.
+    </p> <p>
+
+  
+Instead, use
+<code>&lt;a href=&quot;something.html&quot; onclick=&quot;somefunction();return false&quot;&gt;</code>
+where <code>something.html</code> is a meaningful alternative. Alternatively,
+attach the <code>click</code> callback using an event registry.
+      </p><ul class='linkList'><li><a href="/faq/example/jsuri/" >/faq/example/jsuri/</a></li>
+
+<li><a href="http://www.useit.com/alertbox/20021223.html" >http://www.useit.com/alertbox/20021223.html</a></li>
+</ul> </div>
+<div id='comments' class='section'><h2 id='FAQ5'>13 Comments and Suggestions</h2>
+<p>
+  
+The FAQ uses the stylesheet <a href="faq.css" >faq.css</a> and is generated
+from the xml source <a href="index.xml" >index.xml</a> by the windows script
+host script <a href="process.wsf" >process.wsf</a> which also checks the links.
+   </p> </div><div id='FAQENTRY' class='section'><h3 id='FAQ5_1'>13.1 Why do some posts have &lt;FAQENTRY&gt; in them?</h3><p>
+
+  
+If a poster feels that the question they are answering should be
+covered in the FAQ, placing &lt;FAQENTRY&gt; in the post lets the FAQ
+robot collect the messages for easy review and inclusion. A Draft Proposal
+for the FAQ is requested and appreciated.
+    </p> <p>
+  
+The &lt;FAQENTRY&gt; should not be used in posts except in
+conjunction with a suggestion/proposal for the FAQ. It should
+also not be literally quoted in replies, instead it should be
+partly obscured as, e.g. &lt;FAQ**TRY&gt; or similar.
+    </p> </div>
+
+<div id='makeSuggestion' class='section'><h3 id='FAQ5_2'>13.2 How do I make a suggestion?</h3><p>
+  
+To make a suggestion to the FAQ, use either the FAQENTRY method
+above, or email Garrett Smith dhtmlkitchen&#64;gmail.com (current FAQ editor) 
+or Jim Ley (jim.ley&#64;gmail.com). All comments, suggestions, and 
+especially corrections are welcome.
+    </p> </div>
+<!--<script src='FAQReader.js' type='text/javascript'></script>--></body> 
+</html>

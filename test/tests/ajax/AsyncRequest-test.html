@@ -54,15 +54,16 @@ var Assert = YAHOO.util.Assert,
 
         req.onsucceed = function(e) {
             succeeded = true;
-        };
+         };
 
         // send the request.
         req.send();
 
-        this.wait(function(){
+        function segment(){
             Assert.isTrue(completed, "completed");
             Assert.isTrue(succeeded, "succeeded");
-        }, 2000);
+        }
+        this.wait(segment, 2000);
     },
 
     // make sure that oncomplete fires with successful:false
@@ -106,7 +107,7 @@ var Assert = YAHOO.util.Assert,
     },
 
     testSuccessResponseData : function() {
-        var req = AsyncRequest.getById("", {action:"data.json.txt", method:"GET"} ),
+        var req = AsyncRequest.getById("a", {action:"data.json.txt", method:"GET"} ),
             data = {};
         req.send(null, 2400);
         req.onsucceed = function(actualRequest){
@@ -245,7 +246,7 @@ var Assert = YAHOO.util.Assert,
             aborted = false;
 
         req.onsucceed = function( response ) {
-            data = eval("("+response.responseText +")");
+            data = eval("('"+response.responseText +")");
         };
         req.oncomplete = function( doneEvent ) {
             completed = true;

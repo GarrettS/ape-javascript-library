@@ -111,8 +111,8 @@ APE.namespace("APE.dom");
      */
     function _tagNamesToUpperCase(s) {
         // Element Selector = Start of string or ws, followed by one or more letter chars.
-        var elementSelector = /(^|\s)([a-z]+)/;
-        var matches = s.match( elementSelector ), R = RegExp;
+        var elementSelector = /(^|\s)([a-z]+)/,
+            R = RegExp;
         while( elementSelector.test(s) ) s = s.replace(elementSelector, R.$1+R.$2.toUpperCase());
         return s;
     };

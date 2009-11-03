@@ -35,6 +35,7 @@ APE.namespace("APE.ajax");
     var defaultEnctype = 'application/x-www-form-urlencoded',
         nType = 'XMLHttpRequest', aType = 'ActiveXObject',
         type = (nType in self) ? nType : aType,
+        uid = 0,
         isNative = nType == type,
         /** store up to 4 XHR objects. */
         xhrList = [];
@@ -64,7 +65,7 @@ APE.namespace("APE.ajax");
     
     function createAsyncProto() {
         
-        function F(){}
+        var F = Function.prototype;
 
         /** sets up poll for readyState change.
          * fires 'oncomplete', followed by either 'onsucceed' or 'onfail'.
@@ -73,27 +74,29 @@ APE.namespace("APE.ajax");
          * @private for internal use only.
          */
         function setUpReadyStateChangeHandler(ar) {
-            ar.req.onreadystatechange = readyStateChangePoll;
+            ar.timerId = setInterval(readyStateChangePoll, 50);
             if(ar.timeoutMillis > 0) {
                 var userTimeout = function() {
                     ar.ontimeout(/* Should we pass anything here? */);
                     ar.req.abort(); // Directly abort the request, don't fire "onabort".
                     oncomplete(ar);
+                    ar.req.onreadystatechange = F;
                 };
                 ar.timeoutID = setTimeout( userTimeout, ar.timeoutMillis );
             }    
+            /** Called repeatedly until readyState i== 4, then calls processResponse. */
+            function readyStateChangePoll() {
+                if( ar.req.readyState === 4 ) {
+                    processResponse(ar);
+                }
+            }
         }
 
-         /** Called repeatedly until readyState i== 4, then calls processResponse. */
-         function readyStateChangePoll() {
-             if( this.req.readyState === 4 ) {
-                 processResponse(this);
-             }
-         }
 
         /** processes a response after readyState == 4. */
         function processResponse(asyncRequest) {
-            var httpStatus = asyncRequest.req.status,
+            var req = asyncRequest.req,
+                httpStatus = req.status,
                 succeeded = httpStatus >= 200 && httpStatus < 300 
                 || httpStatus == 304 || httpStatus == 1223;
     
@@ -101,14 +104,14 @@ APE.namespace("APE.ajax");
             if(succeeded) {
                 // fire oncomplete, then onsucceed.
                 oncomplete(asyncRequest, true);
-                asyncRequest.onsucceed(asyncRequest.req);
+                
+                asyncRequest.onsucceed(req);
             } else {
                 // fire oncomplete, then onfail.
                 oncomplete(asyncRequest, false);
-                asyncRequest.onfail(asyncRequest.req);
+                asyncRequest.onfail(req);
             }
-            // The call is complete, cancel the timeout..
-            clearTimeout(asyncRequest.timeoutID);
+            asyncRequest.timerId = clearInterval(asyncRequest.timerId);
         }
     
         function oncomplete(ar, successful) {
@@ -153,11 +156,11 @@ APE.namespace("APE.ajax");
     
                 this.timeoutMillis = timeoutMillis|0 || 4000;
     
-                setUpReadyStateChangeHandler(this);
                 if(this.httpMethod == "get" && typeof data == "string") {
                     uri += data;
                 }
                 this.req.open(this.httpMethod, uri, true);
+                setUpReadyStateChangeHandler(this);
                 if("setRequestHeader" in this.req) {
                     this.req.setRequestHeader('X-REQUESTED-WITH', 'XMLHttpRequest');
                     if(this.httpMethod == "post") {
@@ -165,7 +168,7 @@ APE.namespace("APE.ajax");
                             this.req.setRequestHeader('Content-Type', this.enctype);
                         } else if(data && typeof data.unshift == "function" && 
                                          this.enctype == "multipart/form-data") {
-                            boundary = "---------------------------DATA_"+(+new Date) + "\n";
+                            boundary = "---------------------------DATA_"+(++uid) + "\n";
                             data = boundary + data.join(boundary) + boundary;
                             this.req.setRequestHeader('Content-Type', this.enctype + "; " + boundary);
                         }
@@ -175,7 +178,7 @@ APE.namespace("APE.ajax");
                     this.onsend();
                     this.req.send( data||null );
                 } catch(ex) { 
-                    this.onfail(ex)
+                    this.onfail(ex);
                 }
                 return this;
             },

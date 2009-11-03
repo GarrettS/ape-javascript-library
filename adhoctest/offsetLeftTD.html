@@ -1,0 +1,25 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>OffsetTop of Child of BODY or TD</title>
+</head>
+<body style="position: relative; border: 10px solid">
+
+<table border="2">
+<div id="x" style="position: relative;">aaa</div>
+
+<tr><td>cell one</td><td>cell two</td><td style="position:relative">
+    <div id="c3" style="position:relative">cell 3</div></td>
+</tr>
+<script type="text/javascript">
+onload = function(){
+    var ol= document.getElementById("c3").offsetLeft,   
+        xol= document.getElementById("x").offsetLeft,
+        m = document.getElementById("m");
+    m.firstChild.data = "c3: " + ol + ", x:" + xol;
+}
+</script>
+<pre id="m">-</pre>
+</body>
+</html>

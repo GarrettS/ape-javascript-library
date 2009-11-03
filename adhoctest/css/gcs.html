@@ -1,0 +1,40 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+    <title>getComputedStyle(top) Opera Bug</title>
+<style type="text/css">
+ul, ul li {
+     /* uncomment for result "0" in Gecko */
+     /* position: relative; */
+}
+
+ul div {
+    padding: .1em 1em;
+}
+</style>
+</head>
+<body>
+    <ul>
+        <li><div>item 0</div></li>
+        <li><div>item 1</div></li>
+        <li><div>item 2</div></li>
+        <li><div>item 3</div></li>
+        <li><div>item 4</div></li>
+        <li><div>item 5</div></li>
+        <li><div>item 6</div></li>
+        <li id="i7"><div>item 7</div></li>
+        <li><div>item 8</div></li>
+        <li><div>item 9</div></li>
+    </ul>
+<script type="text/javascript">
+onload = function(){
+  var i7 = document.getElementById("i7");
+  var top = document.defaultView.getComputedStyle(i7,"").top;
+  var m = document.getElementById("m");
+  m.innerHTML = top;
+};
+</script>
+<pre id="m">-</pre>
+</body>
+</html>
