@@ -123,7 +123,7 @@
             if(typeof id.id == "string") {
             // Modifying - id - modifies the arguments object; 
             // but not in poor Safari 2.x.
-                arguments[0] = getId(id);
+                arguments[0] = getId(ctor, id);
             }
             if(!(INSTANCES in this)) {
                 if(typeof createPrototype === "function") {
@@ -154,11 +154,11 @@
         return getOrCreate.call(this, this, arguments);
     }
     
-    function getId(el) {
+    function getId(ctor, el) {
         var id = el.id,
             fName;
         if(!id) {
-            fName = getFunctionName(this) || "APE";
+            fName = getFunctionName(ctor) || "APE";
             id = el.id = fName+"_" + (getIdI++);
         }
         return id;
