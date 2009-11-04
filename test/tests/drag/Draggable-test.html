@@ -272,6 +272,31 @@ var draggableMouseTestCase = new YAHOO.tool.TestCase({
         StringAssert.contains( aClass, testNode.className );
     },
 
+    testOnbeforeDragStartPreventDefault : function(){
+        var d = Draggable.getByNode( testNode ),
+        ds = false,
+        bds = false,
+        origLeft = testNode.style.left,
+        dragEvent;
+
+        d.activeDragClassName = aClass;
+    
+        d.onbeforedragstart = function() {
+            bds = true;
+            return false;
+        };
+    
+        Action.mousedown( testNode );
+        Assert.isTrue( bds, "onbeforedragstart should have fired." );
+
+        Action.mousemove( document, {clientX:101} );
+        this.wait(function(){
+            Action.mousemove( document, {clientX:101} );
+            Assert.areSame( origLeft, testNode.style.left, 
+                    "testnode moved, but should have been prevented.");
+        }, 78);    
+    },
+    
     testDragClone : function() {
         var d = Draggable.getByNode( testNode ),
             ds = false,

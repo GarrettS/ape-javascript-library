@@ -428,8 +428,10 @@ APE.namespace("APE.drag");
                 return;
 
             e = getPointerEvent(e, "touches");
-            var target = Event.getTarget(evOrig), instances = Draggable.instances, dOTarg, testNode = target, metaKey = e.metaKey
-                    || e.ctrlKey;
+            var target = Event.getTarget(evOrig), 
+                instances = Draggable.instances, 
+                dOTarg, testNode = target, 
+                metaKey = e.metaKey || e.ctrlKey;
 
             while (!dOTarg && testNode !== null) {
                 dOTarg = instances[testNode.id];
@@ -498,11 +500,13 @@ APE.namespace("APE.drag");
             // if(metaKey) { }
 
             // Sets up dropTargets that have dragOverClassName | ondragover
+
+            if(dragObjGrabbed(e, dOTarg) == false) return true;
+
             dO = dOTarg;
             preventDefault(evOrig);
-            dragObjGrabbed(e, dOTarg);
 
-            for ( var id in draggableList) {
+            for (var id in draggableList) {
                 dragObjGrabbed(e, draggableList[id]);
             }
             return target.tagName !== "IMG"; // Mozilla will prevent focus
@@ -541,8 +545,9 @@ APE.namespace("APE.drag");
          */
         function dragObjGrabbed(e, dObj) {
             if (typeof dObj.onbeforedragstart == FUNCTION
-                    && dObj.onbeforedragstart(getDragStartEvent(dObj, e)) == false)
-                return true;
+                    && dObj.onbeforedragstart(getDragStartEvent(dObj, e)) == false) {
+                return false;
+            }
 
             var eventCoords = getEventCoords(e), elementPixelCoords;
 
@@ -600,8 +605,12 @@ APE.namespace("APE.drag");
 
             dO.hasBeenDragged = (dO.hasBeenDragged || !!(distX || distY));
 
-            var isLeft = newX < dO.minX, isRight = newX > dO.maxX, isAbove = newY < dO.minY, isBelow = newY > dO.maxY, isOutsideContainer = dO.container != null, hasOnDrag = (typeof dO.ondrag == FUNCTION), planesStopped = 0;
+            var isLeft = newX < dO.minX, isRight = newX > dO.maxX, 
+                isAbove = newY < dO.minY, isBelow = newY > dO.maxY, 
+                isOutsideContainer = dO.container != null, 
+                hasOnDrag = (typeof dO.ondrag == FUNCTION), planesStopped = 0;
 
+            // TODO: 2009-10-31 - can this be removed?
             if (typeof dO.onbeforedrag == FUNCTION
                     && dO.onbeforedrag(e) == false)
                 return;
