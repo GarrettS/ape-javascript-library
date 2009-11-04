@@ -221,8 +221,8 @@ APE.namespace("APE.dom" );
         if(!coords)
             coords = {x:0, y:0};
 
+        coords.x = coords.y = 0;
         if(el === container) {
-            coords.x = coords.y = 0;
             return coords;
         }
         if(getBoundingClientRect in el) {

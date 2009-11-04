@@ -222,29 +222,27 @@ window.onload = function() {
       		keepInContainer : true, 
      		dragCopy : true,
      		dragMultiple : true,
-     		
-    		addDropTarget(trashDropTarget),
-    		
+     		    		
     		// Event handlers for onfocus, ondragstart,onblur et c.
      		activeDragClassName : "folder-drag",
      		focusClassName : "folder-focus",
      		selectedClassName : "folder-selected"
     };
 	// Let's instantiate some Directories.
-	Draggable.getById("UntitledFolder", dragConfig);
-	Draggable.getById("UntitledFolder2", dragConfig);
-	Draggable.getById("MusicFolder", dragConfig);
-	Draggable.getById("PicturesFolder", dragConfig);
-	Draggable.getById("MP3Folder", dragConfig);
-
-    Draggable.getById("trash", dragConfig);
+	var folderIds = [ "UntitledFolder", "UntitledFolder2",  "MusicFolder", 
+                    "PicturesFolder", "MP3Folder", "trash"];
+    
+    for(var i = 0; i < folderIds.length; i++) {
+        var folder = Draggable.getById(folderIds[i], dragConfig);
+        folder.addDropTarget(trashDropTarget);
+    }
 
     var desktop = Draggable.getById("desktop", {
         constraint : "x",
         activeDragClassName : "desktop-drag",
         keepInContainer : true,
         isDragEnabled : false
-    }
+    });
 
     var t = document.getElementById('desktopToggle').firstChild;
     t.checked = false;
