@@ -16,8 +16,8 @@
     <li><a href="table/">table reorder</a></li>
     <li><a href="droptarget/">drop target</a></li>
     <li><a href="Slider">Slider</a></li>
-    <li class="d"><a href="drag/sortlist/">drag/sortlist</a></li>
-    <li class="d"><a href="drag/sortlist/proxy.html">drag/sortlist/proxy.html</a></li>
+    <li class="d"><a href="sortlist/">sortlist</a></li>
+    <li class="d"><a href="sortlist/proxy.html">sortlist/proxy.html</a></li>
 </ul>
 
 <h2>Tutorial Overview</h2>
