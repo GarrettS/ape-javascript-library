@@ -728,15 +728,12 @@ APE.namespace("APE.drag");
             }
             keepUserSelection = false;
             
-            if(dO.copyEl) 
-                retireClone(dO);
             draggableList[dO.id] = dO;
-            if(hasGroupSelection) {
-                for(id in draggableList) {
-                    o = draggableList[id];
-                    if(o.copyEl) 
-                        retireClone(o);
-                }
+            for(id in draggableList) {
+                o = draggableList[id];
+                o = eventDraggableList[id] = draggableList[id];
+                if(o.copyEl) 
+                    retireClone(o);
             }
             // if it's been dragged onto a dropTarget, fire that event.
             e = getPointerEvent(e, "changedTouches");
@@ -745,7 +742,6 @@ APE.namespace("APE.drag");
             if(hasGroupSelection && !isProxyDrag) {
                 for(id in draggableList) {
                     o = draggableList[id];
-                    o = eventDraggableList[id] = draggableList[id];
                     x = o.x;
                     y = o.y;
                     if(x < o.minX)
@@ -761,17 +757,15 @@ APE.namespace("APE.drag");
                 }
             }
             if(hasBeenDragged) {
-                if(false == dO.ondragend({
+                var preventDragEnd = false == dO.ondragend({
                     domEvent: e,
                     draggableList : eventDraggableList
-                })); else {
+                });
+                
+                if(!preventDragEnd){
                     dragDone(dO, e);
-                    if(hasGroupSelection) {
-                        for(id in draggableList) {
-                            if(hasBeenDragged) {
-                                dragDone(o, e);
-                            }
-                        }
+                    for(id in draggableList) {
+                       dragDone(draggableList[id], e);
                     }
                 }
             }
