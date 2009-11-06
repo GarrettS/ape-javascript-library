@@ -25,10 +25,8 @@ APE.namespace("APE.dom" );
     });
 
 
-    var documentElement = "documentElement", 
-        docEl = document[documentElement],
-        IS_BODY_ACTING_ROOT = docEl && docEl.clientWidth === 0;
-    docEl = null;
+    var DOCUMENT_ELEMENT = "documentElement", 
+        IS_BODY_ACTING_ROOT = document[DOCUMENT_ELEMENT].clientWidth === 0;
 
     /** @memberOf APE.dom
      * @name getScrollOffsets
@@ -38,20 +36,22 @@ APE.namespace("APE.dom" );
      */
     function getScrollOffsets(win) {
         win = win || window;
-        var f, d = win.document, node = d[documentElement];
+        var f, r;
         if("pageXOffset"in win)
-            f = function() {
+            f = function(win) {
+                win = win||window;
                 return{ left:win.pageXOffset, top: win.pageYOffset};
             };
         else {
-            if(IS_BODY_ACTING_ROOT) node = d.body;
-            f = function() {
+            f = function(win) {
+              win = win || window;
+              var node = win.document[IS_BODY_ACTING_ROOT ? "body" : DOCUMENT_ELEMENT];
               return{ left : node.scrollLeft, top : node.scrollTop };
             };
         }
-        d = null;
-        this.getScrollOffsets = f;
-        return f();
+        r = (this.getScrollOffsets = f)(win);
+        win = null;
+        return r;
     }
 
     /** @memberOf APE.dom
@@ -61,44 +61,37 @@ APE.namespace("APE.dom" );
      */
     function getViewportDimensions(win) {
         win = win || window;
-        var node = win.document, d = node, propPrefix = "client",
+        var baseName = "document",
+            nodeName = baseName, 
+            d = win[baseName], 
+            propPrefix = "client",
             wName, hName;
 
     // Safari 2 uses document.clientWidth (default).
-        if(typeof d.clientWidth == "number");
+        if(typeof d.clientWidth == "number"){
+            baseName = "window";
+        }
 
     // Opera < 9.5, or IE in quirks mode.
-        else if(IS_BODY_ACTING_ROOT || isDocumentElementHeightOff(win)) {
-            node = d.body;
+        else if(IS_BODY_ACTING_ROOT) {
+            baseName = DOCUMENT_ELEMENT;
+            nodeName = "body";
 
     // Modern Webkit, Firefox, IE.
     // Might be undefined. 0 in older mozilla.
-        } else if(d[documentElement].clientHeight > 0){
-            node = d[documentElement];
-
-    // For older versions of Mozilla.
-        } else if(typeof innerHeight == "number") {
-            node = win;
-            propPrefix = "inner";
+        } else if(d[DOCUMENT_ELEMENT].clientHeight > 0){
+            nodeName = DOCUMENT_ELEMENT;
         }
         wName = propPrefix + "Width";
         hName = propPrefix + "Height";
-
-        return (this.getViewportDimensions = function() {
+        function getViewportDimensions(win){
+            var node = (win || window)[baseName][nodeName];
             return{width: node[wName], height: node[hName]};
-        })();
-
-    // Used to feature test Opera returning wrong values
-    // for documentElement.clientHeight.
-        function isDocumentElementHeightOff(win){
-            var d = win.document,
-                div = d.createElement('div');
-            div.style.height = "2500px";
-            d.body.insertBefore(div, d.body.firstChild);
-            var r = d[documentElement].clientHeight > 2400;
-            d.body.removeChild(div);
-            return r;
         }
+
+        r = (this.getViewportDimensions = getViewportDimensions)(win);
+        win = d = null;
+        return r;
     }
 })();/**
  * @fileoverview

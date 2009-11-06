@@ -78,7 +78,7 @@ APE.namespace("APE.drag"<!--necessary space --> );</header>
             <fileset dir="${build}" includes="**/*.js"/>
             <arg line="-jar"/>
             <arg path="yuicompressor-2.4\build\yuicompressor-2.4.jar"/>
-            <!--arg line="-v"/-->
+            <arg line="-v"/>
             <srcfile/>
             <arg line="-o"/>
             <mapper type="glob" from="*.js" to="*-min.js"/>
