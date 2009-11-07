@@ -264,7 +264,7 @@ APE.namespace("APE.drag");
         function dragObjReleased(dObj, e) {
             animateBack(dObj);
 
-            var removeClass = dom.removeClass, dt, i, j, id;
+            var dt, i, j, id;
 
             if (dragOverTargets !== false) {
                 for (i = 0, j = dragOverTargets.length; i < j; i++) {
@@ -275,7 +275,7 @@ APE.namespace("APE.drag");
                         if (typeof dt.ondragout == FUNCTION)
                             dt.ondragout(e, dObj);
                         if (dt.dragOverClassName)
-                            removeClass(dt.el, dt.dragOverClassName);
+                            dom.removeClass(dt.el, dt.dragOverClassName);
                         dt.hasDropTargetOver = false;
                     }
                 }
@@ -909,11 +909,8 @@ APE.namespace("APE.drag");
         }
 
         function glideStart(dObj) {
-            var anim = APE.anim;
-            dObj.startX = dObj.x;
-            dObj.startY = dObj.y;
-
-            var a = new anim.Animation(.2);
+            var anim = APE.anim,
+                a = new anim.Animation(.2);
             a.transition = anim.Transitions.accel;
             a.run = glide;
             a.dObj = dObj;
@@ -924,12 +921,12 @@ APE.namespace("APE.drag");
 
         function glide(rationalValue) {
             var dObj = this.dObj, 
-                dx = dObj.startX - dObj.grabX, 
-                dy = dObj.startY - dObj.grabY;
+                dx = dObj.x - dObj.grabX, 
+                dy = dObj.y - dObj.grabY;
 
             rationalValue = Math.pow(rationalValue, 3); // accel.
-            dObj.moveToX(dObj.startX - (dx * rationalValue));
-            dObj.moveToY(dObj.startY - (dy * rationalValue));
+            dObj.moveToX(dObj.x - (dx * rationalValue));
+            dObj.moveToY(dObj.y - (dy * rationalValue));
         }
 
         function animOnEnd() {
@@ -950,8 +947,8 @@ APE.namespace("APE.drag");
 
         /** Starts gliding the draggable back to its original x,y coords. */
         function animateBack(dObj) {
-            
-            if(APE.anim && dObj.useAnim) {
+            if(!dObj.hasBeenDragged) return;
+            if (APE.anim && dObj.useAnim) {
                 glideStart(dObj);
             } else {
                 dObj.moveToX(dObj.grabX);

@@ -26,8 +26,8 @@
         // just make sure we have one.
         if(li) {
             dli = Draggable.getByNode(li, SortList.getById(this.id).dragOptions);
+            dli.ondragend = dliDragEndHandler;
         }
-        dli.ondragend = dliDragEndHandler;
     }
 
     function dliDragEndHandler(dragEvent) {
@@ -36,7 +36,6 @@
             draggableList = dragEvent.draggableList,
             sortList = el.parentNode,
             id, dt, i, insertItems = [], c = 0;
-        
         dom.addClass(sortList, "hiddenSelection");
         dt = getElementFromY(sortList, draggableList, coords.y);
         for(id in draggableList) {
