@@ -44,7 +44,8 @@
 (function(){
 var APE = self.APE,
    /** Map of [APE.EventPublisher], keyed by type. */
-    Registry = {};
+    Registry = {},
+    isMaybeLeak/*@cc_on=(@_jscript_version<5.7)@*/;
 
 APE.EventPublisher = EventPublisher;
 APE.mixin(EventPublisher, {
@@ -255,7 +256,6 @@ function get(src, sEvent) {
     return publisher;
 }
 
-var isMaybeLeak/*@cc_on=(@_jscript_version<5.7)@*/;
 if(isMaybeLeak)
-    EventPublisher.get( self, "onunload" ).addAfter( cleanUp, EventPublisher );
+    get( window, "onunload" ).addAfter( cleanUp, EventPublisher );
 })();

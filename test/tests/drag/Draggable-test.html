@@ -74,6 +74,8 @@ var Assert = YAHOO.util.Assert,
 
 var draggableTestCase = new YAHOO.tool.TestCase({
 
+    name : "draggableTestCase",
+    
     tearDown : function() {
         Draggable.instanceDestructor();
         Draggable.instanceDestructor.call(APE.drag.DropTarget);
@@ -175,7 +177,7 @@ var draggableTestCase = new YAHOO.tool.TestCase({
 
 var draggableMouseTestCase = new YAHOO.tool.TestCase({
 
-    name : "Draggable Test Case",
+    name : "draggableMouseTestCase",
 
     // pageX broken, so all tests test target from 0, 0.
 
@@ -1205,7 +1207,7 @@ var animatedDragTestCase = new YAHOO.tool.TestCase({
 });
 
 var proxyTestCase = new YAHOO.tool.TestCase({
-    name : "proxy test suite",
+    name : "proxyTestCase",
     setUp : draggableTestCase.setUp,
     tearDown : draggableTestCase.tearDown,
 
@@ -1255,6 +1257,36 @@ var proxyTestCase = new YAHOO.tool.TestCase({
             Assert.areSame(2, count);
         }, 70);
     },
+
+    testProxyCopy : function() {
+        var opts = {
+                proxyId : "testNode3",
+                dragCopy : true
+            },
+            dObj = Draggable.getById("testNode", opts),
+            testNode3 = document.getElementById('testNode3'),
+            count,
+            l, t,
+            coords = {clientX:101, clientY:100};
+        
+        testNode3.style.display = "none";
+        dObj.ondrag = ondragHandler;
+
+        function ondragHandler(dragEvent) {
+            var cs = this.copyEl.style;
+            l = parseInt(cs.left, 10);
+            t = parseInt(cs.top, 10);
+        }
+        
+        Action.mousedown( testNode );
+        Action.mousemove( document, coords );
+        this.wait(function(){
+            Action.mousemove( document, coords );
+            Action.mouseup(document);
+            Assert.areSame(coords.clientX, l, "left position of copyEl wrong");
+            Assert.areSame(coords.clientY, t, "top position of copyEl wrong");
+        }, 70);    
+    },
     
     testGroupProxy : function() {
         var opts = {
@@ -1299,7 +1331,7 @@ TestRunner.add( draggableTestCase );
 if(!IS_TOUCH_EVENT) {
    TestRunner.add( draggableMouseTestCase );
    TestRunner.add( animatedDragTestCase );
-    TestRunner.add( proxyTestCase );
+   TestRunner.add( proxyTestCase );
 } else {
     var touchTestCase = new YAHOO.tool.TestCase({
         name : "touch drag tests",

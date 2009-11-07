@@ -78,6 +78,8 @@ APE.namespace("APE.widget");
     function inpBlurred() {
         if(isEmpty(this)){
             showPlaceholderText(this);
+        } else {
+            inpValue[this.id] = this.value;
         }
     }
 

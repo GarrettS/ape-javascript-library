@@ -14,11 +14,10 @@
         mixin : mixin,
         extend : extend,
         createFactory : createFactory,
-        getById : getById,
         deferError : deferError,
         toString : function() { return "[APE JavaScript Library]"; }
     };
-
+    
     function F(){}
     
     var getIdI = 0,
@@ -26,9 +25,8 @@
         PROTOTYPE = "prototype",
         OP = Object[PROTOTYPE], 
         opHap = OP.hasOwnProperty,
-        functionToString = Function[PROTOTYPE].toString,
+        functionToString = F.toString,
         jscriptSkips = ['toString', 'valueOf'];
-
     
     /**
      * does <em>not</em> automatically add APE to the front of the chain, as YUI does.
@@ -87,14 +85,14 @@
      * @description Prototype inheritance.
      * @param {Object} subclass
      * @param {Object} superclass
-     * @param {Object} mixin If present, <var>mixin</var>'s own properties are copied to receiver
+     * @param {Object} [mix] If present, <var>mixin</var>'s own properties are copied to receiver
      * using APE.mixin(subclass.prototoype, superclass.prototype).
      */
-    function extend(subclass, superclass, mixin) {
+    function extend(subclass, superclass, mix) {
         F[PROTOTYPE] = superclass[PROTOTYPE];
         var subp = subclass[PROTOTYPE] = new F;
-        if(typeof mixin == "object")
-            APE.mixin(subp, mixin);
+        if(typeof mix == "object")
+            mixin(subp, mix);
         subp.constructor = subclass;
         return subclass;
     }
@@ -114,46 +112,28 @@
      * @memberOf APE
      */
     function createFactory(ctor, createPrototype) {
-        return { 
-            getById : getById, 
-            getByNode : getById
+        return{ 
+            getById : getOrCreate, 
+            getByNode : getOrCreate
         };
         
-        function getById(id) {
-            if(typeof id.id == "string") {
+        function getOrCreate(id) {
+            if(typeof id.id === "string") {
             // Modifying - id - modifies the arguments object; 
             // but not in poor Safari 2.x.
-                arguments[0] = getId(ctor, id);
+                id = arguments[0] = getId(ctor, id);
             }
-            if(!(INSTANCES in this)) {
+            var instances = this[INSTANCES];
+            if(!instances) {
+                instances = this[INSTANCES] = {};
                 if(typeof createPrototype === "function") {
                     ctor[PROTOTYPE] = createPrototype();
                 } 
             }
-            return getOrCreate.call(this, ctor, arguments);
+            return instances[id] || (instances[id] = newApply(ctor, arguments));
         }
     }
-    
-   // Not exported----------------------------------
-    function getOrCreate(ctor, args) {
-        var id = args[0];
-        // Public instances property, for purge or cleanup.
-        if(!hasOwnProp(this, INSTANCES)) this[INSTANCES] = {};
-        return this[INSTANCES][id] || (this[INSTANCES][id] = newApply(ctor, args));
-    }
-    
-    /** 
-     * APE.getById
-     * @deprecated - use APE.createFactory instead.
-     * 
-     * Creational method meant for being cross-cut.
-     * @param {HTMLElement} el An element that has an id.
-     * @return <pre>new this(id [,args...])</pre>
-     */
-    function getById(id){
-        return getOrCreate.call(this, this, arguments);
-    }
-    
+            
     function getId(ctor, el) {
         var id = el.id,
             fName;
@@ -179,18 +159,21 @@
     function newApply(ctor, args) {
         var i, 
             fp = F[PROTOTYPE] = ctor[PROTOTYPE];// Copy prototype.
-        fp.constructor = ctor;
+        if(fp) {
+            fp.constructor = ctor;
+        }
         i = new F;
         ctor.apply(i, args); // Apply the original constructor.
         return i;
     }
 
-    Package[PROTOTYPE].toString = function(){
+    function packageToString(){
         return"["+this.qualifiedName+"]";
-    };
+    }
 
     function Package(qualifiedName) {
         this.qualifiedName = qualifiedName;
+        this.toString = packageToString;
     }
     
     /** Crutches for Safari 2, which does not have native impl.
@@ -199,7 +182,7 @@
      * function X(){ this.t = 1; }
      * X.prototype.t = 1;
      * hasOwnProp(new X, "t"); // False in Safari 2.
-     */   
+     */
     function hasOwnProp(o, p) { 
         if(p in o) {
             if(opHap) {
@@ -207,7 +190,7 @@
             }
             var xp = o.__proto__;
             if(xp) {
-                return !(p in xp) || xp[p] !== o[p];
+                return!(p in xp) || xp[p] !== o[p];
             }
             return OP[p] !== o[p];
         }  

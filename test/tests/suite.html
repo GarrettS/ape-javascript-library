@@ -41,14 +41,14 @@
             "ajax/AsyncRequest-test.html", 
             "color/ColorRGB-test.html", 
             "dom/constants-test.html",
-            "dom/position-f-test.html",
-            "dom/style-f-test.html",
             "dom/classname-f-test.html",
-            "dom/traversal-f-test.html",
-            "dom/viewport-f-test.html",
             "dom/Event-test.html",
             "dom/Event-coords-test.html",
+            "dom/position-f-test.html",
+            "dom/style-f-test.html",
             "dom/StyleSheetAdapter-test.html",
+            "dom/traversal-f-test.html",
+            "dom/viewport-f-test.html",
             "form/Form-test.html",
             "timing/Lock-a-test.html",
             "anim/Animation-test.html",
@@ -57,11 +57,11 @@
             "drag/Slider-test.html",
             "widget/HSVPicker-test.html",
             "widget/Calendar-test.html",
+            "widget/Placeholder-test.html",
             "widget/Scroller-test.html"
         ]);
 
         
-
         TM.subscribe(TM.TEST_MANAGER_COMPLETE_EVENT, function testCompleted(o) {
         log("# of pages passed: " + o.pages_passed);
         log("# of pages failed: " + o.pages_failed + ": " + o.failed.join(", "));

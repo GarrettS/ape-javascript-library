@@ -138,7 +138,17 @@ window.onload = function(){
             Action.focus(first);
             Assert.areSame("first name", first.value);
         },
-    
+
+        testFocusTypeBlurFocus : function(){
+            var ph = Placeholder.getById("first");
+            Action.focus(first);
+            first.value = "c";
+            Assert.areSame("c", first.value, "value not set?"); 
+            Action.blur(first);
+            Action.focus(first);
+            Assert.areSame("c", first.value); 
+        },
+        
         testDetachEvents : function() {
             var ph = Placeholder.getById("first");
             ph.detachEvents();

@@ -2,8 +2,9 @@
     /* Requires Draggable.js */
     
     var dom = APE.dom,
-        SortList = APE.drag.SortList = APE.createFactory(SortListC),
-        Draggable = APE.drag.Draggable;
+        drag = APE.drag,
+        SortList = drag.SortList = APE.createFactory(SortListC),
+        Draggable = drag.Draggable;
 
     /** Makes an HTML List sortable by drag drop. 
      * @param {String} id the id of the LIST
@@ -84,6 +85,13 @@
                 //    2. The second node precedes the reference node.
                     return b.compareDocumentPosition(a) - 3;
             };
+        } else {
+                f = function(a, b){
+                    for(var next = a.nextSibling; next !== null;next = next.nextSibling) {
+                        if(next == b) return -1;
+                    }
+                    return 1;
+                };
         }
         node = null;
         return (sortBySourceOrder = f)(a, b);

@@ -8,6 +8,7 @@
     margin: 0;
     padding: 0;
     position: relative;
+    top: 0;
     cursor: default;
     list-style: none;
     border: 1px solid #eee;
@@ -72,15 +73,18 @@
 <script src="../../../build/drag/Draggable.js" type="text/javascript"></script>
 <script src="../../../build/drag/SortList.js" type="text/javascript"></script>
 <script type="text/javascript">
-APE.drag.SortList.getById("sortList", { 
-    proxyId : "listProxyEl",
-    dragMultiple : true,
-    selectedClassName : "drag-selected",
-    constraint : "y",
-    ondragstart : function(dragEvent) {
-        document.getElementById(this.proxyId).firstChild.firstChild.data = dragEvent.count;
-    }
-});
+window.onload = function(){
+    APE.drag.SortList.getById("sortList", { 
+        proxyId : "listProxyEl",
+        dragMultiple : true,
+        dragCopy : true,
+        selectedClassName : "drag-selected",
+        constraint : "y",
+        ondragstart : function(dragEvent) {
+            document.getElementById(this.proxyId).firstChild.firstChild.data = dragEvent.count;
+        }
+    });
+};
 </script>
 </body>
 </html>

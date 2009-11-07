@@ -21,9 +21,14 @@
 APE.namespace("APE.drag");
 
 ( function() {
-    var APE = self.APE, dom = APE.dom, getStyle = dom.getStyle, drag = APE.drag, Event = dom.Event, highestZIndex = 1000, draggableList = {}, undef, noop = Function.prototype, parseInt = self.parseInt, grabbed, FUNCTION = "function", Draggable = APE
-            .createFactory(Drag, createDraggablePrototype), DropTarget = APE
-            .createFactory(DropTargetC, createDropTargetPrototype);
+    var APE = self.APE, dom = APE.dom, getStyle = dom.getStyle, drag = APE.drag, 
+        Event = dom.Event, highestZIndex = 1000, draggableList = {}, 
+        undef, 
+        noop = Function.prototype, 
+        parseInt = self.parseInt, 
+        grabbed, FUNCTION = "function", 
+        Draggable = APE.createFactory(Drag, createDraggablePrototype), 
+        DropTarget = APE.createFactory(DropTargetC, createDropTargetPrototype);
 
     drag.Draggable = Draggable;
     drag.DropTarget = DropTarget;
@@ -55,12 +60,6 @@ APE.namespace("APE.drag");
         if (options) {
             for (p in options) {
                 this[p] = options[p];
-            }
-            constraint = options.constraint;
-            if (constraint == "y") {
-                this.moveToX = noop;
-            } else if (constraint == "x") {
-                this.moveToY = noop;
             }
             el.style.zIndex = parseInt(getStyle(el, "zIndex"), 10)
                     || highestZIndex++;
@@ -190,20 +189,12 @@ APE.namespace("APE.drag");
                     y : 0
                 } : dom.getOffsetCoords(cb, container),
                 // subtract in-flow offsets.
-                pixelCoords = dom.getPixelCoords(el);
-            
-            
-                try {
-                    dom.getOffsetCoords(el, el.parentNode)
-                } catch(ex){
-                    console.log(el.id, el.parentNode.nodeName)
-                }
-                var 
+                pixelCoords = dom.getPixelCoords(el),
                 // Due to the AVK-CSSOM Mess, offsetTop/offsetLeft are broken - DO NOT USE offset*!
                 // Instead, use getOffsetCoords(el, el.parentNode);
-                offsetFromParent = dom.getOffsetCoords(el, el.parentNode), inFlowOffsetX = offsetFromParent.x
-                    - pixelCoords.x + coords.x, inFlowOffsetY = offsetFromParent.y
-                    - pixelCoords.y + coords.y;
+                offsetFromParent = dom.getOffsetCoords(el, el.parentNode),
+                inFlowOffsetX = offsetFromParent.x - pixelCoords.x + coords.x,
+                inFlowOffsetY = offsetFromParent.y - pixelCoords.y + coords.y;
 
             // Safari Bug: if el is inside a TD, safari adds the TD's offsetLeft
             // to the
@@ -239,7 +230,7 @@ APE.namespace("APE.drag");
         }
 
         function removeGroupSelection() {
-            for ( var id in draggableList) {
+            for (var id in draggableList) {
                 select(draggableList[id], false);
             }
             hasGroupSelection = false;
@@ -278,9 +269,10 @@ APE.namespace("APE.drag");
         function dragDone(dObj, e) {
             if (dObj.activeDragClassName)
                 dom.removeClass(dObj.el, dObj.activeDragClassName);
-            if (dObj.copyEl) { // in case caller does some appending of el, etc.
+            if (dObj.dragCopy && !dObj.proxyId) { // in case caller does some appending of el, etc.
                 dObj.el.parentNode.insertBefore(dObj.copyEl, dObj.el);
             }
+            removeDynamicDispatchConstraint(dObj);
         }
 
         function setGroupSelection(dObj, hasMetaKey) {
@@ -296,6 +288,7 @@ APE.namespace("APE.drag");
             }
         }
 
+        /** @param APE.drag.Draggable */
         function assignProxy(dObj) {
             var el = dObj.el, copyEl = dObj.copyEl;
             if (!copyEl) {
@@ -325,8 +318,6 @@ APE.namespace("APE.drag");
             // and then moving copyEl *exactly* overlapping origEl causes
             // the css
             // information for selectedClassName to be lost.
-            origEl.parentNode.insertBefore(copyEl, origEl);
-            
             // 100 draggable items appear above.
             copyElStyle.zIndex = parseInt(origEl.style.zIndex, 10) + 100;
             if (dObj.origClassName)
@@ -336,11 +327,22 @@ APE.namespace("APE.drag");
             dObj.style = copyElStyle;
             var display = getStyle(origEl, "display");
             copyElStyle.display = display;
-            if (dObj.isRel) {
-                subtractInflowOffsets(copyElStyle, origEl, display);
+            if(dObj.dragCopy) {
+                origEl.parentNode.insertBefore(copyEl, origEl);
+                if (dObj.isRel) {
+                    subtractInflowOffsets(copyElStyle, origEl, display);
+                }
+            } else { // Proxy.
+                positionProxyToOrigEl(dObj, copyEl, origEl);
             }
         }
 
+        function positionProxyToOrigEl(dObj, copyEl, origEl) {
+            var coords = dom.getOffsetCoords(origEl, copyEl.parentNode);
+            dObj.moveToX(coords.x);
+            dObj.moveToY(coords.y);
+        }
+        
         // This helps prevent copyEl from displacing other elements.
         function subtractInflowOffsets(copyElStyle, origEl, display) {
             if (display == "inline") {
@@ -384,7 +386,7 @@ APE.namespace("APE.drag");
         function dragStart(dObj, ev) {
             if (dObj.isBeingDragged)
                 return;
-            if (dObj.dragCopy) {
+            if (dObj.dragCopy && !dObj.proxyId) {
                 // dObj.el assigned to copyEl, dObj.origEl
                 // stays put.
                 assignClone(dObj);
@@ -429,6 +431,7 @@ APE.namespace("APE.drag");
 
             e = getPointerEvent(e, "touches");
             var target = Event.getTarget(evOrig), 
+                id,
                 instances = Draggable.instances, 
                 dOTarg, testNode = target, 
                 metaKey = e.metaKey || e.ctrlKey;
@@ -437,7 +440,6 @@ APE.namespace("APE.drag");
                 dOTarg = instances[testNode.id];
                 testNode = dom.findAncestorWithAttribute(testNode, "id");
             }
-
             if (dOTarg) { // found. 
                 if (!dOTarg.isDragEnabled) {
 
@@ -500,13 +502,12 @@ APE.namespace("APE.drag");
             // if(metaKey) { }
 
             // Sets up dropTargets that have dragOverClassName | ondragover
-
-            if(dragObjGrabbed(e, dOTarg) == false) return true;
+            if(dragObjGrabbed(e, dOTarg) == false) return;
 
             dO = dOTarg;
             preventDefault(evOrig);
 
-            for (var id in draggableList) {
+            for (id in draggableList) {
                 dragObjGrabbed(e, draggableList[id]);
             }
             return target.tagName !== "IMG"; // Mozilla will prevent focus
@@ -551,6 +552,11 @@ APE.namespace("APE.drag");
 
             var eventCoords = getEventCoords(e), elementPixelCoords;
 
+            if(dObj.proxyId && !dObj.dragCopy) {
+                assignProxy(dObj);
+            }
+
+            setDynamicDispatchConstraint(dObj);
             mousedownX = eventCoords.x;
             mousedownY = eventCoords.y;
 
@@ -560,6 +566,21 @@ APE.namespace("APE.drag");
             dObj.origY = dObj.grabY = elementPixelCoords.y;
 
             dObj.isBeingDragged = false;
+        }
+
+        // For constraint.
+        function setDynamicDispatchConstraint(dObj) {
+            var constraint = dObj.constraint;
+            if (constraint == "y") {
+                dObj.moveToX = noop;
+            } else if (constraint == "x") {
+                dObj.moveToY = noop;
+            }
+        }
+        
+        function removeDynamicDispatchConstraint(dObj) {
+            delete dObj.moveToX;
+            delete dObj.moveToY;
         }
 
         function mouseMove(e) {
@@ -579,9 +600,14 @@ APE.namespace("APE.drag");
                     return;
                 preventDefault(evOrig);
             }
-            var eventCoords = getEventCoords(e), ePageX = eventCoords.x, ePageY = eventCoords.y, distX = ePageX
-                    - mousedownX, distY = ePageY - mousedownY, isDragStopped = false, newX = dO.origX
-                    + distX, newY = dO.origY + distY, id;
+            var eventCoords = getEventCoords(e), 
+                ePageX = eventCoords.x, 
+                ePageY = eventCoords.y, 
+                distX = ePageX - mousedownX, 
+                distY = ePageY - mousedownY, 
+                isDragStopped = false, 
+                newX = dO.origX + distX, 
+                newY = dO.origY + distY, id;
             // document.title=([eventCoords.x, eventCoords.y])
             // Initiate dragging.
 
@@ -594,7 +620,7 @@ APE.namespace("APE.drag");
                 // is not part of selection.
                 delete draggableList[dO.id];
                 dragStart(dO, e);
-                if (dO.proxyId) {
+                if (dO.proxyId && dO.dragCopy) {
                     assignProxy(dO);
                 }
 
@@ -685,7 +711,7 @@ APE.namespace("APE.drag");
                     if (hasOnDrag)
                         dO.ondrag(e);
                 }
-            } else { // In container.
+            } else { // Container boundaries irrelevant.
                 dO.isAtLeft = dO.isAtRight = dO.isAtTop = dO.isAtBottom = false;
                 dO.moveToX(newX);
                 dO.moveToY(newY);
@@ -742,16 +768,14 @@ APE.namespace("APE.drag");
                 }
             }
             if (hasBeenDragged) {
-                var preventDragEnd = false == dO.ondragend( {
+                dO.ondragend( {
                     domEvent : e,
                     draggableList : eventDraggableList
                 });
 
-                if (!preventDragEnd) {
-                    dragDone(dO, e);
-                    for (id in draggableList) {
-                        dragDone(draggableList[id], e);
-                    }
+                dragDone(dO, e);
+                for (id in draggableList) {
+                    dragDone(draggableList[id], e);
                 }
             }
             // finally.
@@ -811,7 +835,8 @@ APE.namespace("APE.drag");
 
         /** fires ondrop for each dropTarget */
         function handleDrops(ev) {
-            var targets = dO.dropTargets, dropTarget, coords, len = targets.length, i, id, o;
+            var targets = dO.dropTargets, dropTarget, coords, 
+                len = targets.length, i, id, o;
             if (len > 0) {
                 coords = getEventCoords(ev);
                 for (i = 0; i < len; i++) {
@@ -1014,12 +1039,13 @@ APE.namespace("APE.drag");
                 this.grabY = grabCoords.y;
 
                 // Get the container's offset.
-                var eventCoords = getEventCoords(e), handle = this.handle, offsetCoords = dom
-                        .getOffsetCoords(dom.getContainingBlock(this.el)), offsetX = eventCoords.x
-                        - offsetCoords.x, newX = offsetX
-                        - (0 | handle.offsetWidth / 2), offsetY = eventCoords.y
-                        - offsetCoords.y, newY = (offsetY - (0 | handle.offsetHeight / 2)), handleOffsetCoords = dom
-                        .getOffsetCoords(handle, this.el);
+                var eventCoords = getEventCoords(e), handle = this.handle, 
+                    offsetCoords = dom.getOffsetCoords(dom.getContainingBlock(this.el)), 
+                    offsetX = eventCoords.x - offsetCoords.x, 
+                    newX = offsetX - (0 | handle.offsetWidth / 2), 
+                    offsetY = eventCoords.y - offsetCoords.y, 
+                    newY = (offsetY - (0 | handle.offsetHeight / 2)), 
+                    handleOffsetCoords = dom .getOffsetCoords(handle, this.el);
 
                 if (this.keepInContainer) {
                     newX = Math.max(newX, 0);
@@ -1039,12 +1065,12 @@ APE.namespace("APE.drag");
 
             /**
              * releases the draggable.
-             * @param {Event} [e] the event that triggered release
+             * @param {Event} [ev] the event that triggered release
              */
-            release : function(e) {
-                dragObjReleased(e, this);
+            release : function(ev) {
+                dragObjReleased(ev, this);
                 if (typeof this.onrelease == FUNCTION)
-                    this.onrelease(e);
+                    this.onrelease(ev);
                 // Put back into selection.
                 if (this.dragMultiple) {
                     draggableList[this.id] = this;

@@ -11,7 +11,6 @@ APE.namespace("APE.dom");
         getViewportDimensions : getViewportDimensions
     });
 
-
     var DOCUMENT_ELEMENT = "documentElement", 
         IS_BODY_ACTING_ROOT = document[DOCUMENT_ELEMENT].clientWidth === 0;
 
@@ -21,7 +20,7 @@ APE.namespace("APE.dom");
      * @return an object with <code>width</code> and <code>height</code>.
      * This will exhibit a bug in Mozilla, which is often 5-7 pixels off.
      */
-    function getScrollOffsets(win) {
+     function getScrollOffsets(win) {
         win = win || window;
         var f, r;
         if("pageXOffset"in win)
