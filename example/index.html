@@ -27,6 +27,7 @@
         <ul>
             <li class="d"><a href="widget/calendar">widget/calendar</a></li>
             <li class="d"><a href="widget/Scroller">widget/Scroller</a></li>
+            <li class="d"><a href="widget/Placeholder">widget/Placeholder</a></li>
             <li class="d"><a href="widget/HSVPicker">widget/HSVPicker</a></li>
         </ul>
     </li>

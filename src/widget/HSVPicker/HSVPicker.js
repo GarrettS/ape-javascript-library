@@ -218,7 +218,7 @@ APE.namespace("APE.widget");
                 el = document.getElementById(this.id),
                 checkbox = document.getElementById(this.id + "-transparent-checkbox"),
                 previewEl = document.getElementById(this.id + "-color-preview"),
-                rgb, hsv, isInpubValid;
+                rgb, hsv;
     		if(hexOrRGB == TRANSPARENT) {
                 APE.dom.addClass(el, "ape-hsv-transparent");
     			previewEl.style.backgroundColor = TRANSPARENT;

@@ -24,7 +24,7 @@ body {
 }
 
 /** Rather than use clip, we must use a clip layer 
- * to accomodate IE6's special needs for AlphaImageLoader
+ * to acommodate IE's special needs for AlphaImageLoaders
  */
 .ape-hsv-saturation-value-frame-container {
 	position: relative;
@@ -130,6 +130,7 @@ body {
 	top: 6px;
 	left: 6px;
 	overflow: hidden;
+	zoom: 1;
 }
 
 .ape-hsv-transparent-sv {

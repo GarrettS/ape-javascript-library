@@ -20,9 +20,10 @@
 
 APE.namespace("APE.drag");
 
-( function() {
+(function() {
     var APE = self.APE, dom = APE.dom, getStyle = dom.getStyle, drag = APE.drag, 
-        Event = dom.Event, highestZIndex = 1000, draggableList = {}, 
+        Event = dom.Event, highestZIndex = 1000, 
+        draggableList = {}, 
         undef, 
         noop = Function.prototype, 
         parseInt = self.parseInt, 
@@ -42,7 +43,7 @@ APE.namespace("APE.drag");
      */
     function Drag(id, options) {
         var d = document, // not cross-frame.
-        el = d.getElementById(id), constraint, c, p;
+        el = d.getElementById(id), c, p;
         this.id = id;
         this.el = this.origEl = el;
         this.style = el.style;
@@ -87,25 +88,43 @@ APE.namespace("APE.drag");
     function createDraggablePrototype() {
 
         // Static initializer code.
-        var d = document, EventPublisher = APE.EventPublisher, addCallback = EventPublisher.add, preventDefault = Event.preventDefault, DOC_EL = "documentElement", ds = d[DOC_EL].style, serSelect = "serSelect", mus = "MozU"
-                + serSelect, kus = "MozU" + serSelect, us = "u" + serSelect, userSelectType = mus in ds ? mus
-                : kus in ds ? kus : us in ds ? us : "", PIXEL_PX = "px", LSTYLE = "left", TSTYLE = "top", keepUserSelection = false, mousedownX = 0, mousedownY = 0,
+        var d = document, 
+            EventPublisher = APE.EventPublisher, 
+            addCallback = EventPublisher.add, 
+            preventDefault = Event.preventDefault, 
+            DOC_EL = "documentElement", 
+            ds = d[DOC_EL].style, 
+            serSelect = "serSelect", 
+            mus = "MozU" + serSelect, 
+            kus = "MozU" + serSelect, 
+            us = "u" + serSelect, 
+            userSelectType = mus in ds ? mus : kus in ds ? kus : us in ds ? us : "", 
+            PIXEL_PX = "px", 
+            LSTYLE = "left", 
+            TSTYLE = "top", 
+            keepUserSelection = false, 
+            mousedownX = 0, 
+            mousedownY = 0,
 
-        /* The active drag object, possibly null */
-        dO,
-
-        /* For the active dragObj, dragOverTargets
-         * is either boolean "false" or
-         * an array of DropTarget that has one of: 
-         * - an ondragover or ondragout handler
-         * - a hoverClassName
-         */
-        dragOverTargets = false, hasGroupSelection = false, isProxyDrag = false,
-        /* Keep CPUs to a minimum. */
-        MOUSE_MOVE_THRESHOLD = 25,
-
-        lastMouseMoveTime = -1, EV_DRAG_START = "onmousedown", EV_DRAG = "onmousemove", EV_DRAG_END = "onmouseup", IS_TOUCH_EVENT, docMouseDown;
-        getEventCoords = Event.getCoords;
+            /* The active drag object, possibly null */
+            dO,
+    
+            /* For the active dragObj, dragOverTargets
+             * is either boolean "false" or
+             * an array of DropTarget that has one of: 
+             * - an ondragover or ondragout handler
+             * - a hoverClassName
+             */
+            dragOverTargets = false, hasGroupSelection = false, isProxyDrag = false,
+            /* Keep CPUs to a minimum. */
+            MOUSE_MOVE_THRESHOLD = 25,
+    
+            lastMouseMoveTime = -1, 
+            EV_DRAG_START = "onmousedown", 
+            EV_DRAG = "onmousemove", 
+            EV_DRAG_END = "onmouseup", 
+            IS_TOUCH_EVENT, docMouseDown,
+            getEventCoords = Event.getCoords;
 
         if ('ontouchstart' in d) {
             IS_TOUCH_EVENT = true;
@@ -242,7 +261,7 @@ APE.namespace("APE.drag");
          * @param {Event} e the event that triggered the release. This gets passed back to ondragout.
          * @param {Draggable} the draggable object that was released.
          */
-        function dragObjReleased(e, dObj) {
+        function dragObjReleased(dObj, e) {
             animateBack(dObj);
 
             var removeClass = dom.removeClass, dt, i, j, id;
@@ -266,15 +285,43 @@ APE.namespace("APE.drag");
             }
         }
 
-        function dragDone(dObj, e) {
+        function dragDone(dObj, ev) {
             if (dObj.activeDragClassName)
                 dom.removeClass(dObj.el, dObj.activeDragClassName);
-            if (dObj.dragCopy && !dObj.proxyId) { // in case caller does some appending of el, etc.
-                dObj.el.parentNode.insertBefore(dObj.copyEl, dObj.el);
+            removeConstraint(dObj);
+            if (dObj.copyEl)
+                retireClone(dObj);
+            if (dObj === dO) {
+                if(ev.type === "mouseup") {
+                    handleDrops(ev);
+                }
+                mainDragObjectEnd(ev);
             }
-            removeDynamicDispatchConstraint(dObj);
+            keepUserSelection = false;
+            dObj.hasBeenDragged = false;
         }
 
+        function mainDragObjectEnd(ev){
+            if (dO.hasBeenDragged) {
+                if(dO.dragMultiple) {
+                    // Add back to selection for event, 
+                    // but also for next mouseDown.
+                    draggableList[dO.id] = dO;
+                }
+                else {
+                    draggableList = {};
+                }
+                // ondragend won't fire on "glideend".
+                if(ev && ev.type) {
+                    dO.ondragend( {
+                        domEvent : ev,
+                        draggableList : draggableList
+                    });
+                }
+            }
+            dO = null;
+        }
+        
         function setGroupSelection(dObj, hasMetaKey) {
             if (hasMetaKey) {
                 if (dObj.id in draggableList) { // selected.
@@ -290,7 +337,8 @@ APE.namespace("APE.drag");
 
         /** @param APE.drag.Draggable */
         function assignProxy(dObj) {
-            var el = dObj.el, copyEl = dObj.copyEl;
+            var el = dObj.el, 
+                copyEl = dObj.copyEl;
             if (!copyEl) {
                 copyEl = dObj.copyEl = document.getElementById(dObj.proxyId);
             }
@@ -359,7 +407,7 @@ APE.namespace("APE.drag");
         function retireClone(dObj) {
 
             dObj.el = dObj.origEl;
-            dObj.style = dObj.origEl.style;
+            dObj.style = dObj.el.style;
 
             // Update position of origEl, which was left behind.
             dObj.moveToX(dObj.x);
@@ -367,6 +415,9 @@ APE.namespace("APE.drag");
             dObj.copyEl.style.display = "none";
             if (dObj.origClassName)
                 dom.removeClass(dObj.el, dObj.origClassName);
+            if (dObj.dragCopy && !dObj.proxyId) { // in case caller does some appending of el, etc.
+                dObj.el.parentNode.insertBefore(dObj.copyEl, dObj.el);
+            }
         }
 
         /* called on mousemove */
@@ -578,7 +629,7 @@ APE.namespace("APE.drag");
             }
         }
         
-        function removeDynamicDispatchConstraint(dObj) {
+        function removeConstraint(dObj) {
             delete dObj.moveToX;
             delete dObj.moveToY;
         }
@@ -730,25 +781,18 @@ APE.namespace("APE.drag");
             grabbed = false;
             if (!dO)
                 return;
-            var hasBeenDragged = dO.hasBeenDragged, isRandomMouseMoveEvent = (dO.isBeingDragged && !hasBeenDragged), eventDraggableList = {}, id, o, x, y;
+            var hasBeenDragged = dO.hasBeenDragged, 
+                isRandomMouseMoveEvent = (dO.isBeingDragged && !hasBeenDragged), 
+                id, o, x, y;
             if (!dO.hasBeenDragged && !isRandomMouseMoveEvent) {
                 if (!keepUserSelection) {
                     dO = null;
                 }
                 return;
             }
-            keepUserSelection = false;
 
-            draggableList[dO.id] = dO;
-            for (id in draggableList) {
-                o = draggableList[id];
-                o = eventDraggableList[id] = draggableList[id];
-                if (o.copyEl)
-                    retireClone(o);
-            }
             // if it's been dragged onto a dropTarget, fire that event.
             e = getPointerEvent(e, "changedTouches");
-            handleDrops(e);
 
             if (hasGroupSelection && !isProxyDrag) {
                 for (id in draggableList) {
@@ -767,22 +811,10 @@ APE.namespace("APE.drag");
                     // a related dragObjects collection is provided.
                 }
             }
-            if (hasBeenDragged) {
-                dO.ondragend( {
-                    domEvent : e,
-                    draggableList : eventDraggableList
-                });
-
-                dragDone(dO, e);
-                for (id in draggableList) {
-                    dragDone(draggableList[id], e);
-                }
+            for (id in draggableList) {
+                dragDone(draggableList[id], e);
             }
-            // finally.
-            dO.hasBeenDragged = false;
-            // Add back to selection.
-            draggableList[dO.id] = dO;
-            dO = null;
+            dragDone(dO, e);
         }
 
         /** 
@@ -791,11 +823,10 @@ APE.namespace("APE.drag");
          * draggables are released.
          */
         function dragCancel(e) {
+            if(!dO) return;
             e = e || event;
             if (e.keyCode == 27 || e.type === "touchcancel") { // esc key = 27.
-                if (dO) {
-                    dO.release(e);
-                }
+                dO.release(e);
             }
         }
 
@@ -832,7 +863,7 @@ APE.namespace("APE.drag");
                 }
             }
         }
-
+        
         /** fires ondrop for each dropTarget */
         function handleDrops(ev) {
             var targets = dO.dropTargets, dropTarget, coords, 
@@ -892,8 +923,9 @@ APE.namespace("APE.drag");
         }
 
         function glide(rationalValue) {
-            var dObj = this.dObj, dx = dObj.startX - dObj.grabX, dy = dObj.startY
-                    - dObj.grabY;
+            var dObj = this.dObj, 
+                dx = dObj.startX - dObj.grabX, 
+                dy = dObj.startY - dObj.grabY;
 
             rationalValue = Math.pow(rationalValue, 3); // accel.
             dObj.moveToX(dObj.startX - (dx * rationalValue));
@@ -918,7 +950,8 @@ APE.namespace("APE.drag");
 
         /** Starts gliding the draggable back to its original x,y coords. */
         function animateBack(dObj) {
-            if (APE.anim && dObj.useAnim) {
+            
+            if(APE.anim && dObj.useAnim) {
                 glideStart(dObj);
             } else {
                 dObj.moveToX(dObj.grabX);
@@ -1068,17 +1101,9 @@ APE.namespace("APE.drag");
              * @param {Event} [ev] the event that triggered release
              */
             release : function(ev) {
-                dragObjReleased(ev, this);
+                dragObjReleased(this, ev);
                 if (typeof this.onrelease == FUNCTION)
                     this.onrelease(ev);
-                // Put back into selection.
-                if (this.dragMultiple) {
-                    draggableList[this.id] = this;
-                }
-                if (this === dO) {
-                    dO.hasBeenDragged = false;
-                    dO = null;
-                }
             },
 
             moveToX : function(x) {

@@ -2,67 +2,67 @@
 "http://www.w3.org/TR/html4/strict.dtd">
 <html lang="en">
 <head>
-	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" >
+    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" >
     <meta name="viewport" content="height=470;width=800;user-scalable=no">
-	<title>drag demo</title>
-	<style type="text/css" media="Screen">
+    <title>drag demo</title>
+    <style type="text/css" media="Screen">
 
 html { height: 100%; }
 
 body {
-	margin: 0;
-	padding: 0;
-	height: 100%;
-	background: #5f667f;
- 	position: relative;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background: #5f667f;
+     position: relative;
 }
 
 .label {
-	position: absolute;
+    position: absolute;
     width: auto;
     min-width: 150%;
-	bottom: -1.4em;
-	margin: auto;
-	display: block;
-	font-size: 9px;
- 	margin-left: -25%;
-	white-space: nowrap;
-	border-radius: 6px;
-	-moz-border-radius: 6px;
-	-webkit-border-radius: 6px;
+    bottom: -1.4em;
+    margin: auto;
+    display: block;
+    font-size: 9px;
+     margin-left: -25%;
+    white-space: nowrap;
+    border-radius: 6px;
+    -moz-border-radius: 6px;
+    -webkit-border-radius: 6px;
     background-color: #fff;
 }
 
 .folder-style {
-	position: absolute;
-	text-align: center;
- 	height: 48px;
- 	width: 53px;
-	background: url(f_yellow.png) no-repeat center center;
-	font: caption;
-	color: #222;
-	cursor: default;
-	top: 20px;
-	left: 14px;
-	border-radius: 10px;
-	-moz-border-radius: 10px;
-	-webkit-border-radius: 10px;
+    position: absolute;
+    text-align: center;
+     height: 48px;
+     width: 53px;
+    background: url(f_yellow.png) no-repeat center center;
+    font: caption;
+    color: #222;
+    cursor: default;
+    top: 20px;
+    left: 14px;
+    border-radius: 10px;
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
 }
 
 .cool-folder {
-	background-image: url(f_blue.png);
+    background-image: url(f_blue.png);
 }
 
 .mood-folder {
-	background-image: url(f_purple.png);
+    background-image: url(f_purple.png);
 }
 
 .interest-folder {
-	background-image: url(f_green.png);
+    background-image: url(f_green.png);
 }
 
 * > html  .folder-style { /* for  mac  ie */
-	width: 70px;
+    width: 70px;
 }
 
 /** 
@@ -70,90 +70,90 @@ body {
  * Opera 9, Firefox, and Webkit all support :active, so this is purely a workaround for IE7
  */
 .folder-style-active-drag {
-	background: #ffb;
-	color: #000;
-	border-color: #dcb;
-	opacity: .85;
-	filter: alpha(opacity=85);
+    background: #ffb;
+    color: #000;
+    border-color: #dcb;
+    opacity: .85;
+    filter: alpha(opacity=85);
 }
 
 .folder-focus  {
-	border: 1px solid #bbd0e6;
+    border: 1px solid #bbd0e6;
 }
 
 .folder-focus .label {
-	background: #fff;
-	color: #123;
-	border: 1px outset #bbd0e6;
+    background: #fff;
+    color: #123;
+    border: 1px outset #bbd0e6;
 }
 
 .folder-selected {
-	border: 0;
-	background-color: #bbd0e6;
+    border: 0;
+    background-color: #bbd0e6;
 }
 
 .folder-drag {
-	background-color: #D0E3F6;
-	opacity: .8;
+    background-color: #D0E3F6;
+    opacity: .8;
 }
 
 
 .trash-style {
-	position: absolute;
-	left: 40px;
-	height: 82px;
-	width: 82px;
-	bottom: 0;
-	font: caption;
-	text-align: center;
-	cursor: default;
-	/** Icon courtesy of http://proenca.deviantart.com/ */
-	background: url(trash-empty.png) no-repeat 1px 1px;
+    position: absolute;
+    left: 40px;
+    height: 82px;
+    width: 82px;
+    bottom: 0;
+    font: caption;
+    text-align: center;
+    cursor: default;
+    /** Icon courtesy of http://proenca.deviantart.com/ */
+    background: url(trash-empty.png) no-repeat 1px 1px;
 }
 
 * > html  .trash-style { /* for  mac  ie */
-	width: 36px;
+    width: 36px;
 }
 
 .trash-full {
-	border-color: #222;
-	/** Icon courtesy of http://proenca.deviantart.com/ */
-	background: transparent url(trash.png) no-repeat !important;
+    border-color: #222;
+    /** Icon courtesy of http://proenca.deviantart.com/ */
+    background: transparent url(trash.png) no-repeat !important;
 }
 
 .icon-drop-target-over {
-	border: 1px dotted #116;
-	background-position: 0 0;
+    border: 1px dotted #116;
+    background-position: 0 0;
 }
 
 #desktop {
-	position: relative;
-	top: 10px;
-	left: 40px; 
-	width: 400px;
-	height: 400px;
-	background: #fff;
-	padding: 10px;
+    position: relative;
+    top: 10px;
+    left: 40px; 
+    width: 400px;
+    height: 400px;
+    background: #fff;
+    padding: 10px;
 
-	/** This border will cause calculation problems in Opera.
+    /** This border will cause calculation problems in Opera.
     Opera includes parentNode's border-width in offsetLeft/Top */
-	border: 12px solid #4f5c71;
-	border-radius: 12px;
-	-moz-border-radius: 12px;
-	-webkit-border-radius: 12px;
+    border: 12px solid #4f5c71;
+    border-radius: 12px;
+    -moz-border-radius: 12px;
+    -webkit-border-radius: 12px;
 }
 
 #sticky {
-	font-size: 10px;
-	position: absolute;
-	left: 500px;
-	top: 20px;
-	background-color: #f3f3f3;
-	padding: 4px;
-	border: 1px solid #4f5c71;
-	border-radius: 3px;
-	-moz-border-radius: 3px;
-	-webkit-border-radius: 3px;
+    font-size: 10px;
+    position: absolute;
+    left: 500px;
+    top: 20px;
+    background-color: #f3f3f3;
+    padding: 4px;
+    border: 1px solid #4f5c71;
+    border-radius: 3px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
 }
 #sticky:hover {
     border-color: #6f7799;
@@ -192,22 +192,22 @@ window.onload = function() {
     trashEl.style.top= trashEl.offsetTop + "px";
     trashEl.style.left= trashEl.offsetLeft+ "px";
     
-	var trashDropTarget = APE.drag.DropTarget.getByNode(trashEl);
+    var trashDropTarget = APE.drag.DropTarget.getByNode(trashEl);
     
-	trashDropTarget.dragOverClassName = "icon-drop-target-over";
-	
-	// event handlers for trash :ondrop, ondragover, ondragout. 
-	// When an object is dropped here and that object has trash as a dropTarget, the trash is notified.
-	trashDropTarget.ondrop = trashReceivedDrop;
+    trashDropTarget.dragOverClassName = "icon-drop-target-over";
+    
+    // event handlers for trash :ondrop, ondragover, ondragout. 
+    // When an object is dropped here and that object has trash as a dropTarget, the trash is notified.
+    trashDropTarget.ondrop = trashReceivedDrop;
 
-	function trashReceivedDrop(dropEvent) {
-		APE.dom.addClass(this.el, "trash-full");
+    function trashReceivedDrop(dropEvent) {
+        APE.dom.addClass(this.el, "trash-full");
         //console.log(dropEvent);
-		dropEvent.dragObj.el.style.display = "none";
-	};
+        dropEvent.dragObj.el.style.display = "none";
+    };
 
 //-----------------------------------------------------------------------------
-	
+    
 
 /** These are the "folders" within the desktop. 
  * Each instance has-a dragObj, so it's draggable.
@@ -219,17 +219,17 @@ window.onload = function() {
  */
     var Draggable = APE.drag.Draggable,
         dragConfig = {
-      		keepInContainer : true, 
-     		dragCopy : true,
-     		dragMultiple : true,
-     		    		
-    		// Event handlers for onfocus, ondragstart,onblur et c.
-     		activeDragClassName : "folder-drag",
-     		focusClassName : "folder-focus",
-     		selectedClassName : "folder-selected"
+              keepInContainer : true, 
+             dragCopy : true,
+             dragMultiple : true,
+                         
+            // Event handlers for onfocus, ondragstart,onblur et c.
+             activeDragClassName : "folder-drag",
+             focusClassName : "folder-focus",
+             selectedClassName : "folder-selected"
     };
-	// Let's instantiate some Directories.
-	var folderIds = [ "UntitledFolder", "UntitledFolder2",  "MusicFolder", 
+    // Let's instantiate some Directories.
+    var folderIds = [ "UntitledFolder", "UntitledFolder2",  "MusicFolder", 
                     "PicturesFolder", "MP3Folder", "trash"];
     
     for(var i = 0; i < folderIds.length; i++) {
@@ -251,41 +251,41 @@ window.onload = function() {
     function desktopToggleClickHandler(){ 
         desktop.isDragEnabled = !desktop.isDragEnabled;
     }
-	
+    
     var sticky = Draggable.getById("sticky");
-    sticky.keepInContainer = true;	
+    sticky.keepInContainer = true;    
 };
 </script>
 </head>
 <body>
-	<pre id="sticky">
+    <pre id="sticky">
 ctrl + click.....select/deselect multiple objects
 Mac: cmd + click.....select/deselect multiple objects
 esc..............cancel dragging
 </pre>
-	
+    
 <div id="desktop" tabindex="0">
 
-	<div id='MusicFolder' class="folder-style mood-folder" tabindex="1">
-		<span class='label'>Music</span>
-	</div>
+    <div id='MusicFolder' class="folder-style mood-folder" tabindex="1">
+        <span class='label'>Music</span>
+    </div>
 
-	<div id='PicturesFolder' class="folder-style cool-folder" style="left: 100px;" tabindex="2">
-		<span class='label'>Pictures</span>
-	</div>
+    <div id='PicturesFolder' class="folder-style cool-folder" style="left: 100px;" tabindex="2">
+        <span class='label'>Pictures</span>
+    </div>
 
 
-	<div id='UntitledFolder' class="folder-style" style="top: 90px;" tabindex="3">
-		<span class='label'>Something Boring</span>
-	</div>
+    <div id='UntitledFolder' class="folder-style" style="top: 90px;" tabindex="3">
+        <span class='label'>Something Boring</span>
+    </div>
 
-	<div id='UntitledFolder2' class="folder-style interest-folder" style="left: 100px; top: 90px;" tabindex="4">
-		<span class='label'>Documents</span>
-	</div>
+    <div id='UntitledFolder2' class="folder-style interest-folder" style="left: 100px; top: 90px;" tabindex="4">
+        <span class='label'>Documents</span>
+    </div>
 
-	<div id='MP3Folder' class="folder-style interest-folder" style="left: 190px; top: 90px;" tabindex="5">
-		<span class='label'>MP3</span>
-	</div>
+    <div id='MP3Folder' class="folder-style interest-folder" style="left: 190px; top: 90px;" tabindex="5">
+        <span class='label'>MP3</span>
+    </div>
 <div id='trash' class="trash-style" tabindex="6"></div>
 </div>
 <form action="">
@@ -294,7 +294,7 @@ esc..............cancel dragging
 </div>
 </form>
 <p style='position: absolute; bottom: 12px; background: #fff;font: 10px arial, sans-serif;'>
-	Trash icons courtesy of <a href="http://proenca.deviantart.com/">Proenca</a>.
+    Trash icons courtesy of <a href="http://proenca.deviantart.com/">Proenca</a>.
 </p>
 
 <script src="../../../build/ape-ep-dom.js" type="text/javascript"></script>

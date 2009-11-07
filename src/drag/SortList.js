@@ -35,16 +35,18 @@
             coords = dom.Event.getCoords(dragEvent.domEvent),
             draggableList = dragEvent.draggableList,
             sortList = el.parentNode,
-            id, dt, i, insertItems = [];
+            id, dt, i, insertItems = [], c = 0;
         
         dom.addClass(sortList, "hiddenSelection");
         dt = getElementFromY(sortList, draggableList, coords.y);
         for(id in draggableList) {
             el = draggableList[id].el;
             el.style.top = "";
-            insertItems[insertItems.length] = el;
+            insertItems[c++] = el;
         }
-        insertItems.sort(sortBySourceOrder);
+        if(c > 1) {
+            insertItems.sort(sortBySourceOrder);
+        }
         for(i = 0; i < insertItems.length; i++) {
             sortList.insertBefore(insertItems[i], dt);
         }

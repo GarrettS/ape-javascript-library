@@ -63,11 +63,6 @@ APE.namespace("APE.widget");
         }
     };
 
-    // Save the real value.
-    function inpChanged(){
-        inpValue[this.id] = this.value;
-    }
-
     /* sets placeholderText and manages state in inpValue */
     function showPlaceholderText(inp) {
         inpValue[inp.id] = inp.value;

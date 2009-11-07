@@ -313,13 +313,13 @@ var draggableMouseTestCase = new YAHOO.tool.TestCase({
 
         Action.mousemove( document, {clientX:101} );
         this.wait(function(){
-	        Action.mousemove( document, {clientX:101} );
-	
-	        Assert.areEqual(left, testNode.style.left);
-	        Assert.areEqual(top, testNode.style.top);
-	        StringAssert.doesNotContain( aClass, testNode.className );        
-	        StringAssert.contains( aClass, d.el.className );        
-	        Action.mouseup(document);
+            Action.mousemove( document, {clientX:101} );
+    
+            Assert.areEqual(left, testNode.style.left);
+            Assert.areEqual(top, testNode.style.top);
+            StringAssert.doesNotContain( aClass, testNode.className );        
+            StringAssert.contains( aClass, d.el.className );        
+            Action.mouseup(document);
         }, 78);
     },
 
@@ -349,13 +349,13 @@ var draggableMouseTestCase = new YAHOO.tool.TestCase({
     testYuiTestMouseMove : function(){
         var expected = 10,
         actual;
-	    function cb(ev){
-	        ev = ev||event;
-	        actual = ev.pageX;
-	    }
-	    document.onmousemove = cb;
-	    Action.mousemove(document, {clientX: expected});
-	    Assert.areEqual(expected, actual, "pageX issue.");
+        function cb(ev){
+            ev = ev||event;
+            actual = ev.pageX;
+        }
+        document.onmousemove = cb;
+        Action.mousemove(document, {clientX: expected});
+        Assert.areEqual(expected, actual, "pageX issue.");
     },
     
     testConstraintHorz : function() {
@@ -374,11 +374,11 @@ var draggableMouseTestCase = new YAHOO.tool.TestCase({
             Action.mousemove( document, moveToCoords );
             this.wait(function(){
                 Action.mousemove( document, moveToCoords );
-	            var coords2 = dom.getOffsetCoords( testNode );
-	            Assert.areEqual( 83, coords2.x, "x wrong" );
-	            Assert.areEqual( coords.y, coords2.y, 
-	                    "y pos should not have changed." );
-	        }, 78);
+                var coords2 = dom.getOffsetCoords( testNode );
+                Assert.areEqual( 83, coords2.x, "x wrong" );
+                Assert.areEqual( coords.y, coords2.y, 
+                        "y pos should not have changed." );
+            }, 78);
         }, 110);
     },
 
@@ -395,13 +395,13 @@ var draggableMouseTestCase = new YAHOO.tool.TestCase({
         
         Action.mousemove( document, {clientX:1, clientY:1} );
         this.wait(function() {
-	        Action.mousemove( document, {clientX:221, clientY:111} );
+            Action.mousemove( document, {clientX:221, clientY:111} );
 
-	        var coords2 = dom.getOffsetCoords( testNode );
-	    
-	        Assert.areEqual( 111, coords2.y, "y coords wrong" );
-	        Assert.areEqual( coords.x, coords2.x, "x pos should not have changed." );
-	    }, 78);
+            var coords2 = dom.getOffsetCoords( testNode );
+        
+            Assert.areEqual( 111, coords2.y, "y coords wrong" );
+            Assert.areEqual( coords.x, coords2.x, "x pos should not have changed." );
+        }, 78);
     },
 
     testSetHandle : function() {
@@ -431,10 +431,10 @@ var draggableMouseTestCase = new YAHOO.tool.TestCase({
         var coords = {clientX: 33, clientY: 55};
         Action.mousemove(document, coords);
         this.wait(function(){
-	        Action.mousemove( document, coords);
-	
-	        Assert.areEqual( 33, parseInt(testNode.style.left), "left was wrong");
-	        Assert.areEqual( 55, parseInt(testNode.style.top), "top was wrong");
+            Action.mousemove( document, coords);
+    
+            Assert.areEqual( 33, parseInt(testNode.style.left), "left was wrong");
+            Assert.areEqual( 55, parseInt(testNode.style.top), "top was wrong");
         }, 40);
     },
 
@@ -688,7 +688,6 @@ var draggableMouseTestCase = new YAHOO.tool.TestCase({
             glidended = true;
         };
 
-
         Action.mousedown( testNode );
 
         Action.mouseup( document );
@@ -701,18 +700,18 @@ var draggableMouseTestCase = new YAHOO.tool.TestCase({
         this.wait(function(){
             Action.mousemove( document, coords);
                         
-	        Assert.areEqual("10px", testNode.style.left);
-	        Assert.areEqual("20px", testNode2.style.top);
-	
-	        StringAssert.contains("DOC", dt.el.className);
-	        Action.keydown( document, {keyCode:ESC} );
-	
-	        this.wait(function(){
-	            Assert.areEqual("0px", testNode.style.left);
-	            Assert.areEqual("-20px", testNode2.style.top);
-	            Assert.isTrue(glidended, "d did not fire onglideend");
-	            StringAssert.doesNotContain("DOC", dt.el.className);
-	        }, 20);
+            Assert.areEqual("10px", testNode.style.left);
+            Assert.areEqual("20px", testNode2.style.top);
+    
+            StringAssert.contains("DOC", dt.el.className);
+            Action.keydown( document, {keyCode:ESC} );
+    
+            this.wait(function(){
+                Assert.areEqual("0px", testNode.style.left);
+                Assert.areEqual("-20px", testNode2.style.top);
+                Assert.isTrue(glidended, "d did not fire onglideend");
+                StringAssert.doesNotContain("DOC", dt.el.className);
+            }, 20);
         }, 78);
     },
 
@@ -927,8 +926,8 @@ var draggableMouseTestCase = new YAHOO.tool.TestCase({
 
     testReleaseOverDropTarget : function() {
         var d = Draggable.getByNode( testNode ),
-	        testNode3 = document.getElementById('testNode3'),
-	        gotDrop = false;
+            testNode3 = document.getElementById('testNode3'),
+            gotDrop = false;
 
         testNode3.style.position = "absolute";
         testNode3.style.top = "100px";
@@ -960,8 +959,8 @@ var draggableMouseTestCase = new YAHOO.tool.TestCase({
     
     testRemoveDropTarget : function() {
         var d = Draggable.getByNode( testNode ),
-	        testNode3 = document.getElementById('testNode3'),
-	        gotDrop = false;
+            testNode3 = document.getElementById('testNode3'),
+            gotDrop = false;
 
         testNode3.style.position = "absolute";
         testNode3.style.top = "100px";
@@ -977,7 +976,7 @@ var animatedDragTestCase = new YAHOO.tool.TestCase({
     name : "Animated Draggable Test",
 
     // pageX broken, so all tests test target from 0, 0.
-	
+    
     tearDown : function() {
         Draggable.instanceDestructor();
         Draggable.instanceDestructor.call(APE.drag.DropTarget);
@@ -1004,11 +1003,11 @@ var animatedDragTestCase = new YAHOO.tool.TestCase({
             // Wait until anim is loaded.
             var _pollStart = +new Date,
                 tid = setInterval(checkAnimLoaded, 100);
-	        this.wait(function(){
+            this.wait(function(){
                 clearInterval(tid);
                 YAHOO.log("APE.anim did not load. Proceeding anyway.", "warn", "TestRunner");
                 testOnGlide.call(testRunner);
-	        }, 3000);
+            }, 3000);
         }
 
         var testRunner = this;
@@ -1059,7 +1058,7 @@ var animatedDragTestCase = new YAHOO.tool.TestCase({
                 }, 320);
             }, 178);
         }
-	},
+    },
 
 
     testOnglideUseAnimFalse : function() {
@@ -1092,84 +1091,84 @@ var animatedDragTestCase = new YAHOO.tool.TestCase({
         }, 78);
     },
     
-	testReleaseGroup : function() {
-	    // because it is in-flow, offset by it's prev sibling (testNode).
-	    testNode2.style.top = "-20px";
-	    testNode.style.height = "20px";
-	
-	    document.body.style.height = "900px"
-	
-	    var d = Draggable.getByNode( testNode ),
-	        d2 = Draggable.getByNode( testNode2 ),
-	        glidended = false,
-	        glided = false,
-	        testNode3 = document.getElementById("testNode3");
-	
-	    d2.onglide = function() {
-	        glided = true;
-	    };
-	
-	    d.dragMultiple = d2.dragMultiple = true;
-	
-	    var dt = d2.addDropTarget(testNode3);
-	
-	    dt.dragOverClassName = "DOC";
-	
-	    testNode3.style.left = "9px";
-	    testNode3.style.top = "-1px";
-	
-	    d.onglideend = function() {
-	        glidended = true;
-	    };
-	
-	
-	    Action.mousedown( testNode );
-	
-	    Action.mouseup( document );
-	    Action.mousedown( testNode2, {ctrlKey:true, metaKey:true} );
-	
-	    // Opera and Chrome need duplicate coords here.
-	    var coords = {clientX: 10, clientY: 40};
-	    Action.mousemove( document, coords);
-	    this.wait(function(){
-	        Action.mousemove( document, coords);
-	                    
-	        Assert.areEqual("10px", testNode.style.left);
-	        Assert.areEqual("20px", testNode2.style.top);
-	
-	        StringAssert.contains("DOC", dt.el.className);
-	        Action.keydown( document, {keyCode:ESC} );
-	
-	        this.wait(function(){
-	            Assert.areEqual("0px", testNode.style.left);
-	            Assert.areEqual("-20px", testNode2.style.top);
-	            Assert.isTrue(glidended, "d did not fire onglideend");
-	            StringAssert.doesNotContain("DOC", dt.el.className);
-	        }, 350);
-	    }, 78);
-	},
-	
-	testGlideEndOnce : function() {
-	    var d = Draggable.getByNode( testNode ),
-	        gcount = 0;
-	    d.dragMultiple = true; // does add to group?
-	    d.onglideend = function() {
-	        gcount++;
-	    };
-	
-	    Action.mousedown(testNode);
-	    // Opera and Chrome need duplicate coords here.
-	    var coords = {clientX: 10, clientY: 40};
-	    Action.mousemove( document, coords);
-	    this.wait(function(){
-	        Action.mousemove(document, coords);
-	        Action.keydown( document, {keyCode: ESC} );
-	        this.wait(function(){
-	            Assert.areEqual(1, gcount, "glidend fired wrong number of times.");
-	        }, 350);
-	    }, 78);
-	    
-	},
+    testReleaseGroup : function() {
+        // because it is in-flow, offset by it's prev sibling (testNode).
+        testNode2.style.top = "-20px";
+        testNode.style.height = "20px";
+    
+        document.body.style.height = "900px"
+   
+        var d = Draggable.getByNode( testNode ),
+            d2 = Draggable.getByNode( testNode2 ),
+            glidended = false,
+            glided = false,
+            testNode3 = document.getElementById("testNode3");
+    
+        d2.onglide = function() {
+            glided = true;
+        };
+    
+        d.dragMultiple = d2.dragMultiple = true;
+    
+        var dt = d2.addDropTarget(testNode3);
+    
+        dt.dragOverClassName = "DOC";
+    
+        testNode3.style.left = "9px";
+        testNode3.style.top = "-1px";
+    
+        d.onglideend = function() {
+            glidended = true;
+        };
+    
+    
+        Action.mousedown( testNode );
+    
+        Action.mouseup( document );
+        Action.mousedown( testNode2, {ctrlKey:true, metaKey:true} );
+    
+        // Opera and Chrome need duplicate coords here.
+        var coords = {clientX: 10, clientY: 40};
+        Action.mousemove( document, coords);
+        this.wait(function(){
+            Action.mousemove( document, coords);
+                        
+            Assert.areEqual("10px", testNode.style.left);
+            Assert.areEqual("20px", testNode2.style.top);
+    
+            StringAssert.contains("DOC", dt.el.className);
+            Action.keydown( document, {keyCode:ESC} );
+    
+            this.wait(function(){
+                Assert.areEqual("0px", testNode.style.left);
+                Assert.areEqual("-20px", testNode2.style.top);
+                Assert.isTrue(glidended, "d did not fire onglideend");
+                StringAssert.doesNotContain("DOC", dt.el.className);
+            }, 350);
+        }, 78);
+    },
+    
+    testGlideEndOnce : function() {
+        var d = Draggable.getByNode( testNode ),
+            gcount = 0;
+        d.dragMultiple = true; // does add to group?
+        d.onglideend = function() {
+            gcount++;
+        };
+    
+        Action.mousedown(testNode);
+        // Opera and Chrome need duplicate coords here.
+        var coords = {clientX: 10, clientY: 40};
+        Action.mousemove( document, coords);
+        this.wait(function(){
+            Action.mousemove(document, coords);
+            Action.keydown( document, {keyCode: ESC} );
+            this.wait(function(){
+                Assert.areEqual(1, gcount, "glidend fired wrong number of times.");
+            }, 350);
+        }, 78);
+        
+    },
 
     testReleaseOverDropTarget : function() {
         return;
@@ -1420,13 +1419,13 @@ if(!IS_TOUCH_EVENT) {
 
             Action.touchmove( document, {clientX:101} );
             this.wait(function(){
-    	        Action.touchmove( document, {clientX:101} );
-    	
-    	        Assert.areEqual(left, testNode.style.left);
-    	        Assert.areEqual(top, testNode.style.top);
-    	        StringAssert.doesNotContain( aClass, testNode.className );        
-    	        StringAssert.contains( aClass, d.el.className );        
-    	        Action.touchend(document);
+                Action.touchmove( document, {clientX:101} );
+        
+                Assert.areEqual(left, testNode.style.left);
+                Assert.areEqual(top, testNode.style.top);
+                StringAssert.doesNotContain( aClass, testNode.className );        
+                StringAssert.contains( aClass, d.el.className );        
+                Action.touchend(document);
             }, 78);
         },
 
@@ -1471,11 +1470,11 @@ if(!IS_TOUCH_EVENT) {
                     Draggable.v = 1;
                     Action.touchmove( document, moveToCoords );
                     delete Draggable.v;
-    	            var coords2 = dom.getOffsetCoords( testNode );
-    	            Assert.areEqual( 83, coords2.x, "x wrong" );
-    	            Assert.areEqual( coords.y, coords2.y, 
-    	                    "y pos should not have changed." );
-    	        }, 78);
+                    var coords2 = dom.getOffsetCoords( testNode );
+                    Assert.areEqual( 83, coords2.x, "x wrong" );
+                    Assert.areEqual( coords.y, coords2.y, 
+                            "y pos should not have changed." );
+                }, 78);
             }, 110);
         },
 
@@ -1492,13 +1491,13 @@ if(!IS_TOUCH_EVENT) {
             
             Action.touchmove( document, {pageX:1, pageY:1} );
             this.wait(function() {
-    	        Action.touchmove( document, {pageX:221, pageY:111} );
+                Action.touchmove( document, {pageX:221, pageY:111} );
 
-    	        var coords2 = dom.getOffsetCoords( testNode );
-    	    
-    	        Assert.areEqual( 111, coords2.y, "y coords wrong" );
-    	        Assert.areEqual( coords.x, coords2.x, "x pos should not have changed." );
-    	    }, 78);
+                var coords2 = dom.getOffsetCoords( testNode );
+            
+                Assert.areEqual( 111, coords2.y, "y coords wrong" );
+                Assert.areEqual( coords.x, coords2.x, "x pos should not have changed." );
+            }, 78);
         },
         
         testSetHandle : function() {
@@ -1528,10 +1527,10 @@ if(!IS_TOUCH_EVENT) {
             var coords = {pageX: 33, pageY: 55};
             Action.touchmove(document, coords);
             this.wait(function(){
-    	        Action.touchmove( document, coords);
-    	
-    	        Assert.areEqual( 33, parseInt(testNode.style.left), "left was wrong");
-    	        Assert.areEqual( 55, parseInt(testNode.style.top), "top was wrong");
+                Action.touchmove( document, coords);
+        
+                Assert.areEqual( 33, parseInt(testNode.style.left), "left was wrong");
+                Assert.areEqual( 55, parseInt(testNode.style.top), "top was wrong");
             }, 40);
         },
 
