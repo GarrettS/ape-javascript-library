@@ -259,11 +259,10 @@ APE.namespace("APE.drag" );/**
         /**
          * When a draggable has been released (by ESC), it calls dragout from the relevant 
          * droptargets and resets any active over droptargets.
-         * @param {Event} e the event that triggered the release. This gets passed back to ondragout.
-         * @param {Draggable} the draggable object that was released.
+         * @param {Event} ev the event that triggered the release. This gets passed back to ondragout.
          */
-        function dragObjReleased(dObj, e) {
-            animateBack(dObj);
+        function dragObjReleased(ev) {
+            animateBack(dO);
 
             var dt, i, j, id;
 
@@ -274,7 +273,7 @@ APE.namespace("APE.drag" );/**
                     // Did we just move off dObj dropTarget?
                     if (dt.hasDropTargetOver) {
                         if (typeof dt.ondragout == FUNCTION)
-                            dt.ondragout(e, dObj);
+                            dt.ondragout(ev, dO);
                         if (dt.dragOverClassName)
                             dom.removeClass(dt.el, dt.dragOverClassName);
                         dt.hasDropTargetOver = false;
@@ -282,7 +281,9 @@ APE.namespace("APE.drag" );/**
                 }
             }
             for (id in draggableList) {
-                animateBack(draggableList[id]);
+                if(id !== dO.id) {
+                    animateBack(draggableList[id]);
+                }
             }
         }
 
@@ -293,12 +294,11 @@ APE.namespace("APE.drag" );/**
             if (dObj.copyEl)
                 retireClone(dObj);
             if (dObj === dO) {
-                if(ev.type === "mouseup") {
+                if(ev.type !== "keyup") {
                     handleDrops(ev);
                 }
                 mainDragObjectEnd(ev);
             }
-            keepUserSelection = false;
             dObj.hasBeenDragged = false;
         }
 
@@ -308,8 +308,7 @@ APE.namespace("APE.drag" );/**
                     // Add back to selection for event, 
                     // but also for next mouseDown.
                     draggableList[dO.id] = dO;
-                }
-                else {
+                } else {
                     draggableList = {};
                 }
                 // ondragend won't fire on "glideend".
@@ -320,6 +319,7 @@ APE.namespace("APE.drag" );/**
                     });
                 }
             }
+            keepUserSelection = false;
             dO = null;
         }
         
@@ -948,7 +948,6 @@ APE.namespace("APE.drag" );/**
 
         /** Starts gliding the draggable back to its original x,y coords. */
         function animateBack(dObj) {
-            if(!dObj.hasBeenDragged) return;
             if (APE.anim && dObj.useAnim) {
                 glideStart(dObj);
             } else {
@@ -1099,7 +1098,7 @@ APE.namespace("APE.drag" );/**
              * @param {Event} [ev] the event that triggered release
              */
             release : function(ev) {
-                dragObjReleased(this, ev);
+                dragObjReleased(ev);
                 if (typeof this.onrelease == FUNCTION)
                     this.onrelease(ev);
             },
