@@ -228,7 +228,8 @@ var table = document.getElementById("stats"),
         activeDragClassName : "dragActive",
         focusClassName : "dragFocused",
         container : table,
-        
+        ondragend : dragEndHandler,
+        ondragstart : dragStartHandler
     };
 
 init();
@@ -236,20 +237,12 @@ init();
 function init() {
     for(var i = 0, c = 0, len = headers.length; i < len; i++) {
 
-        var header = headers[i];
+        var header = headers[i], 
+            draggableEl, dragObj;
         if(header.id == 'skip_me') continue;
-
-        var draggableEl = headers[i].getElementsByTagName("div")[1];
         
-        var dragObj = dragObjArray[c++] = Draggable.getByNode(draggableEl, config);
-
-        // container = table.tBodies[0] won't work in safari. 
-        // Safari thinks the offsetParent of a td is null, so if the 
-        // getOffsetTop returns the td's offsetTop, but the tBody has an offsetTop, 
-        // that won't be included and the dragObj will be positioned in respect to 
-
-        dragObj.ondragstart = dragStartHandler;
-        dragObj.ondragend = dragEndHandler;
+        draggableEl = headers[i].getElementsByTagName("div")[1];
+        dragObj = dragObjArray[c++] = Draggable.getByNode(draggableEl, config);
     }
     addDropTargets();
     
@@ -259,6 +252,7 @@ function init() {
 }
 
 function dragStartHandler(e) {
+    this.enclosingDropTarget = null;
     setZIndex(this.el, 10000);
 }
 
@@ -296,7 +290,6 @@ function unHilightCol(table, iCol) {
 }
 
 function dropEventReceived(dropEvent) {
-
     var dragObject = dropEvent.dragObj,
         dropTarget = this.el,
         droppar = dropTarget.parentNode,
@@ -322,7 +315,7 @@ function dropEventReceived(dropEvent) {
 	setZIndex(dropTargetClone, 0);
 
 	//dragObject.el = doCopy;
-
+    //Draggable.instances[dragObject.el.id].el = doCopy;
 	Draggable.instances[dropTarget.id].el = dropTargetClone; 
 
 	dragObject.el = doCopy;
