@@ -185,6 +185,18 @@ window.onload = function() {
 //-----------------------------------------------------------------------------
 // The only drop-target element (Trash). We'll make this draggable, too, later.
 
+    var APE = self.APE,
+        Draggable = APE.drag.Draggable,
+        dragConfig = {
+             keepInContainer : true, 
+             dragCopy : true,
+             dragMultiple : true,
+                         
+            // Event handlers for onfocus, ondragstart,onblur et c.
+             activeDragClassName : "folder-drag",
+             focusClassName : "folder-focus",
+             selectedClassName : "folder-selected"
+        };
     var trashEl = document.getElementById("trash");
     
     // Simple way to set top/left, needed for IE and 
@@ -208,27 +220,8 @@ window.onload = function() {
 
 //-----------------------------------------------------------------------------
     
-
-/** These are the "folders" within the desktop. 
- * Each instance has-a dragObj, so it's draggable.
- * each instance: 
- *   stays in the container (keepInContainer = true), 
- *   can drag a copy (dragCopy = true), 
- *   can be dragged with other objects in the same container (dragMultiple = true)
- *   has trashDropTarget (addDropTarget(trashDropTarget))
- */
-    var Draggable = APE.drag.Draggable,
-        dragConfig = {
-              keepInContainer : true, 
-             dragCopy : true,
-             dragMultiple : true,
-                         
-            // Event handlers for onfocus, ondragstart,onblur et c.
-             activeDragClassName : "folder-drag",
-             focusClassName : "folder-focus",
-             selectedClassName : "folder-selected"
-    };
-    // Let's instantiate some Directories.
+    
+    // Instantiate some Directories.
     var folderIds = [ "UntitledFolder", "UntitledFolder2",  "MusicFolder", 
                     "PicturesFolder", "MP3Folder", "trash"];
     
