@@ -274,6 +274,34 @@ var draggableMouseTestCase = new YAHOO.tool.TestCase({
         StringAssert.contains( aClass, testNode.className );
     },
 
+    testOndragOnce : function() {
+
+        // ondrag only fires when an object actually moves.
+        var d = Draggable.getByNode( testNode, {
+                keepInContainer: true
+            }),
+            dragCount = 0,
+            coords = {clientX:301};
+
+        d.ondrag = function(de) {
+            dragCount++;
+        };
+
+        document.body.style.width = "300px";
+        
+        Action.mousedown( testNode );
+
+        Action.mousemove( document, coords );
+
+        this.wait(function(){
+            Action.mousemove( document, coords );
+            this.wait(function(){
+                Action.mousemove( document, coords );
+                Assert.areSame(1, dragCount, "ondrag should have fired exactly once");
+            }, 78);
+        }, 78);
+    },
+
     testOnbeforeDragStartPreventDefault : function(){
         var d = Draggable.getByNode( testNode ),
         ds = false,

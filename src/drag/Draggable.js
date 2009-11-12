@@ -620,6 +620,7 @@ APE.namespace("APE.drag");
             delete dObj.moveToY;
         }
 
+        // TODO: remove ondragstop.
         function mouseMove(e) {
 
             if(!dO)
@@ -642,7 +643,6 @@ APE.namespace("APE.drag");
                 ePageY = eventCoords.y, 
                 distX = ePageX - mousedownX, 
                 distY = ePageY - mousedownY, 
-                isDragStopped = false, 
                 newX = dO.origX + distX, 
                 newY = dO.origY + distY, id;
 
@@ -666,84 +666,18 @@ APE.namespace("APE.drag");
 
             var isLeft = newX < dO.minX, isRight = newX > dO.maxX, 
                 isAbove = newY < dO.minY, isBelow = newY > dO.maxY, 
-                isOutsideContainer = dO.container != null, 
-                hasOnDrag = (typeof dO.ondrag == FUNCTION), planesStopped = 0;
+                hasOnDrag = (typeof dO.ondrag === FUNCTION);
 
             // TODO: 2009-10-31 - can this be removed?
             if(typeof dO.onbeforedrag == FUNCTION
                     && dO.onbeforedrag(e) == false)
                 return;
 
-            isOutsideContainer &= (isLeft || isRight || isAbove || isBelow);
-            if(isOutsideContainer && dO.onbeforeexitcontainer() == false) {
-                if(isLeft) {
-                    if(!dO.isAtLeft) {
-                        dO.moveToX(dO.minX);
-                        // dO.minX - dO.origX = max possible negative distance
-                        // to travel.
-                        carryGroup(dO.minX - dO.origX, null);
-                        if(hasOnDrag)
-                            dO.ondrag(e);
-                        dO.isAtRight = false;
-                        dO.isAtLeft = true;
-                    }
-                    planesStopped += 1;
-                } else if(isRight) {
-                    if(!dO.isAtRight) {
-                        dO.moveToX(dO.maxX);
-                        // dO.maxX - dO.origX = max possible positive distance
-                        // to travel.
-                        carryGroup(dO.maxX - dO.origX, null);
-                        if(hasOnDrag)
-                            dO.ondrag(e);
-                        dO.isAtRight = true;
-                        dO.isAtLeft = false;
-                    }
-                    planesStopped += 1;
-                } else {
-                    dO.isAtLeft = dO.isAtRight = false;
-                    dO.moveToX(newX);
-                    carryGroup(distX, null);
-                }
-                if(isAbove) {
-                    if(!dO.isAtTop) {
-                        dO.moveToY(dO.minY);
-                        // dO.minY - dO.origY = max possible positive distance
-                        // to travel.
-                        carryGroup(null, dO.minY - dO.origY);
-                        if(hasOnDrag)
-                            dO.ondrag(e);
-                        dO.isAtTop = true;
-                        dO.isAtBottom = false;
-                    }
-                    planesStopped += 1;
-                } else if(isBelow) {
-                    if(!dO.isAtBottom) {
-                        if(dO.maxY > 0)
-                            dO.moveToY(dO.maxY);
-                        // dO.maxY - dO.origY = max possible positive distance
-                        // to travel.
-                        carryGroup(null, dO.maxY - dO.origY);
-                        if(hasOnDrag)
-                            dO.ondrag(e);
-                        dO.isAtTop = false;
-                        dO.isAtBottom = true;
-                    }
-                    planesStopped += 1;
-                } else {
-                    dO.isAtTop = dO.isAtBottom = false;
-                    dO.moveToY(newY);
-                    carryGroup(null, distY);
-                }
-
-                isDragStopped = planesStopped == 2;
-
-                if(isDragStopped) {
-                    dO.ondragstop(e);
-                } else {
-                    if(hasOnDrag)
-                        dO.ondrag(e);
-                }
+            if(dO.container != null 
+                    && isLeft || isRight || isAbove || isBelow 
+                    && dO.onbeforeexitcontainer() != true) {
+                // TODO: Too many parameter varialbes.
+                keepInContainerOnDrag(isLeft, isRight, isAbove, isBelow, newX, newY, distX, distY, hasOnDrag, e);
             } else { // Container boundaries irrelevant.
                 dO.isAtLeft = dO.isAtRight = dO.isAtTop = dO.isAtBottom = false;
                 dO.moveToX(newX);
@@ -796,18 +730,88 @@ APE.namespace("APE.drag");
             }
         }
 
+        function keepInContainerOnDrag(isLeft, isRight, isAbove, isBelow, newX, newY, distX, distY, hasOnDrag, e){
+            var planesStopped = 0;
+            if(isLeft) {
+                if(!dO.isAtLeft) {
+                    dO.moveToX(dO.minX);
+                    // dO.minX - dO.origX = max possible negative distance
+                    // to travel.
+                    carryGroup(dO.minX - dO.origX, null);
+                    if(hasOnDrag)
+                        dO.ondrag(e);
+                    dO.isAtRight = false;
+                    dO.isAtLeft = true;
+                }
+                planesStopped += 1;
+            } else if(isRight) {
+                if(!dO.isAtRight) {
+                    dO.moveToX(dO.maxX);
+                    // dO.maxX - dO.origX = max possible positive distance
+                    // to travel.
+                    carryGroup(dO.maxX - dO.origX, null);
+                    if(hasOnDrag)
+                        dO.ondrag(e);
+                    dO.isAtRight = true;
+                    dO.isAtLeft = false;
+                }
+                planesStopped += 1;
+            } else {
+                dO.isAtLeft = dO.isAtRight = false;
+                dO.moveToX(newX);
+                carryGroup(distX, null);
+            }
+            if(isAbove) {
+                if(!dO.isAtTop) {
+                    dO.moveToY(dO.minY);
+                    // dO.minY - dO.origY = max possible positive distance
+                    // to travel.
+                    carryGroup(null, dO.minY - dO.origY);
+                    if(hasOnDrag)
+                        dO.ondrag(e);
+                    dO.isAtTop = true;
+                    dO.isAtBottom = false;
+                }
+                planesStopped += 1;
+            } else if(isBelow) {
+                if(!dO.isAtBottom) {
+                    if(dO.maxY > 0)
+                        dO.moveToY(dO.maxY);
+                    // dO.maxY - dO.origY = max possible positive distance
+                    // to travel.
+                    carryGroup(null, dO.maxY - dO.origY);
+                    if(hasOnDrag)
+                        dO.ondrag(e);
+                    dO.isAtTop = false;
+                    dO.isAtBottom = true;
+                }
+                planesStopped += 1;
+            } else {
+                dO.isAtTop = dO.isAtBottom = false;
+                dO.moveToY(newY);
+                carryGroup(null, distY);
+            }
+
+            if(planesStopped >= 1) {
+                dO.ondragstop(e);
+            } else {
+                if(hasOnDrag) {
+                    dO.ondrag(e);
+                }
+            }
+        }
+        
         function keepObjInContainer(dObj){
-            var o = dObj,
-                x = o.x,
-                y = o.y;
-            if(x < o.minX)
-                o.moveToX(o.minX);
-            else if(x > o.maxX)
-                o.moveToX(o.maxX);
-            if(y < o.minY)
-                o.moveToY(o.minY);
-            else if(y > o.maxY)
-                o.moveToY(o.maxY);
+            var x = dObj.x,
+                y = dObj.y;
+            if(x < dObj.minX)
+                dObj.moveToX(dObj.minX);
+            else if(x > dObj.maxX)
+                dObj.moveToX(dObj.maxX);
+            if(y < dObj.minY)
+                dObj.moveToY(dObj.minY);
+            else if(y > dObj.maxY)
+                dObj.moveToY(dObj.maxY);
             // ondragend does notfire for each object,
             // a related dragObjects collection is provided.
         }
