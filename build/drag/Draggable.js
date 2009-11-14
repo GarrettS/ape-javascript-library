@@ -136,10 +136,6 @@ APE.namespace("APE.drag");
             TSTYLE = "pixelTop";
         }
         addCallback(d, "onkeydown", dragCancel);
-        addCallback(d, EV_DRAG, mouseMove);
-        addCallback(self, EV_DRAG, function(ev) {
-            ev.preventDefault();
-        });
         addCallback(d, EV_DRAG_END, mouseUp);
         initGuardUserSelection(d, ds);
         docMouseDown.add(mouseDown).addAfter(setUpDragOver);
@@ -283,7 +279,7 @@ APE.namespace("APE.drag");
         }
 
         /**
-         * @param {Draggable] dObj
+         * @param {Draggable} dObj
          * @param {Event} [ev] optional, as public instance method release() 
          * calls this.
          */
@@ -307,6 +303,7 @@ APE.namespace("APE.drag");
                 }
             }
             keepUserSelection = false;
+            EventPublisher.remove(document, EV_DRAG, mouseMove);
             dO = null;
         }
         
@@ -603,6 +600,7 @@ APE.namespace("APE.drag");
             dObj.origY = dObj.grabY = elementPixelCoords.y;
 
             dObj.isBeingDragged = false;
+            addCallback(document, EV_DRAG, mouseMove);            
         }
 
         // For constraint.
@@ -623,9 +621,9 @@ APE.namespace("APE.drag");
         // TODO: remove ondragstop.
         function mouseMove(e) {
 
-            if(!dO)
+            if(!dO) {
                 return;
-
+            }
             var now = +new Date, evOrig;
             if(now - lastMouseMoveTime < MOUSE_MOVE_THRESHOLD)
                 return;
@@ -695,7 +693,10 @@ APE.namespace("APE.drag");
 
         function mouseUp(e) {
             grabbed = false;
-            if(!dO)
+            // We need this here, but also after release(), so in 
+            // mainDragObjEnd.
+            EventPublisher.remove(document, EV_DRAG, mouseMove);
+            if(!dO) 
                 return;
             var hasBeenDragged = dO.hasBeenDragged, 
                 isRandomMouseMoveEvent = (dO.isBeingDragged && !hasBeenDragged);
@@ -1089,7 +1090,7 @@ APE.namespace("APE.drag");
                 }
                 this.moveToX(newX - handleOffsetCoords.x + (xOffset || 0));
                 this.moveToY(newY - handleOffsetCoords.y + (yOffset || 0));
-
+                
                 dragObjGrabbed(this, e);
                 grabbed = true;
                 dO = this;

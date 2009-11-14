@@ -16,9 +16,12 @@ traversal-f.js, Event.js, Event-coords.js, style-f.js'/>
         <concat destfile="${build}/dom/dom.js">
             <filelist dir="${build}/dom" files="${domFiles}"/>
             <filterchain>
+            	<!--stripjavacomments/-->
                 <tokenfilter>
                     <replacestring from='APE.namespace("APE.dom");' to=""/>
                     <replacestring from="APE.namespace('APE.dom');" to=""/>
+                	<!-- TODO: combine modules into one scope. -->
+                	<!--replaceregex pattern="\}\)\(\);\s+\(function\s*\(\)\s*\{" flags="m" replace=""/-->
                 </tokenfilter>
             </filterchain>
             <header>/**dom.js rollup: ${domFiles} */
@@ -74,13 +77,13 @@ APE.namespace("APE.drag"<!--necessary space --> );</header>
     </target>
 
     <target name="js.minify" depends="js.rollups">
-        <apply executable="java" parallel="false" dest="${build}" taskname="yui">
+        <apply executable="java" parallel="false" verbose="true" dest="${build}" taskname="js.compile">
             <fileset dir="${build}" includes="**/*.js"/>
             <arg line="-jar"/>
-            <arg path="yuicompressor-2.4\build\yuicompressor-2.4.jar"/>
-            <arg line="-v"/>
-            <srcfile/>
-            <arg line="-o"/>
+            <arg path="compiler.jar"/>
+        	<arg line="--js"/>
+        	<srcfile/>
+        	<arg line="--js_output_file"/>
             <mapper type="glob" from="*.js" to="*-min.js"/>
             <targetfile/>
         </apply>

@@ -261,6 +261,7 @@ APE.EventPublisher = EventPublisher;
 APE.mixin(EventPublisher, {
     get : get,
     add : add,
+    remove : remove,
     fire : fire,
     cleanUp : cleanUp
 });
@@ -276,27 +277,27 @@ EventPublisher.prototype = {
 /**  
  *  @param {Function} fp the callback function that gets called when src[sEvent] is called.
  *  @param {Object} thisArg the context that the function executes in.
- *  @return {EventPublisher} this;
+ *  @return {EventPublisher} this.
  */
     add : function(fp, thisArg) {
         this._callStack.push([fp, thisArg||this.src]);
         return this;
     },
 /**  Adds beforeAdvice to the callStack. This fires before the callstack. 
- *  @param {Function:boolean} fp the callback function that gets called when src[sEvent] is called.
+ *  @param {Function} fp the callback function that gets called when src[sEvent] is called.
  *  function's returnValue proceed false stops the callstack and returns false to the original call.
  *  @param {Object} thisArg the context that the function executes in.
- *  @return {EventPublisher} this;
+ *  @return {EventPublisher} this.
  */
     addBefore : function(f, thisArg) {
         return add(this, "beforeFire", f, thisArg||this.src); 
     },
     
 /**  Adds afterAdvice to the callStack. This fires after the callstack. 
- *  @param {Function:boolean} fp the callback function that gets called when src[sEvent] is called.
+ *  @param {Function} fp the callback function that gets called when src[sEvent] is called.
  *  function's returnValue of false returns false to the original call.
  *  @param {Object} thisArg the context that the function executes in.
- *  @return {EventPublisher} this;
+ *  @return {EventPublisher} this.
  */
     addAfter : function(f, thisArg) {
         return add(this, "afterFire", f, thisArg||this.src); 
@@ -311,9 +312,9 @@ EventPublisher.prototype = {
     },
 
 /**  Removes fp from callstack.
- *  @param {Function:boolean} fp the callback function to remove.
+ *  @param {Function} fp the callback function to remove.
  *  @param {Object} [thisArg] the context that the function executes in.
- *  @return {Function} the function that was passed in, or null if not found;
+ *  @return {EventPublisher} this.
  */
     remove : function(fp, thisArg) {
         var cs = this._callStack, i, call;
@@ -328,9 +329,9 @@ EventPublisher.prototype = {
     },
 
 /**  Removes fp from callstack's beforeFire.
- *  @param {Function:boolean} fp the callback function to remove.
+ *  @param {Function} fp the callback function to remove.
  *  @param {Object} [thisArg] the context that the function executes in.
- *  @return {Function} the function that was passed in, or null if not found (uses remove());
+ *  @return {EventPublisher} this.
  */
     removeBefore : function(fp, thisArg) {
         return get(this, "beforeFire").remove(fp, thisArg||this.src);
@@ -338,9 +339,9 @@ EventPublisher.prototype = {
 
 
 /**  Removes fp from callstack's afterFire.
- *  @param {Function:boolean} fp the callback function to remove.
+ *  @param {Function} fp the callback function to .
  *  @param {Object} [thisArg] the context that the function executes in.
- *  @return {Function} the function that was passed in, or null if not found (uses remove());
+ *  @return {EventPublisher} this.
  */
     removeAfter : function(fp, thisArg) {
         return get(this, "afterFire").remove(fp, thisArg||this.src);
@@ -386,6 +387,10 @@ function cleanUp() {
  *  @param {Object} thisArg the context that the function executes in.
  */
 function add(src, sEvent, fp, thisArg) {
+    return get(src, sEvent).add(fp, thisArg);
+}
+
+function remove(src, sEvent, fp, thisArg) {
     return get(src, sEvent).add(fp, thisArg);
 }
 
