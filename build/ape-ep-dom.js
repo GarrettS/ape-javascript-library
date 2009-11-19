@@ -1373,7 +1373,7 @@ APE.namespace("APE.dom.Event");
                 return {
                     x : e.clientX + scrollOffsets.left,
                     y : e.clientY + scrollOffsets.top
-                }
+                };
             };
         }
         return (Event.getCoords = f)(e);

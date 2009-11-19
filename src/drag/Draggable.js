@@ -165,7 +165,8 @@ APE.namespace("APE.drag");
             }
         }
         
-        /** @param {HTMLElement} target Element that is checked.*/
+        /** @param {HTMLElement} target Element that might be a handle 
+         * for dObj*/
         function isInHandle(dObj, target) {
             return target === dObj.handle
                     || (dObj.useHandleTree && dom.contains(dObj.handle, target));
@@ -468,15 +469,11 @@ APE.namespace("APE.drag");
 
             e = getPointerEvent(e, "touches");
             var target = Event.getTarget(evOrig), 
-                instances = Draggable.instances, 
-                dOTarg, testNode = target, 
-                metaKey = e.metaKey || e.ctrlKey;
+                metaKey = e.metaKey || e.ctrlKey,
+                dOTarg = findDragObjectTarget(target);
 
-            while (!dOTarg && testNode !== null) {
-                dOTarg = instances[testNode.id];
-                testNode = dom.findAncestorWithAttribute(testNode, "id");
-            }
             if(dOTarg) { // found. 
+
                 if(!dOTarg.isDragEnabled) {
 
                     if(!metaKey) {
@@ -486,8 +483,7 @@ APE.namespace("APE.drag");
                 }
 
                 // If it's got a handle, make sure user clicked the handle.
-                if(!metaKey && dOTarg.hasHandleSet
-                        && !isInHandle(dOTarg, target)) {
+                if(!metaKey && dOTarg.hasHandleSet && !isInHandle(dOTarg, target)) {
                     removeGroupSelection();
                     dOTarg = null;
                     return;
@@ -548,29 +544,42 @@ APE.namespace("APE.drag");
                                              // events for return false;
         }
 
+        function findDragObjectTarget(testNode) {
+            var dOTarg, 
+                instances = Draggable.instances;
+            for(; !dOTarg && testNode !== null;
+                testNode = dom.findAncestorWithAttribute(testNode, "id")) {
+                dOTarg = instances[testNode.id];
+            }
+            return dOTarg;
+        }
+
         /** 
          * called before dragstart, this function checks to see if there are any droptargets 
          * that need mousemove consideration. For example, if the droptarget has a
          * dragOverClassName, or has an ondragover handler.
          */
         function setUpDragOver() {
-            if(!dO)
+            if(!dO) {
                 return;
+            }
             // subset for ondragover, to help speed up dragging
             // with multiple drop targets.
+            var dropTargets = dO.dropTargets, 
+                dt, i, c, len;
+            if(!dropTargets) {
+                return dragOverTargets = false;
+            }
             dragOverTargets = [];
-            var dropTargets = dO.dropTargets, dt, i = 0, len = dropTargets.length;
-
-            for(; i < len; i++) {
+            for(i = c = 0, len = dropTargets.length; i < len; i++) {
                 dt = dropTargets[i];
                 dt.initCoords();
-                if(typeof dt.ondragover == FUNCTION
-                        || typeof dt.ondragout == FUNCTION
-                        || dt.dragOverClassName)
-                    dragOverTargets.push(dt);
+                if(dt.ondragover ||  dt.ondragout || dt.dragOverClassName) {
+                    dragOverTargets[c++]= dt;
+                }
             }
             // set to false, for quicker access on drag over.
-            if(dragOverTargets.length === 0) {
+            if(c === 0) {
                 dragOverTargets = false;
             }
         }
@@ -606,9 +615,9 @@ APE.namespace("APE.drag");
         // For constraint.
         function setDynamicDispatchConstraint(dObj) {
             var constraint = dObj.constraint;
-            if(constraint == "y") {
+            if(constraint === "y") {
                 dObj.moveToX = noop;
-            } else if(constraint == "x") {
+            } else if(constraint === "x") {
                 dObj.moveToY = noop;
             }
         }
@@ -696,20 +705,21 @@ APE.namespace("APE.drag");
             // We need this here, but also after release(), so in 
             // mainDragObjEnd.
             EventPublisher.remove(document, EV_DRAG, mouseMove);
-            if(!dO) 
+            if(!dO) {
                 return;
+            }
             var hasBeenDragged = dO.hasBeenDragged, 
                 isRandomMouseMoveEvent = (dO.isBeingDragged && !hasBeenDragged);
+            e = getPointerEvent(e, "changedTouches");
             if(!dO.hasBeenDragged && !isRandomMouseMoveEvent) {
                 if(!keepUserSelection) {
-                    dO = null;
+                    retireClone(dO);
+                    mainDragObjectEnd(e);
                 }
                 return;
             }
 
             // if it's been dragged onto a dropTarget, fire that event.
-            e = getPointerEvent(e, "changedTouches");
-
             if(!isProxyDrag) {
                 applyGroupAction(keepObjInContainer);
             }
@@ -726,6 +736,7 @@ APE.namespace("APE.drag");
                 domEvent : e,
                 draggableList : draggableList
             });
+
             if(dO) { //ondragend handler may call release(), as in Table example.
                 mainDragObjectEnd(e);
             }
