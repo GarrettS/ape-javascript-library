@@ -354,8 +354,6 @@ APE.namespace("APE.drag");
             // information for selectedClassName to be lost.
             // 100 draggable items appear above.
             copyElStyle.zIndex = parseInt(origEl.style.zIndex, 10) + 100;
-            if(dObj.origClassName)
-                dom.addClass(origEl, dObj.origClassName);
 
             dObj.el = copyEl;
             dObj.style = copyElStyle;
@@ -392,19 +390,21 @@ APE.namespace("APE.drag");
 
         function retireClone(dObj) {
 
+            var copyEl = dObj.copyEl;
+            
+            // If the clone was not created (yet), exit.
+            // (This does happen when no mousemove occurs).
+            if(!copyEl) return;
+            
             dObj.el = dObj.origEl;
             dObj.style = dObj.el.style;
 
             // Update position of origEl, which was left behind.
             dObj.moveToX(dObj.x);
             dObj.moveToY(dObj.y);
-            if(dObj.copyEl) {
-                dObj.copyEl.style.display = "none";
-            }
-            if(dObj.origClassName)
-                dom.removeClass(dObj.el, dObj.origClassName);
+            copyEl.style.display = "none";
             if(dObj.dragCopy && !dObj.proxyId) { // in case caller does some appending of el, etc.
-                dObj.el.parentNode.insertBefore(dObj.copyEl, dObj.el);
+                dObj.el.parentNode.insertBefore(copyEl, dObj.el);
             }
         }
 

@@ -81,9 +81,10 @@ APE.namespace("APE.drag"<!--necessary space --> );</header>
             <fileset dir="${build}" includes="**/*.js"/>
             <arg line="-jar"/>
             <arg path="compiler.jar"/>
-        	<arg line="--js"/>
-        	<srcfile/>
-        	<arg line="--js_output_file"/>
+            <arg value=" --create_source_map "/>
+            <arg line="--js"/>
+            <srcfile/>
+            <arg line="--js_output_file"/>
             <mapper type="glob" from="*.js" to="*-min.js"/>
             <targetfile/>
         </apply>
