@@ -97,7 +97,9 @@ APE.namespace("APE.drag");
             PIXEL_PX = "px", 
             LSTYLE = "left", 
             TSTYLE = "top", 
-            keepUserSelection = false, 
+            keepUserSelection = false,
+            // setCapture allows dragging outside of window in IE.
+            needsCapture = "setCapture" in document.documentElement,
             mousedownX = 0, 
             mousedownY = 0,
 
@@ -288,6 +290,9 @@ APE.namespace("APE.drag");
             if(dObj.activeDragClassName)
                 dom.removeClass(dObj.el, dObj.activeDragClassName);
             removeConstraint(dObj);
+            if(needsCapture) {
+                dObj.el.releaseCapture();
+            }
             dObj.hasBeenDragged = false;
         }
 
@@ -433,6 +438,10 @@ APE.namespace("APE.drag");
                 dObj.ondragstart(getDragStartEvent(dObj, ev));
             }
 
+            if(needsCapture) {
+                dObj.el.setCapture();
+            }
+            
             if(dObj.activeDragClassName)
                 dom.addClass(dObj.el, dObj.activeDragClassName);
             // Check the coords after making the copyEl here.
@@ -671,21 +680,15 @@ APE.namespace("APE.drag");
 
             dO.hasBeenDragged = (dO.hasBeenDragged || !!(distX || distY));
 
-            var isLeft = newX < dO.minX, isRight = newX > dO.maxX, 
-                isAbove = newY < dO.minY, isBelow = newY > dO.maxY, 
-                hasOnDrag = (typeof dO.ondrag === FUNCTION);
-
             // TODO: 2009-10-31 - can this be removed?
             if(typeof dO.onbeforedrag == FUNCTION
                     && dO.onbeforedrag(e) == false)
                 return;
 
-            if(dO.container != null 
-                    && isLeft || isRight || isAbove || isBelow 
-                    && dO.onbeforeexitcontainer() != true) {
-                // TODO: Too many parameter varialbes.
-                keepInContainerOnDrag(isLeft, isRight, isAbove, isBelow, newX, newY, distX, distY, hasOnDrag, e);
-            } else { // Container boundaries irrelevant.
+            var hasOnDrag = typeof dO.ondrag === FUNCTION;
+
+            if(!keptInContainerOnDrag(dO, newX, newY, distX, distY, hasOnDrag, e)) {
+             // Container boundaries irrelevant.
                 dO.isAtLeft = dO.isAtRight = dO.isAtTop = dO.isAtBottom = false;
                 dO.moveToX(newX);
                 dO.moveToY(newY);
@@ -700,6 +703,91 @@ APE.namespace("APE.drag");
             return false;
         }
 
+        /** If the object has a container, dragging is handled here.
+         * @return {Boolean] true, if object was kept in container, false otherwise.
+         */
+        function keptInContainerOnDrag(dO, newX, newY, distX, distY, hasOnDrag, e){
+            if(dO.container) {
+                var isLeft = newX < dO.minX, isRight = newX > dO.maxX, 
+                    isAbove = newY < dO.minY, isBelow = newY > dO.maxY,
+                    stopped;
+             
+                if(isLeft || isRight || isAbove || isBelow 
+                        && dO.onbeforeexitcontainer() != true) {
+                    // TODO: Too many parameter varialbes.
+                    if(isLeft) {
+                        if(!dO.isAtLeft) {
+                            dO.moveToX(dO.minX);
+                            // dO.minX - dO.origX = max possible negative distance
+                            // to travel.
+                            carryGroup(dO.minX - dO.origX, null);
+                            if(hasOnDrag)
+                                dO.ondrag(e);
+                            dO.isAtRight = false;
+                            dO.isAtLeft = true;
+                        }
+                        stopped = true;
+                    } else if(isRight) {
+                        if(!dO.isAtRight) {
+                            dO.moveToX(dO.maxX);
+                            // dO.maxX - dO.origX = max possible positive distance
+                            // to travel.
+                            carryGroup(dO.maxX - dO.origX, null);
+                            if(hasOnDrag)
+                                dO.ondrag(e);
+                            dO.isAtRight = true;
+                            dO.isAtLeft = false;
+                        }
+                        stopped = true;
+                    } else {
+                        dO.isAtLeft = dO.isAtRight = false;
+                        dO.moveToX(newX);
+                        carryGroup(distX, null);
+                    }
+                    if(isAbove) {
+                        if(!dO.isAtTop) {
+                            dO.moveToY(dO.minY);
+                            // dO.minY - dO.origY = max possible positive distance
+                            // to travel.
+                            carryGroup(null, dO.minY - dO.origY);
+                            if(hasOnDrag)
+                                dO.ondrag(e);
+                            dO.isAtTop = true;
+                            dO.isAtBottom = false;
+                        }
+                        stopped = true;
+                    } else if(isBelow) {
+                        if(!dO.isAtBottom) {
+                            if(dO.maxY > 0)
+                                dO.moveToY(dO.maxY);
+                            // dO.maxY - dO.origY = max possible positive distance
+                            // to travel.
+                            carryGroup(null, dO.maxY - dO.origY);
+                            if(hasOnDrag)
+                                dO.ondrag(e);
+                            dO.isAtTop = false;
+                            dO.isAtBottom = true;
+                        }
+                        stopped = true;
+                    } else {
+                        dO.isAtTop = dO.isAtBottom = false;
+                        dO.moveToY(newY);
+                        carryGroup(null, distY);
+                    }
+        
+                    if(stopped) {
+                        dO.ondragstop(e);
+                    } else {
+                        if(hasOnDrag) {
+                            dO.ondrag(e);
+                        }
+                    }
+                    return true;
+                }
+            }
+            return false;
+        }
+        
         function mouseUp(e) {
             grabbed = false;
             // We need this here, but also after release(), so in 
@@ -742,77 +830,6 @@ APE.namespace("APE.drag");
             }
         }
 
-        function keepInContainerOnDrag(isLeft, isRight, isAbove, isBelow, newX, newY, distX, distY, hasOnDrag, e){
-            var planesStopped = 0;
-            if(isLeft) {
-                if(!dO.isAtLeft) {
-                    dO.moveToX(dO.minX);
-                    // dO.minX - dO.origX = max possible negative distance
-                    // to travel.
-                    carryGroup(dO.minX - dO.origX, null);
-                    if(hasOnDrag)
-                        dO.ondrag(e);
-                    dO.isAtRight = false;
-                    dO.isAtLeft = true;
-                }
-                planesStopped += 1;
-            } else if(isRight) {
-                if(!dO.isAtRight) {
-                    dO.moveToX(dO.maxX);
-                    // dO.maxX - dO.origX = max possible positive distance
-                    // to travel.
-                    carryGroup(dO.maxX - dO.origX, null);
-                    if(hasOnDrag)
-                        dO.ondrag(e);
-                    dO.isAtRight = true;
-                    dO.isAtLeft = false;
-                }
-                planesStopped += 1;
-            } else {
-                dO.isAtLeft = dO.isAtRight = false;
-                dO.moveToX(newX);
-                carryGroup(distX, null);
-            }
-            if(isAbove) {
-                if(!dO.isAtTop) {
-                    dO.moveToY(dO.minY);
-                    // dO.minY - dO.origY = max possible positive distance
-                    // to travel.
-                    carryGroup(null, dO.minY - dO.origY);
-                    if(hasOnDrag)
-                        dO.ondrag(e);
-                    dO.isAtTop = true;
-                    dO.isAtBottom = false;
-                }
-                planesStopped += 1;
-            } else if(isBelow) {
-                if(!dO.isAtBottom) {
-                    if(dO.maxY > 0)
-                        dO.moveToY(dO.maxY);
-                    // dO.maxY - dO.origY = max possible positive distance
-                    // to travel.
-                    carryGroup(null, dO.maxY - dO.origY);
-                    if(hasOnDrag)
-                        dO.ondrag(e);
-                    dO.isAtTop = false;
-                    dO.isAtBottom = true;
-                }
-                planesStopped += 1;
-            } else {
-                dO.isAtTop = dO.isAtBottom = false;
-                dO.moveToY(newY);
-                carryGroup(null, distY);
-            }
-
-            if(planesStopped >= 1) {
-                dO.ondragstop(e);
-            } else {
-                if(hasOnDrag) {
-                    dO.ondrag(e);
-                }
-            }
-        }
-        
         function keepObjInContainer(dObj){
             var x = dObj.x,
                 y = dObj.y;
