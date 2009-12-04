@@ -711,19 +711,17 @@ APE.namespace("APE.drag" );/**
             if(dO.container) {
                 var isLeft = newX < dO.minX, isRight = newX > dO.maxX, 
                     isAbove = newY < dO.minY, isBelow = newY > dO.maxY,
-                    stopped;
+                    stopped, doOnDrag;
              
                 if(isLeft || isRight || isAbove || isBelow 
                         && dO.onbeforeexitcontainer() != true) {
-                    // TODO: Too many parameter varialbes.
                     if(isLeft) {
                         if(!dO.isAtLeft) {
                             dO.moveToX(dO.minX);
                             // dO.minX - dO.origX = max possible negative distance
                             // to travel.
                             carryGroup(dO.minX - dO.origX, null);
-                            if(hasOnDrag)
-                                dO.ondrag(e);
+                            doOnDrag = hasOnDrag;
                             dO.isAtRight = false;
                             dO.isAtLeft = true;
                         }
@@ -734,8 +732,7 @@ APE.namespace("APE.drag" );/**
                             // dO.maxX - dO.origX = max possible positive distance
                             // to travel.
                             carryGroup(dO.maxX - dO.origX, null);
-                            if(hasOnDrag)
-                                dO.ondrag(e);
+                            doOnDrag = hasOnDrag;
                             dO.isAtRight = true;
                             dO.isAtLeft = false;
                         }
@@ -751,8 +748,7 @@ APE.namespace("APE.drag" );/**
                             // dO.minY - dO.origY = max possible positive distance
                             // to travel.
                             carryGroup(null, dO.minY - dO.origY);
-                            if(hasOnDrag)
-                                dO.ondrag(e);
+                            doOnDrag = hasOnDrag;
                             dO.isAtTop = true;
                             dO.isAtBottom = false;
                         }
@@ -764,8 +760,7 @@ APE.namespace("APE.drag" );/**
                             // dO.maxY - dO.origY = max possible positive distance
                             // to travel.
                             carryGroup(null, dO.maxY - dO.origY);
-                            if(hasOnDrag)
-                                dO.ondrag(e);
+                            doOnDrag = hasOnDrag;
                             dO.isAtTop = false;
                             dO.isAtBottom = true;
                         }
@@ -775,14 +770,8 @@ APE.namespace("APE.drag" );/**
                         dO.moveToY(newY);
                         carryGroup(null, distY);
                     }
-        
-                    if(stopped) {
-                        dO.ondragstop(e);
-                    } else {
-                        if(hasOnDrag) {
-                            dO.ondrag(e);
-                        }
-                    }
+                    
+                    dO[stopped && !doOnDrag ? "ondragstop" : "ondrag"](e);                    
                     return true;
                 }
             }
