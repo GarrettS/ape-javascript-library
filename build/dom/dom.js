@@ -649,10 +649,11 @@ APE.namespace("APE.dom" );
         }
         var exp = getTokenizedExp(klass,""),
             collection = el.getElementsByTagName(tagName),
-            len = collection.length,
+            ret = [],
+            len = ret.length = collection.length,
             counter = 0,
-            i,
-            ret = Array(len);
+            i;
+        
         for(i = 0; i < len; i++){
             if(exp.test(collection[i][className]))
                 ret[counter++] = collection[i];
@@ -799,31 +800,36 @@ function normalizeString(s) { return s.replace(STRING_TRIM_EXP,'').replace(WS_MU
 
 (function() {
 
-    var hasEventTarget = "addEventListener"in this,
-        eventTarget = hasEventTarget ? "target" : "srcElement";
+    var HAS_EVENT_TARGET = "addEventListener"in this,
+        TARGET = HAS_EVENT_TARGET ? "target" : "srcElement",
+        FOCUS_DELEGATED = HAS_EVENT_TARGET ? "focus" : "focusin",
+        BLUR_DELEGATED = HAS_EVENT_TARGET ? "blur" : "focusout";
 
     APE.mixin(
         APE.dom.Event = {}, {
-            eventTarget : eventTarget,
             getTarget : getTarget, 
             addCallback : addCallback,
             removeCallback : removeCallback,
-            preventDefault : preventDefault
+            addDelegatedFocus : addDelegatedFocus,
+            addDelegatedBlur : addDelegatedBlur,
+            removeDelegatedFocus : removeDelegatedFocus,
+            removeDelegatedBlur : removeDelegatedBlur,
+            preventDefault : preventDefault,
+            stopPropagation : stopPropagation
     });
     
     function getTarget(e) {
-        return (e || window.event)[eventTarget];
+        return (e || window.event)[TARGET];
     }
 
     /**
-     * If EventTarget is supported, cb (input param) is returned.
-     * Otherwise, a closure is used to wrap a call to the callback
+     * A closure is used to wrap a call to the callback
      * in context of o.
      * @param {Object} o the desired would-be EventTarget
      * @param {Function} cb the callback.
      */
     function getBoundCallback(o, cb) {
-        return hasEventTarget ? cb : function(ev) {
+        return function(ev) {
             cb.call(o, ev);
         };
     }
@@ -833,13 +839,14 @@ function normalizeString(s) { return s.replace(STRING_TRIM_EXP,'').replace(WS_MU
      * @param {Object} o host object, Element, Document, Window.
      * @param (string} type
      * @param {Function} cb
+     * @param {boolean} [useCapture] for internal use for delegated focus.
      * @return {Function} cb If EventTarget is not supported,
      * a bound callback is created and returned. Otherwise,
      * cb (input param) is returned.
      */
-    function addCallback(o, type, cb) {
-        if (hasEventTarget) {
-            o.addEventListener(type, cb, false);
+    function addCallback(o, type, cb, useCapture) {
+        if (HAS_EVENT_TARGET) {
+            o.addEventListener(type, cb, !!useCapture);
         } else {
             var bound = getBoundCallback(o, cb);
             o.attachEvent("on" + type, bound);
@@ -852,19 +859,36 @@ function normalizeString(s) { return s.replace(STRING_TRIM_EXP,'').replace(WS_MU
      * @param {EventTarget} o host object, Element, Document, Window.
      * @param (string} type
      * @param {Function} cb
+     * @param {boolean} [useCapture] for internal use for delegated focus.
      * @return {Function} bound If EventTarget is not supported,
      * a bound callback is created and returned. Otherwise,
      * cb (input param) is returned.
      */
-    function removeCallback(o, type, bound) {
-        if (hasEventTarget) {
-            o.removeEventListener(type, bound, false);
+    function removeCallback(o, type, bound, useCapture) {
+        if (HAS_EVENT_TARGET) {
+            o.removeEventListener(type, bound, !!useCapture);
         } else {
             o.detachEvent("on" + type, bound);
         }
         return bound;
     }
-
+    
+    function addDelegatedFocus(o, cb){
+        return addCallback(o, FOCUS_DELEGATED, cb, true);
+    }
+     
+    function addDelegatedBlur(o, cb){
+        return addCallback(o, BLUR_DELEGATED, cb, true);
+    }    
+    
+    function removeDelegatedFocus(o, bound){
+        removeCallback(o, FOCUS_DELEGATED, bound, true);
+    }
+     
+    function removeDelegatedBlur(o, bound){
+        removeCallback(o, BLUR_DELEGATED, bound, true);
+    }
+    
     /** @param {Event} */
     function preventDefault(ev) {
         ev = ev || window.event;
@@ -872,6 +896,14 @@ function normalizeString(s) { return s.replace(STRING_TRIM_EXP,'').replace(WS_MU
             ev.preventDefault();
         } else if("returnValue" in ev) {
             ev.returnValue = false;
+        }
+    }
+    
+    function stopPropagation(ev) {
+        if(HAS_EVENT_TARGET) {
+            ev.stopPropagation();
+        } else {
+            ev.cancelBubble = true;
         }
     }
 })();/**

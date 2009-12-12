@@ -705,7 +705,7 @@ APE.namespace("APE.drag" );/**
         }
 
         /** If the object has a container, dragging is handled here.
-         * @return {Boolean] true, if object was kept in container, false otherwise.
+         * @return {Boolean} true, if object was kept in container, false otherwise.
          */
         function keptInContainerOnDrag(dO, newX, newY, distX, distY, hasOnDrag, e){
             if(dO.container) {
@@ -1073,7 +1073,7 @@ APE.namespace("APE.drag" );/**
              * Grabs the draggable, centering it under the cursor.
              * @param {Event} e the event to grab the element from.
              * @param {int} [xOffset] amount of horizontal adjustment to apply.
-             * @param {int} [xOffset] amount of vertical adjustment to apply.
+             * @param {int} [yOffset] amount of vertical adjustment to apply.
              */
             grab : function(e, xOffset, yOffset) {
                 e = e || window.event;

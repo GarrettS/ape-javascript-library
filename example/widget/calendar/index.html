@@ -10,17 +10,7 @@
 
     label {
         font: 15px Tahoma, sans-serif;
-        position: relative;
-        display: block;
-        width: 20em;
-    }
-    label input {
-        position: absolute;
-        right: 0;
-    }
-
-    label input[type=text] {
-        width: 8em;
+        float: left;
     }
     /* for the style transition */
     .ape-calendar {
@@ -30,17 +20,26 @@
         width: 9em;
         visibility: hidden;
     }
+    #sf {
+        z-index: 1;
+     }
+     
+     .ape-calendar-container{
+         width: 17em;
+     }
 </style>
 
 </head>
 <body>
 
-<div>
-    <label for="start" id='sf'>Start (YYYY-MM-DD)<input id="start" name="start" type="date"></label>
+<div class="ape-calendar-container" id="start-container">
+    <label for="start" id='sf'>Start (YYYY-MM-DD)</label>
+    <input id="start" name="start" type="date">
 </div>
 
-<div>
-    <label for="end">End (YYYY-MM-DD)<input id="end" type="date"></label>
+<div class="ape-calendar-container" id="end-container">
+    <label for="end">End (YYYY-MM-DD) </label>
+    <input id="end" type="date">
 </div>
 
 <script src="../../../build/ape-ep-dom.js" type="text/javascript"></script>
@@ -68,7 +67,7 @@ window.onload = function(){
         endStyle = {
             opacity: .98, 
             width: "14.4em", 
-            height: "13.8em",
+            height: "14.4em",
             visibility: "visible"
         };
 
@@ -103,7 +102,6 @@ window.onload = function(){
              anim.Transitions.getSigmoid(3)
          );
     }
-                    
 };
 </script>
 </body>

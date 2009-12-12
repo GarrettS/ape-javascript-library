@@ -2782,10 +2782,16 @@ YAHOO.util.UserAction = {
 
     focus : function(target, options) {
         this.fireHTMLEvent(target, "focus", options);
+        if("onfocusin" in document.body) {
+            this.fireHTMLEvent(target, "focusin", options);
+        }
     },
 
     blur : function(target, options) {
         this.fireHTMLEvent(target, "blur", options);
+        if("focusout" in document.body) {
+            this.fireHTMLEvent(target, "focusout", options);
+        }
     },
 
     /**

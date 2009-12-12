@@ -19,33 +19,51 @@
 
 </head>
 <body style="position:relative;top: 10px">
-<div id="testNode"></div>
-
+<div id="template">
+    <div id="testNode"><input id="testInp"></div>
+</div>
 <div id="testLogger"></div>
 
 <script type="text/javascript">
 setTimeout(function(){
 
 var dom = APE.dom,
+    Event = dom.Event,
     Assert = YAHOO.util.Assert,
-    Action = YAHOO.util.UserAction;
+    Action = YAHOO.util.UserAction,
+    testNode,
+    testInp,
+    template = document.getElementById("template"),
+    templateHTML = template.innerHTML;
+    
 
 var eventTestCase = new YAHOO.tool.TestCase({
     name : "Event Test Case",
 
     setUp : function() {
+        testNode = document.getElementById("testNode");
+        testInp = document.getElementById("testInp");
     },
 
     tearDown : function() {
+        template.innerHTML = templateHTML;
+        testNode = testInp = null;
     },
-
+    
     testGetTarget : function() {
         var target;
-        document.body.onclick = function(e) {
+        if(testNode.addEventListener) {
+            testNode.addEventListener("click", gotTarget, false);
+        } else {
+            testNode.onclick = gotTarget;
+        }
+        Action.click(testNode);
+        function gotTarget(e){
             target = dom.Event.getTarget(e);
-        };
-        Action.click(document.body);
-        Assert.areEqual(document.body, target);
+        }
+        this.wait(function() {
+            Assert.areEqual(testNode, target);
+        }, 10);
     },
 
     testAddCallback : function() {
@@ -76,6 +94,76 @@ var eventTestCase = new YAHOO.tool.TestCase({
         function bodyClicked() {
             called = true;
         }
+    },
+
+    testAddDelegatedFocus : function(){
+        var called = false,
+            testNode = document.getElementById("testNode");
+
+        dom.Event.addDelegatedFocus(testNode, tnFocused);
+        Action.focus(document.getElementById("testInp"));
+        Assert.isTrue(called, "focus handler was not called.");
+        function tnFocused() {
+            called = true;
+        }
+    },
+
+    testRemoveDelegatedFocus : function(){
+        var called = false,
+            bound = dom.Event.addDelegatedFocus(testNode, tnFocused);
+
+        dom.Event.removeDelegatedFocus(testNode, bound);
+        Action.focus(testInp);
+        this.wait(function(){
+            Assert.isFalse(called, 
+                 "focus handler was called, but should not have been");
+        }, 100);
+        function tnFocused() {
+            called = true;
+        }
+    },
+
+    testAddDelegatedBlur : function(){
+        var called = false;
+
+        dom.Event.addDelegatedFocus(testNode, tnBlurHandler);
+        Action.focus(testInp);
+        Action.blur(testInp);
+        Assert.isTrue(called, "blur handler was not called.");
+        function tnBlurHandler() {
+            called = true;
+        }
+    },
+
+    testRemoveDelegatedBlur : function(){
+        var called = false,
+            bound = dom.Event.addDelegatedFocus(testNode, tnBlurHandler);
+
+        dom.Event.removeDelegatedFocus(testNode, bound);
+        Action.focus(testInp);
+        Action.blur(testInp);
+        this.wait(function(){
+            Assert.isFalse(called, 
+                 "blur handler was called, but should not have been.");
+        }, 100);
+        function tnBlurHandler() {
+            called = true;
+        }
+    },
+
+    testStopPropagation : function(){
+        var called = false;
+
+        Event.addCallback(testNode, "click", tnClick);
+        Event.addCallback(testInp, "click", inpClick);
+        function tnClick() { called = true;  }
+        function inpClick(ev){ Event.stopPropagation(ev); }
+        
+        Action.click(testInp);
+        this.wait(function(){
+            Assert.isFalse(called, 
+                 "click handler bubbled up to testInp, but should not have.");
+        }, 100);
     }
 });
 

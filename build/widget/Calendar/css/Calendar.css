@@ -1,68 +1,81 @@
 .ape-calendar {
-	position: absolute;
-	padding: 2px 8px;
-	text-align: center;
-	border: 1px solid #ccc;
-	user-select: none;
-	-moz-user-select: none;
-	-webkit-user-select: none;
-	font-size: 12px;
-	font-family: sans-serif;
-	opacity: .2;
-	filter:progid:DXImageTransform.Microsoft.Alpha(Opacity=20);
-	overflow: hidden;
-	visibility: hidden;
-	height: 0;
-	width: 0;
-	background: #f3f3f3;
+    position: absolute;
+    padding: 2px 8px;
+    text-align: center;
+    border: 1px solid #ccc;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    font-size: 12px;
+    font-family: sans-serif;
+    opacity: .2;
+    filter:progid:DXImageTransform.Microsoft.Alpha(Opacity=20);
+    overflow: hidden;
+    visibility: hidden;
+    height: 0;
+    width: 0;
+    background: #f3f3f3;
+    z-index: 10;
+}
+
+.ape-calendar-container {
+    position: relative;
+}
+
+.ape-calendar-container input {
+	width: 8em;
+	float: right;
 }
 
 .ape-calendar th {
-	font: 1em normal sans-serif;
-	cursor: default;
-	width: 1.4em;
+    font: 1em normal sans-serif;
+    cursor: default;
+    width: 1.4em;
 }
 
 .ape-calendar-header div {
-	float: left;
-	font-weight: normal;
-	font-size: .9em;
-	text-align: center;
-	white-space:nowrap;
-	cursor: default;
+    float: left;
+    font-weight: normal;
+    font-size: .9em;
+    text-align: center;
+    white-space:nowrap;
+    cursor: default;
 }
 
 .ape-calendar table {
-	border-spacing: none;
-	border: 0;
-	margin: auto;
-}
-
-thead {
-	border-bottom: 1px solid #ccc;
+    border-spacing: none;
+    border: 0;
+    margin: auto;
 }
 
 .ape-calendar b {
-	display: block;
-	cursor: pointer;
-	border: 1px solid #fff;
-	width: 1.4em;
+    display: block;
+    cursor: pointer;
+    border: 1px solid #fff;
+    width: 1.4em;
 }
 
-
+.ape-calendar *:focus, .ape-calendar-focused-el {
+	color: #345;
+	background: #111;
+	background-color:#445588;
+	color:#F3F6FF;
+}
+	
 .ape-calendar-empty-day {
-	visibility: hidden;
+    visibility: hidden;
 }
 
 .ape-calendar-days {
-	cursor: default;
+    cursor: default;
 }
 
 b.ape-calendar-today {
-	border: 1px solid #bbb;
+    border: 1px solid #bbb;
 }
 
 .ape-calendar b.ape-calendar-selected-day {
-	border: 1px solid #ccc;
-	background: #f9f9f9;
+    border: 1px solid #ccc;
+    background: #Ff3;
+    color: #000;
 }

@@ -53,10 +53,13 @@ window.onload = function(){
             start = sf = null;
             var instances = Calendar.instances;
             for(var x in instances) {
-                var instance = instances[x], calendarId = instance.calendarId;
+                var instance = instances[x], 
+                    calendarId = instance.calendarId;
                 if(!calendarId) continue;
                 var c = document.getElementById(calendarId);
-                c.parentNode.removeChild(c);
+                if(c) {
+                    c.parentNode.removeChild(c);
+                }
             }
             Calendar.instances = {};
         },
@@ -76,21 +79,21 @@ window.onload = function(){
             var c = Calendar.getById("start");
             Assert.isNotNull(c);
         },
- 
+        
         testFocusHandler : function() {
             var c = Calendar.getById("start");
             start.focus();
             this.wait(function(){
                 var calendarEl = document.getElementById(c.calendarId);
                 Assert.areEqual("visible", calendarEl.style.visibility, "calendar visiblity wrong.");
-                start.blur();
-                document.getElementById('blah').focus();
+                Action.mousedown( document.getElementById('blah') );
                 this.wait(function(){
-                    Assert.areEqual("hidden", calendarEl.style.visibility, "calendar visiblity not hidden.");
-                }, 30);
+                    Assert.areEqual("hidden", calendarEl.style.visibility, 
+                            "calendar visiblity not hidden.");
+                }, 330);
             }, 30);
         },
- 
+        
         testCalendarStaysVisible : function() {
             var c = Calendar.getById("start");
             start.focus();
@@ -114,7 +117,7 @@ window.onload = function(){
                 }, 170);
             }, 270);
         },
- 
+        
         testSelectDateInFuture : function() {
             var c = Calendar.getById("start");
 
@@ -149,7 +152,7 @@ window.onload = function(){
                     var split = start.value.split("-");
                     actualDate.setFullYear(split[0], split[1]-1, split[2]);
                     DateAssert.datesAreEqual(expectedDate, actualDate);
-                }, 20);
+                }, 220);
             }, 20);
 
             // Find the B element that has |dayIndex| for data.
@@ -170,7 +173,7 @@ window.onload = function(){
             }
         },
  
-        testGetDateFromInput : function() {
+        testReadDateFromInput : function() {
             
             var c = Calendar.getById("start");
 
@@ -184,9 +187,10 @@ window.onload = function(){
             start.focus();
 
             this.wait(function(){
-                var id = "start-selected-day",
-                    selected = document.getElementById(id);
- 
+                var calendarEl = document.getElementById(c.calendarId);
+                var selected = APE.dom.getElementsByClassName(calendarEl, "b", 
+                        "ape-calendar-selected-day")[0];
+                
                 Assert.areEqual(selected.innerHTML, expectedDate.getDate().toString());
                 var actualYearMonthString = document.getElementById(c.calendarId + "-header").innerHTML,
                     parts = actualYearMonthString.split(", "),
@@ -209,16 +213,24 @@ window.onload = function(){
             inp.setMonth(10);
             DateAssert.datesAreEqual( copy, actual, "better handle mutability." );
         },
- 
+
+        // Ignoring this. We don't select "today" anymore, by default.
+        // Let the user make a selection.
         testTodaySelected : function() {
-            var c = Calendar.getById("start");
+            var c = Calendar.getById("start"),
+                today = new Date,
+                calendarEl;
             start.focus();
- 
-            DateAssert.datesAreEqual(c.getDate(), new Date);
+
+            calendarEl = document.getElementById(c.calendarId);
+            
+            DateAssert.datesAreEqual(c.getDate(), today);
+            
             this.wait(function(){
-                var id = "start-selected-day",
-                    selected = document.getElementById(id);
-                ArrayAssert.contains(c.calendarClass+ "-today", selected.className.split(" "));
+                console.log(calendarEl.getElementsByTagName("b"));
+                var todayEl = APE.dom.getElementsByClassName(calendarEl, 
+                        "b", c.calendarClass+"-today")[0];
+                Assert.areSame(+todayEl.innerHTML, today.getDate());
             }, 20);
         }
     });

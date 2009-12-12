@@ -74,10 +74,11 @@ APE.namespace("APE.dom");
         }
         var exp = getTokenizedExp(klass,""),
             collection = el.getElementsByTagName(tagName),
-            len = collection.length,
+            ret = [],
+            len = ret.length = collection.length,
             counter = 0,
-            i,
-            ret = Array(len);
+            i;
+        
         for(i = 0; i < len; i++){
             if(exp.test(collection[i][className]))
                 ret[counter++] = collection[i];
