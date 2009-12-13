@@ -1378,7 +1378,7 @@ function normalizeString(s) { return s.replace(STRING_TRIM_EXP,'').replace(WS_MU
         if(HAS_EVENT_TARGET) {
             ev.stopPropagation();
         } else {
-            ev.cancelBubble = true;
+            (window.event || ev).cancelBubble = true;
         }
     }
 })();/**

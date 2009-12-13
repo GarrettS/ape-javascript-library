@@ -109,7 +109,7 @@ APE.namespace("APE.dom");
         if(HAS_EVENT_TARGET) {
             ev.stopPropagation();
         } else {
-            ev.cancelBubble = true;
+            (window.event || ev).cancelBubble = true;
         }
     }
 })();
