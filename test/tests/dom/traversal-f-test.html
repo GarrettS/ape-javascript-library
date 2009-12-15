@@ -68,9 +68,32 @@ var viewportTestCase = new YAHOO.tool.TestCase({
 
     testContains : function() {
         Assert.isTrue(dom.contains(body, testNode));
-        Assert.isFalse(dom.contains(body, body), "body cannot contain itself");
+    },
+    
+    testContainsParent : function() {
+        Assert.isFalse(dom.contains(testNode, body), 
+            "testNode can't contain body.");
     },
 
+    testContainsSameEl : function() {
+        Assert.isFalse(dom.contains(body, body), "body cannot contain itself");
+    },
+    
+    testContainsIncludeElChildEl : function() {
+        Assert.isTrue(dom.contains(body, testNode, true), 
+                "testNode can contain itself; includeEl is true");
+    },
+    
+    testContainsIncludeElSameEl : function() {
+        Assert.isTrue(dom.contains(testNode, testNode, true), 
+                "testNode can contain itself; includeEl is true");
+    },
+    
+    testContainsIncludeElParent : function() {
+        Assert.isFalse(dom.contains(testNode, body, true), 
+            "testNode can never contain body.");
+    },
+    
     testFindAncestorWithAttribute : function() {
         var ancestor = dom.findAncestorWithAttribute(testNode,"action");
         Assert.isNull(ancestor);

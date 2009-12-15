@@ -103,6 +103,33 @@ var animationTestCase = new YAHOO.tool.TestCase({
             bMessage = ex.message;
         }	    
     },
+
+    testStartAfterDoesNotStart : function(){
+        var a = new Animation( .5 );
+        a.startAfter(250);
+        this.wait(function(){
+            Assert.areSame(0, a.position, "a started already.");
+        }, 10);
+    },
+    
+    testStartAfterStarts : function(){
+        var a = new Animation( .5 );
+        a.startAfter(50);
+        this.wait(function(){
+            Assert.areNotSame(0, a.position, "a did not started.");
+        }, 200);
+    },
+
+    testStartAfterCancel : function(){
+        var a = new Animation( .5 );
+        a.startAfter(150);
+        this.wait(function(){
+            a.stop();
+            this.wait(function(){
+                Assert.areSame(0, a.position, "a should not have started.");
+            }, 200);
+        }, 10);
+    },
     
     testSeekTo : function() {
         var a = new Animation( .5 );

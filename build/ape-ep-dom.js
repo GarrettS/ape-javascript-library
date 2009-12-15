@@ -1178,24 +1178,31 @@ function normalizeString(s) { return s.replace(STRING_TRIM_EXP,'').replace(WS_MU
     
     /** 
      * @memberOf APE.dom
-     * @return {boolean} true if a contains b.
-     * Internet Explorer's native contains() is different. It will return true for:
+     * @param {HTMLElement} el the potential container.
+     * @param {HTMLElement} b the potential containee
+     * @param {boolean} if true, and el === b, return true, 
+     * otherwise, work like IE's contains (see below). 
+     * @return {boolean} true if a contains b and when includeEl
+     * Internet Explorer's native contains() will return true for:
      * code body.contains(body); 
-     * Whereas APE.dom.contains will return false.
+     * In Safari, body.contains(body) returns false.
      */
 
     function getContains(){
         if(COMPARE_POSITION in docEl)
-            return function(el, b) {
-                return (el[COMPARE_POSITION](b) & 16) !== 0;
+            return function(el, b, includeEl) {
+                return el && includeEl && (el === b) || 
+                  (el[COMPARE_POSITION](b) & 16) !== 0;
         };
         else if('contains'in docEl)
-            return function(el, b) {
-                return el !== b && el.contains(b);
+            return function(el, b, includeEl) {
+                return el !== null 
+                    && includeEl ? el === b || el.contains(b) :
+                        el !== b && el.contains(b);
         };
-        return function(el, b) {
-            if(el === b) return false;
-            while(el !== b && (b = b[PARENT_NODE]) !== null);
+        return function(el, b, includeEl) {
+            if(!includeEl && el === b) return false;
+            while(el && el !== b && (b = b[PARENT_NODE]) !== null);
             return el === b;
         };
     }

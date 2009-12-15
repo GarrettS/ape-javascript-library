@@ -41,7 +41,7 @@ APE.namespace("APE.anim" );
             this.duration = duration * 1000; // default 1 sec.
         this.timeLimit = this.duration; // for SeekTo()
     }
-
+    
     function noop(p) { return p; }
 
     Animation.prototype = {
@@ -151,6 +151,17 @@ APE.namespace("APE.anim" );
             this._start();
         },
 
+        startAfter : function(delay){
+            var anim = this;
+            function startAfter(){
+                anim.start();
+                // Handle subsequent calls to startAfter.
+                clearTimeout(this.startAfterTimer);
+                delete anim.startAfterTimer;
+            }
+            anim.startAfterTimer = setTimeout(startAfter, delay);
+        },
+        
         /**
          * timeLimit is not calculated here. unregisters Animation, calls
          * onstart(), registers Animation.
@@ -165,6 +176,8 @@ APE.namespace("APE.anim" );
             this.onstart();
             Manager.register(this);
             this.started = true;
+            clearTimeout(this.startAfterTimer);
+            delete this.startAfterTimer;
         },
 
         /**
@@ -264,6 +277,8 @@ APE.namespace("APE.anim" );
          *            method.
          */
         stop : function(ended) {
+            clearTimeout(this.startAfterTimer);
+            delete this.startAfterTimer;
             this._end(ended);
         },
 
