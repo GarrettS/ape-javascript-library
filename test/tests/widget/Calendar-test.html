@@ -49,17 +49,19 @@ window.onload = function(){
         },
  
         tearDown : function () {
+            Action.mousedown(document);
+            Action.mouseup(document);
+            Action.keypress(start, {keyCode:27});
             template.innerHTML = "";
             start = sf = null;
             var instances = Calendar.instances;
             for(var x in instances) {
-                var instance = instances[x], 
-                    calendarId = instance.calendarId;
-                if(!calendarId) continue;
-                var c = document.getElementById(calendarId);
-                if(c) {
-                    c.parentNode.removeChild(c);
+                var instance = instances[x]; 
+                instance.purgeEvents();
+                for(var prop in instance) {
+                    delete instance[prop];
                 }
+                delete instances[x];
             }
             Calendar.instances = {};
         },
@@ -69,7 +71,7 @@ window.onload = function(){
                 testFocusHandler : Calendar.IS_NATIVE,
                 testCalendarStaysVisible : Calendar.IS_NATIVE,
                 testSelectDateInFuture : Calendar.IS_NATIVE,
-                testGetDateFromInput : Calendar.IS_NATIVE,
+                testReadDateFromInput : Calendar.IS_NATIVE,
                 testTodaySelected :  Calendar.IS_NATIVE
                 
             }
@@ -86,12 +88,21 @@ window.onload = function(){
             this.wait(function(){
                 var calendarEl = document.getElementById(c.calendarId);
                 Assert.areEqual("visible", calendarEl.style.visibility, "calendar visiblity wrong.");
-                Action.mousedown( document.getElementById('blah') );
+            }, 30);
+        },
+        
+        testDocumentMousedown : function() {
+            var c = Calendar.getById("start");
+            start.focus();
+            this.wait(function(){
+                start.blur();
+                Action.mousedown( document.body );
                 this.wait(function(){
+                    var calendarEl = document.getElementById(c.calendarId);
                     Assert.areEqual("hidden", calendarEl.style.visibility, 
                             "calendar visiblity not hidden.");
-                }, 330);
-            }, 30);
+                }, 20);
+            }, 20);
         },
         
         testCalendarStaysVisible : function() {
@@ -108,8 +119,10 @@ window.onload = function(){
                 Action.mousedown(calendarEl);
                 // next month.
                 Action.mousedown(document.getElementById("start-next-month"));
+                Action.mouseup(document);
                 // prev year.
                 Action.mousedown(document.getElementById("start-prev-year"));
+                Action.mouseup(document);
                 
                 this.wait(function(){
                     Assert.areEqual("visible", calendarEl.style.visibility, "calendar visiblity wrong.");
@@ -130,6 +143,7 @@ window.onload = function(){
 
             // Set start value for calendar to read.
             start.value = initial;
+            
             start.focus();
             this.wait(function(){
                 var calendarEl = document.getElementById(c.calendarId);
@@ -218,17 +232,12 @@ window.onload = function(){
         // Let the user make a selection.
         testTodaySelected : function() {
             var c = Calendar.getById("start"),
-                today = new Date,
-                calendarEl;
+                today = new Date;
             start.focus();
 
-            calendarEl = document.getElementById(c.calendarId);
-            
-            DateAssert.datesAreEqual(c.getDate(), today);
-            
             this.wait(function(){
-                console.log(calendarEl.getElementsByTagName("b"));
-                var todayEl = APE.dom.getElementsByClassName(calendarEl, 
+                var calendarEl = document.getElementById(c.calendarId),
+                    todayEl = APE.dom.getElementsByClassName(calendarEl, 
                         "b", c.calendarClass+"-today")[0];
                 Assert.areSame(+todayEl.innerHTML, today.getDate());
             }, 20);

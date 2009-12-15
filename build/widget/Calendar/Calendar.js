@@ -56,12 +56,15 @@ APE.namespace("APE.widget");
         // Private static prototype methods---------------------------------------------.
         
         var Event = dom.Event,
+            EventPublisher = APE.EventPublisher,
+            addCallback = EventPublisher.add,
+            removeCallback = EventPublisher.remove,
             testEl = document.body,
             TEXT_CONTENT = typeof testEl.textContent === "string" ? "textContent" : "innerText",
             CAN_FOCUS_EL = typeof testEl.focus !== "undefined",
             FOCUSED_CLASS = "ape-calendar-focused-el",
             SELECTED_DAY_CLASS = "ape-calendar-selected-day",
-            addedDocmouseup;
+            activeCalendar = null;
         testEl = null;
         
         /** @param {Calendar} calendar widget to update after input has been read. 
@@ -69,7 +72,6 @@ APE.namespace("APE.widget");
          *  false, otherwise (and displayDate defaults to "today" 
          */ 
         function updateCalendarWidget(calendar, hasDateFromInput) {
-
             var CalendarLocale = widget.CalendarLocale;
             if(!CalendarLocale) throw Error("Missing Resource: APE.widget.CalendarLocale");
             
@@ -197,14 +199,9 @@ APE.namespace("APE.widget");
                 + "</table>";
             calendarEl.id = calendar.calendarId;
             calendarEl.className = calendar.calendarClass;
-            calendarEl.onmousedown = calendarMousedownHandler;
+            calendarEl.tabIndex = 0;
+            calendarEl.onmousedown = calendarMouseDownHandler;
             
-            if(!addedDocmouseup){
-                // We need to clear the timerID on document, 
-                // incase the user mouse out of the next/prev elements,
-                // and then mouse up.
-                APE.EventPublisher.add(document, "onmouseup", calendarMouseupHandler);
-            }
             calendarEl.onkeydown = calendarKeyDownHandler;
             // Use the table el to avoid calling this function 
             // for calendarEl's focus event.
@@ -213,23 +210,9 @@ APE.namespace("APE.widget");
                 table.onfocusin = handleTableFocusIn;
                 table.onfocusout = handleTableFocusOut;
             }
-            Event.addDelegatedFocus(container, containerFocused);
             container.insertBefore(calendarEl, input.nextSibling);
-            Event.addDelegatedBlur(input.parentNode, hideCalendarOnBlur);
         }
-        
-        function hideCalendarOnBlur(ev){
-            var target = Event.getTarget(ev),
-                id = this.id.replace("-calendar", ""),
-                input = document.getElementById(this.id),
-                calendarDiv = document.getElementById(this.id),
-                calendar;
-            if(target !== input && !dom.contains(calendarDiv, target)) {
-                calendar = widget.Calendar.getById(id);
-                _hideCalendar(calendar);
-            }
-        }
-        
+                
         function buildCalendarBody(){
             var td = [],
                 weekCount = 6,
@@ -251,7 +234,6 @@ APE.namespace("APE.widget");
             if(/-next-|-prev-|-day/.test(target.id)) {
                 dom.addClass(target, FOCUSED_CLASS);
             }
-            Event.stopPropagation(ev);
         }
         
         function handleTableFocusOut(ev){
@@ -274,25 +256,7 @@ APE.namespace("APE.widget");
                 _showCalendar(calendar, ev);
             }
         }
-        
-        function calInputKeyHandler(ev){
-            ev = ev || window.event;
-            var calendar = widget.Calendar.getById(this.id),
-                calendarEl = document.getElementById(calendar.id),
-                keyCode = ev.keyCode;
-            if(keyCode === 27) {
-                Event.preventDefault(ev);
-                _hideCalendar(calendar);
-            } else if(keyCode === 13) { // Enter
-                Event.preventDefault(ev);
-                if(calendar._isHidden) {
-                    _showCalendar(calendar);
-                } else {
-                    _hideCalendar(calendar);
-                } 
-            }
-        }
-        
+                
         function calendarKeyDownHandler(ev) {
             ev = ev || window.event;
             var keyCode = ev.keyCode,
@@ -301,7 +265,10 @@ APE.namespace("APE.widget");
                 target;
             
             if(keyCode === 27) {
-                _hideCalendar(calendar);
+                if(!calendar._isHidden) {
+                    document.getElementById(inputId).focus();
+                    _hideCalendar(calendar);
+                }
             } else if(keyCode === 13) { // Enter.
                 target = Event.getTarget(ev);
                 calendarActivationEventHandler(this, target);
@@ -368,64 +335,83 @@ APE.namespace("APE.widget");
         /**
          * Shows the calendar. The first time this is called, 
          * the selectedDate is initialized.
-         * @param {Event} ev the DOM Event the triggered the action.
          * @fires onshow
          * @private
          */
-        function _showCalendar(calendar, ev) {
+        function _showCalendar(calendar) {
             if(IS_NATIVE) {
-                calendar.onshow(ev);
+                calendar.onshow();
                 return;
             }
+            addCallback(document, "onmousedown", calDocumentMouseDownHandler);
+            addCallback(document, "onmouseup", calDocumentMouseUpHandler);
 
+            if(!calendar._isHidden) return;
+            if(activeCalendar) {
+                _hideCalendar(activeCalendar);
+            }
             createCalendarOnDemand(calendar);
-
-            var el = document.getElementById(calendar.calendarId),
-                calStyle = el.style;
             
             calendar._isHidden = false;
             
-            if(isShown(calendar.calendarEl.style)) {
-                _hideCalendar(calendar, ev);
-            }
-            
-            position(calendar, calStyle);
-            calendar.onshow(ev);
-            calendar.show(calStyle); 
+            var calendarEl = document.getElementById(calendar.calendarId)
+                calStyle = calendarEl.style;
+            position(calendar.id, calStyle);
+            calendar.onshow();
+            calendar.show(calStyle);
+            activeCalendar = calendar;
             calendar.setDate(readDateFromInput(calendar));
+            focusCalendar(calendar, calendarEl);
+            
+            // IE Needs this for showing calendar over other elements.
+            calendarEl.parentNode.style.zIndex = "100";
+        }
+
+        function focusCalendar(calendar, calendarEl){
             if(CAN_FOCUS_EL) {
                 if(calendar.selectedId) {
-                    document.getElementById(calendar.selectedId).focus();
+                    setTimeout(function(){
+                        var selected = document.getElementById(calendar.selectedId);
+                        try {
+                            selected.focus();
+                        } catch(element_hidden){
+                        } finally {
+                            calendar = calendarEl = selected = null;
+                        }
+                    }, 120);
                 } else {
-                    el.focus();                
+                    calendarEl.focus();
                 }
             }
         }
 
-         /** Positions the calendar just below the input.
-          * @param {CSSStyleDeclaration} calStyle the caledar element's style.
-          */
-         function position(calendar, calStyle) {
-             var input = document.getElementById(calendar.id);
-             calStyle.left = input.offsetLeft + "px";
-             calStyle.top =  input.offsetTop + input.offsetHeight + "px";
-         }
+        /** Positions the calendar just below the input.
+         * @param {CSSStyleDeclaration} calStyle the caledar element's style.
+         */
+        function position(inputId, calStyle) {
+            var input = document.getElementById(inputId);
+            calStyle.left = input.offsetLeft + "px";
+            calStyle.top =  input.offsetTop + input.offsetHeight + "px";
+        }
 
-         /**
+        /**
          * Hides the calendar.
-         * @param {Event} e the DOM Event the triggered the action.
          * @fires onhide(e)
          */
-        function _hideCalendar(calendar, ev) {
+        function _hideCalendar(calendar) {
             if(calendar._isHidden) return;
 
-            calendar.onhide(ev);
+            calendar.onhide();
             if(IS_NATIVE) return;
             
             var calendarEl = document.getElementById(calendar.calendarId);
-            calendar.hide(calendarEl.style);
+            if(calendarEl !== null) {
+                calendar.hide(calendarEl.style);
+                
+                // IE Needs this for showing calendar over other elements.
+                calendarEl.parentNode.style.zIndex = "";
+            }
             calendar._isHidden = true;
-            document.getElementById(calendar.id).focus();
         }
 
         /**
@@ -433,7 +419,7 @@ APE.namespace("APE.widget");
          * @description called when calendar is clicked.
          */
         var monthYearAnim;
-        function calendarMousedownHandler(ev) {
+        function calendarMouseDownHandler(ev) {
             ev = ev||window.event;
             
             // Ignore right button; just let those have default 
@@ -444,7 +430,7 @@ APE.namespace("APE.widget");
             if(ev.button > 1) return;
             var target = Event.getTarget(ev),
                 calendarDiv = this;
-            if(/-next-|-prev-/.test(target.id)) {
+            if(/-next-|-prev-/.test(target.id) || /^b$/i.test(target.tagName)) {
                 calendarActivationEventHandler(calendarDiv, target);
                 monthYearAnim = tryGetMonthYearAnim(calendarDiv, target);
                 if(monthYearAnim){
@@ -456,19 +442,18 @@ APE.namespace("APE.widget");
         /** @return {APE.anim.Animation|undefined} monthYearAnim */
         function tryGetMonthYearAnim(calendarDiv, target){
             var runMonthYearAnim, anim = APE.anim;
-            if(!monthYearAnim && anim){
-                monthYearAnim = new anim.Animation(10);
+            if(anim) {
+                if(!monthYearAnim){
+                    monthYearAnim = new anim.Animation(10);
+                }
+                monthYearAnim.run = function runMonthYearAnim(){
+                    calendarActivationEventHandler(calendarDiv, target);
+                }
+                runMonthYearAnim = null;
             }
-            monthYearAnim.run = function runMonthYearAnim(){
-                calendarActivationEventHandler(calendarDiv, target);
-            }
-            runMonthYearAnim = null;
             return monthYearAnim;
         }
         
-        function calendarMouseupHandler(ev){
-            monthYearAnim && monthYearAnim.stop();
-        }
         /** Called from mousedown/keydown */
         function calendarActivationEventHandler(calendarDiv, target) {
             var calendarObject,
@@ -493,7 +478,7 @@ APE.namespace("APE.widget");
         /**
          * Sets the className on the day the user selected, calls onselect, hides 
          *  widget if hideOnSelect is true.
-         *  @param {int] selectedIndex day selected
+         *  @param {uint} selectedIndex day selected
          *  @param {HTMLElement} target the element the user clicked.
          *  @param (string} selectedId new id to give to target.
          */
@@ -572,9 +557,10 @@ APE.namespace("APE.widget");
             var keyCode = ev.keyCode,
                 calendar;
             if(keyCode === 27 || keyCode === 13) {
+                Event.preventDefault(ev);
                 calendar = widget.Calendar.getById(this.id);
                 if(keyCode === 27) {//ESC.
-                    _hideCalendar(calendar, ev);
+                    _hideCalendar(calendar);
                 } else if(keyCode === 13) { // Enter.
                     if(calendar._isHidden) {
                         _showCalendar(calendar);
@@ -583,6 +569,30 @@ APE.namespace("APE.widget");
                     }
                 }
             }
+        }
+
+        function calDocumentMouseDownHandler(ev){
+            if(!activeCalendar) return;
+            
+            var target = dom.Event.getTarget(ev),
+                d = document,
+                calendarEl = d.getElementById(activeCalendar.calendarId);
+
+            // If the innerHTML was wiped or something.
+            // This is a document event handler. Anything can happen.
+            // Sometimes during unit test, target is null (IE6).
+            if(target && target.id !== activeCalendar.id && 
+                    !calendarEl || !dom.contains(calendarEl, target, true)) {
+                
+                _hideCalendar(activeCalendar);
+                activeCalendar = null;
+                removeCallback(d, "onmousedown", calDocumentMouseDownHandler);
+                removeCallback(d, "onmouseup", calDocumentMouseUpHandler);                
+            }    
+        }
+
+        function calDocumentMouseUpHandler(ev){
+            monthYearAnim && monthYearAnim.stop();
         }
 
         return {     
@@ -595,28 +605,37 @@ APE.namespace("APE.widget");
                 if(IS_NATIVE) return;
                 
                 var d = document, 
-                    input = d.getElementById(this.id),
-                    addCallback = APE.EventPublisher.add;
+                    input = d.getElementById(this.id);
                     
                 addCallback(input, "onfocus", calInputFocusHandler);
-                addCallback(input, "onkeydown", calInputKeyHandler);
                 addCallback(input, "onkeydown", calInputKeyDown);
-                if(!IS_NATIVE) {
-                    // IE needs this because if calendar is 
-                    // not shown at pg load time, and input has focus,
-                    // onfocus won't fire when user clicks input.
-                    addCallback(input, "onclick", calInputFocusHandler);
-               }
+                
+                // IE needs this because if calendar is 
+                // not shown at pg load time, and input has focus,
+                // onfocus won't fire when user clicks input.
+                addCallback(input, "onclick", calInputFocusHandler);
+            },
+            
+            purgeEvents : function(){
+                var d = document, 
+                    input = d.getElementById(this.id);
+                if(input) {
+                    removeCallback(input, "onfocus", calInputFocusHandler);
+                    removeCallback(input, "onkeydown", calInputKeyDown);
+                    removeCallback(input, "onclick", calInputFocusHandler);
+                }
+                removeCallback(d, "onmousedown", calDocumentMouseDownHandler);
+                removeCallback(d, "onmouseup", calDocumentMouseUpHandler); 
             },
             
             calendarId : "",
-        
+            
             hiddenDayClass : 'ape-calendar-empty-day',
             calendarClass : 'ape-calendar',
         
             /** Shows the calendar by setting visibility to 'visible'.
              * @param {CSSStyleDeclaration} calStyle the caledar element's style.
-             * Used internally, but may be overridden.
+             * Called internally, but may be overridden.
              */
             show : function(calStyle) {
                 calStyle.visibility = "visible";
@@ -625,7 +644,7 @@ APE.namespace("APE.widget");
             /**
              * Hides the calendar by setting visibility to "hidden"
              * @param {CSSStyleDeclaration} calStyle the calendar element's style.
-             * Used internally, but may be overridden.
+             * Called internally, but may be overridden.
              */
             hide : function(calStyle) {
                 calStyle.visibility = "hidden";

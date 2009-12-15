@@ -34,12 +34,12 @@
 
 <div class="ape-calendar-container" id="start-container">
     <label for="start" id='sf'>Start (YYYY-MM-DD)</label>
-    <input id="start" name="start" type="date">
+    <input id="start" name="start" type="date" class="ape-calendar-input">
 </div>
 
 <div class="ape-calendar-container" id="end-container">
     <label for="end">End (YYYY-MM-DD) </label>
-    <input id="end" type="date">
+    <input id="end" type="date" class="ape-calendar-input">
 </div>
 
 <script src="../../../build/ape-ep-dom.js" type="text/javascript"></script>
@@ -48,22 +48,13 @@
 <script src="../../../build/widget/Calendar/Calendar.js" type="text/javascript"></script>
 <script src="../../../build/widget/Calendar/Calendar_en.js" type="text/javascript"></script>
 <script type="text/javascript">
-// TODO: delegated focus event.
-window.onload = function(){
-    
-    var APE = window.APE;
-    if(APE.widget.Calendar.IS_NATIVE) return;
-
-    window.start = APE.widget.Calendar.getById( "start" );
-    window.end = APE.widget.Calendar.getById( "end" );
-
-    //start.hideOnSelect = false;
-
-// Add a style transition to show() and hide() the calendar.
-    var anim = APE.anim,
-        styleTransition,
-        styleTransition2,
+window.onload = function(ev){
+    var APE = window.APE,
+        anim = APE.anim,
         duration = .1,
+        styleTransitionObjects = {},
+        
+     // Add a style transition to show() and hide() the calendar.
         endStyle = {
             opacity: .98, 
             width: "14.4em", 
@@ -71,37 +62,38 @@ window.onload = function(){
             visibility: "visible"
         };
 
-    start.onshow =  function(cs) {
-        if(!styleTransition) {
-            styleTransition = createStyleTransition(this.calendarId);
-        }
-        styleTransition.seekTo(1);
-    };
+    if(APE.widget.Calendar.IS_NATIVE) return;
 
-    // override "hide".
-    start.hide = function() {
-        styleTransition.seekTo(0);
-    };
-
-    end.onshow =  function(cs) {
-        if(!styleTransition2) {
-            styleTransition2 = createStyleTransition(this.calendarId);
-        }
-        styleTransition2.seekTo(1);
-    };
-
-    // override "hide".
-    end.hide = function() {
-        styleTransition2.seekTo(0);
-    };
-
-    function createStyleTransition(id) {
-        return new anim.StyleTransition(
+    function getStyleTransition(id) {
+        var obj = styleTransitionObjects[id];
+        if(!obj) {
+            obj = styleTransitionObjects[id] = new anim.StyleTransition(
              id, 
              endStyle, duration,
              anim.Transitions.getSigmoid(3)
          );
+        }
+        return obj;
     }
+
+    function calendarShowHandler(){
+        var transition = getStyleTransition(this.calendarId);
+        transition.seekTo(1);
+    }
+
+    function calendarHide(){
+        var transition = getStyleTransition(this.calendarId);
+        transition.seekTo(0);
+    }
+    
+    APE.dom.Event.addDelegatedFocus(document.body, function(ev) {
+        var target = APE.dom.Event.getTarget(ev);
+        if(!APE.dom.hasToken(target.className, "ape-calendar-input")) return;
+
+        calendar = APE.widget.Calendar.getById( target.id );
+        calendar.onshow = calendarShowHandler;
+        calendar.hide = calendarHide;
+    });
 };
 </script>
 </body>

@@ -1180,14 +1180,13 @@ function normalizeString(s) { return s.replace(STRING_TRIM_EXP,'').replace(WS_MU
      * @memberOf APE.dom
      * @param {HTMLElement} el the potential container.
      * @param {HTMLElement} b the potential containee
-     * @param {boolean} if true, and el === b, return true, 
+     * @param {boolean} [includeEl] if true, and el === b, return true, 
      * otherwise, work like IE's contains (see below). 
      * @return {boolean} true if a contains b and when includeEl
      * Internet Explorer's native contains() will return true for:
      * code body.contains(body); 
      * In Safari, body.contains(body) returns false.
      */
-
     function getContains(){
         if(COMPARE_POSITION in docEl)
             return function(el, b, includeEl) {
