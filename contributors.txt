@@ -1,0 +1,23 @@
+Contributing to APE:
+
+APE is AFL. That means it cannot be used for commercial uses. 
+
+Contributors, however, may use the project code for their 
+own work, commercial or not.
+
+Contributors *should* use project code in their own work. 
+The code is designed to be used in real projects. Real 
+projects can identify shortcomings and lead to improvements.
+
+One way to get started is by reviewing commits and leaving 
+comments on GitHub under "Commits" -> "Comments".
+
+Contributors' TODO:
+  1) Bug Fix
+  2) Code Reviews and bug hunts
+  
+Desirable Widgets
+  1) Auto Complete
+  2) Table Sort
+  3) Table Resize
+  4) Rich Text Editor
