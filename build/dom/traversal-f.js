@@ -33,17 +33,18 @@ APE.namespace("APE.dom");
     function getContains(){
         if(COMPARE_POSITION in docEl)
             return function(el, b, includeEl) {
-                return el && includeEl && (el === b) || 
-                  (el[COMPARE_POSITION](b) & 16) !== 0;
+                return el && (includeEl && (el === b) || 
+                  (el[COMPARE_POSITION](b) & 16) !== 0);
         };
-        else if('contains'in docEl)
-            return function(el, b, includeEl) {
-                return el !== null 
-                    && includeEl ? el === b || el.contains(b) :
-                        el !== b && el.contains(b);
-        };
+        else if('contains'in docEl) {
+                return function(el, b, includeEl) {
+                    return el !== null 
+                        && (includeEl ? el === b || el.contains(b) :
+                            el !== b && el.contains(b));
+            };
+        }
         return function(el, b, includeEl) {
-            if(!includeEl && el === b) return false;
+            if(!el || !includeEl && el === b) return false;
             while(el && el !== b && (b = b[PARENT_NODE]) !== null);
             return el === b;
         };

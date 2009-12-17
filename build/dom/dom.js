@@ -619,6 +619,7 @@ APE.dom.key = {
      * @description removes all occurances of <code>klass</code> from element's className.
      */
     function removeClass(el, klass) {
+if(!el) console.log(removeClass.caller)
         var cn = el[className];
         if(!cn) return;
         if(cn === klass) {
@@ -726,17 +727,18 @@ function normalizeString(s) { return s.replace(STRING_TRIM_EXP,'').replace(WS_MU
     function getContains(){
         if(COMPARE_POSITION in docEl)
             return function(el, b, includeEl) {
-                return el && includeEl && (el === b) || 
-                  (el[COMPARE_POSITION](b) & 16) !== 0;
+                return el && (includeEl && (el === b) || 
+                  (el[COMPARE_POSITION](b) & 16) !== 0);
         };
-        else if('contains'in docEl)
-            return function(el, b, includeEl) {
-                return el !== null 
-                    && includeEl ? el === b || el.contains(b) :
-                        el !== b && el.contains(b);
-        };
+        else if('contains'in docEl) {
+                return function(el, b, includeEl) {
+                    return el !== null 
+                        && (includeEl ? el === b || el.contains(b) :
+                            el !== b && el.contains(b));
+            };
+        }
         return function(el, b, includeEl) {
-            if(!includeEl && el === b) return false;
+            if(!el || !includeEl && el === b) return false;
             while(el && el !== b && (b = b[PARENT_NODE]) !== null);
             return el === b;
         };
@@ -835,9 +837,16 @@ function normalizeString(s) { return s.replace(STRING_TRIM_EXP,'').replace(WS_MU
             stopPropagation : stopPropagation
     });
     
-    function getTarget(e) {
-        var t = (e || window.event)[TARGET];
-        if(typeof t !== "undefined" && t.nodeName === "#text") {
+    function getTarget(ev) {
+        ev = ev || window.event;
+        if(!ev) return null;
+        
+        // Sometimes window.event is null here,
+        // as during the Calendar test "onfocusout" 
+        // event handler.
+        var t = (ev || window.event)[TARGET];
+        if(t == null) return null;
+        if(t.nodeName === "#text") {
             // For Safari 2.0, 2.0.4.
             t = t.parentNode;
         }

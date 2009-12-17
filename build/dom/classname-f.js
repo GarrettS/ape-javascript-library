@@ -33,6 +33,7 @@ APE.namespace("APE.dom");
      * @description removes all occurances of <code>klass</code> from element's className.
      */
     function removeClass(el, klass) {
+if(!el) console.log(removeClass.caller)
         var cn = el[className];
         if(!cn) return;
         if(cn === klass) {

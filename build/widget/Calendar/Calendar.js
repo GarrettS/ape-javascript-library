@@ -233,17 +233,23 @@ APE.namespace("APE.widget");
             return"<tbody>" + htmlBuf.join("") + "</tbody>";
         }
         
-        /** IE <= 8, :focus is unsupported.*/
+        /** IE <= 8, :focus is unsupported.
+         */
         function handleTableFocusIn(ev){
             var target = Event.getTarget(ev);
-            if(NEXT_PREV_DAY_EXP.test(target.id)) {
+            if(NEXT_PREV_DAY_EXP.test(target.id) && target !== null) {
                 dom.addClass(target, FOCUSED_CLASS);
             }
         }
         
         function handleTableFocusOut(ev){
             var target = Event.getTarget(ev);
-            dom.removeClass(target, FOCUSED_CLASS);
+            // Somehow window.event is null during the test, 
+            // and that results in getTarget returning null, 
+            // causing target to be null
+            if(target !== null) {
+                dom.removeClass(target, FOCUSED_CLASS);
+            }
         }
         
         /**

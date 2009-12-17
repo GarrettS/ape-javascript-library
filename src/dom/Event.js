@@ -24,9 +24,16 @@ APE.namespace("APE.dom");
             stopPropagation : stopPropagation
     });
     
-    function getTarget(e) {
-        var t = (e || window.event)[TARGET];
-        if(typeof t !== "undefined" && t.nodeName === "#text") {
+    function getTarget(ev) {
+        ev = ev || window.event;
+        if(!ev) return null;
+        
+        // Sometimes window.event is null here,
+        // as during the Calendar test "onfocusout" 
+        // event handler.
+        var t = (ev || window.event)[TARGET];
+        if(t == null) return null;
+        if(t.nodeName === "#text") {
             // For Safari 2.0, 2.0.4.
             t = t.parentNode;
         }
