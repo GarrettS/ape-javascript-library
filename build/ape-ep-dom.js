@@ -473,7 +473,7 @@ function get(src, sEvent) {
 
 if(isMaybeLeak)
     get( window, "onunload" ).addAfter( cleanUp, EventPublisher );
-})();/**dom.js rollup: constants.js, viewport-f.js, position-f.js, classname-f.js,  traversal-f.js, Event.js, Event-coords.js, style-f.js */
+})();/**dom.js rollup: constants.js, keys.js, viewport-f.js, position-f.js, classname-f.js,  traversal-f.js, Event.js, Event-coords.js, style-f.js */
 APE.namespace("APE.dom" );
 (function(){
 	var dom = APE.dom,
@@ -486,7 +486,18 @@ APE.namespace("APE.dom" );
 	
 	dom.OWNER_DOCUMENT = OWNER_DOCUMENT;
     dom.IS_COMPUTED_STYLE = (typeof view != "undefined" && "getComputedStyle" in view);
-})();/**
+})();
+APE.dom.key = {
+    LEFT : 37,
+    UP : 38,
+    RIGHT : 39,
+    DOWN : 40,
+    
+    ARROW_KEY_EXP : /^(?:37|38|39|40)$/,
+    ENTER : 13,
+    TAB : 9,
+    ESC : 27
+};/**
  * @author Garret Smith
  */
 
@@ -539,7 +550,7 @@ APE.namespace("APE.dom" );
             nodeName = baseName, 
             d = win[baseName], 
             propPrefix = "client",
-            wName, hName;
+            wName, hName, r;
 
     // Safari 2 uses document.clientWidth (default).
         if(typeof d.clientWidth == "number"){
@@ -1300,7 +1311,12 @@ function normalizeString(s) { return s.replace(STRING_TRIM_EXP,'').replace(WS_MU
     });
     
     function getTarget(e) {
-        return (e || window.event)[TARGET];
+        var t = (e || window.event)[TARGET];
+        if(typeof t !== "undefined" && t.nodeName === "#text") {
+            // For Safari 2.0, 2.0.4.
+            t = t.parentNode;
+        }
+        return t;
     }
 
     /**

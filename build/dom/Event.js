@@ -25,7 +25,12 @@ APE.namespace("APE.dom");
     });
     
     function getTarget(e) {
-        return (e || window.event)[TARGET];
+        var t = (e || window.event)[TARGET];
+        if(typeof t !== "undefined" && t.nodeName === "#text") {
+            // For Safari 2.0, 2.0.4.
+            t = t.parentNode;
+        }
+        return t;
     }
 
     /**

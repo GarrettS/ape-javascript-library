@@ -27,6 +27,7 @@
 <script type="text/javascript">
 window.onload = function(){
     var Calendar = APE.widget.Calendar,
+        dom = APE.dom,
         Assert = YAHOO.util.Assert,
         DateAssert = YAHOO.util.DateAssert,
         ArrayAssert = YAHOO.util.ArrayAssert,
@@ -34,6 +35,23 @@ window.onload = function(){
         Action = YAHOO.util.UserAction,
         template = document.getElementById('template'),
         templateHTML = template.innerHTML;
+
+    // Find the B element that has |dayIndex| for data.
+    // @param {uint} desiredDate.
+    function findDayElement(calendarEl, desiredDate) {
+        var dayElements = calendarEl.getElementsByTagName("tbody")[0].
+            getElementsByTagName("b");
+        var j = desiredDate-1;
+        var daySelected = dayElements[j];
+        var dayValue = daySelected.firstChild.data;
+        while(dayValue < desiredDate) {
+            daySelected = dayElements[j++];
+            var data = daySelected.firstChild.data;
+            if(!/\d/.test(data)) continue;
+            dayValue = +daySelected.firstChild.data;
+        }
+        return daySelected;
+    }
  
     var calendarTest = new YAHOO.tool.TestCase({
  
@@ -51,7 +69,7 @@ window.onload = function(){
         tearDown : function () {
             Action.mousedown(document);
             Action.mouseup(document);
-            Action.keypress(start, {keyCode:27});
+            Action.keydown(start, {keyCode: dom.key.ESC});
             template.innerHTML = "";
             start = sf = null;
             var instances = Calendar.instances;
@@ -168,25 +186,42 @@ window.onload = function(){
                     DateAssert.datesAreEqual(expectedDate, actualDate);
                 }, 220);
             }, 20);
-
-            // Find the B element that has |dayIndex| for data.
-            // @param {uint} desiredDate.
-            function findDayElement(calendarEl, desiredDate) {
-                var dayElements = calendarEl.getElementsByTagName("tbody")[0].
-                    getElementsByTagName("b");
-                var j = desiredDate-1;
-                var daySelected = dayElements[j];
-                var dayValue = daySelected.firstChild.data;
-                while(dayValue < desiredDate) {
-                    daySelected = dayElements[j++];
-                    var data = daySelected.firstChild.data;
-                    if(!/\d/.test(data)) continue;
-                    dayValue = +daySelected.firstChild.data;
-                }
-                return daySelected;
-            }
         },
- 
+        
+        testHideOnSelectFalse : function(){
+            var c = Calendar.getById("start");
+
+            c.hideOnSelect = false;
+            var initial = "2009-09-24";
+            var expected = "2009-09-29",
+                expectedSplit = expected.split("-");
+            
+            var expectedDate = new Date(0);
+            expectedDate.setFullYear(expectedSplit[0], expectedSplit[1]-1, expectedSplit[2]);
+
+            // Set start value for calendar to read.
+            start.value = initial;
+            
+            start.focus();
+            this.wait(function(){
+                var calendarEl = document.getElementById(c.calendarId);
+
+                // Find 10th day on calendar.
+                var daySelected = findDayElement(calendarEl, 29);
+                Action.mousedown(daySelected);
+                
+                this.wait(function(){
+                    Assert.areSame("visible", calendarEl.style.visibility, "was not visible");
+                    var split = start.value.split("-");
+                    var actualDate = new Date(0);
+                    var split = start.value.split("-");
+                    actualDate.setFullYear(split[0], split[1]-1, split[2]);
+                    DateAssert.datesAreEqual(expectedDate, actualDate);
+                }, 220);
+            }, 20);
+
+        },
+        
         testReadDateFromInput : function() {
             
             var c = Calendar.getById("start");
@@ -241,9 +276,34 @@ window.onload = function(){
                         "b", c.calendarClass+"-today")[0];
                 Assert.areSame(+todayEl.innerHTML, today.getDate());
             }, 20);
-        }
+        },
+
+        testNavigateDays : function(){
+            var c = Calendar.getById("start"),
+                startDate = "2021-01-01",
+                expectedDate = "2021-01-08";
+
+            start.value = startDate;
+            start.focus();
+
+            this.wait(function(){
+
+                var calendarEl = document.getElementById(c.calendarId),
+                    dayToSelect = document.getElementById("start-day7");
+
+                // Focus to first day.
+                Action.keydown( calendarEl, {keyCode:dom.key.DOWN} );
+                Action.keydown( dayToSelect, {keyCode:dom.key.DOWN} );
+                
+                // Close calendar.
+                Action.keydown( dayToSelect, {keyCode:dom.key.ENTER} );
+                this.wait(function(){
+                    Assert.areSame(expectedDate, start.value, "wrong date.");
+                }, 200);
+            }, 20);
+        }            
     });
- 
+    
     //create the logger
     new YAHOO.tool.TestLogger("testLogger");
  

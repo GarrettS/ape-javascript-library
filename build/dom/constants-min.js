@@ -1,1 +1,1 @@
-APE.namespace("APE.dom");(function(){var c=APE.dom,b="ownerDocument",a=document,d=a.documentElement;b=d&&typeof d[b]!=="undefined"?b:"document";a=a.defaultView;c.OWNER_DOCUMENT=b;c.IS_COMPUTED_STYLE=typeof a!="undefined"&&"getComputedStyle"in a})();
+APE.namespace("APE.dom");(function(){var E=APE.dom,A="ownerDocument",D=document,F=D.documentElement,C=F&&typeof F[A]!=="undefined"?A:"document",B=D.defaultView;E.OWNER_DOCUMENT=C;E.IS_COMPUTED_STYLE=(typeof B!="undefined"&&"getComputedStyle" in B)})();

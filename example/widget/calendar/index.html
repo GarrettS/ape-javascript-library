@@ -87,7 +87,8 @@ window.onload = function(ev){
     }
     
     APE.dom.Event.addDelegatedFocus(document.body, function(ev) {
-        var target = APE.dom.Event.getTarget(ev);
+        var target = APE.dom.Event.getTarget(ev),
+            calendar;
         if(!APE.dom.hasToken(target.className, "ape-calendar-input")) return;
 
         calendar = APE.widget.Calendar.getById( target.id );

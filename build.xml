@@ -11,7 +11,7 @@
     <!-- concat all dom-f.js files, EXCEPT the first (style-f.js).
          Remove the APE.namespace(APE.dom) from each file (except the first)
     -->
-        <property name='domFiles' value='constants.js, viewport-f.js, position-f.js, classname-f.js, 
+        <property name='domFiles' value='constants.js, keys.js, viewport-f.js, position-f.js, classname-f.js, 
 traversal-f.js, Event.js, Event-coords.js, style-f.js'/>
         <concat destfile="${build}/dom/dom.js">
             <filelist dir="${build}/dom" files="${domFiles}"/>
@@ -77,17 +77,30 @@ APE.namespace("APE.drag"<!--necessary space --> );</header>
     </target>
 
     <target name="js.minify" depends="js.rollups">
+    	<apply executable="java" parallel="false" dest="${build}" taskname="yui">
+            <fileset dir="${build}" includes="**/*.js"/>
+            <arg line="-jar"/>
+            <arg path="yuicompressor-2.4\build\yuicompressor-2.4.jar"/>
+            <arg line="-v"/>
+            <srcfile/>
+            <arg line="-o"/>
+            <mapper type="glob" from="*.js" to="*-min.js"/>
+            <targetfile/>
+    	</apply>
+    	
+    	<!--
         <apply executable="java" parallel="false" verbose="true" dest="${build}" taskname="js.compile">
             <fileset dir="${build}" includes="**/*.js"/>
             <arg line="-jar"/>
             <arg path="compiler.jar"/>
-            <arg value=" --create_source_map "/>
-            <arg line="--js"/>
+            <arg value=" -/*remove*/-create_source_map "/>
+            <arg line=" -/*remove*/-js"/>
             <srcfile/>
-            <arg line="--js_output_file"/>
+            <arg line="-/*remove*/-js_output_file"/>
             <mapper type="glob" from="*.js" to="*-min.js"/>
             <targetfile/>
         </apply>
+        -->
     </target>
 
     <target name="js.clean">

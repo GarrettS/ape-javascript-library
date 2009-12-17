@@ -1,1 +1,1 @@
-APE.Lock={getLock:function(){if(this.__ape_lock_has_lock)return false;return this.__ape_lock_has_lock=true},releaseLock:function(){this.__ape_lock_has_lock=false},isLocked:function(){return true===this.__ape_lock_has_lock}};
+APE.Lock={getLock:function(){if(this.__ape_lock_has_lock){return false}return this.__ape_lock_has_lock=true},releaseLock:function(){this.__ape_lock_has_lock=false},isLocked:function(){return(true===this.__ape_lock_has_lock)}};

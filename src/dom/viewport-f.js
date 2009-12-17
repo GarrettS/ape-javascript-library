@@ -51,7 +51,7 @@ APE.namespace("APE.dom");
             nodeName = baseName, 
             d = win[baseName], 
             propPrefix = "client",
-            wName, hName;
+            wName, hName, r;
 
     // Safari 2 uses document.clientWidth (default).
         if(typeof d.clientWidth == "number"){

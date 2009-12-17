@@ -60,11 +60,15 @@ APE.namespace("APE.widget");
             addCallback = EventPublisher.add,
             removeCallback = EventPublisher.remove,
             testEl = document.body,
+            activeCalendar = null,
             TEXT_CONTENT = typeof testEl.textContent === "string" ? "textContent" : "innerText",
-            CAN_FOCUS_EL = typeof testEl.focus !== "undefined",
+            CAN_FOCUS_EL = typeof testEl.focus !== "undefined", // False in Safari 2.x.
             FOCUSED_CLASS = "ape-calendar-focused-el",
             SELECTED_DAY_CLASS = "ape-calendar-selected-day",
-            activeCalendar = null;
+            NEXT_PREV_EXP = /-((?:next|prev)-(?:month|year))$/,
+            NEXT_PREV_DAY_EXP = /-next-|-prev-|-day\d/,
+            key = dom.key,
+            noop = Function.prototype;
         testEl = null;
         
         /** @param {Calendar} calendar widget to update after input has been read. 
@@ -77,8 +81,7 @@ APE.namespace("APE.widget");
             
             createCalendarOnDemand(calendar); 
             
-            var curDate = new Date,
-                d = document,
+            var d = document,
                 year = calendar.displayDate.getFullYear(),
                 month = calendar.displayDate.getMonth(),
                 monthName = CalendarLocale.months.abbr[month],
@@ -95,6 +98,7 @@ APE.namespace("APE.widget");
             }
         }
         
+        /** TODO: Consider refactor to a new "APE.date".*/
         function getFirstDayOfMonth(date){
          // Safe copy (Don't mutate displayDate!)
             date = new Date(date); 
@@ -102,11 +106,13 @@ APE.namespace("APE.widget");
             return date.getDay();
         }
         
+        /** Fills in the day elements in the calendar. */
         function populateDays(calendar, year, month, firstDayOfMonth, dayElements) {
             var i = 0, j = 0, 
                 daysInThisMonth = daysInMonth[month],
                 dayElement,
                 dayId = calendar.id + "-day",
+                // TODO: consider refactor to "APE.Date".
                 isLeapYear = (0 == (year%4)) && ((0 != (year%100)) || (0 == (year%400)));
 
             if(month === 1 && isLeapYear)
@@ -229,9 +235,8 @@ APE.namespace("APE.widget");
         
         /** IE <= 8, :focus is unsupported.*/
         function handleTableFocusIn(ev){
-            var target = Event.getTarget(ev),
-                tabIndex = target.tabIndex;
-            if(/-next-|-prev-|-day/.test(target.id)) {
+            var target = Event.getTarget(ev);
+            if(NEXT_PREV_DAY_EXP.test(target.id)) {
                 dom.addClass(target, FOCUSED_CLASS);
             }
         }
@@ -264,17 +269,17 @@ APE.namespace("APE.widget");
                 calendar = widget.Calendar.getById(inputId),
                 target;
             
-            if(keyCode === 27) {
+            if(keyCode === key.ESC) {
                 if(!calendar._isHidden) {
                     document.getElementById(inputId).focus();
                     _hideCalendar(calendar);
                 }
-            } else if(keyCode === 13) { // Enter.
+            } else if(keyCode === key.ENTER) { 
                 target = Event.getTarget(ev);
                 calendarActivationEventHandler(this, target);
-            } else if(keyCode === 9){ // Tab
+            } else if(keyCode === key.TAB){  
                 keepTabsInWidget(calendar, ev);
-            } else if(/37|38|39|40/.test(keyCode)){ 
+            } else if(key.ARROW_KEY_EXP.test(keyCode)){ 
                 handleDayNavigation(calendar, ev, keyCode);
             } 
         }
@@ -282,7 +287,6 @@ APE.namespace("APE.widget");
         function keepTabsInWidget(calendar, ev){
             if(!CAN_FOCUS_EL) return;
             var target = Event.getTarget(ev),
-                calendarEl,
                 hasShiftKey = ev.shiftKey,
                 prevYearId = calendar.id + "-prev-year",
                 isPreviousYear = target.id === prevYearId,
@@ -303,17 +307,17 @@ APE.namespace("APE.widget");
                 dayToFocus,
                 cellToFocus;
             if(currentDay) {
-                if(keyCode === 37) {
-                    dayIndex = -1;
-                } else if(keyCode === 39){
-                    dayIndex = 1;
-                } else if(keyCode === 38) {
-                    dayIndex = -7;
-                } else if(keyCode === 40) {
-                    dayIndex = 7;
+                if(keyCode === key.LEFT) {
+                    dayToFocus = -1;
+                } else if(keyCode === key.RIGHT){
+                    dayToFocus = 1;
+                } else if(keyCode === key.UP) {
+                    dayToFocus = -7;
+                } else if(keyCode === key.DOWN) {
+                    dayToFocus = 7;
                 }
-                if(dayIndex) {
-                    dayToFocus = +currentDay[1] + dayIndex;
+                if(dayToFocus) {
+                    dayToFocus = +currentDay[1] + dayToFocus;
                 } 
             } else {
                 dayToFocus = 0;
@@ -354,7 +358,7 @@ APE.namespace("APE.widget");
             
             calendar._isHidden = false;
             
-            var calendarEl = document.getElementById(calendar.calendarId)
+            var calendarEl = document.getElementById(calendar.calendarId),
                 calStyle = calendarEl.style;
             position(calendar.id, calStyle);
             calendar.onshow();
@@ -367,9 +371,12 @@ APE.namespace("APE.widget");
             calendarEl.parentNode.style.zIndex = "100";
         }
 
+        /** Try to focus the selected day, but if not possible, focus the calendar. */
         function focusCalendar(calendar, calendarEl){
             if(CAN_FOCUS_EL) {
                 if(calendar.selectedId) {
+                    // Using a setTimeout, as in the example, calling "focus" mid-animation
+                    // causes the table to be positioned oddly within the container.
                     setTimeout(function(){
                         var selected = document.getElementById(calendar.selectedId);
                         try {
@@ -386,6 +393,7 @@ APE.namespace("APE.widget");
         }
 
         /** Positions the calendar just below the input.
+        * @param {string} inputId the id of the input/calendar.
          * @param {CSSStyleDeclaration} calStyle the caledar element's style.
          */
         function position(inputId, calStyle) {
@@ -429,25 +437,35 @@ APE.namespace("APE.widget");
             //   IE: 1 is "left". 
             if(ev.button > 1) return;
             var target = Event.getTarget(ev),
-                calendarDiv = this;
-            if(/-next-|-prev-/.test(target.id) || /^b$/i.test(target.tagName)) {
-                calendarActivationEventHandler(calendarDiv, target);
-                monthYearAnim = tryGetMonthYearAnim(calendarDiv, target);
-                if(monthYearAnim){
-                    monthYearAnim.startAfter(400);
+                targetId = target.id;
+            if(NEXT_PREV_DAY_EXP.test(targetId)) {
+                calendarActivationEventHandler(this, target);
+                if(NEXT_PREV_EXP.test(targetId)) {
+                    monthYearAnim = tryGetMonthYearAnim(this, targetId);
+                    if(monthYearAnim){
+                        monthYearAnim.startAfter(400);
+                    }
                 }
             }
         }
         
-        /** @return {APE.anim.Animation|undefined} monthYearAnim */
-        function tryGetMonthYearAnim(calendarDiv, target){
-            var runMonthYearAnim, anim = APE.anim;
+        /** @return {APE.anim.Animation|undefined} monthYearAnim.
+         * This animation is what keeps the days/years updating 
+         * while user has mousedown. When document.mouseup occurs,
+         * this animation stops.
+         */
+        function tryGetMonthYearAnim(calendarDiv, targetId){
+            var runMonthYearAnim, anim = APE.anim,
+                calendar = widget.Calendar.getById(calendarDiv.id.replace(/-calendar$/,""));
+
             if(anim) {
                 if(!monthYearAnim){
-                    monthYearAnim = new anim.Animation(10);
+                    // 90 seconds should provide more than enough scrolling for 
+                    // about 6000 calls or so (6000 years).
+                    monthYearAnim = new anim.Animation(90);
                 }
                 monthYearAnim.run = function runMonthYearAnim(){
-                    calendarActivationEventHandler(calendarDiv, target);
+                    userSelectedMonthOrYear(calendar, targetId);
                 }
                 runMonthYearAnim = null;
             }
@@ -462,7 +480,7 @@ APE.namespace("APE.widget");
             
             calendarObject = widget.Calendar.getById(calendarDiv.id.replace(/-calendar$/,""));
         
-            if(/^b$/i.test(target.tagName)) {
+            if(/-day\d/.test(targetId)) {
                 if(calendarObject.hideOnSelect || targetId !== calendarObject.selectedId) {
                     selectedIndex = +target.firstChild.data;
                     // Days are 1-31.
@@ -470,7 +488,7 @@ APE.namespace("APE.widget");
                         userSelectedDay(calendarObject, selectedIndex, target, targetId);
                     }
                 }
-            } else if(/-next-|-prev-/.test(targetId)){
+            } else if(NEXT_PREV_EXP.test(targetId)){
                 userSelectedMonthOrYear(calendarObject, targetId);
             }
         }
@@ -503,28 +521,21 @@ APE.namespace("APE.widget");
             }
         }
 
-        function userSelectedMonthOrYear(calendarObject, targetId) {
-            var newDate,
-                nextPrevMonthYearExp = 
-                    new RegExp("^" + calendarObject.id + "-((?:next|prev)-(?:year|month))"),
-                match;
-            
-            if(nextPrevMonthYearExp.test(targetId)){
-                newDate = new Date(calendarObject.displayDate);
-                match = nextPrevMonthYearExp.exec(targetId)[1];
-                if(match === "next-year") {
-                    newDate.setFullYear(newDate.getFullYear() + 1);
-                } else if(match === "prev-year") {
-                    newDate.setFullYear(newDate.getFullYear() - 1);
-                } else if(match === "next-month") {
-                    newDate.setMonth(newDate.getMonth() + 1);
-                } else if(match === "prev-month") {
-                     newDate.setMonth(newDate.getMonth() - 1);
-                }
-                calendarObject.setDate(newDate);
+        function userSelectedMonthOrYear(calendarObject, targetId) {            
+            var newDate = new Date(calendarObject.displayDate),
+                match = NEXT_PREV_EXP.exec(targetId)[1];
+            if(match === "next-year") {
+                newDate.setFullYear(newDate.getFullYear() + 1);
+            } else if(match === "prev-year") {
+                newDate.setFullYear(newDate.getFullYear() - 1);
+            } else if(match === "next-month") {
+                newDate.setMonth(newDate.getMonth() + 1);
+            } else if(match === "prev-month") {
+                 newDate.setMonth(newDate.getMonth() - 1);
             }
+            calendarObject.setDate(newDate);
         }
-        
+                
         /** Updates the calendar's date. */
         function setDateOfMonth(calendar, dateOfMonth) {
             var dateToModify = calendar.displayDate||new Date,
@@ -535,7 +546,6 @@ APE.namespace("APE.widget");
         }
         
         function returnFalse() {return false;}
-        function noop(){}
         
          /** 
           * formats the date in default of MM dd, yyyy. Looks like 
@@ -556,12 +566,13 @@ APE.namespace("APE.widget");
             ev = ev || window.event;
             var keyCode = ev.keyCode,
                 calendar;
-            if(keyCode === 27 || keyCode === 13) {
+            if(keyCode === key.ESC || keyCode === key.ENTER) {
                 Event.preventDefault(ev);
                 calendar = widget.Calendar.getById(this.id);
                 if(keyCode === 27) {//ESC.
                     _hideCalendar(calendar);
-                } else if(keyCode === 13) { // Enter.
+                } else if(keyCode === key.ENTER) { // Enter.
+                    
                     if(calendar._isHidden) {
                         _showCalendar(calendar);
                     } else {
