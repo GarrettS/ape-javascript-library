@@ -36,7 +36,9 @@ var dom = APE.dom,
     ds = documentElement.style,
     bs = body.style,
     ts,
-    bCssText;
+    bCssText = document.body.style.cssText,
+    dCssText = documentElement.style.cssText,
+    iframe = document.getElementById('iframe');
 
 var shim = document.createElement('div'),
     ss = shim.style;
@@ -56,12 +58,19 @@ var viewportTestCase = new YAHOO.tool.TestCase({
         scrollTo( 0, 0 );
         shim.style.height = shim.style.width = "0";
 
+        
         // Make testLogger height:0, width: 0.
         // Used for avoiding scrollbar.
         ts = document.getElementById('testLogger').style;
         ts.display = 'none';
+        iframe.style.display = "block";
     },
 
+    tearDown : function(){
+        document.body.style.cssText = bCssText;
+        document.documentElement.style.cssText = dCssText;
+    },
+    
     // TODO: implement these.
     _should : {
         ignore : {
@@ -96,7 +105,6 @@ var viewportTestCase = new YAHOO.tool.TestCase({
     },
 
     testGetScrollOffsetsIframe : function() {
-        var iframe = document.getElementById('iframe');
 
         iframe.style.height = "90px";
         iframe.style.width = "90px";
@@ -131,10 +139,19 @@ var viewportTestCase = new YAHOO.tool.TestCase({
 
     testGetViewportDimensions : function() {
         var dims = dom.getViewportDimensions();
-        Assert.isTypeOf("number", dims.width);
-        Assert.isTypeOf("number", dims.height);
+        shim.style.height = "10000px";
+        Assert.isTrue(dims.height < 10000, "height returned was size of shim");
     },
 
+    testGetViewportHeightLargeEl : function(){
+        document.body.style.height = document.documentElement.style.height = 
+            "100%";
+        iframe.style.display = 
+            document.getElementById("testLogger").style.display = "none";
+        var dims = dom.getViewportDimensions();
+        Assert.isTrue(dims.height > 99, "height returned was smaller than normal");
+    },
+    
     testGetViewportHeightNoScroll: function() {
 
     // Grab viewport dimensions, save as 'dims'.
@@ -184,7 +201,6 @@ var viewportTestCase = new YAHOO.tool.TestCase({
     },
 
     testGetViewportDimensionsIframe : function() {
-        var iframe = document.getElementById('iframe');
         var dims = dom.getViewportDimensions.call(iframe.contentWindow);
 
         iframe.style.height = "90px";

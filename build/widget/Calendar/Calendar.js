@@ -41,17 +41,35 @@ APE.namespace("APE.widget");
     inputTypeDate = null;
     
     function readDateFromInput(calendar) {
-        var input = document.getElementById(calendar.id),
-            iso8601Exp = /(?:^|\s+)(\d{4})-(\d\d)-(\d\d)(?:$|\s+)/,
-            split = iso8601Exp.exec(input.value),
-            displayDate;
-        if(split) {
-            displayDate = new Date(0);
-            displayDate.setFullYear(split[1], split[2]-1, split[3]);
-        }
-        return displayDate;
+        var input = document.getElementById(calendar.id);
+        return parseISO8601(input.value);
     }
 
+    /**Parses string formatted as YYYY-MM-DD to a Date object.
+     * If the supplied string does not match the format, null is returned.
+     * @param {string} dateStringInRange format YYYY-MM-DD, with year in
+     * range of 0000-9999, inclusive.
+     * @return {Date} Date object representing the string.
+     */
+    function parseISO8601(dateStringInRange) {
+        var isoExp = /^\s*([\d]{4})-(\d\d)-(\d\d)\s*$/, 
+            date = null, 
+            month, 
+            parts = isoExp.exec(dateStringInRange);
+
+        if(parts) {
+            date = new Date(0);
+            month = +parts[2];
+            date.setFullYear(parts[1], month - 1, parts[3]);
+            if(month === date.getMonth() + 1) {
+                date.setHours(0, 0, 0, 0);
+            } else {
+                date = null;
+            }
+        }
+        return date;
+    }
+    
     function createCalendarPrototype(){
         // Private static prototype methods---------------------------------------------.
         
@@ -71,21 +89,24 @@ APE.namespace("APE.widget");
             noop = Function.prototype;
         testEl = null;
         
-        /** @param {Calendar} calendar widget to update after input has been read. 
-         *  @param {boolean} hasDateFromInput true, if date was read from input, 
+        /** Updates the calendar based on the input date, or, if no input, today.
+         * 
+         * @param {Calendar} calendar widget to update after input has been read. 
+         * @param {boolean} hasDateFromInput true, if date was read from input, 
          *  false, otherwise (and displayDate defaults to "today" 
          */ 
         function updateCalendarWidget(calendar, hasDateFromInput) {
-            var CalendarLocale = widget.CalendarLocale;
+            var CalendarLocale = widget.CalendarLocale,
+                displayDate = calendar.displayDate;
             if(!CalendarLocale) throw Error("Missing Resource: APE.widget.CalendarLocale");
             
             createCalendarOnDemand(calendar); 
             
             var d = document,
-                year = calendar.displayDate.getFullYear(),
-                month = calendar.displayDate.getMonth(),
+                year = displayDate.getFullYear(),
+                month = displayDate.getMonth(),
                 monthName = CalendarLocale.months.abbr[month],
-                firstDayOfMonth = getFirstDayOfMonth(calendar.displayDate),
+                firstDayOfMonth = getFirstDayOfMonth(displayDate),
                 calendarEl = d.getElementById(calendar.calendarId),
                 dayElements = calendarEl.getElementsByTagName("tbody")[0].getElementsByTagName("b"),
                 calendarHeader = d.getElementById(calendar.calendarId+"-header");
@@ -94,7 +115,7 @@ APE.namespace("APE.widget");
             populateDays(calendar, year, month, firstDayOfMonth, dayElements);
             hiliteToday(calendar, firstDayOfMonth, dayElements);
             if(hasDateFromInput){
-                hiliteSelectedDay(calendar, firstDayOfMonth + calendar.displayDate.getDate(), dayElements);
+                hiliteSelectedDay(calendar, firstDayOfMonth + displayDate.getDate(), dayElements);
             }
         }
         
@@ -218,7 +239,7 @@ APE.namespace("APE.widget");
             }
             container.insertBefore(calendarEl, input.nextSibling);
         }
-                
+        
         function buildCalendarBody(){
             var td = [],
                 weekCount = 6,
@@ -399,7 +420,7 @@ APE.namespace("APE.widget");
         }
 
         /** Positions the calendar just below the input.
-        * @param {string} inputId the id of the input/calendar.
+         * @param {string} inputId the id of the input/calendar.
          * @param {CSSStyleDeclaration} calStyle the caledar element's style.
          */
         function position(inputId, calStyle) {
