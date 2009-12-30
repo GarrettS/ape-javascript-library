@@ -52,7 +52,7 @@ APE.namespace("APE.widget");
      * @return {Date} Date object representing the string.
      */
     function parseISO8601(dateStringInRange) {
-        var isoExp = /^\s*([\d]{4})-(\d\d)-(\d\d)\s*$/, 
+        var isoExp = /^\s*(\d{4})-(\d\d)-(\d\d)\s*$/, 
             date = null, 
             month, 
             parts = isoExp.exec(dateStringInRange);
@@ -85,6 +85,7 @@ APE.namespace("APE.widget");
             SELECTED_DAY_CLASS = "ape-calendar-selected-day",
             NEXT_PREV_EXP = /-((?:next|prev)-(?:month|year))$/,
             NEXT_PREV_DAY_EXP = /-next-|-prev-|-day\d/,
+            DAY_EXP = /-day(\d+)$/,
             key = dom.key,
             noop = Function.prototype;
         testEl = null;
@@ -330,7 +331,7 @@ APE.namespace("APE.widget");
         
         function handleDayNavigation(calendar, ev, keyCode) {
             var target = Event.getTarget(ev),
-                currentDay = target.id.match(/-day(\d+)$/),
+                currentDay = target.id.match(DAY_EXP),
                 dayToFocus,
                 cellToFocus;
             if(currentDay) {
@@ -507,7 +508,7 @@ APE.namespace("APE.widget");
             
             calendarObject = widget.Calendar.getById(calendarDiv.id.replace(/-calendar$/,""));
         
-            if(/-day\d/.test(targetId)) {
+            if(DAY_EXP.test(targetId)) {
                 if(calendarObject.hideOnSelect || targetId !== calendarObject.selectedId) {
                     selectedIndex = +target.firstChild.data;
                     // Days are 1-31.
