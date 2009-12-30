@@ -425,9 +425,11 @@ APE.namespace("APE.widget");
          * @param {CSSStyleDeclaration} calStyle the caledar element's style.
          */
         function position(inputId, calStyle) {
-            var input = document.getElementById(inputId);
-            calStyle.left = input.offsetLeft + "px";
-            calStyle.top =  input.offsetTop + input.offsetHeight + "px";
+            var input = document.getElementById(inputId),
+                container = input.parentNode,
+                coords = dom.getOffsetCoords(input, container);
+            calStyle.left = coords.x + "px";
+            calStyle.top =  coords.y + input.offsetHeight + "px";
         }
 
         /**
