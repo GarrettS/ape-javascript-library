@@ -689,7 +689,7 @@ APE.dom.key = {
      */
     function getOffsetCoords(el, container, coords) {
 
-        var doc = el[dom.OWNER_DOCUMENT],
+        var doc = el.ownerDocument,
             documentElement = doc.documentElement,
             body = doc.body;
 
