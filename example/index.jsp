@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
 "http://www.w3.org/TR/html4/strict.dtd">
-<html lang="en">
+<html lang="en-US">
 <head>
 <title>APE JavaScript Library</title>
 <link type="text/css" rel="stylesheet" href="../resources/ape.css">

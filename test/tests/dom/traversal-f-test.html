@@ -1,7 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
    "http://www.w3.org/TR/html4/strict.dtd">
 <html lang="en">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
     <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" >
     <title>DOM Traversal Test</title>
@@ -21,7 +20,7 @@
 </head>
 <body style="position:relative;top: 10px">
 <div id="testLogger"></div>
-<div id="testNode"><form id="monkey"></form></div>
+<div id="testNode"><form id="monkey" action=""><p><!-- form must have content to be valid--></p></form></div>
 <!--  comment is not an element. -->
 <div id="afterTestNode"></div>
 
