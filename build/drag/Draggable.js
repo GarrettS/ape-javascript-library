@@ -708,19 +708,20 @@ APE.namespace("APE.drag");
             if(dO.container) {
                 var isLeft = newX < dO.minX, isRight = newX > dO.maxX, 
                     isAbove = newY < dO.minY, isBelow = newY > dO.maxY,
-                    moved = newX !== dO.x || newY !== dO.y, 
                     cX = dO.constraint == "x",
                     cY = dO.constraint == "y",
-                    movedX, movedY, doOnDrag;
-             
+                    movedX = !cX, movedY = !cY, doOnDrag;
+
                 if(isLeft || isRight || isAbove || isBelow 
                         && dO.onbeforeexitcontainer() != true) {
                     if(!cY) {
                         movedX = moveDoX(newX, distX, isLeft, isRight);
-                    } else if(!cX) {
+                    }
+                    if(!cX) {
                         movedY = moveDoY(newY, distY, isAbove, isBelow);
                     }
-                    moved = moved && movedX || movedY;
+                    moved = movedX || movedY;
+                    console.log(movedX, movedY)
                     if(moved && dO.ondrag) {
                         dO.ondrag(e);
                     } else {
@@ -733,6 +734,9 @@ APE.namespace("APE.drag");
         }
         
         function moveDoX(newX, distX, isLeft, isRight){
+            if(dO.x === newX) {
+                return false;
+            }
             var stoppedX;
             if(isLeft) {
                 if(!dO.isAtLeft) {
@@ -765,6 +769,9 @@ APE.namespace("APE.drag");
         }
         
         function moveDoY(newY, distY, isAbove, isBelow, hasOnDrag){
+            if(dO.y === newY) {
+                return false;
+            }
             var stoppedY;
             if(isAbove) {
                 if(!dO.isAtTop) {
@@ -774,8 +781,9 @@ APE.namespace("APE.drag");
                     carryGroup(null, dO.minY - dO.origY);
                     dO.isAtTop = true;
                     dO.isAtBottom = false;
+                } else {
+                    stoppedY = true;
                 }
-                stoppedY = true;
             } else if(isBelow) {
                 if(!dO.isAtBottom) {
                     if(dO.maxY > 0)
@@ -785,8 +793,9 @@ APE.namespace("APE.drag");
                     carryGroup(null, dO.maxY - dO.origY);
                     dO.isAtTop = false;
                     dO.isAtBottom = true;
+                } else {
+                    stoppedY = true;
                 }
-                stoppedY = true;
             } else {
                 dO.isAtTop = dO.isAtBottom = false;
                 dO.moveToY(newY);
