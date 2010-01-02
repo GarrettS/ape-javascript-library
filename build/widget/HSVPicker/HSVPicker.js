@@ -14,14 +14,13 @@ APE.namespace("APE.widget");
         ColorRGB = color.ColorRGB,
         ColorHSV = color.ColorHSV,
         HsvPicker,
+        noop = Function.prototype,
         ERR_INVALID_COLOR = "Please enter a valid color value.";
         
     color = null;
     
     
     APE.widget.HsvPicker = HsvPicker = APE.createFactory(HsvPick);
-
-    function noop(){}
     
     function HsvPick(id) {
     	
@@ -31,14 +30,13 @@ APE.namespace("APE.widget");
             bg,
     	    bgSelectorEl = document.getElementById(this.id + "-saturation-value-selector");
     
-    	this.hueSlider = Draggable.getByNode(hueSelectorEl);
-        this.hueSlider.moveToX = noop;
+    	this.hueSlider = Draggable.getByNode(hueSelectorEl, {constraint:"y"});
     	this.hueSlider.keepInContainer = true;
     
     	this.bgSelector = Draggable.getByNode(bgSelectorEl);
     	
     	bg = bgSelectorEl.parentNode.parentNode;
-                
+        
     	this.bg = bg;
     	this.bgSelector.container = bg;
     	
@@ -56,7 +54,7 @@ APE.namespace("APE.widget");
     	this.prevValue = this.textInput.value;
     }
         
-	function hueSlid(e) {
+	function hueSlid(ev) {
 		var hsvPicker = HsvPicker.getById(this.id.split("-")[0]);
 		if(!hsvPicker.enabled) return;
 		hsvPicker.onbeforechange();
@@ -64,7 +62,7 @@ APE.namespace("APE.widget");
 		
 		hsvPicker.bg.style.background = hsvPicker.rgbForHue(hsvPicker.h);
 		hsvPicker.updateDisplay();
-		hsvPicker.onchange(e);
+		hsvPicker.onchange(ev);
 	}
 
 	function grabHueSlider(e) {
@@ -165,8 +163,7 @@ APE.namespace("APE.widget");
     		this.bgSelector.onglide = bgSelectorDrag;
             
     		this.hueSlider.onbeforedragstart =
-    		this.hueSlider.ondrag =
-    		this.hueSlider.onglide = hueSlid;
+    		this.hueSlider.ondrag = this.hueSlider.onglide = hueSlid;
             
     		this.hueSlider.container.onmousedown = grabHueSlider;
     		this.bgSelector.onglide = bgSelectorDrag;

@@ -9,7 +9,6 @@ APE.namespace("APE.ajax");
      *   };
      *   req.send();
      *
-     * This file has no dependencies.
      * Assign multiple callbacks using EventPublisher, if desired.
      */
     APE.ajax.AsyncRequest = APE.createFactory(AsyncRequest, createAsyncProto);
@@ -34,9 +33,11 @@ APE.namespace("APE.ajax");
 
     var defaultEnctype = 'application/x-www-form-urlencoded',
         nType = 'XMLHttpRequest', aType = 'ActiveXObject',
+        progId,
         type = (nType in self) ? nType : aType,
         uid = 0,
         isNative = nType == type,
+        supported = isNative || aType in self,
         /** store up to 4 XHR objects. */
         xhrList = [];
 
@@ -59,8 +60,33 @@ APE.namespace("APE.ajax");
         return getXHR();
     }
     
+    /**
+     * @return an XMLHttpRequest, either native or ActiveX, or 
+     * undefined, if not supported.
+     */
     function getXHR() {
-        return isNative ? new self[type] : new self[type]('Microsoft.XMLHTTP');
+        if(!supported) return;
+        return isNative ? new self[type] : tryGetXhrFromProgId();
+    }
+    
+    function tryGetXhrFromProgId(){        
+        var ctor = self[type],
+            i, progIdList, xhr;
+        
+        if(progId) return new ctor(progId);
+
+        // http://blogs.msdn.com/xmlteam/archive/2006/10/23/using-the-right-version-of-msxml-in-internet-explorer.aspx
+        // try for 3.0 version as Msxml2.XMLHTTP, 
+        // fallback to "legacy" Microsoft.XMLHTTP.
+        progIdList = ["Msxml2.XMLHTTP", "Microsoft.XMLHTTP"];
+        for(i = 0; i < progIdList.length; i++) {
+            try {
+                xhr = new ctor(progIdList[i]);
+                progId = progIdList[i];
+                return xhr;
+            } catch(ex){}
+        }
+        supported = false;
     }
     
     function createAsyncProto() {
