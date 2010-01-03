@@ -684,7 +684,7 @@ APE.namespace("APE.drag");
 
             var hasOnDrag = typeof dO.ondrag === FUNCTION;
 
-            if(!keptInContainerOnDrag(dO, newX, newY, distX, distY, hasOnDrag, e)) {
+            if(!keptInContainerOnDrag(newX, newY, distX, distY)) {
              // Container boundaries irrelevant.
                 dO.isAtLeft = dO.isAtRight = dO.isAtTop = dO.isAtBottom = false;
                 dO.moveToX(newX);
@@ -704,12 +704,13 @@ APE.namespace("APE.drag");
         /** If the object has a container, dragging is handled here.
          * @return {Boolean} true, if object was kept in container, false otherwise.
          */
-        function keptInContainerOnDrag(dO, newX, newY, distX, distY, hasOnDrag, e){
+        function keptInContainerOnDrag(newX, newY, distX, distY){
             if(dO.container) {
                 var isLeft = newX < dO.minX, isRight = newX > dO.maxX, 
                     isAbove = newY < dO.minY, isBelow = newY > dO.maxY,
-                    cX = dO.constraint == "x",
-                    cY = dO.constraint == "y",
+                    constraint = dO.constraint,
+                    cX = constraint == "x",
+                    cY = constraint == "y",
                     movedX = !cX, movedY = !cY, doOnDrag;
 
                 if(isLeft || isRight || isAbove || isBelow 
@@ -720,12 +721,12 @@ APE.namespace("APE.drag");
                     if(!cX) {
                         movedY = moveDoY(newY, distY, isAbove, isBelow);
                     }
-                    moved = movedX || movedY;
-                    console.log(movedX, movedY)
-                    if(moved && dO.ondrag) {
-                        dO.ondrag(e);
+                    if(movedX || movedY) {
+                        if(dO.ondrag) {
+                            dO.ondrag();
+                        }
                     } else {
-                        dO.ondragstop(e);
+                        dO.ondragstop();
                     }
                     return true;
                 }
