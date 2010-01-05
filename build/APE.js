@@ -47,7 +47,7 @@
             // hasOwnProperty on window (or Host obj). Use internal hasOwnProp.
             // Opera does not support the global object or [[Put]] properly (see below)
             if(!hasOwnProp(pkg, name)) {
-                pkg[name] = new Package((pkg.qualifiedName||"APE")+"."+name);
+                pkg[name] = new Package(pkg, name);
             }
             pkg = pkg[name];
         }
@@ -171,8 +171,9 @@
         return"["+this.qualifiedName+"]";
     }
 
-    function Package(qualifiedName) {
-        this.qualifiedName = qualifiedName;
+    function Package(base, name) {
+        var baseName = base.qualifiedName ? base.qualifiedName + "." : "";
+        this.qualifiedName = baseName + name;
         this.toString = packageToString;
     }
     

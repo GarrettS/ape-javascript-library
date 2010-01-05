@@ -31,15 +31,6 @@ var apeTest = new YAHOO.tool.TestCase({
     // Test methods - names must begin with "test"
     //---------------------------------------------------------------------
         
-    testNamespace : function(s) {
-        APE.namespace("APE.test.pkg");
-        Assert.isNotNull(window.APE);
-        Assert.isNotNull(window.APE.test);
-        Assert.isNotNull(window.APE.test.pkg);
-        APE.namespace("APE.test.pkg2");
-        Assert.isNotNull(window.APE.test.pkg2, "pkg2 was not found.");
-    },
-
     _should : {
         // Patch to Object.prototype.hasOwnProperty for Opera
         // cannot be tested in Safari < 2.0.2 because it is
@@ -48,6 +39,20 @@ var apeTest = new YAHOO.tool.TestCase({
             testHasOwnProperty : 
                 typeof Object.prototype.hasOwnProperty != "function"
         }
+    },
+
+    testNamespace : function() {
+        APE.namespace("APE.test.pkg");
+        Assert.isNotNull(window.APE);
+        Assert.isNotNull(window.APE.test);
+        Assert.isNotNull(window.APE.test.pkg);
+        APE.namespace("APE.test.pkg2");
+        Assert.isNotNull(window.APE.test.pkg2, "pkg2 was not found.");
+    },
+
+    testNamespaceOther : function() {
+        APE.namespace("other");
+        YAHOO.util.Assert.isObject(window.other);
     },
     
     testExtend : function() {
