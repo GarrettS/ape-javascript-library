@@ -12,7 +12,8 @@ APE.namespace("APE.ajax");
      * Assign multiple callbacks using EventPublisher, if desired.
      */
     APE.ajax.AsyncRequest = APE.createFactory(AsyncRequest, createAsyncProto);
-
+    APE.ajax.AsyncRequest.isSupported = isSupported;
+    
     function AsyncRequest(id, formConfig) {
         this.id = id;
         this.httpMethod = formConfig.method && formConfig.method.toLowerCase()||"get";
@@ -22,25 +23,27 @@ APE.namespace("APE.ajax");
         if(!this.enctype && this.httpMethod == "post") {
             this.enctype = defaultEnctype;
         }
-
-        this.req = getAvailableXHR();
-        // copy config.
-        this.config = {};
-        for(var prop in formConfig) {
-            this.config[prop] = formConfig[prop];
+        if(supported) {
+            this.req = getAvailableXHR();
         }
+        // copy config.
+        this.config = APE.mixin({}, formConfig);
     }
 
     var defaultEnctype = 'application/x-www-form-urlencoded',
         nType = 'XMLHttpRequest', aType = 'ActiveXObject',
         progId,
-        type = (nType in self) ? nType : aType,
+        type = typeof window[nType] != "undefined" ? nType : aType,
         uid = 0,
         isNative = nType == type,
-        supported = isNative || aType in self,
+        supported = isNative || typeof window[aType] != "undefined" && !!getXHR(),
         /** store up to 4 XHR objects. */
         xhrList = [];
-
+    
+    function isSupported(){
+        return supported;
+    }
+    
     function getAvailableXHR(){
         var x, i, readyState;
         for(i = 0; i < 4; i++) {
@@ -66,11 +69,11 @@ APE.namespace("APE.ajax");
      */
     function getXHR() {
         if(!supported) return;
-        return isNative ? new self[type] : tryGetXhrFromProgId();
+        return isNative ? new this[type] : tryGetXhrFromProgId();
     }
     
     function tryGetXhrFromProgId(){        
-        var ctor = self[type],
+        var ctor = this[type],
             i, progIdList, xhr;
         
         if(progId) return new ctor(progId);
@@ -178,6 +181,9 @@ APE.namespace("APE.ajax");
              * the error is returned. Otherwise, the AsyncRequest is returned.
              */
             send : function( data, timeoutMillis ) {
+                if(!supported) {
+                    return this.onfail();
+                }
                 var uri = this.uri, boundary;
     
                 this.timeoutMillis = timeoutMillis|0 || 4000;
@@ -213,6 +219,7 @@ APE.namespace("APE.ajax");
              * then fires "oncomplete" with {successful : false}
              */
             abort : function() {
+                if(!supported) return;
                 this.req.abort();
     
                 // Clear the timeout timer.
@@ -223,17 +230,20 @@ APE.namespace("APE.ajax");
     
             toString : function() {
                 var s = "AsyncRequest: \n"
-                    + "uri: " + this.uri
+                    + "isSupported(): " + supported
+                    + "\nuri: " + this.uri
                     + "\nmethod: " + this.httpMethod
                     + "\n----------------------\n"
                     + "req: \n",
                     prop;
-                for(prop in this.req)
-                    try {
-                        if(typeof this.req[prop] == "string") {
-                            s.concat(prop + ": " + this.req[prop] + "\n");
-                        }
-                    } catch(mozillaSecurityError) { }
+                if(supported) {
+                    for(prop in this.req)
+                        try {
+                            if(typeof this.req[prop] == "string") {
+                                s.concat(prop + ": " + this.req[prop] + "\n");
+                            }
+                        } catch(mozillaSecurityError) { }
+                }
                 return s;
             }
         };

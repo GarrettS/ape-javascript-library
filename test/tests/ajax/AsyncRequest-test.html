@@ -21,19 +21,40 @@
 <script type="text/javascript">
 (function(){
 var Assert = YAHOO.util.Assert,
-    AsyncRequest = APE.ajax.AsyncRequest;
-
+    AsyncRequest = APE.ajax.AsyncRequest,
+    isSupported = AsyncRequest.isSupported(),
+    ignoreTest = location.protocol == "file:" || !isSupported;
     // hrefStart = location.protocol + "//" + location.hostname + "/";
 
     var asyncTestCase = new YAHOO.tool.TestCase({
 
     name : "AsyncRequest Tests",
 
+    _should : {
+        ignore : {
+            testDone : ignoreTest,
+            testDoneFailure : ignoreTest,
+            testOnsucceed : ignoreTest,
+            testGetById : ignoreTest,
+            testConfigData : ignoreTest,
+            testAbort : ignoreTest,
+            testTimeout : ignoreTest,
+            testPostData : ignoreTest,
+            testPassFail : ignoreTest,
+            testFailSuccess : ignoreTest,
+            testSuccessNoOnabort : ignoreTest,
+            testSuccessNoOnfail : ignoreTest,
+            testSuccessResponseData : ignoreTest,
+
+            testNotSupported : isSupported
+        }
+    },
+    
     setUp : function () {
     },
 
     tearDown : function(){
-        AsyncRequest.instances = {};
+        delete AsyncRequest.instances;
     },
     
     //---------------------------------------------------------------------
@@ -118,6 +139,22 @@ var Assert = YAHOO.util.Assert,
             Assert.areEqual( "Garrett", data.name );
         }
         this.wait(probablyDone, 2500);
+    },
+
+    testIsSupported : function(){
+        Assert.isBoolean(isSupported);
+    },
+
+    testNotSupported : function(){
+        var req = AsyncRequest.getById("d", {action:"data.json.txt", method:"GET"} ),
+            failed;
+
+        req.onfail = function(){
+            failed = true;
+        };
+
+        req.send();
+        Assert.isTrue(failed);
     },
     
     // make sure that onfail doesn't fire.
