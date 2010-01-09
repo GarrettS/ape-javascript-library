@@ -14,8 +14,34 @@ Tested Browsers:
  - IE 6 up
  - Opera 9.5 up
  - Chrome 2 up
- - BlackBerry9000 4.6
 
 Other browsers:
 Safari 2.0.4 has many test failures due to limitation in YUI Test's UserAction (pageX).
-Many tests will unofficially pass in Safari 2.0 and IE 5.5.
+Many tests will unofficially pass in Safari 2.0, and IE 5.5. Blackberry9000 support is 
+desirable, where possible, though the test runner needs reengineering to better support 
+that.
+
+Contributing:
+Code reviews: Click "Commits" and add your comments.
+
+Code contributions: Create a Fork of APE using the Fork button
+(http://help.github.com/forking/)
+When you're done, click "Pull Request".
+
+Building:
+Download ANT (http://ant.apache.org/).
+Modify build.xml to point to directory on your drive or use 
+a .properties file to specify own properties for build.xml.
+
+Build Targets:
+ * js.rollups - builds the rollups to the build directory
+ * js.minify - builds rollups then minifies to *-min.js
+ * deploy -   deploys to your Tomcat (or other webserver).
+ * deploy copy - just a fast copy, does not include -min files.
+ 
+Deploying to server is necessary for testing AsyncRequest or anything 
+else that may involve server communication.
+
+Testing:
+Tests are located under /test/tests/. File suite.html contains 
+test suites for the entire APE library.
