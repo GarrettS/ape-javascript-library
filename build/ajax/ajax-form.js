@@ -9,29 +9,27 @@ APE.namespace("APE.ajax");
      *   };
      *   req.send();
      *
+     * @param {Object|string} formConfig object must have `action`, and 
+     * may have `method`, and `enctype`.
      * Assign multiple callbacks using EventPublisher, if desired.
      */
-    APE.ajax.AsyncRequest = APE.createFactory(AsyncRequest, createAsyncProto);
-    APE.ajax.AsyncRequest.isSupported = isSupported;
+    var APE = window.APE,
+        AsyncRequest = APE.createFactory(AsyncRequestC, createAsyncProto);
+    AsyncRequest.isSupported = isSupported;
+    APE.ajax.AsyncRequest = AsyncRequest;
     
-    function AsyncRequest(id, formConfig) {
+    function AsyncRequestC(id, formConfig) {
         this.id = id;
-        this.httpMethod = formConfig.method && formConfig.method.toLowerCase()||"get";
-        this.uri = formConfig.action;
+        this.uri = formConfig.action || typeof formConfig == "string" && formConfig;
         if(!this.uri) throw URIError("formConfig.action = undefined");
-        this.enctype = formConfig.enctype;
-        if(!this.enctype && this.httpMethod == "post") {
-            this.enctype = defaultEnctype;
-        }
+        this.httpMethod = formConfig.method && formConfig.method.toLowerCase()||"get";
+        this.enctype = formConfig.enctype || "application/x-www-form-urlencoded";
         if(supported) {
             this.req = getAvailableXHR();
         }
-        // copy config.
-        this.config = APE.mixin({}, formConfig);
     }
 
-    var defaultEnctype = 'application/x-www-form-urlencoded',
-        nType = 'XMLHttpRequest', aType = 'ActiveXObject',
+    var nType = 'XMLHttpRequest', aType = 'ActiveXObject',
         progId,
         type = typeof window[nType] != "undefined" ? nType : aType,
         uid = 0,
@@ -68,7 +66,6 @@ APE.namespace("APE.ajax");
      * undefined, if not supported.
      */
     function getXHR() {
-        if(!supported) return;
         return isNative ? new this[type] : tryGetXhrFromProgId();
     }
     
@@ -171,7 +168,7 @@ APE.namespace("APE.ajax");
     
             /** Sends the call.
              * @param {string|Array} [data] post data. 
-             * For an unencoded "multipart/form-data" request, if "data" is
+             * For an unencoded "multipart/form-data" request, if `data` is
              * an array, it is joined on a unique boundary.
              * 
              * If method is GET, and data is present, data is appended to URI 

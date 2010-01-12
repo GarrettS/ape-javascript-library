@@ -173,6 +173,23 @@ var Assert = YAHOO.util.Assert,
         this.wait(probablyLongEnough, 2500);
     },
 
+    testConfigStringValue : function(){
+        var req = AsyncRequest.getById("", "data.json.txt" );
+        // send the request.
+        Assert.areSame("data.json.txt", req.uri);
+    },
+    
+    testMissingAction : function(){
+        var req, err;
+        try {
+            req = AsyncRequest.getById("", "" );
+        } catch(ex) {
+            err = ex;
+        }
+        // send the request.
+        Assert.isInstanceOf(URIError, err);
+    },
+    
     // make sure that onfail doesn't fire.
     testSuccessNoOnabort : function(){
         var req = AsyncRequest.getById("", {action:"data.json.txt", method:"GET"} ),
@@ -313,12 +330,6 @@ var Assert = YAHOO.util.Assert,
     testToString : function() {
         var req = AsyncRequest.getById("", {action:"data.json.txt", method:"POST" });
         Assert.isTypeOf("string", req.toString());
-    },
-
-    testConfigData : function() {
-        var config = {action:"data.json.txt", method:"POST", id : "12" };
-        var req = AsyncRequest.getById("12", config );
-        Assert.areSame("12", req.config.id, "config data missing.");
     },
 
     testGetById : function() {
