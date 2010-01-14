@@ -40,7 +40,7 @@ APE.namespace("APE.drag" );/**
     /*
      * @constructor @param {HTMLElement} el the element to drag. @param {Object}
      * [options] { - activeDragClassName - selectedClaslusName - dragCopy
-     * {boolean} - dragMultiple {boolean} - useAnim {boolean}
+     * {boolean} - dragMultiple {boolean} - useAnim {boolean}, constraint "x" | "y".
      */
     function Drag(id, options) {
         var d = document, // not cross-frame.
@@ -1235,8 +1235,8 @@ APE.namespace("APE.drag" );/**
         drag = APE.drag,
         dom = APE.dom,
         Slider = drag.Slider = APE.createFactory(SliderC, createSliderProto),
-        HORZ = 1,
-        VERT = 2,
+        HORZ = "x",
+        VERT = "y",
         MINVAL = "minValue",
         MAXVAL = "maxValue";
     
@@ -1245,17 +1245,15 @@ APE.namespace("APE.drag" );/**
         VERT : VERT
     };
 
-    function SliderC(id, dir, minValue, maxValue) {
+    function SliderC(id, config) {
         this.id = id;
-        this.dir = dir;
+        this.dir = config.dir;
         this.value = 0;
         this.rationalValue = 0;
-    
-        var handle = drag.Draggable.getById(id, dir);
-        handle.keepInContainer = true;
-        this.handle = handle;
-        this[MINVAL] = minValue||0;
-        this[MAXVAL] = maxValue;
+        this.handle = drag.Draggable.getById(id, {constraint:this.dir});
+        this.handle.keepInContainer = true;
+        this[MINVAL] = config[MINVAL]||0;
+        this[MAXVAL] = config[MAXVAL];
         this.tDist = 0;
         this.init();
     }
@@ -1270,22 +1268,22 @@ APE.namespace("APE.drag" );/**
         return { 
             
             init : function() {
-                var EventPublisher = APE.EventPublisher,
+                var addCallback = APE.EventPublisher.add,
                     el = document.getElementById(this.id),
                     handle = this.handle,
                     container = this.trackbar = document.getElementById(this.id).parentNode;
                 
-                EventPublisher.add(handle, "onglideend", dragEnd, this);
-                EventPublisher.add(handle, "ondragend", dragEnd, this);
-                EventPublisher.add(handle, "onglideend", dragEnd, this);
-                EventPublisher.add(handle, "ondrag", sliderSlid, this);
+                addCallback(handle, "onglideend", dragEnd, this);
+                addCallback(handle, "ondragend", dragEnd, this);
+                addCallback(handle, "onglideend", dragEnd, this);
+                addCallback(handle, "ondrag", sliderSlid, this);
                 if(!("focus" in handle)) {
-                    EventPublisher.add(el, "onmousedown", sliderFocus, this);
+                    addCallback(el, "onmousedown", sliderFocus, this);
                 }
-                EventPublisher.add(el, "onfocus", sliderFocus, this);
-                EventPublisher.add(el, "onblur", sliderBlur, this);
-                EventPublisher.add(handle, "onglide", sliderSlid, this);
-                EventPublisher.add(handle, "ondragstop", sliderSlid, this);
+                addCallback(el, "onfocus", sliderFocus, this);
+                addCallback(el, "onblur", sliderBlur, this);
+                addCallback(handle, "onglide", sliderSlid, this);
+                addCallback(handle, "ondragstop", sliderSlid, this);
 
                 if(this.dir === VERT){
                     this.tDist = container.clientHeight - el.offsetHeight;
@@ -1298,7 +1296,7 @@ APE.namespace("APE.drag" );/**
                 // Default: use pixels for min/max.
                 if(this[MAXVAL] === undefined) 
                     this[MAXVAL] = this.tDist;
-                EventPublisher.add(container, "onmousedown", trackbarMouseDown, container);
+                addCallback(container, "onmousedown", trackbarMouseDown, container);
             },
         
             ticks : 15,
@@ -1356,11 +1354,14 @@ APE.namespace("APE.drag" );/**
         function moveToNo(){} 
         
         function trackbarMouseDown(e) {
+            e = e||window.event;
             var target = dom.Event.getTarget(e),
-                slider;
-            if(target !== this) return true;
+                slider, el;
             slider = Slider.instances[this.getElementsByTagName("*")[0].id];
-            e = e||self.event;
+            ensureFocus(slider.id);
+            if(target !== this) {
+                return true;
+            }
             if(e.preventDefault)
                 e.preventDefault();
     
@@ -1369,14 +1370,25 @@ APE.namespace("APE.drag" );/**
             sliderSlid.call(slider, e);
             return false;
         }
-            
+        
+        // This focus management should not be necessary.
+        function ensureFocus(sliderId) {
+            var el = document.getElementById(sliderId);
+            if(activeSlider && activeSlider.blur) {
+                activeSlider.blur();
+            }
+            if(el.focus) {
+                el.focus();
+            }
+        }
+        
         function dragEnd(e) {
             dom.removeClass(this.trackbar, ACTIVE_TRACKBAR);
             sliderSlid.call(this, e);
             if(typeof this.onslideend === "function")
                 this.onslideend(e);
-         }
-         
+        }
+        
         function sliderFocus(e) {
             activeSlider = this;
             dom.addClass(this.trackbar, ACTIVE_TRACKBAR);

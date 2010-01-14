@@ -56,6 +56,8 @@ var Assert = YAHOO.util.Assert,
     TestRunner = YAHOO.tool.TestRunner,
     Draggable = APE.drag.Draggable,
     Slider = APE.drag.Slider,
+    hConfig = {dir:Slider.direction.HORZ},
+    vConfig = {dir:Slider.direction.VERT},
     testNodeHandle = document.getElementById('testNode-handle'),
     testNode2Handle = document.getElementById('testNode2-handle'),
     template = document.getElementById('template'),
@@ -111,7 +113,7 @@ var draggableTestCase = new YAHOO.tool.TestCase({
         
         testNodeHandle.className = "orig";
         
-        var d = Slider.getByNode( testNodeHandle, Slider.direction.HORZ );
+        var d = Slider.getByNode( testNodeHandle, hConfig );
 
         Action.mousedown(testNodeHandle); // Force "onfocus" to fire in Safari.
         testNodeHandle.focus(); 
@@ -128,7 +130,7 @@ var draggableTestCase = new YAHOO.tool.TestCase({
     
     testOnslide : function() {
         
-        var d = Slider.getByNode( testNodeHandle, Slider.direction.HORZ ),
+        var d = Slider.getByNode( testNodeHandle, hConfig ),
             slid = false;
 
         d.onslide = function() {
@@ -153,7 +155,7 @@ var draggableTestCase = new YAHOO.tool.TestCase({
 
     testRationalValue : function() {
                 
-        var d = Slider.getByNode( testNodeHandle, Slider.direction.HORZ );
+        var d = Slider.getByNode( testNodeHandle, hConfig );
 
         if(testNodeHandle.focus)
             testNodeHandle.focus();
@@ -173,7 +175,7 @@ var draggableTestCase = new YAHOO.tool.TestCase({
     },
 
     testSetValue : function() {
-        var d = Slider.getByNode( testNode2Handle, Slider.direction.VERT );
+        var d = Slider.getByNode( testNode2Handle, vConfig );
 
         d.minValue = 200;
         d.maxValue = 800;
@@ -189,7 +191,7 @@ var draggableTestCase = new YAHOO.tool.TestCase({
     },
 
     testSetValueNegMin : function() {
-        var d = Slider.getByNode( testNode2Handle, Slider.direction.VERT );
+        var d = Slider.getByNode( testNode2Handle, vConfig );
 
         d.minValue = -200;
         d.maxValue = 800;
@@ -205,7 +207,7 @@ var draggableTestCase = new YAHOO.tool.TestCase({
     },
 
     testSetValueNegMin0Max : function() {
-        var d = Slider.getByNode( testNode2Handle, Slider.direction.VERT );
+        var d = Slider.getByNode( testNode2Handle, vConfig );
 
         d.minValue = -200;
         d.maxValue = 0;
@@ -221,7 +223,7 @@ var draggableTestCase = new YAHOO.tool.TestCase({
     },
 
     testTrackbarMousedown : function() {
-        var d = Slider.getByNode( testNodeHandle, Slider.direction.HORZ );
+        var d = Slider.getByNode( testNodeHandle, hConfig );
 
         Action.mousedown( testNodeHandle.parentNode,  {clientX : 100 } );
         Action.mouseup( document );
@@ -232,7 +234,7 @@ var draggableTestCase = new YAHOO.tool.TestCase({
     },
 
     testSetRationalValue : function() {
-        var d = Slider.getByNode( testNode2Handle, Slider.direction.VERT );
+        var d = Slider.getByNode( testNode2Handle, vConfig );
         d.minValue = 100;
         d.maxValue = 1100;
         d.setRationalValue( .9 );
@@ -241,7 +243,7 @@ var draggableTestCase = new YAHOO.tool.TestCase({
     },
 
     testSetRationalValueNegMin : function() {
-        var d = Slider.getByNode( testNode2Handle, Slider.direction.VERT );
+        var d = Slider.getByNode( testNode2Handle, vConfig );
         d.minValue = -900;
         d.maxValue = 100;
         d.setRationalValue( .9 );
@@ -250,7 +252,7 @@ var draggableTestCase = new YAHOO.tool.TestCase({
     },
 
     testDragEnd : function() {
-        var d = Slider.getByNode( testNodeHandle, Slider.direction.HORZ ),
+        var d = Slider.getByNode( testNodeHandle, hConfig ),
             ended = false;
 
         d.onslideend = function() {
@@ -273,7 +275,7 @@ var draggableTestCase = new YAHOO.tool.TestCase({
 
 
     testKeyNeg : function() {
-        var d = Slider.getByNode( testNodeHandle, Slider.direction.HORZ );
+        var d = Slider.getByNode( testNodeHandle, hConfig );
         Action.mousedown( testNodeHandle );
         Action.mouseup( document );
 
@@ -291,7 +293,7 @@ var draggableTestCase = new YAHOO.tool.TestCase({
     },
 
     testKey1tic : function() {
-        var d = Slider.getByNode( testNodeHandle, Slider.direction.HORZ );
+        var d = Slider.getByNode( testNodeHandle, hConfig );
 
         d.maxValue = 150;
 
@@ -311,7 +313,7 @@ var draggableTestCase = new YAHOO.tool.TestCase({
     },
 
     testGlideBackTo0 : function(){
-        var d = Slider.getByNode( testNodeHandle, Slider.direction.HORZ ),
+        var d = Slider.getByNode( testNodeHandle, hConfig ),
         actualValue;
 
 	    d.onslideend = function() {

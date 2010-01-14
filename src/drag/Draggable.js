@@ -39,7 +39,7 @@ APE.namespace("APE.drag");
     /*
      * @constructor @param {HTMLElement} el the element to drag. @param {Object}
      * [options] { - activeDragClassName - selectedClaslusName - dragCopy
-     * {boolean} - dragMultiple {boolean} - useAnim {boolean}
+     * {boolean} - dragMultiple {boolean} - useAnim {boolean}, constraint "x" | "y".
      */
     function Drag(id, options) {
         var d = document, // not cross-frame.

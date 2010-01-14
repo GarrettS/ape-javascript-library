@@ -57,8 +57,7 @@ body {
 </div>
 <label id='lb-display' for='weight' class="ape-slider-label">
 	lb <input id='weight' name='lb' value='' size='5' maxlength='5' 
-        tabindex="0"
-		onblur='slider.setValue(this.value);updateSliders(slider, slider2);'>
+        tabindex="0">
 </label>
 
 <div id='weight-vertical-track' class='ape-slider-track ape-slider-v-track'>
@@ -68,8 +67,7 @@ body {
 </div>
 <label id='kg-display' for='weight-vertical' class="ape-slider-label">
 	<input id='weight-vertical' name='kg' value='' size='5' maxlength='5'
-             tabindex="0" 
-		onblur='slider2.setValue(this.value);updateSliders(slider2, slider);'>
+             tabindex="0">
 
 kg </label>
 
@@ -89,13 +87,11 @@ arrow keys to adjust
 
 <script type="text/javascript">
 
-var slider, slider2;
-
 (function () {
     var Slider = APE.drag.Slider;
 
- 	slider = Slider.getByNode(document.getElementById("weight-handle"), Slider.direction.HORZ);
-	slider2 = Slider.getByNode(document.getElementById("weight-vertical-handle"), Slider.direction.VERT);
+ 	var slider = Slider.getById("weight-handle", {dir:Slider.direction.HORZ}),
+    	slider2 = Slider.getById("weight-vertical-handle", {dir:Slider.direction.VERT});
  	
  	slider.minValue = 0;
  	slider.maxValue = 1000;
@@ -115,15 +111,17 @@ var slider, slider2;
   	slider.onslide();
  	slider2.setValue(0);
   	slider.onslide();
+
+    var weight = document.getElementById("weight"),
+        weightVertical = document.getElementById("weight-vertical");
+
+    function updateSliders(source, target, e) {
+        target.setValue(source.rationalValue * (target.maxValue - target.minValue));
+            
+        document.getElementById("weight").value = slider.value;
+        document.getElementById("weight-vertical").value = slider2.value;
+    }        
 })();
-
-function updateSliders(source, target, e) {
-	target.setValue(source.rationalValue * (target.maxValue - target.minValue));
-		
-	document.getElementById("weight").value = slider.value;
-	document.getElementById("weight-vertical").value = slider2.value;
-}
-
 </script>
 </body>
 </html>
