@@ -117,11 +117,9 @@
             getByNode : getOrCreate
         };
         
-        function getOrCreate(id) {
+        function getOrCreate(id, config) {
             if(typeof id.id === "string") {
-            // Modifying - id - modifies the arguments object; 
-            // but not in poor Safari 2.x.
-                id = arguments[0] = getId(ctor, id);
+                id = getId(ctor, id);
             }
             var instances = this[INSTANCES];
             if(!instances) {
@@ -130,7 +128,7 @@
                     ctor[PROTOTYPE] = createPrototype();
                 } 
             }
-            return instances[id] || (instances[id] = newApply(ctor, arguments));
+            return instances[id] || (instances[id] = new ctor(id, config));
         }
     }
             
@@ -148,23 +146,6 @@
         if(typeof fun.name === "string") return fun.name;
         var name = functionToString.call(fun).match(/\s([a-z]+)\(/i);
         return name && name[1]||"";
-    }
-
-    /**
-     * @param {Function} constructor constructor to be invoked.
-     * @param {Array} s arguments to pass to the constructor.
-     * Instantiates a constructor and uses apply().
-     * @memberOf APE
-     */
-    function newApply(ctor, args) {
-        var i, 
-            fp = F[PROTOTYPE] = ctor[PROTOTYPE];// Copy prototype.
-        if(fp) {
-            fp.constructor = ctor;
-        }
-        i = new F;
-        ctor.apply(i, args); // Apply the original constructor.
-        return i;
     }
 
     function packageToString(){

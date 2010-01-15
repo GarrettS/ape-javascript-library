@@ -82,7 +82,7 @@ var apeTest = new YAHOO.tool.TestCase({
             constructor: "Yumi" 
         });
         return;
-        Assert.areEqual(extendReturn, ElectricGuitar);
+        Assert.areSame(extendReturn, ElectricGuitar);
 
         var testGuitar = new ElectricGuitar;
 
@@ -91,14 +91,14 @@ var apeTest = new YAHOO.tool.TestCase({
         for(var i = 0; i < allProps.length; i++)
             ObjectAssert.hasProperty(allProps[i], testGuitar);
         
-        Assert.areEqual(document.title, testGuitar.whammyBar, "whammyBar");
-        Assert.areEqual(undefined, testGuitar.piezos, "piezos");
-        Assert.areEqual( undefined, testGuitar.soundhole, "soundhole" );
-        Assert.areEqual( 0, testGuitar.numStrings, "numStrings" );
-        Assert.areEqual( "Guitar", testGuitar.toString(), "toString()" );
-        Assert.areEqual( "Ibanez", testGuitar.make );
-        Assert.areNotEqual( Guitar, testGuitar.constructor, "testGuitar had the wrong constructor.");
-        Assert.areEqual( ElectricGuitar, testGuitar.constructor, "testGuitar had the wrong constructor.");
+        Assert.areSame(document.title, testGuitar.whammyBar, "whammyBar");
+        Assert.areSame(undefined, testGuitar.piezos, "piezos");
+        Assert.areSame( undefined, testGuitar.soundhole, "soundhole" );
+        Assert.areSame( 0, testGuitar.numStrings, "numStrings" );
+        Assert.areSame( "Guitar", testGuitar.toString(), "toString()" );
+        Assert.areSame( "Ibanez", testGuitar.make );
+        Assert.areNotSame( Guitar, testGuitar.constructor, "testGuitar had the wrong constructor.");
+        Assert.areSame( ElectricGuitar, testGuitar.constructor, "testGuitar had the wrong constructor.");
         Assert.isInstanceOf( Guitar, testGuitar );
         Assert.isInstanceOf( ElectricGuitar, testGuitar );
         Assert.isUndefined(testGuitar["soundhole"], "soundhole should be undefined.");
@@ -129,8 +129,8 @@ var apeTest = new YAHOO.tool.TestCase({
         };
         Q.prototype.nodef = true;
         var mixed = APE.mixin(new P, new Q);
-        Assert.areEqual("PAkina", mixed.toString());
-        Assert.areEqual("QAkina", mixed.valueOf());
+        Assert.areSame("PAkina", mixed.toString());
+        Assert.areSame("QAkina", mixed.valueOf());
         ObjectAssert.doesNotHaveProperty("nodef", mixed);
     },
 
@@ -147,7 +147,15 @@ var apeTest = new YAHOO.tool.TestCase({
     }
 });
 
-var C, testNode = document.createElement("u");
+function C(id, config) { 
+    this.id = id;
+    if(typeof config === "object") {
+        this.i = config.i;
+        this.j = config.j;
+    }
+};
+
+var testNode = document.createElement("u");
 testNodeId = "testCreational";
 testNode.id = testNodeId;
 document.body.appendChild(testNode);
@@ -156,10 +164,6 @@ var creationalTest = new YAHOO.tool.TestCase({
     
     name : "APE creationalTest",
     
-    setUp : function() {
-        C = function(id, i, j ) { this.id = id; this.i = i; this.j = j; };
-    },
-
     _should : {
         ignore : {
             testGetById : true // Deprecated; now removed.
@@ -170,26 +174,42 @@ var creationalTest = new YAHOO.tool.TestCase({
 
         var CNFactory = APE.createFactory(C);
         
-        var c = CNFactory.getByNode(testNode, 7, 1);
-        Assert.areEqual(testNode.id, c.id);
-        Assert.areEqual(7, c.i, "i wrong.");
-        Assert.areEqual(1, c.j, "j wrong.");
+        var c = CNFactory.getByNode(testNode, {i:7, j:1});
+        Assert.areSame(testNode.id, c.id, "testNode.id wrong.");
+        Assert.areSame(7, c.i, "i wrong.");
+        Assert.areSame(1, c.j, "j wrong.");
+   },
+
+    testGetByNodeCreatesId : function(){
+       var CNFactory = APE.createFactory(C);
+       var d = document.createElement("div");
+       CNFactory.getByNode(d);
+       YAHOO.log("created id: " + d.id, "info", "TestRunner");
+       Assert.areNotSame("", d.id, "id was not generated dynamically.");
+    },
+
+    testGetByNodeTwiceSameId : function(){
+        var CNFactory = APE.createFactory(C);
+        var d = document.createElement("div");
+        var cnd = CNFactory.getByNode(d);
+        var id = cnd.id;
+
+        // Try to get d again - it should have the same id.
+        CNFactory.getByNode(d);
+        Assert.areSame(id, d.id);
+    },
+
+    testGetByNodeOtherNotSameId : function(){
+        var CNFactory = APE.createFactory(C);
         var d = document.createElement("div");
         CNFactory.getByNode(d);
-        YAHOO.log("created id: " + d.id, "info", "TestRunner");
-        Assert.areNotEqual("", d.id);
-
-        // Try to get it again - it should have the same id.
-        var id = d.id;
-        CNFactory.getByNode(d);
-        Assert.areEqual(id, d.id);
-
+        
         // Create a new one. It should have a unique ID.
         var d2 = document.createElement("div");
         c = CNFactory.getByNode(d2);
-        Assert.areNotEqual(d.id, d2.id);
-   },
-
+        Assert.areNotSame(d.id, d2.id);
+    },
+    
     testGetByNodeNoIdAnonymousConstructor : function() {
         var C = function(el, s) { 
             this.s = s;
@@ -202,8 +222,8 @@ var creationalTest = new YAHOO.tool.TestCase({
         var c2 = CFactory.getByNode(document.body, "foo"),
             id2 = document.body.id;
 
-        Assert.areEqual(id1, id2);
-        Assert.areEqual(c1, c2);
+        Assert.areSame(id1, id2);
+        Assert.areSame(c1, c2);
         Assert.isTypeOf("string", c1.s);
         Assert.isTypeOf("string", document.body.id);
     },
@@ -211,10 +231,10 @@ var creationalTest = new YAHOO.tool.TestCase({
     testGetById : function() {
         C.getById = APE.getById;
         var c = C.getById(testNode.id, 10);
-        Assert.areEqual(testNode.id, c.id);
-        Assert.areEqual(10, c.i);
+        Assert.areSame(testNode.id, c.id);
+        Assert.areSame(10, c.i);
         var cc = C.getById(testNode.id, 11);
-        Assert.areEqual(c, cc);
+        Assert.areSame(c, cc);
     },
     
     testCreateFactory : function() {
