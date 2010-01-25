@@ -1,19 +1,16 @@
-APE.namespace("APE.widget");
-(function(){
-    var APE = self.APE,
-        widget = APE.widget,
-        dom = APE.dom;
-    widget.Scroller = APE.createFactory(Scroller, scrollerCreatePrototype);
-    
-    function Scroller(id, timeDuration, vertical) {
-        this.id = id;
-        this.timeDuration = timeDuration || 250;
-        this.isVertical = !!vertical;
-        this._queue = 0;
-        this.init();
-    }
-
-    function scrollerCreatePrototype() {
+APE.namespace("APE.widget").createFactory(
+    "Scroller", 
+    function(Scroller) {
+        var APE = self.APE,
+            dom = APE.dom;
+        
+        function ScrollerC(id, timeDuration, vertical) {
+            this.id = id;
+            this.timeDuration = timeDuration || 250;
+            this.isVertical = !!vertical;
+            this._queue = 0;
+            this.init();
+        }
     
         function getMoveScroller(scroller) {
             return moveScroller;
@@ -25,7 +22,7 @@ APE.namespace("APE.widget");
         /** onclick callback for Left/Right buttons. */
         function handleButtonClick(ev) {
             var dir = this.id.match(/(\w+)(Next|Prev)$/),
-                scroller = widget.Scroller.getById(dir[1]);
+                scroller = Scroller.getById(dir[1]);
             dom.Event.preventDefault(ev);
             moveStart(scroller, dir[2] === "Next");
         }
@@ -113,7 +110,7 @@ APE.namespace("APE.widget");
             }
         }
 
-        return {
+        ScrollerC.prototype = {
             pos : 0,
             
             init : function() {
@@ -165,5 +162,5 @@ APE.namespace("APE.widget");
                 return this;
             }
         };
-    }
-})();
+        return ScrollerC;
+});

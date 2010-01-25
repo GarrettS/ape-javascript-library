@@ -10,7 +10,7 @@ APE.namespace("APE.dom");
     
     var dom = APE.dom,
     	IS_SCROLL = typeof document.createElement("p").scrollLeft == "number";
-    APE.mixin(
+    APE.createMixin(
         dom, {
             getOffsetCoords : getOffsetCoords,
             isAboveElement : isAboveElement,

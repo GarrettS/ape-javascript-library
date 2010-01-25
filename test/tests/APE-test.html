@@ -55,7 +55,7 @@ var apeTest = new YAHOO.tool.TestCase({
         YAHOO.util.Assert.isObject(window.other);
     },
     
-    testExtend : function() {
+    testCreateSubclass : function() {
         function Guitar() {}
         Guitar.prototype = {
             isPlayable : true,
@@ -75,7 +75,7 @@ var apeTest = new YAHOO.tool.TestCase({
             this.make = "Ibanez";
         }
 
-        var extendReturn = APE.extend(ElectricGuitar, Guitar, {
+        var extendReturn = APE.createSubclass(ElectricGuitar, Guitar, {
             whammyBar : document.title,
             numStrings: 0,
             soundhole : undefined,
@@ -105,7 +105,7 @@ var apeTest = new YAHOO.tool.TestCase({
         ObjectAssert.hasProperty("soundhole", testGuitar, "soundhole should be present.");
     },
 
-    testMixin : function() {
+    testCreateMixin : function() {
 
         function P() {
             this.name = "Rika";
@@ -128,7 +128,7 @@ var apeTest = new YAHOO.tool.TestCase({
             return this.name;
         };
         Q.prototype.nodef = true;
-        var mixed = APE.mixin(new P, new Q);
+        var mixed = APE.createMixin(new P, new Q);
         Assert.areSame("PAkina", mixed.toString());
         Assert.areSame("QAkina", mixed.valueOf());
         ObjectAssert.doesNotHaveProperty("nodef", mixed);
@@ -154,10 +154,11 @@ function C(id, config) {
         this.j = config.j;
     }
 };
+var CNFactory;
 
 var testNode = document.createElement("u");
-testNodeId = "testCreational";
-testNode.id = testNodeId;
+
+testNode.id = "testCreational";
 document.body.appendChild(testNode);
 
 var creationalTest = new YAHOO.tool.TestCase({
@@ -166,22 +167,23 @@ var creationalTest = new YAHOO.tool.TestCase({
     
     _should : {
         ignore : {
-            testGetById : true // Deprecated; now removed.
+    // deferError was extracted to EventPublisher, the only place used.
+            testDeferError : true  
         }
     },
     
-    testGetByNode : function() {
-
-        var CNFactory = APE.createFactory(C);
-        
+    setUp : function(){
+        CNFactory = APE.createFactory("C", function(){return C;});
+    },
+    
+    testGetByNode : function() {        
         var c = CNFactory.getByNode(testNode, {i:7, j:1});
         Assert.areSame(testNode.id, c.id, "testNode.id wrong.");
         Assert.areSame(7, c.i, "i wrong.");
         Assert.areSame(1, c.j, "j wrong.");
-   },
+    },
 
     testGetByNodeCreatesId : function(){
-       var CNFactory = APE.createFactory(C);
        var d = document.createElement("div");
        CNFactory.getByNode(d);
        YAHOO.log("created id: " + d.id, "info", "TestRunner");
@@ -189,7 +191,6 @@ var creationalTest = new YAHOO.tool.TestCase({
     },
 
     testGetByNodeTwiceSameId : function(){
-        var CNFactory = APE.createFactory(C);
         var d = document.createElement("div");
         var cnd = CNFactory.getByNode(d);
         var id = cnd.id;
@@ -200,26 +201,29 @@ var creationalTest = new YAHOO.tool.TestCase({
     },
 
     testGetByNodeOtherNotSameId : function(){
-        var CNFactory = APE.createFactory(C);
         var d = document.createElement("div");
         CNFactory.getByNode(d);
         
         // Create a new one. It should have a unique ID.
         var d2 = document.createElement("div");
-        c = CNFactory.getByNode(d2);
+        var c = CNFactory.getByNode(d2);
         Assert.areNotSame(d.id, d2.id);
     },
     
     testGetByNodeNoIdAnonymousConstructor : function() {
         var C = function(el, s) { 
-            this.s = s;
-            this.toString = function() { return el.id + ": " + s; }
-        };
+                this.s = s;
+                this.toString = function() { return el.id + ": " + s; }
+            },
 
-        CFactory = APE.createFactory(C);
-        var c1 = CFactory.getByNode(document.body, "foo"),
-            id1 = document.body.id;
-        var c2 = CFactory.getByNode(document.body, "foo"),
+            CFactory = APE.createFactory(
+                "CFactory", 
+                function(){return C;}
+            ),
+            
+            c1 = CFactory.getByNode(document.body, "foo"),
+            id1 = document.body.id,
+            c2 = CFactory.getByNode(document.body, "foo"),
             id2 = document.body.id;
 
         Assert.areSame(id1, id2);
@@ -227,44 +231,32 @@ var creationalTest = new YAHOO.tool.TestCase({
         Assert.isTypeOf("string", c1.s);
         Assert.isTypeOf("string", document.body.id);
     },
-
-    testGetById : function() {
-        C.getById = APE.getById;
-        var c = C.getById(testNode.id, 10);
-        Assert.areSame(testNode.id, c.id);
-        Assert.areSame(10, c.i);
-        var cc = C.getById(testNode.id, 11);
-        Assert.areSame(c, cc);
-    },
     
     testCreateFactory : function() {
-        var cFactory = APE.createFactory(C, cCreatePrototype);
-        function cCreatePrototype() {
-            return { 
-                getId : function() {
-                    return this.id;
-                }
-            };
+        APE.createFactory( 
+            "CFactory", 
+            function(){return C;}
+        );
+        function getC() {
+            return C;
         }
         
-        var c = cFactory.getById('c', 3);
-        var c2 = cFactory.getById('c', 3);
+        var c = APE.CFactory.getById('c', 3);
+        var c2 = APE.CFactory.getById('c', 3);
         Assert.areSame(c, c2);
-        
     },
     
     testCreateFactoryNode : function() {
-        var cFactory = APE.createFactory(C, cCreatePrototype);
-        function cCreatePrototype() {
-            return { 
-                getId : function() {
-                    return this.id;
-                }
-            };
+        APE.createFactory( 
+            "CFactory", 
+            function(){return C;}
+        );
+        function getC() {
+            return C;
         }
         
-        var c = cFactory.getById('c', 3);
-        var c2 = cFactory.getById({id:'c'}, 2);
+        var c = APE.CFactory.getById('c', 3);
+        var c2 = APE.CFactory.getById({id:'c'}, 2);
         Assert.areSame(c, c2);
         
     },

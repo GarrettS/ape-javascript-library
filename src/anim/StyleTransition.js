@@ -27,7 +27,7 @@
         PROTO = "prototype",
         BLEND_TO = "blendTo",
         TO_STRING = "toString",
-        EXTEND = "extend",
+        EXTEND = "createSubclass",
         STYLE = "style";
     
     /**

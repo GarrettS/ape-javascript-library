@@ -12,7 +12,7 @@
     <script type="text/javascript" src="../../yui-test/build/logger/logger.js"></script>
     <script type="text/javascript" src="../../yui-test/build/yuitest/yuitest-beta.js"></script>
 
-    <script type="text/javascript" src="../../../build/ape-ep-dom-min.js"></script>
+    <script type="text/javascript" src="../../../build/ape-ep-dom.js"></script>
     <script type="text/javascript" src="../../../build/widget/Calendar/Calendar_en.js"></script>
     <script type="text/javascript" src="../../../build/widget/Calendar/Calendar.js"></script>
 </head>
@@ -35,7 +35,6 @@ window.onload = function(){
         Action = YAHOO.util.UserAction,
         template = document.getElementById('template'),
         templateHTML = template.innerHTML;
-
     // Find the B element that has |dayIndex| for data.
     // @param {uint} desiredDate.
     function findDayElement(calendarEl, desiredDate) {

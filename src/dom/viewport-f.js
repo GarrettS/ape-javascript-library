@@ -6,7 +6,7 @@ APE.namespace("APE.dom");
 (function() {
 
     // Public exports.
-    APE.mixin(APE.dom, {
+    APE.dom.mixin({
         getScrollOffsets : getScrollOffsets,
         getViewportDimensions : getViewportDimensions
     });

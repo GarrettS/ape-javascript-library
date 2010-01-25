@@ -2,17 +2,14 @@
  * @requires APE.dom.Viewport
  */
 /** @namespace APE.dom */
-APE.namespace("APE.dom");
-
-(function() {
+APE.namespace("APE.dom.Event").mixin(function() {
 
     var HAS_EVENT_TARGET = "addEventListener"in this,
         TARGET = HAS_EVENT_TARGET ? "target" : "srcElement",
         FOCUS_DELEGATED = HAS_EVENT_TARGET ? "focus" : "focusin",
         BLUR_DELEGATED = HAS_EVENT_TARGET ? "blur" : "focusout";
 
-    APE.mixin(
-        APE.dom.Event = {}, {
+    return{
             getTarget : getTarget, 
             addCallback : addCallback,
             removeCallback : removeCallback,
@@ -22,7 +19,7 @@ APE.namespace("APE.dom");
             removeDelegatedBlur : removeDelegatedBlur,
             preventDefault : preventDefault,
             stopPropagation : stopPropagation
-    });
+    };
     
     function getTarget(ev) {
         ev = ev || window.event;
@@ -124,4 +121,4 @@ APE.namespace("APE.dom");
             (window.event || ev).cancelBubble = true;
         }
     }
-})();
+}());

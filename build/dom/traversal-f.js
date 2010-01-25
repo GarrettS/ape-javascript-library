@@ -8,8 +8,7 @@ APE.namespace("APE.dom");
         PARENT_NODE = "parentNode",
         caseTransform = /^H/.test(docEl.tagName) ? 'toUpperCase' : 'toLowerCase';
 
-    APE.mixin(
-        APE.dom, {
+    APE.dom.mixin({
         contains : getContains(),
         findAncestorWithAttribute : findAncestorWithAttribute,
         findAncestorWithTagName : findAncestorWithTagName,
@@ -28,7 +27,7 @@ APE.namespace("APE.dom");
      * @return {boolean} true if a contains b and when includeEl
      * Internet Explorer's native contains() will return true for:
      * code body.contains(body); 
-     * In Safari, body.contains(body) returns false.
+     * In Safari <= 3, body.contains(body) returns false.
      */
     function getContains(){
         if(COMPARE_POSITION in docEl)

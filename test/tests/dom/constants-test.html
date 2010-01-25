@@ -38,7 +38,7 @@ var domconstants = new TestCase({
 	
     testTextContent : function() {
         var n = document.createElement('div');
-        n[dom.textContent] = "foo";
+        n[dom.TEXT_CONTENT] = "foo";
         Assert.areSame("foo", n.innerHTML);
     },
 

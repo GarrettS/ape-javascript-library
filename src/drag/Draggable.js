@@ -27,65 +27,71 @@ APE.namespace("APE.drag");
         undef, 
         noop = Function.prototype, 
         parseInt = self.parseInt, 
-        grabbed, FUNCTION = "function", 
-        Draggable = APE.createFactory(Drag, createDraggablePrototype), 
-        DropTarget = APE.createFactory(DropTargetC, createDropTargetPrototype);
+        grabbed, FUNCTION = "function",
+        DropTarget = drag.createFactory(
+            "DropTarget", 
+            createDropTarget
+        );
 
-    drag.Draggable = Draggable;
-    drag.DropTarget = DropTarget;
-
-    Draggable.instanceDestructor = instanceDestructor;
-
-    /*
-     * @constructor @param {HTMLElement} el the element to drag. @param {Object}
-     * [options] { - activeDragClassName - selectedClaslusName - dragCopy
-     * {boolean} - dragMultiple {boolean} - useAnim {boolean}, constraint "x" | "y".
-     */
-    function Drag(id, options) {
-        var d = document, // not cross-frame.
-        el = d.getElementById(id), c, p;
-        this.id = id;
-        this.el = this.origEl = el;
-        this.style = el.style;
-        this.isRel = getStyle(el, "position").toLowerCase() == "relative";
-
-        // default 'container' is the containing block.
-        c = (this.isRel ? el.parentNode : dom.getContainingBlock(el));
-        if(c === null)
-            c = d.documentElement;
-        this.container = c;
-
-        this.dropTargets = [];
-        this.handle = el;
-        this.onbeforeexitcontainer = beforeExitContainer;
-        if(options) {
-            for(p in options) {
-                this[p] = options[p];
-            }
-            el.style.zIndex = parseInt(getStyle(el, "zIndex"), 10)
-                    || highestZIndex++;
+    drag.createCustomFactory(
+        "Draggable", 
+        function(Draggable){
+            return createDraggable;
         }
-    }
+    );
 
-    /* default "onbeforeexitcontainer" handler */
-    function beforeExitContainer() {
-        return !this.keepInContainer;
-    }
+    function createDraggable(Draggable) {
 
-    /** @name APE.drag.instanceDestructor */
-    function instanceDestructor() {
-        var x, p, dObj;
-        for(x in this.instances) {
-            dObj = this.instances[x];
-            for(p in dObj) {
-                delete dObj[p];
+        Draggable.instanceDestructor = instanceDestructor;
+
+        /** @constructor @param {HTMLElement} el the element to drag. @param {Object}
+         * [options] { - activeDragClassName - selectedClaslusName - dragCopy
+         * {boolean} - dragMultiple {boolean} - useAnim {boolean}, constraint "x" | "y".
+         */
+        function Drag(id, options) {
+            var d = document, // not cross-frame.
+            el = d.getElementById(id), c, p;
+            this.id = id;
+            this.el = this.origEl = el;
+            this.style = el.style;
+            this.isRel = getStyle(el, "position").toLowerCase() == "relative";
+    
+            // default 'container' is the containing block.
+            c = (this.isRel ? el.parentNode : dom.getContainingBlock(el));
+            if(c === null)
+                c = d.documentElement;
+            this.container = c;
+    
+            this.dropTargets = [];
+            this.handle = el;
+            this.onbeforeexitcontainer = beforeExitContainer;
+            if(options) {
+                for(p in options) {
+                    this[p] = options[p];
+                }
+                el.style.zIndex = parseInt(getStyle(el, "zIndex"), 10)
+                        || highestZIndex++;
             }
-            delete this.instances[x];
         }
-        draggableList = {};
-    }
+    
+        /* default "onbeforeexitcontainer" handler */
+        function beforeExitContainer() {
+            return !this.keepInContainer;
+        }
+    
+        /** @name APE.drag.instanceDestructor */
+        function instanceDestructor() {
+            var x, p, dObj;
+            for(x in this.instances) {
+                dObj = this.instances[x];
+                for(p in dObj) {
+                    delete dObj[p];
+                }
+                delete this.instances[x];
+            }
+            draggableList = {};
+        }
 
-    function createDraggablePrototype() {
 
         // Static initializer code.
         var d = document, 
@@ -1006,7 +1012,7 @@ APE.namespace("APE.drag");
             }
         }
 
-        return {
+        Drag.prototype = {
 
             /** set to true to make a temporary "ghost" copy dragged. */
             dragCopy : false,
@@ -1183,46 +1189,48 @@ APE.namespace("APE.drag");
                 return "Draggable(id=" + this.id + ")";
             }
         };
+        return Drag;
     }
+    
+    function createDropTarget() {
+         /** @param {id} element id. */
+         function DropTargetC(id) {
+             this.el = document.getElementById(id);
+             this.id = id;
+         }
 
-    /** @param {id} element id. */
-    function DropTargetC(id) {
-        this.el = document.getElementById(id);
-        this.id = id;
-    }
+         DropTargetC.prototype = {
+             /* the className to add when selected. */
+             dragOverClassName : "",
 
-    function createDropTargetPrototype() {
-        return {
-            /* the className to add when selected. */
-            dragOverClassName : "",
+             initCoords : function() {
+                 var coords = this.coords || (this.coords = {}), 
+                     el = this.el;
+                 dom.getOffsetCoords(el, document, coords);
+                 coords.w = el.clientWidth;
+                 coords.h = el.clientHeight;
+             },
 
-            initCoords : function() {
-                var coords = this.coords || (this.coords = {}), 
-                    el = this.el;
-                dom.getOffsetCoords(el, document, coords);
-                coords.w = el.clientWidth;
-                coords.h = el.clientHeight;
-            },
+             /** returns true if x and y are both inside dropTarget
+              * @param {Object} curs {x,y} coordinates of the event.
+              */
+             containsCoords : function(curs) {
+                 // check for x, then y.
+             var coords = this.coords, dt_x = coords.x, dt_y = coords.y;
 
-            /** returns true if x and y are both inside dropTarget
-             * @param {Object} curs {x,y} coordinates of the event.
-             */
-            containsCoords : function(curs) {
-                // check for x, then y.
-            var coords = this.coords, dt_x = coords.x, dt_y = coords.y;
+             return (curs.x >= dt_x && curs.x <= dt_x + coords.w) && // now check for y.
+                     (curs.y >= dt_y && curs.y <= dt_y + coords.h);
+         },
 
-            return (curs.x >= dt_x && curs.x <= dt_x + coords.w) && // now check for y.
-                    (curs.y >= dt_y && curs.y <= dt_y + coords.h);
-        },
+         /** @event Dragged over a droptarget */
+         ondragover : false,
 
-        /** @event Dragged over a droptarget */
-        ondragover : false,
+         /** @event Dragged off a droptarget */
+         ondragout : undef,
 
-        /** @event Dragged off a droptarget */
-        ondragout : undef,
-
-        /** @event Hit a drop target. Fires for each object being dragged. */
-        ondrop : undef
-        };
+         /** @event Hit a drop target. Fires for each object being dragged. */
+         ondrop : undef
+         };
+         return DropTargetC;
     }
 })();

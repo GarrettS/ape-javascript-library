@@ -9,24 +9,18 @@
  */
 (function(){
     if(typeof APE !== "undefined") throw Error("APE is already defined.");
-    self.APE = {
-        namespace : namespace,
-        mixin : mixin,
-        extend : extend,
-        createFactory : createFactory,
-        deferError : deferError,
-        toString : function() { return "[APE JavaScript Library]"; }
-    };
     
-    function F(){}
-    
-    var getIdI = 0,
-        INSTANCES = "instances",
+    var INSTANCES = "instances",
         PROTOTYPE = "prototype",
         OP = Object[PROTOTYPE], 
         opHap = OP.hasOwnProperty,
-        functionToString = F.toString,
         jscriptSkips = ['toString', 'valueOf'];
+    
+    function F(){}
+    
+    function createMixin(r, s){
+        return mixin.call(r, s);
+    }
     
     /**
      * does <em>not</em> automatically add APE to the front of the chain, as YUI does.
@@ -57,27 +51,26 @@
     /**
      * Shallow copy of properties; does not look up prototype chain.
      * Copies all properties in s to r, using hasOwnProp.
-     * @param {Object} r the receiver of properties.
      * @param {Object} s the supplier of properties.
      * Accounts for JScript DontEnum bug for valueOf and toString.
      * @return {Object} r the receiver.
      */
-    function mixin(r, s) {
+    function mixin(s) {
         var prop,
             i = 0,
             skipped;
         for(prop in s) {
             if(hasOwnProp(s, prop)) {
-                r[prop] = s[prop];
+                this[prop] = s[prop];
             }
         }
         // JScript DontEnum bug.
         for( ; i < jscriptSkips.length; i++) {
             skipped = jscriptSkips[i];
             if(hasOwnProp(s, skipped))
-                r[skipped] = s[skipped];
+                this[skipped] = s[skipped];
         }
-        return r;
+        return this;
     }
     
     /**
@@ -88,76 +81,70 @@
      * @param {Object} [mix] If present, <var>mixin</var>'s own properties are copied to receiver
      * using APE.mixin(subclass.prototoype, superclass.prototype).
      */
-    function extend(subclass, superclass, mix) {
+    function createSubclass(subclass, superclass, mix) {
         F[PROTOTYPE] = superclass[PROTOTYPE];
         var subp = subclass[PROTOTYPE] = new F;
         if(typeof mix == "object")
-            mixin(subp, mix);
+            createMixin(subp, mix);
         subp.constructor = subclass;
         return subclass;
     }
-
-    /** Throws the error in a setTimeout 1ms.
-     *  Deferred errors are useful for Event Notification systems,
-     * Animation, and testing.
-     * @param {Error} error that occurred.
-     */
-    function deferError(error) {
-        self.setTimeout(function(){throw error;},1);
+    
+    function Package(base, name) {
+        var baseName = base.qualifiedName ? base.qualifiedName + "." : "";
+        this.qualifiedName = baseName + name;
     }
-
-    /** Creates a Factory method out of a function.
-     * @param {Function} constructor
-     * @param {Function} createPrototype function to lazily create the prototype.
-     * @memberOf APE
-     */
-    function createFactory(ctor, createPrototype) {
-        return{ 
-            getById : getOrCreate, 
-            getByNode : getOrCreate
-        };
+    
+    Package[PROTOTYPE] = {
+        toString : function(){
+            return"["+this.qualifiedName+"]";
+        },
         
+        /** Creates a Factory method and adds it to the Package.
+         *  @param {String} name the name of the factory to be created.
+         *  @param {Function} getConstructor function that returns constructor
+         */
+        createFactory : function(name, getConstructor){
+            return this[name] = new Factory(name, getConstructor);
+        },
+
+        /** Creates a Factory method and adds it to the Package.
+        *  @param {String} name the name of the factory to be created.
+        *  @param {Function} staticInitializer function runs
+        *  static initializer code and returns a getConstructor function.
+        */
+        createCustomFactory : function(name, staticInitializer) {
+            return this[name] = new Factory(name, staticInitializer, true);
+        },
+        
+        mixin : mixin
+    };    
+    
+    function Factory(name, getConstructor, hasStaticInitializer){ 
+        var i = 0, ctor;
+        this.name = name;
+        this.getById = this.getByNode = getOrCreate;
+        if(hasStaticInitializer) {
+            getConstructor = getConstructor(this);
+        }
         function getOrCreate(id, config) {
             if(typeof id.id === "string") {
-                id = getId(ctor, id);
+                id = id.id || (id.id = name + i++);
             }
             var instances = this[INSTANCES];
-            if(!instances) {
+            if(!instances) { // First time.
                 instances = this[INSTANCES] = {};
-                if(typeof createPrototype === "function") {
-                    ctor[PROTOTYPE] = createPrototype();
-                } 
+            // Get the constructor.
+                ctor = getConstructor(this);
             }
             return instances[id] || (instances[id] = new ctor(id, config));
         }
     }
-            
-    function getId(ctor, el) {
-        var id = el.id,
-            fName;
-        if(!id) {
-            fName = getFunctionName(ctor) || "APE";
-            id = el.id = fName+"_" + (getIdI++);
-        }
-        return id;
-    }
     
-    function getFunctionName(fun) {
-        if(typeof fun.name === "string") return fun.name;
-        var name = functionToString.call(fun).match(/\s([a-z]+)\(/i);
-        return name && name[1]||"";
-    }
+    Factory[PROTOTYPE].toString = function(){ 
+        return this.name;
+    };
 
-    function packageToString(){
-        return"["+this.qualifiedName+"]";
-    }
-
-    function Package(base, name) {
-        var baseName = base.qualifiedName ? base.qualifiedName + "." : "";
-        this.qualifiedName = baseName + name;
-        this.toString = packageToString;
-    }
-    
     /** Crutches for Safari 2, which does not have native impl.
      * @param {Object} o a Native ECMAScript Object object. 
      * This fails in Safari 2 in one case:
@@ -190,6 +177,13 @@
             return (this === self) ? (p in this && this[p] !== OP[p]) : oldOpHap.call(this, p);
         };
     }
+    
+    APE = namespace("APE").mixin({
+        /** APE is a global Package with these special methods: */
+        namespace : namespace,
+        createSubclass : createSubclass,
+        createMixin : createMixin
+    });
 })();/** 
  * @fileoverview 
  * EventPublisher
@@ -240,7 +234,7 @@ var APE = self.APE,
     isMaybeLeak/*@cc_on=(@_jscript_version<5.7)@*/;
 
 APE.EventPublisher = EventPublisher;
-APE.mixin(EventPublisher, {
+APE.createMixin(EventPublisher, {
     get : get,
     add : add,
     remove : remove,
@@ -395,7 +389,7 @@ function fire(publisher) {
             try {
                 if(publisher.beforeFire(e) == false)
                     preventDefault = true;
-            } catch(ex){APE.deferError(ex);}
+            } catch(ex){deferError(ex);}
         }
 
         for(i = 0; i < cs.length; i++) {
@@ -409,7 +403,7 @@ function fire(publisher) {
                 // TODO: afterEach
             }
             catch(ex) {
-                APE.deferError(ex);
+                deferError(ex);
             }
         }
         // afterFire can prevent default.
@@ -420,6 +414,14 @@ function fire(publisher) {
         return !preventDefault;
     }
 }
+ /** Throws the error in a setTimeout 1ms.
+  *  Deferred errors are useful for Event Notification systems,
+  *  Animation, and testing.
+  *  @param {Error} error that occurred.
+  */
+ function deferError(error) {
+     self.setTimeout(function(){throw error;},1);
+ }
 
 /** 
  * @static
@@ -456,19 +458,19 @@ function get(src, sEvent) {
 if(isMaybeLeak)
     get( window, "onunload" ).addAfter( cleanUp, EventPublisher );
 })();/**dom.js rollup: constants.js, keys.js, viewport-f.js, position-f.js, classname-f.js,  traversal-f.js, Event.js, Event-coords.js, style-f.js */
-APE.namespace("APE.dom" );
-(function(){
+APE.namespace("APE.dom" );APE.namespace("APE.dom").mixin(function(){
 	var dom = APE.dom,
 	    od = "ownerDocument",
 	    doc = document,
 	    docEl = doc.documentElement,
-	    // typeof, not in for BlackBerry9000.
-        OWNER_DOCUMENT = docEl && typeof docEl[od] !== "undefined" ? od : "document",
     	view = doc.defaultView;
-	
-	dom.OWNER_DOCUMENT = OWNER_DOCUMENT;
-    dom.IS_COMPUTED_STYLE = (typeof view != "undefined" && "getComputedStyle" in view);
-})();
+    return{
+        TEXT_CONTENT : typeof docEl.textContent === "string" ? "textContent" : "innerText",
+        // typeof, not in for BlackBerry9000.
+    	OWNER_DOCUMENT : docEl && typeof docEl[od] !== "undefined" ? od : "document",
+        IS_COMPUTED_STYLE : (typeof view != "undefined" && "getComputedStyle" in view)
+    };
+}());
 APE.dom.key = {
     LEFT : 37,
     UP : 38,
@@ -487,7 +489,7 @@ APE.dom.key = {
 (function() {
 
     // Public exports.
-    APE.mixin(APE.dom, {
+    APE.dom.mixin({
         getScrollOffsets : getScrollOffsets,
         getViewportDimensions : getViewportDimensions
     });
@@ -572,7 +574,7 @@ APE.dom.key = {
     
     var dom = APE.dom,
     	IS_SCROLL = typeof document.createElement("p").scrollLeft == "number";
-    APE.mixin(
+    APE.createMixin(
         dom, {
             getOffsetCoords : getOffsetCoords,
             isAboveElement : isAboveElement,
@@ -1050,18 +1052,19 @@ APE.dom.key = {
  * </p>
  */
 
+;
+APE.namespace("APE.dom").mixin(function() {
+    var className = "className",
+        Exps = { };
 
-(function() {
-    APE.mixin(APE.dom,
-        {
+    return {
         hasToken : hasToken,
         removeClass : removeClass,
         addClass : addClass,
         getElementsByClassName : getElementsByClassName,
         findAncestorWithClass : findAncestorWithClass
-    });
+    };
 
-    var className = "className";
     /** @param {String} s string to search
      * @param {String} token white-space delimited token the delimiter of the token.
      * This is generally used with element className:
@@ -1076,7 +1079,6 @@ APE.dom.key = {
      * @description removes all occurances of <code>klass</code> from element's className.
      */
     function removeClass(el, klass) {
-if(!el) console.log(removeClass.caller)
         var cn = el[className];
         if(!cn) return;
         if(cn === klass) {
@@ -1096,7 +1098,6 @@ if(!el) console.log(removeClass.caller)
         if(!getTokenizedExp(klass).test(el[className])) el[className] += " " + klass;
     }
 
-    var Exps = { };
     function getTokenizedExp(token, flag){
         var p = token + "$" + flag;
         return (Exps[p] || (Exps[p] = RegExp("(?:^|\\s)"+token+"(?:$|\\s)", flag)));
@@ -1145,11 +1146,11 @@ if(!el) console.log(removeClass.caller)
         }
         return null;
     }
-
-var STRING_TRIM_EXP = /^\s+|\s+$/g,
-    WS_MULT_EXP = /\s\s+/g;
-function normalizeString(s) { return s.replace(STRING_TRIM_EXP,'').replace(WS_MULT_EXP, " "); }
-})();
+    
+    function normalizeString(s) { 
+        return s.replace(/^\s+|\s+$/g,"").replace(/\s\s+/g, " "); 
+    }
+}());
 (function(){
 
     var docEl = document.documentElement,
@@ -1159,8 +1160,7 @@ function normalizeString(s) { return s.replace(STRING_TRIM_EXP,'').replace(WS_MU
         PARENT_NODE = "parentNode",
         caseTransform = /^H/.test(docEl.tagName) ? 'toUpperCase' : 'toLowerCase';
 
-    APE.mixin(
-        APE.dom, {
+    APE.dom.mixin({
         contains : getContains(),
         findAncestorWithAttribute : findAncestorWithAttribute,
         findAncestorWithTagName : findAncestorWithTagName,
@@ -1179,7 +1179,7 @@ function normalizeString(s) { return s.replace(STRING_TRIM_EXP,'').replace(WS_MU
      * @return {boolean} true if a contains b and when includeEl
      * Internet Explorer's native contains() will return true for:
      * code body.contains(body); 
-     * In Safari, body.contains(body) returns false.
+     * In Safari <= 3, body.contains(body) returns false.
      */
     function getContains(){
         if(COMPARE_POSITION in docEl)
@@ -1272,17 +1272,14 @@ function normalizeString(s) { return s.replace(STRING_TRIM_EXP,'').replace(WS_MU
  * @requires APE.dom.Viewport
  */
 /** @namespace APE.dom */
-
-
-(function() {
+APE.namespace("APE.dom.Event").mixin(function() {
 
     var HAS_EVENT_TARGET = "addEventListener"in this,
         TARGET = HAS_EVENT_TARGET ? "target" : "srcElement",
         FOCUS_DELEGATED = HAS_EVENT_TARGET ? "focus" : "focusin",
         BLUR_DELEGATED = HAS_EVENT_TARGET ? "blur" : "focusout";
 
-    APE.mixin(
-        APE.dom.Event = {}, {
+    return{
             getTarget : getTarget, 
             addCallback : addCallback,
             removeCallback : removeCallback,
@@ -1292,7 +1289,7 @@ function normalizeString(s) { return s.replace(STRING_TRIM_EXP,'').replace(WS_MU
             removeDelegatedBlur : removeDelegatedBlur,
             preventDefault : preventDefault,
             stopPropagation : stopPropagation
-    });
+    };
     
     function getTarget(ev) {
         ev = ev || window.event;
@@ -1394,7 +1391,7 @@ function normalizeString(s) { return s.replace(STRING_TRIM_EXP,'').replace(WS_MU
             (window.event || ev).cancelBubble = true;
         }
     }
-})();/**
+}());/**
  * @requires viewport-f.js (for scrollOffsets in IE).
  */
 APE.namespace("APE.dom.Event");

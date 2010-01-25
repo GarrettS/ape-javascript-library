@@ -7,18 +7,19 @@
  * </p>
  */
 
-APE.namespace("APE.dom");
-(function() {
-    APE.mixin(APE.dom,
-        {
+;
+APE.namespace("APE.dom").mixin(function() {
+    var className = "className",
+        Exps = { };
+
+    return {
         hasToken : hasToken,
         removeClass : removeClass,
         addClass : addClass,
         getElementsByClassName : getElementsByClassName,
         findAncestorWithClass : findAncestorWithClass
-    });
+    };
 
-    var className = "className";
     /** @param {String} s string to search
      * @param {String} token white-space delimited token the delimiter of the token.
      * This is generally used with element className:
@@ -33,7 +34,6 @@ APE.namespace("APE.dom");
      * @description removes all occurances of <code>klass</code> from element's className.
      */
     function removeClass(el, klass) {
-if(!el) console.log(removeClass.caller)
         var cn = el[className];
         if(!cn) return;
         if(cn === klass) {
@@ -53,7 +53,6 @@ if(!el) console.log(removeClass.caller)
         if(!getTokenizedExp(klass).test(el[className])) el[className] += " " + klass;
     }
 
-    var Exps = { };
     function getTokenizedExp(token, flag){
         var p = token + "$" + flag;
         return (Exps[p] || (Exps[p] = RegExp("(?:^|\\s)"+token+"(?:$|\\s)", flag)));
@@ -102,8 +101,8 @@ if(!el) console.log(removeClass.caller)
         }
         return null;
     }
-
-var STRING_TRIM_EXP = /^\s+|\s+$/g,
-    WS_MULT_EXP = /\s\s+/g;
-function normalizeString(s) { return s.replace(STRING_TRIM_EXP,'').replace(WS_MULT_EXP, " "); }
-})();
+    
+    function normalizeString(s) { 
+        return s.replace(/^\s+|\s+$/g,"").replace(/\s\s+/g, " "); 
+    }
+}());

@@ -48,7 +48,7 @@ var APE = self.APE,
     isMaybeLeak/*@cc_on=(@_jscript_version<5.7)@*/;
 
 APE.EventPublisher = EventPublisher;
-APE.mixin(EventPublisher, {
+APE.createMixin(EventPublisher, {
     get : get,
     add : add,
     remove : remove,
@@ -203,7 +203,7 @@ function fire(publisher) {
             try {
                 if(publisher.beforeFire(e) == false)
                     preventDefault = true;
-            } catch(ex){APE.deferError(ex);}
+            } catch(ex){deferError(ex);}
         }
 
         for(i = 0; i < cs.length; i++) {
@@ -217,7 +217,7 @@ function fire(publisher) {
                 // TODO: afterEach
             }
             catch(ex) {
-                APE.deferError(ex);
+                deferError(ex);
             }
         }
         // afterFire can prevent default.
@@ -228,6 +228,14 @@ function fire(publisher) {
         return !preventDefault;
     }
 }
+ /** Throws the error in a setTimeout 1ms.
+  *  Deferred errors are useful for Event Notification systems,
+  *  Animation, and testing.
+  *  @param {Error} error that occurred.
+  */
+ function deferError(error) {
+     self.setTimeout(function(){throw error;},1);
+ }
 
 /** 
  * @static

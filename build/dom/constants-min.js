@@ -1,1 +1,1 @@
-APE.namespace("APE.dom");(function(){var E=APE.dom,A="ownerDocument",D=document,F=D.documentElement,C=F&&typeof F[A]!=="undefined"?A:"document",B=D.defaultView;E.OWNER_DOCUMENT=C;E.IS_COMPUTED_STYLE=(typeof B!="undefined"&&"getComputedStyle" in B)})();
+APE.namespace("APE.dom").mixin(function(){var D=APE.dom,A="ownerDocument",C=document,E=C.documentElement,B=C.defaultView;return{TEXT_CONTENT:typeof E.textContent==="string"?"textContent":"innerText",OWNER_DOCUMENT:E&&typeof E[A]!=="undefined"?A:"document",IS_COMPUTED_STYLE:(typeof B!="undefined"&&"getComputedStyle" in B)}}());

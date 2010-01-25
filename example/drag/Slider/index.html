@@ -80,8 +80,9 @@ arrow keys to adjust
 </pre>
 
 <p>
-    slider.ticks - default is 15 tics. Press the arrow key on a <em>focused</em> slider handle and the 
-    slider will move 1/15 * tDist. <code>onslide()</code> will fire each tick.
+    slider.ticks - default is 15 tics. Press the arrow key on a <em>focused</em> 
+    slider handle and the slider will move 1/15 * tDist. <code>onslide()</code> 
+    will fire each tick.
 </p>
 </div>
 
@@ -90,20 +91,23 @@ arrow keys to adjust
 (function () {
     var Slider = APE.drag.Slider;
 
- 	var slider = Slider.getById("weight-handle", {dir:Slider.direction.HORZ}),
-    	slider2 = Slider.getById("weight-vertical-handle", {dir:Slider.direction.VERT});
+ 	var slider = Slider.getById("weight-handle", {
+            dir:"x", 
+            minValue : 0,
+            maxValue : 1000
+        ),
+    	slider2 = Slider.getById("weight-vertical-handle", {
+                dir : "y",
+                minValue : 0,
+                maxValue : 453.59237
+            }
+        );
  	
- 	slider.minValue = 0;
- 	slider.maxValue = 1000;
- 	
- 	slider2.minValue = 0;
- 	slider2.maxValue = 453.59237;
- 	
- 	slider.onslide = function () {
+ 	slider.onslide = function() {
 		updateSliders(this, slider2);
 	};
 	
-	slider2.onslide = function (e) {
+	slider2.onslide = function() {
 		updateSliders(this, slider);
 	};
 	

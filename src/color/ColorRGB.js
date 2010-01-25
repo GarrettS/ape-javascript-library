@@ -7,7 +7,6 @@
  * @author Garrett Smith
  */
 APE.namespace("APE.color");
-
 (function(){
     var APE = self.APE,
         color = APE.color,
@@ -18,6 +17,13 @@ APE.namespace("APE.color");
         
     color.ColorRGB = ColorRGB;
     color.ColorHSV = ColorHSV;
+    APE.createMixin(ColorRGB, {
+        fromNumber : fromNumber,
+        fromString : fromString,
+        fromHexString : fromHexString,
+        fromRgbString : fromRgbString,
+        blend : blend
+    });
     
     /** ColorRGB
      * @constructor
@@ -32,16 +38,7 @@ APE.namespace("APE.color");
     }
     
     /** Returns a ColorRGB based on a number.
-     * @param {uint} number from 0 - 0xFFFFFF
-     */
-    APE.mixin(ColorRGB, {
-        fromNumber : fromNumber,
-        fromString : fromString,
-        fromHexString : fromHexString,
-        fromRgbString : fromRgbString,
-        blend : blend
-    });
-    
+     * @param {uint} number from 0 - 0xFFFFFF */   
     function fromNumber(n) {
         return new ColorRGB((0xFF0000 & n) >> 16, (0xFF00 & n) >> 8, 0xFF & n);
     }

@@ -1,43 +1,37 @@
 /** slider.js
  * requires: Draggable, EventPublisher, className-f.js (in dom.js)
  */
-APE.namespace("APE.drag");
-(function(){
-    var APE = self.APE,
-        drag = APE.drag,
-        dom = APE.dom,
-        Slider = drag.Slider = APE.createFactory(SliderC, createSliderProto),
-        HORZ = "x",
-        VERT = "y",
-        MINVAL = "minValue",
-        MAXVAL = "maxValue";
-    
-    Slider.direction = {
-        HORZ : HORZ,
-        VERT : VERT
-    };
+APE.namespace("APE.drag").createFactory(
+    "Slider",
+    function(Slider){
+        var APE = self.APE,
+            drag = APE.drag,
+            dom = APE.dom,
+            HORZ = "x",
+            VERT = "y",
+            MINVAL = "minValue",
+            moveToNo = Function.prototype,
+            MAXVAL = "maxValue";
 
-    function SliderC(id, config) {
-        this.id = id;
-        this.dir = config.dir;
-        this.value = 0;
-        this.rationalValue = 0;
-        this.handle = drag.Draggable.getById(id, {constraint:this.dir});
-        this.handle.keepInContainer = true;
-        this[MINVAL] = config[MINVAL]||0;
-        this[MAXVAL] = config[MAXVAL];
-        this.tDist = 0;
-        this.init();
-    }
+        function SliderC(id, config) {
+            this.id = id;
+            this.dir = config.dir;
+            this.value = 0;
+            this.rationalValue = 0;
+            this.handle = drag.Draggable.getById(id, {constraint:this.dir});
+            this.handle.keepInContainer = true;
+            this[MINVAL] = config[MINVAL]||0;
+            this[MAXVAL] = config[MAXVAL];
+            this.tDist = 0;
+            this.init();
+        }
     
-    function createSliderProto() {
-                
         // IE and Webkit ignore keyEvents on the element.
         APE.EventPublisher.add(document, "onkeydown", _keyDown);
         var ACTIVE_TRACKBAR = "ape-slider-track-active",
             activeSlider = null;
         
-        return { 
+        SliderC.prototype = { 
             
             init : function() {
                 var addCallback = APE.EventPublisher.add,
@@ -122,8 +116,6 @@ APE.namespace("APE.drag");
                 return"Slider: " + this.handle.toString();
             }
         };
-
-        function moveToNo(){} 
         
         function trackbarMouseDown(e) {
             e = e||window.event;
@@ -235,5 +227,6 @@ APE.namespace("APE.drag");
                 return false;
             }
         }
-    }     
-})();
+        return SliderC;
+    }
+);

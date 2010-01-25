@@ -1,5 +1,4 @@
-APE.namespace("APE.widget");
-APE.widget.CalendarLocale = {
+APE.namespace("APE.widget").CalendarLocale = {
 	days : {
         abbr : ["Su", "M",  "Tu", "W", "Th", "F", "Sa"]
 	},

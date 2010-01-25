@@ -1,7 +1,7 @@
-APE.namespace("APE.dom");
 /**
  * @requires APE.dom.style-f.js
  */
+APE.namespace("APE.dom");
 (function(){
 	var dom = APE.dom;
 /** @function 

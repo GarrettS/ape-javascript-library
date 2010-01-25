@@ -255,15 +255,15 @@ var eventPublisherTest = new YAHOO.tool.TestCase({
         ep.add(errBack);
         ep.add(cb2);
 
-        // We're going to wrap APE.deferError so we can trap the error.
-        // First, store the reference to APE.deferError.
-        var old = APE.deferError;
+        // We're going to steal setTimeout so we can trap the error.
+        // First, store the reference to setTimeout.
+        var old = setTimeout;
 
         // Next, wrap the error, so we can see if EventPublisher.fire 
         // caught it and passed it to deferError.
-        APE.deferError = function errorStoppingAdvice(err) {
+        window.setTimeout = function errorStoppingMethod(func, delay) {
             caughtErrorMessage = "err back!";
-            APE.deferError = old; // Put it back.
+            setTimeout = old; // Put it back.
         };
         
         // Now, fire the event, to run the above.
@@ -294,5 +294,4 @@ if (parent && parent != window) {
 
  </script>
 </body>
-
 </html>

@@ -290,6 +290,7 @@ APE.namespace("APE.anim" );
 
         /** @protected - can use in subclass. */
         _end : function(complete) {
+            this.playing = false;
             Manager.unregister(this);
             if (complete !== false) {
                 this.onend();
@@ -348,7 +349,7 @@ APE.namespace("APE.anim" );
 
         /** starts run();  */
         function start() {
-            intervalId = self.setInterval(run, FRAME_PAUSE);
+            intervalId = setInterval(run, FRAME_PAUSE);
         }
 
         /* Plays the frame for each animation. */
@@ -519,7 +520,7 @@ APE.namespace("APE.anim" );
         PROTO = "prototype",
         BLEND_TO = "blendTo",
         TO_STRING = "toString",
-        EXTEND = "extend",
+        EXTEND = "createSubclass",
         STYLE = "style";
     
     /**

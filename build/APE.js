@@ -9,24 +9,18 @@
  */
 (function(){
     if(typeof APE !== "undefined") throw Error("APE is already defined.");
-    self.APE = {
-        namespace : namespace,
-        mixin : mixin,
-        extend : extend,
-        createFactory : createFactory,
-        deferError : deferError,
-        toString : function() { return "[APE JavaScript Library]"; }
-    };
     
-    function F(){}
-    
-    var getIdI = 0,
-        INSTANCES = "instances",
+    var INSTANCES = "instances",
         PROTOTYPE = "prototype",
         OP = Object[PROTOTYPE], 
         opHap = OP.hasOwnProperty,
-        functionToString = F.toString,
         jscriptSkips = ['toString', 'valueOf'];
+    
+    function F(){}
+    
+    function createMixin(r, s){
+        return mixin.call(r, s);
+    }
     
     /**
      * does <em>not</em> automatically add APE to the front of the chain, as YUI does.
@@ -57,27 +51,26 @@
     /**
      * Shallow copy of properties; does not look up prototype chain.
      * Copies all properties in s to r, using hasOwnProp.
-     * @param {Object} r the receiver of properties.
      * @param {Object} s the supplier of properties.
      * Accounts for JScript DontEnum bug for valueOf and toString.
      * @return {Object} r the receiver.
      */
-    function mixin(r, s) {
+    function mixin(s) {
         var prop,
             i = 0,
             skipped;
         for(prop in s) {
             if(hasOwnProp(s, prop)) {
-                r[prop] = s[prop];
+                this[prop] = s[prop];
             }
         }
         // JScript DontEnum bug.
         for( ; i < jscriptSkips.length; i++) {
             skipped = jscriptSkips[i];
             if(hasOwnProp(s, skipped))
-                r[skipped] = s[skipped];
+                this[skipped] = s[skipped];
         }
-        return r;
+        return this;
     }
     
     /**
@@ -88,76 +81,70 @@
      * @param {Object} [mix] If present, <var>mixin</var>'s own properties are copied to receiver
      * using APE.mixin(subclass.prototoype, superclass.prototype).
      */
-    function extend(subclass, superclass, mix) {
+    function createSubclass(subclass, superclass, mix) {
         F[PROTOTYPE] = superclass[PROTOTYPE];
         var subp = subclass[PROTOTYPE] = new F;
         if(typeof mix == "object")
-            mixin(subp, mix);
+            createMixin(subp, mix);
         subp.constructor = subclass;
         return subclass;
     }
-
-    /** Throws the error in a setTimeout 1ms.
-     *  Deferred errors are useful for Event Notification systems,
-     * Animation, and testing.
-     * @param {Error} error that occurred.
-     */
-    function deferError(error) {
-        self.setTimeout(function(){throw error;},1);
+    
+    function Package(base, name) {
+        var baseName = base.qualifiedName ? base.qualifiedName + "." : "";
+        this.qualifiedName = baseName + name;
     }
-
-    /** Creates a Factory method out of a function.
-     * @param {Function} constructor
-     * @param {Function} createPrototype function to lazily create the prototype.
-     * @memberOf APE
-     */
-    function createFactory(ctor, createPrototype) {
-        return{ 
-            getById : getOrCreate, 
-            getByNode : getOrCreate
-        };
+    
+    Package[PROTOTYPE] = {
+        toString : function(){
+            return"["+this.qualifiedName+"]";
+        },
         
+        /** Creates a Factory method and adds it to the Package.
+         *  @param {String} name the name of the factory to be created.
+         *  @param {Function} getConstructor function that returns constructor
+         */
+        createFactory : function(name, getConstructor){
+            return this[name] = new Factory(name, getConstructor);
+        },
+
+        /** Creates a Factory method and adds it to the Package.
+        *  @param {String} name the name of the factory to be created.
+        *  @param {Function} staticInitializer function runs
+        *  static initializer code and returns a getConstructor function.
+        */
+        createCustomFactory : function(name, staticInitializer) {
+            return this[name] = new Factory(name, staticInitializer, true);
+        },
+        
+        mixin : mixin
+    };    
+    
+    function Factory(name, getConstructor, hasStaticInitializer){ 
+        var i = 0, ctor;
+        this.name = name;
+        this.getById = this.getByNode = getOrCreate;
+        if(hasStaticInitializer) {
+            getConstructor = getConstructor(this);
+        }
         function getOrCreate(id, config) {
             if(typeof id.id === "string") {
-                id = getId(ctor, id);
+                id = id.id || (id.id = name + i++);
             }
             var instances = this[INSTANCES];
-            if(!instances) {
+            if(!instances) { // First time.
                 instances = this[INSTANCES] = {};
-                if(typeof createPrototype === "function") {
-                    ctor[PROTOTYPE] = createPrototype();
-                } 
+            // Get the constructor.
+                ctor = getConstructor(this);
             }
             return instances[id] || (instances[id] = new ctor(id, config));
         }
     }
-            
-    function getId(ctor, el) {
-        var id = el.id,
-            fName;
-        if(!id) {
-            fName = getFunctionName(ctor) || "APE";
-            id = el.id = fName+"_" + (getIdI++);
-        }
-        return id;
-    }
     
-    function getFunctionName(fun) {
-        if(typeof fun.name === "string") return fun.name;
-        var name = functionToString.call(fun).match(/\s([a-z]+)\(/i);
-        return name && name[1]||"";
-    }
+    Factory[PROTOTYPE].toString = function(){ 
+        return this.name;
+    };
 
-    function packageToString(){
-        return"["+this.qualifiedName+"]";
-    }
-
-    function Package(base, name) {
-        var baseName = base.qualifiedName ? base.qualifiedName + "." : "";
-        this.qualifiedName = baseName + name;
-        this.toString = packageToString;
-    }
-    
     /** Crutches for Safari 2, which does not have native impl.
      * @param {Object} o a Native ECMAScript Object object. 
      * This fails in Safari 2 in one case:
@@ -190,4 +177,11 @@
             return (this === self) ? (p in this && this[p] !== OP[p]) : oldOpHap.call(this, p);
         };
     }
+    
+    APE = namespace("APE").mixin({
+        /** APE is a global Package with these special methods: */
+        namespace : namespace,
+        createSubclass : createSubclass,
+        createMixin : createMixin
+    });
 })();
