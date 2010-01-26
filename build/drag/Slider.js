@@ -120,7 +120,7 @@ APE.namespace("APE.drag").createFactory(
         function trackbarMouseDown(e) {
             e = e||window.event;
             var target = dom.Event.getTarget(e),
-                slider, el;
+                slider;
             slider = Slider.instances[this.getElementsByTagName("*")[0].id];
             ensureFocus(slider.id);
             if(target !== this) {

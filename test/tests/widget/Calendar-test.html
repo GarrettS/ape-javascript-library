@@ -13,6 +13,7 @@
     <script type="text/javascript" src="../../yui-test/build/yuitest/yuitest-beta.js"></script>
 
     <script type="text/javascript" src="../../../build/ape-ep-dom.js"></script>
+    <script type="text/javascript" src="../../../build/anim/anim.js"></script>
     <script type="text/javascript" src="../../../build/widget/Calendar/Calendar_en.js"></script>
     <script type="text/javascript" src="../../../build/widget/Calendar/Calendar.js"></script>
 </head>
@@ -109,9 +110,17 @@ window.onload = function(){
                 Assert.areEqual("visible", calendarEl.style.visibility, "calendar visiblity wrong.");
             }, 30);
         },
+
+        testRegisterDelegate : function(){
+            Calendar.registerDelegateFor("start");
+            start.focus();
+            this.wait(function(){
+                Assert.isNotNull(Calendar.instances.start);
+            }, 30);
+        },
         
         testDocumentMousedown : function() {
-            var c = Calendar.getById("start");
+            var c = Calendar.getById("start", {useAnim: false});
             start.focus();
             this.wait(function(){
                 start.blur();
@@ -151,7 +160,7 @@ window.onload = function(){
         },
         
         testSelectDateInFuture : function() {
-            var c = Calendar.getById("start");
+            var c = Calendar.getById("start", {useAnim: false});
 
             var initial = "2010-09-24";
             var expected = "2011-10-10",

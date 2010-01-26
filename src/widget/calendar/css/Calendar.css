@@ -8,14 +8,18 @@
     -webkit-user-select: none;
     font-size: 12px;
     font-family: sans-serif;
-    opacity: .2;
     filter:progid:DXImageTransform.Microsoft.Alpha(Opacity=20);
     overflow: hidden;
     visibility: hidden;
-    height: 0;
-    width: 0;
     background: #f3f3f3;
     z-index: 10;
+}
+/* for the style transition */
+.ape-calendar-anim-start {
+    opacity: .1;
+	filter:Alpha(Opacity=20);
+    height: 10em;
+    width: 9em;
 }
 
 .ape-calendar-container {

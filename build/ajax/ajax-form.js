@@ -59,8 +59,7 @@ APE.namespace("APE.ajax").createCustomFactory(
          * may have `method`, and `enctype`.
          * Assign multiple callbacks using EventPublisher, if desired.
          */
-            var APE = window.APE,
-                uid = 0,
+            var uid = 0,
                 F = Function.prototype;
                             
             /** @constructor */

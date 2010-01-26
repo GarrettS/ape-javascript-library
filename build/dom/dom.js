@@ -1,7 +1,6 @@
 /**dom.js rollup: constants.js, keys.js, viewport-f.js, position-f.js, classname-f.js,  traversal-f.js, Event.js, Event-coords.js, style-f.js */
 APE.namespace("APE.dom" );APE.namespace("APE.dom").mixin(function(){
-	var dom = APE.dom,
-	    od = "ownerDocument",
+	var od = "ownerDocument",
 	    doc = document,
 	    docEl = doc.documentElement,
     	view = doc.defaultView;

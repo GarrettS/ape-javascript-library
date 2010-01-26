@@ -1,6 +1,5 @@
 APE.namespace("APE.dom").mixin(function(){
-	var dom = APE.dom,
-	    od = "ownerDocument",
+	var od = "ownerDocument",
 	    doc = document,
 	    docEl = doc.documentElement,
     	view = doc.defaultView;

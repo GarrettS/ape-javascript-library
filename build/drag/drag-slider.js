@@ -718,7 +718,7 @@ APE.namespace("APE.drag" );/**
                     constraint = dO.constraint,
                     cX = constraint == "x",
                     cY = constraint == "y",
-                    movedX = !cX, movedY = !cY, doOnDrag;
+                    movedX = !cX, movedY = !cY;
 
                 if(isLeft || isRight || isAbove || isBelow 
                         && dO.onbeforeexitcontainer() != true) {
@@ -1175,7 +1175,8 @@ APE.namespace("APE.drag" );/**
              * @return {HTMLElement} the removed dropTarget element.
              */
             removeDropTarget : function(el) {
-                var el = document.getElementById(el.id), dts = this.dropTargets, i, len;
+                el = document.getElementById(el.id);
+                var dts = this.dropTargets, i, len;
 
                 for(i = 0, len = dts.length; i < len; i++) {
                     if(dts[i].el === el) {
@@ -1356,7 +1357,7 @@ APE.namespace("APE.drag").createFactory(
         function trackbarMouseDown(e) {
             e = e||window.event;
             var target = dom.Event.getTarget(e),
-                slider, el;
+                slider;
             slider = Slider.instances[this.getElementsByTagName("*")[0].id];
             ensureFocus(slider.id);
             if(target !== this) {

@@ -12,12 +12,41 @@ APE.namespace("APE.widget").createCustomFactory(
     "Calendar", 
     function(Calendar) {
         
-        var inputTypeDate = document.createElement("input");
-            inputTypeDate.setAttribute("type", "date");
-        Calendar.IS_NATIVE = /date/i.test(inputTypeDate.type);
+        var inputTypeDate = document.createElement("input"),
+            APE = window.APE,
+            dom = APE.dom,
+            Event = dom.Event,
+            cbMap = {},
+            INPUT_CLASS = "ape-calendar-input";
+        
+        inputTypeDate.setAttribute("type", "date");
+        APE.createMixin(Calendar, { 
+            IS_NATIVE : /date/i.test(inputTypeDate.type),
+            registerDelegateFor : registerDelegateFor});
         
         return getConstructor;
         
+        function registerDelegateFor(id, config, filter) {
+            cbMap[id] = cbMap[id] || Event.addDelegatedFocus(document.documentElement, 
+                    getDelegate(id, config, filter));
+        }
+        
+        // Returns curried delegation handler for focus event.
+        function getDelegate(id, config, filter) {
+            return function(ev){
+                delegate(ev, id, config, filter);
+            };
+        }
+        
+        function delegate(ev, id, config, filter) {
+            var target = Event.getTarget(ev);
+            if(target.id === id && (!filter || filter(target) != false)) {
+                Event.removeDelegatedFocus(document.documentElement, cbMap[id]);
+                delete cbMap[id];
+                Calendar.getById( id, config );
+            }
+        }
+
         function getConstructor(Calendar){
             /**
              * @constructor
@@ -25,9 +54,14 @@ APE.namespace("APE.widget").createCustomFactory(
              * @private
              * TODO: add support for min/max attributes.
              */
-            function CalendarC( id ) {
+            function CalendarC( id, config ) {
                 this.id = id;
                 if(IS_NATIVE) return;
+                config && APE.createMixin(this, config);
+                if(this.useAnim) {
+                    this.hide = calendarHide;
+                }
+                
                 this._isHidden = true;
                 this.initEvents();
             }
@@ -36,7 +70,7 @@ APE.namespace("APE.widget").createCustomFactory(
                 var input = document.getElementById(calendar.id);
                 return parseISO8601(input.value);
             }
-        
+            
             /**Parses string formatted as YYYY-MM-DD to a Date object.
              * If the supplied string does not match the format, null is returned.
              * @param {string} dateStringInRange format YYYY-MM-DD, with year in
@@ -63,9 +97,7 @@ APE.namespace("APE.widget").createCustomFactory(
             }
         
             // Private static prototype properties---------------------------------------------.
-            var APE = window.APE,
-                dom = APE.dom,
-                Event = dom.Event,
+            var noop = Function.prototype,
                 EventPublisher = APE.EventPublisher,
                 addCallback = EventPublisher.add,
                 removeCallback = EventPublisher.remove,
@@ -79,9 +111,20 @@ APE.namespace("APE.widget").createCustomFactory(
                 DAY_EXP = /-day(\d+)$/,
                 key = dom.key,
                 IS_NATIVE = Calendar.IS_NATIVE,
-                daysInMonth = [31,28,31,30,31,30,31,31,30,31,30,31]
-                noop = Function.prototype;
-            testEl = null;
+                daysInMonth = [31,28,31,30,31,30,31,31,30,31,30,31],
+
+                anim = APE.anim,
+                StyleTransition = anim.StyleTransition,
+                duration = .1,
+                styleTransitionObjects = {},
+            
+             // Add a style transition to show() and hide() the calendar.
+                endStyle = {
+                    opacity: .98, 
+                    width: "14.4em", 
+                    height: "14.4em",
+                    visibility: "visible"
+                };
             
             /** Updates the calendar based on the input date, or, if no input, today.
              * 
@@ -221,6 +264,9 @@ APE.namespace("APE.widget").createCustomFactory(
                     + "</table>";
                 calendarEl.id = calendar.calendarId;
                 calendarEl.className = calendar.calendarClass;
+                if(calendar.useAnim) {
+                    dom.addClass(calendarEl, "ape-calendar-anim-start");
+                }
                 calendarEl.tabIndex = 0;
                 calendarEl.onmousedown = calendarMouseDownHandler;
                 
@@ -383,7 +429,10 @@ APE.namespace("APE.widget").createCustomFactory(
                 var calendarEl = document.getElementById(calendar.calendarId),
                     calStyle = calendarEl.style;
                 position(calendar.id, calStyle);
-                calendar.onshow();
+                if(calendar.useAnim) {
+                    calendarShowHandler(calendar);
+                }    
+                calendar.onshow(calendar);
                 calendar.show(calStyle);
                 activeCalendar = calendar;
                 calendar.setDate(readDateFromInput(calendar));
@@ -409,6 +458,8 @@ APE.namespace("APE.widget").createCustomFactory(
                             }
                         }, 120);
                     } else {
+                        // This can `cause delegated focus listener to fire 
+                        // with target as input.
                         calendarEl.focus();
                     }
                 }
@@ -439,7 +490,6 @@ APE.namespace("APE.widget").createCustomFactory(
                 var calendarEl = document.getElementById(calendar.calendarId);
                 if(calendarEl !== null) {
                     calendar.hide(calendarEl.style);
-                    
                     // IE Needs this for showing calendar over other elements.
                     calendarEl.parentNode.style.zIndex = "";
                 }
@@ -479,7 +529,7 @@ APE.namespace("APE.widget").createCustomFactory(
              * this animation stops.
              */
             function tryGetMonthYearAnim(calendarDiv, targetId){
-                var runMonthYearAnim, anim = APE.anim,
+                var runMonthYearAnim,
                     calendar = Calendar.getById(calendarDiv.id.replace(/-calendar$/,""));
 
                 if(anim) {
@@ -627,10 +677,33 @@ APE.namespace("APE.widget").createCustomFactory(
                 monthYearAnim && monthYearAnim.stop();
             }
 
+            function getStyleTransition(id) {
+                var obj = styleTransitionObjects[id];
+                if(!obj) {
+                    obj = styleTransitionObjects[id] = new StyleTransition(
+                     id, 
+                     endStyle, duration,
+                     anim.Transitions.getSigmoid(3)
+                 );
+                }
+                return obj;
+            }
+        
+            function calendarShowHandler(calendar){
+                if(calendar.useAnim) 
+                    getStyleTransition(calendar.calendarId).seekTo(1);
+            }
+        
+            function calendarHide(){
+                if(this.useAnim) 
+                    getStyleTransition(this.calendarId).seekTo(0);
+            }
+
             CalendarC.prototype = {     
                 /** set to <code>true</code> to hide the calendar when a date is selected. */
                 hideOnSelect : true,
-            
+                useAnim : true,
+                
                 /** call initEvents when calendar HTML is Calendar's html is regenerated (via innerHTML). 
                  */
                 initEvents : function() {
