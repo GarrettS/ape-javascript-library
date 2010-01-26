@@ -46,6 +46,10 @@ APE.namespace("APE.widget").createCustomFactory(
                 Calendar.getById( id, config );
             }
         }
+        
+        function matcher(target){
+            return dom.hasToken(target.className, INPUT_CLASS);
+        }
 
         function getConstructor(Calendar){
             /**
