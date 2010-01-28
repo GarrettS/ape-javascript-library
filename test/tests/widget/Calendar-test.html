@@ -178,14 +178,17 @@ window.onload = function(){
 
                 // +1 month.
                 Action.mousedown(document.getElementById("start-next-month"));
+                Action.mouseup(document);
+                
                 // +1 year.
                 Action.mousedown(document.getElementById("start-next-year"));
+                Action.mouseup(document);
 
                 // Find 10th day on calendar.
                 var daySelected = findDayElement(calendarEl, 10);
                 Action.mousedown(daySelected);
- 
-                Action.mousedown(document);
+                
+                Action.mouseup(document);
                 start.blur();
                 this.wait(function(){
                     Assert.areSame("hidden", calendarEl.style.visibility, "was not hidden");
@@ -195,7 +198,7 @@ window.onload = function(){
                     actualDate.setFullYear(split[0], split[1]-1, split[2]);
                     DateAssert.datesAreEqual(expectedDate, actualDate);
                 }, 220);
-            }, 20);
+            }, 250);
         },
         
         testHideOnSelectFalse : function(){
