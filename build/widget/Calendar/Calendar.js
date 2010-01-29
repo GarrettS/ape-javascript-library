@@ -46,10 +46,6 @@ APE.namespace("APE.widget").createCustomFactory(
                 Calendar.getById( id, config );
             }
         }
-        
-        function matcher(target){
-            return dom.hasToken(target.className, INPUT_CLASS);
-        }
 
         function getConstructor(Calendar){
             /**
@@ -545,7 +541,7 @@ APE.namespace("APE.widget").createCustomFactory(
                     monthYearAnim.run = function runMonthYearAnim(){
                         userSelectedMonthOrYear(calendar, targetId);
                     };
-                    runMonthYearAnim = null;
+                    runMonthYearAnim = calendarDiv = null;
                 }
                 return monthYearAnim;
             }

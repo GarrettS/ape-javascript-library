@@ -151,7 +151,7 @@ APE.namespace("APE.ajax").createCustomFactory(
             }
             
             function appendToURI(baseUri, queryParams){
-                var ch = baseUri.indexOf("?") !== -1 ? "&" : "?";
+                var ch = baseUri ? baseUri.indexOf("?") !== -1 ? "&" : "?" : "";
                 return baseUri + ch + queryParams;
             }
             
@@ -178,11 +178,11 @@ APE.namespace("APE.ajax").createCustomFactory(
                 timeoutMillis : 0,
         
                 get : function(queryParams, timeoutMillis) {
-                    return this.send(null, timeoutMillis, queryParams);
+                    return this.send(queryParams, timeoutMillis);
                 },
                 
-                post : function(data, queryParams, timeoutMillis) {
-                    return this.send(data, timeoutMillis, queryParams);
+                post : function(data, timeoutMillis) {
+                    return this.send(data, timeoutMillis);
                 },
                 
                 /** Sends the call.
@@ -196,18 +196,18 @@ APE.namespace("APE.ajax").createCustomFactory(
                  * @return {ajax.AsyncRequest|Error} if an error occured when trying to send,
                  * the error is returned. Otherwise, the AsyncRequest is returned.
                  */
-                send : function(data, timeoutMillis, queryParams) {
+                send : function(data, timeoutMillis) {
                     if(!supported) {
                         return this.onfail();
                     }
-                    var uri = this.uri && queryParams ?
-                            appendToURI(this.uri, queryParams) : this.uri || queryParams;
+                    var uri = this.uri;
 
                     this.timeoutMillis = timeoutMillis|0 || 4000;
         
                     if(this.httpMethod == "get" && typeof data == "string") {
-                        uri += data;
+                        uri = appendToURI(uri, data);
                     }
+
                     this.req.open(this.httpMethod, uri, true);
                     setUpReadyStateChangeHandler(this);
                     if(typeof this.req.setRequestHeader != "undefined") {

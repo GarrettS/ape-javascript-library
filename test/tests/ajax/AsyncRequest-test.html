@@ -192,6 +192,19 @@ var Assert = YAHOO.util.Assert,
         }, 2000);
     },
     
+    testPostMethod : function(){
+        var req, err,
+            queryData = "first=Mike&last=Hunt";
+
+        req = AsyncRequest.getById("x", "./process.jsp");
+
+        req.post(queryData);
+
+        this.wait(function() {
+            Assert.areEqual("Hunt, Mike", req.req.responseText);
+        }, 2000);
+    },
+    
     // make sure that onfail doesn't fire.
     testSuccessNoOnabort : function(){
         var req = AsyncRequest.getById("", {action:"data.json.txt", method:"GET"} ),
