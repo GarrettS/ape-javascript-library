@@ -65,8 +65,7 @@ APE.namespace("APE.ajax").createCustomFactory(
             /** @constructor */
             function AsyncRequestC(id, formConfig) {
                 this.id = id;
-                this.uri = formConfig.action || typeof formConfig == "string" && formConfig;
-                if(!this.uri) throw URIError("formConfig.action = undefined");
+                this.uri = formConfig.action || typeof formConfig == "string" && formConfig || "";
                 this.httpMethod = formConfig.method && formConfig.method.toLowerCase()||"get";
                 this.enctype = formConfig.enctype || "application/x-www-form-urlencoded";
                 if(supported) {
@@ -151,6 +150,11 @@ APE.namespace("APE.ajax").createCustomFactory(
                 ar.req.setRequestHeader('Content-Type', ar.enctype + "; " + boundary);
             }
             
+            function appendToURI(baseUri, queryParams){
+                var ch = baseUri.indexOf("?") !== -1 ? "&" : "?";
+                return baseUri + ch + queryParams;
+            }
+            
             AsyncRequestC.prototype = {
                 /**@event fires before oncomplete() */
                 onabort : F,
@@ -173,6 +177,14 @@ APE.namespace("APE.ajax").createCustomFactory(
                 /**@type {uint}*/
                 timeoutMillis : 0,
         
+                get : function(queryParams, timeoutMillis) {
+                    return this.send(null, timeoutMillis, queryParams);
+                },
+                
+                post : function(data, queryParams, timeoutMillis) {
+                    return this.send(data, timeoutMillis, queryParams);
+                },
+                
                 /** Sends the call.
                  * @param {string|Array} [data] post data. 
                  * For an unencoded "multipart/form-data" request, if `data` is
@@ -184,12 +196,13 @@ APE.namespace("APE.ajax").createCustomFactory(
                  * @return {ajax.AsyncRequest|Error} if an error occured when trying to send,
                  * the error is returned. Otherwise, the AsyncRequest is returned.
                  */
-                send : function( data, timeoutMillis ) {
+                send : function(data, timeoutMillis, queryParams) {
                     if(!supported) {
                         return this.onfail();
                     }
-                    var uri = this.uri;
-        
+                    var uri = this.uri && queryParams ?
+                            appendToURI(this.uri, queryParams) : this.uri || queryParams;
+
                     this.timeoutMillis = timeoutMillis|0 || 4000;
         
                     if(this.httpMethod == "get" && typeof data == "string") {

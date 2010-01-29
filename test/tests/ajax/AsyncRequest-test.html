@@ -179,15 +179,17 @@ var Assert = YAHOO.util.Assert,
         Assert.areSame("data.json.txt", req.uri);
     },
     
-    testMissingAction : function(){
-        var req, err;
-        try {
-            req = AsyncRequest.getById("", "" );
-        } catch(ex) {
-            err = ex;
-        }
-        // send the request.
-        Assert.isInstanceOf(URIError, err);
+    testGetWithQueryData : function(){
+        var req, err,
+        	queryData = "first=Aaron&last=Young";
+
+        req = AsyncRequest.getById("", "");
+
+        req.get("./process.jsp?"+queryData);
+
+        this.wait(function() {
+            Assert.areEqual("Young, Aaron", req.req.responseText);
+        }, 2000);
     },
     
     // make sure that onfail doesn't fire.
