@@ -1,12 +1,15 @@
-APE.namespace("APE.ajax").createCustomFactory(
+APE.namespace("APE.ajax").appendToURI = function(baseUri, queryParams){
+    var ch = baseUri ? baseUri.indexOf("?") !== -1 ? "&" : "?" : "";
+    return baseUri + ch + queryParams;
+};APE.namespace("APE.ajax").createCustomFactory(
     "AsyncRequest", 
     
     function(AsyncRequest) {
         AsyncRequest.isSupported = isSupported;
-
         var nType = 'XMLHttpRequest', aType = 'ActiveXObject',
             type = typeof window[nType] != "undefined" ? nType : aType,
             progId,
+            appendToURI = APE.ajax.appendToURI,
             isNative = nType == type,
             supported = isNative || typeof window[aType] != "undefined" && !!getXHR(),
             /** store up to 4 XHR objects. */
@@ -148,11 +151,6 @@ APE.namespace("APE.ajax").createCustomFactory(
                 var boundary = "---------------------------DATA_"+(++uid) + "\n";
                 data = boundary + data.join(boundary) + boundary;
                 ar.req.setRequestHeader('Content-Type', ar.enctype + "; " + boundary);
-            }
-            
-            function appendToURI(baseUri, queryParams){
-                var ch = baseUri ? baseUri.indexOf("?") !== -1 ? "&" : "?" : "";
-                return baseUri + ch + queryParams;
             }
             
             AsyncRequestC.prototype = {

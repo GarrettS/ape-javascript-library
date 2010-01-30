@@ -49,10 +49,22 @@ APE.namespace("APE.anim"<!--necessary space, or filterchain will remove this! --
 </header>
         </concat>
 
-        <!-- build anim.js rollup -->
-        <concat destfile="${build}/ajax/ajax-form.js">
+        <!-- build ajax.js rollup -->
+        <concat destfile="${build}/ajax/ajax.js">
             <filelist dir="${src}"
-                 files="ajax/AsyncRequest.js, form/Form.js"/>
+                 files="ajax/ajax-base.js, ajax/AsyncRequest.js, ajax/ScriptLoader.js"/>
+        </concat>
+
+        <!-- build base + ScriptLoader -->
+        <concat destfile="${build}/ajax/ScriptLoader.js">
+            <filelist dir="${src}"
+                 files="ajax/ajax-base.js, ajax/ScriptLoader.js"/>
+        </concat>
+
+        <!-- build base + AsyncRequest -->
+        <concat destfile="${build}/ajax/AsyncRequest.js">
+            <filelist dir="${src}"
+                 files="ajax/ajax-base.js, ajax/AsyncRequest.js"/>
         </concat>
 
         <!-- build drag-slider.js rollup -->
