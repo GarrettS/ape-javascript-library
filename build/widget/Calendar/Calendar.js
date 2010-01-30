@@ -16,8 +16,7 @@ APE.namespace("APE.widget").createCustomFactory(
             APE = window.APE,
             dom = APE.dom,
             Event = dom.Event,
-            cbMap = {},
-            INPUT_CLASS = "ape-calendar-input";
+            cbMap = {};
         
         inputTypeDate.setAttribute("type", "date");
         APE.createMixin(Calendar, { 
