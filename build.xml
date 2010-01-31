@@ -15,17 +15,11 @@
 traversal-f.js, Event.js, Event-coords.js, style-f.js'/>
         <concat destfile="${build}/dom/dom.js">
             <filelist dir="${build}/dom" files="${domFiles}"/>
-            <filterchain>
-            	<!--stripjavacomments/-->
+            <!--filterchain>
                 <tokenfilter>
-                    <replacestring from='APE.namespace("APE.dom");' to=""/>
-                    <replacestring from="APE.namespace('APE.dom');" to=""/>
-                	<!-- TODO: combine modules into one scope. -->
-                	<!--replaceregex pattern="\}\)\(\);\s+\(function\s*\(\)\s*\{" flags="m" replace=""/-->
+                    <replacestring from=');APE.namespace("APE.dom")' to=")."/>
                 </tokenfilter>
-            </filterchain>
-            <header>/**dom.js rollup: ${domFiles} */
-APE.namespace("APE.dom"<!--necessary space for filterchain. --> );</header>
+            </filterchain-->
         </concat>
 
         <!-- build ape-ep-dom.js rollup -->
@@ -38,15 +32,6 @@ APE.namespace("APE.dom"<!--necessary space for filterchain. --> );</header>
         <property name='animFiles' value='Animation.js, StyleTransition.js'/>
         <concat destfile="${build}/anim/anim.js">
             <filelist dir="${build}/anim" files="${animFiles}"/>
-            <filterchain>
-                <tokenfilter>
-                    <replacestring from='APE.namespace("APE.anim");' to=""/>
-                    <replacestring from="APE.namespace('APE.anim');" to=""/>
-                </tokenfilter>
-            </filterchain>
-            <header>/**anim.js rollup: ${animFiles} */
-APE.namespace("APE.anim"<!--necessary space, or filterchain will remove this! --> );
-</header>
         </concat>
 
         <!-- build ajax.js rollup -->
@@ -71,14 +56,6 @@ APE.namespace("APE.anim"<!--necessary space, or filterchain will remove this! --
         <concat destfile="${build}/drag/drag-slider.js">
             <filelist dir="${build}/drag"
                  files="Draggable.js, Slider.js"/>
-            <filterchain>
-                <tokenfilter>
-                    <replacestring from='APE.namespace("APE.drag");' to=""/>
-                    <replacestring from="APE.namespace('APE.drag');" to=""/>
-                </tokenfilter>
-            </filterchain>
-            <header>/**drag-slider.js rollup: Draggable.js, Slider.js*/
-APE.namespace("APE.drag"<!--necessary space --> );</header>
         </concat>
     </target>
 

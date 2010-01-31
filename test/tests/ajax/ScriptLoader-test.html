@@ -14,6 +14,7 @@
 
     <script type="text/javascript" src="../../../build/APE.js"></script>
     <script type="text/javascript" src="../../../build/EventPublisher.js"></script>
+    <script type="text/javascript" src="../../../build/ajax/ajax-base.js"></script>
     <script type="text/javascript" src="../../../build/ajax/ScriptLoader.js"></script>
 
 </head>
@@ -64,7 +65,7 @@ var Assert = YAHOO.util.Assert,
                     + encodeURIComponent("('" + param + "')"));
             this.wait(function() {
                 Assert.areSame(param, resp);
-            }, 2100);
+            }, 2000);
         }
 });
 

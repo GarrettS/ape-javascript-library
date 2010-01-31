@@ -1,5 +1,3 @@
-/**anim.js rollup: Animation.js, StyleTransition.js */
-APE.namespace("APE.anim" );
 /**  @fileoverview anim package: Animation, Transitions, and Manager (private)
  * 
  * <p>
@@ -25,7 +23,7 @@ APE.namespace("APE.anim" );
  * </pre>
  */
 
-
+APE.namespace("APE.anim");
 
 (function() {
     APE.anim.Animation = Animation;

@@ -1,5 +1,4 @@
-/**drag-slider.js rollup: Draggable.js, Slider.js*/
-APE.namespace("APE.drag" );/**
+/**
  * @author Garrett Smith
  * @fileoverview: contains: APE.drag.Draggable, APE.drag.DropTarget
  * 
@@ -19,7 +18,7 @@ APE.namespace("APE.drag" );/**
  * </pre>
  */
 
-
+APE.namespace("APE.drag");
 
 (function() {
     var APE = self.APE, dom = APE.dom, getStyle = dom.getStyle, drag = APE.drag, 

@@ -1,5 +1,4 @@
-APE.namespace("APE.dom");
-APE.dom.key = {
+APE.namespace("APE.dom").key = {
     LEFT : 37,
     UP : 38,
     RIGHT : 39,

@@ -6,11 +6,8 @@ APE.namespace("APE.ajax").createCustomFactory(
         var nType = 'XMLHttpRequest', aType = 'ActiveXObject',
             type = typeof window[nType] != "undefined" ? nType : aType,
             progId,
-            appendToURI = APE.ajax.appendToURI,
             isNative = nType == type,
-            supported = isNative || typeof window[aType] != "undefined" && !!getXHR(),
-            /** store up to 4 XHR objects. */
-            xhrList = [];
+            supported = isNative || typeof window[aType] != "undefined" && !!getXHR();
 
         function isSupported(){
             return supported;
@@ -60,8 +57,11 @@ APE.namespace("APE.ajax").createCustomFactory(
          * Assign multiple callbacks using EventPublisher, if desired.
          */
             var uid = 0,
+                appendToURI = APE.ajax.appendToURI,
+                /** store up to 4 XHR objects. */
+                xhrList = [],
                 F = Function.prototype;
-                            
+            
             /** @constructor */
             function AsyncRequestC(id, formConfig) {
                 this.id = id;

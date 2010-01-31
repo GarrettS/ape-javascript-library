@@ -173,7 +173,8 @@ var creationalTest = new YAHOO.tool.TestCase({
     },
     
     setUp : function(){
-        CNFactory = APE.createFactory("C", function(){return C;});
+        APE.createFactory("C", function(){return C;});
+        CNFactory = APE.C;
     },
     
     testGetByNode : function() {        
@@ -211,19 +212,19 @@ var creationalTest = new YAHOO.tool.TestCase({
     },
     
     testGetByNodeNoIdAnonymousConstructor : function() {
-        var C = function(el, s) { 
-                this.s = s;
-                this.toString = function() { return el.id + ": " + s; }
-            },
+        function C(el, s) { 
+            this.s = s;
+            this.toString = function() { return el.id + ": " + s; }
+        }
 
-            CFactory = APE.createFactory(
-                "CFactory", 
-                function(){return C;}
-            ),
+        APE.createFactory(
+            "CFactory", 
+            function(){return C;}
+        );
             
-            c1 = CFactory.getByNode(document.body, "foo"),
+        var c1 = APE.CFactory.getByNode(document.body, "foo"),
             id1 = document.body.id,
-            c2 = CFactory.getByNode(document.body, "foo"),
+            c2 = APE.CFactory.getByNode(document.body, "foo"),
             id2 = document.body.id;
 
         Assert.areSame(id1, id2);

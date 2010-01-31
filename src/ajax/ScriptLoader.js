@@ -1,11 +1,10 @@
 APE.namespace("APE.ajax").createFactory(
     "ScriptLoader", function(ScriptLoader) {
-                
+        
         var noop = Function.prototype,
             appendToURI = APE.ajax.appendToURI,
             scriptOnloadSupported = null;
         
-        APE.ajax.jsonp = APE.ajax.jsonp || noop;
         
         /** @constructor.
          * config properties:
@@ -23,6 +22,7 @@ APE.namespace("APE.ajax").createFactory(
             var sl = ScriptLoader.getById(script.id);
             if(sl.loaded) return;
             sl.loaded = true;
+            script.onload = script.onreadystatechange = noop;
             script.parentNode.removeChild(script);
             sl.onsuccess();
         }
@@ -31,7 +31,6 @@ APE.namespace("APE.ajax").createFactory(
             // IE6, "loaded" state means script has loaded, but has 
             // not yet been evaluated, Opera never reaches complete.
             if(ev && ev.type === "load" || this.readyState === "complete") {
-                this.onreadystatechange = noop;
                 scriptOnloadSupported = true;
                 loadHandler(this);
                 loadImageForScript = noop;
@@ -44,14 +43,14 @@ APE.namespace("APE.ajax").createFactory(
         function loadImageForScript(uri, script) {
             var image = new Image(),
                 uniqueParam = "ScriptLoader="
-                    + script.id + (+new Date + "").slice(-4);
+                    + script.id + ((+new Date + "").slice(-4));
             image.onload = function() {
                 loadHandler(script);
                 script = null;
             };
             
             // onload won't fire if cached.
-            image.src = APE.ajax.appendToURI(uri, uniqueParam);
+            image.src = appendToURI(uri, uniqueParam);
             image = null;
         }
         
@@ -61,7 +60,6 @@ APE.namespace("APE.ajax").createFactory(
                 var head = document.getElementsByTagName("head")[0],
                     script = this.script;
                 this.loaded = false;
-
                 if(scriptOnloadSupported !== false){
                     script.onload = script.onreadystatechange = scriptLoadHandler;
                 }

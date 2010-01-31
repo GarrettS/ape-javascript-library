@@ -2,17 +2,17 @@
  * @author Garret Smith
  */
 APE.namespace("APE.dom");
-
 (function() {
 
+    var DOCUMENT_ELEMENT = "documentElement", 
+        IS_BODY_ACTING_ROOT = document[DOCUMENT_ELEMENT].clientWidth === 0,
+        dom = APE.dom;
+
     // Public exports.
-    APE.dom.mixin({
+    dom.mixin({
         getScrollOffsets : getScrollOffsets,
         getViewportDimensions : getViewportDimensions
     });
-
-    var DOCUMENT_ELEMENT = "documentElement", 
-        IS_BODY_ACTING_ROOT = document[DOCUMENT_ELEMENT].clientWidth === 0;
 
     /** @memberOf APE.dom
      * @name getScrollOffsets
@@ -35,7 +35,7 @@ APE.namespace("APE.dom");
               return{ left : node.scrollLeft, top : node.scrollTop };
             };
         }
-        r = (this.getScrollOffsets = f)(win);
+        r = (dom.getScrollOffsets = f)(win);
         win = null;
         return r;
     }
@@ -75,7 +75,7 @@ APE.namespace("APE.dom");
             return{width: node[wName], height: node[hName]};
         }
 
-        r = (this.getViewportDimensions = getViewportDimensions)(win);
+        r = (dom.getViewportDimensions = getViewportDimensions)(win);
         win = d = null;
         return r;
     }

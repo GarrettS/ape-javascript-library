@@ -457,8 +457,7 @@ function get(src, sEvent) {
 
 if(isMaybeLeak)
     get( window, "onunload" ).addAfter( cleanUp, EventPublisher );
-})();/**dom.js rollup: constants.js, keys.js, viewport-f.js, position-f.js, classname-f.js,  traversal-f.js, Event.js, Event-coords.js, style-f.js */
-APE.namespace("APE.dom" );APE.namespace("APE.dom").mixin(function(){
+})();APE.namespace("APE.dom").mixin(function(){
 	var od = "ownerDocument",
 	    doc = document,
 	    docEl = doc.documentElement,
@@ -469,8 +468,7 @@ APE.namespace("APE.dom" );APE.namespace("APE.dom").mixin(function(){
     	OWNER_DOCUMENT : docEl && typeof docEl[od] !== "undefined" ? od : "document",
         IS_COMPUTED_STYLE : (typeof view != "undefined" && "getComputedStyle" in view)
     };
-}());
-APE.dom.key = {
+}());APE.namespace("APE.dom").key = {
     LEFT : 37,
     UP : 38,
     RIGHT : 39,
@@ -483,18 +481,18 @@ APE.dom.key = {
 };/**
  * @author Garret Smith
  */
-
-
+APE.namespace("APE.dom");
 (function() {
 
+    var DOCUMENT_ELEMENT = "documentElement", 
+        IS_BODY_ACTING_ROOT = document[DOCUMENT_ELEMENT].clientWidth === 0,
+        dom = APE.dom;
+
     // Public exports.
-    APE.dom.mixin({
+    dom.mixin({
         getScrollOffsets : getScrollOffsets,
         getViewportDimensions : getViewportDimensions
     });
-
-    var DOCUMENT_ELEMENT = "documentElement", 
-        IS_BODY_ACTING_ROOT = document[DOCUMENT_ELEMENT].clientWidth === 0;
 
     /** @memberOf APE.dom
      * @name getScrollOffsets
@@ -517,7 +515,7 @@ APE.dom.key = {
               return{ left : node.scrollLeft, top : node.scrollTop };
             };
         }
-        r = (this.getScrollOffsets = f)(win);
+        r = (dom.getScrollOffsets = f)(win);
         win = null;
         return r;
     }
@@ -557,7 +555,7 @@ APE.dom.key = {
             return{width: node[wName], height: node[hName]};
         }
 
-        r = (this.getViewportDimensions = getViewportDimensions)(win);
+        r = (dom.getViewportDimensions = getViewportDimensions)(win);
         win = d = null;
         return r;
     }
@@ -568,7 +566,7 @@ APE.dom.key = {
  * APE.dom package functions for calculating element position properties.
  */
 /** @name APE.dom */
-
+APE.namespace("APE.dom");
 (function() {
     
     var dom = APE.dom,
@@ -1149,7 +1147,7 @@ APE.namespace("APE.dom").mixin(function() {
     function normalizeString(s) { 
         return s.replace(/^\s+|\s+$/g,"").replace(/\s\s+/g, " "); 
     }
-}());
+}());APE.namespace("APE.dom");
 (function(){
 
     var docEl = document.documentElement,
@@ -1390,43 +1388,35 @@ APE.namespace("APE.dom.Event").mixin(function() {
             (window.event || ev).cancelBubble = true;
         }
     }
-}());/**
- * @requires viewport-f.js (for scrollOffsets in IE).
- */
-APE.namespace("APE.dom.Event");
-(function() {
-    var dom = APE.dom, 
-        Event = dom.Event;
-    Event.getCoords = getCoords;
-    function getCoords(e) {
-        var f;
-        if ("pageX" in e) {
-            f = function(e) {
-                return {
-                    x : e.pageX,
-                    y : e.pageY
-                };
+}());/** @requires viewport-f.js (for scrollOffsets in IE). */
+APE.namespace("APE.dom.Event").getCoords = function(ev) {
+    var dom = APE.dom, getCoords;
+    if ("pageX" in ev) {
+        getCoords = function(ev) {
+            return {
+                x : ev.pageX,
+                y : ev.pageY
             };
-        } else {
-            f = function(e) {
-                var scrollOffsets = dom.getScrollOffsets(); 
-                e = e || window.event;
-                return {
-                    x : e.clientX + scrollOffsets.left,
-                    y : e.clientY + scrollOffsets.top
-                };
+        };
+    } else {
+        getCoords = function(ev) {
+            var scrollOffsets = dom.getScrollOffsets(); 
+            ev = ev || window.event;
+            return {
+                x : ev.clientX + scrollOffsets.left,
+                y : ev.clientY + scrollOffsets.top
             };
-        }
-        return (Event.getCoords = f)(e);
+        };
     }
-})();/** @fileoverview
+    return (Event.getCoords = getCoords)(ev);
+};/** @fileoverview
  * Getting computed styles, opacity functions.
  *
  * @author Garrett Smith
  */
 /**@name APE.dom 
  * @namespace*/
-
+APE.namespace("APE.dom");
 (function(){
 
     var dom = APE.dom;
