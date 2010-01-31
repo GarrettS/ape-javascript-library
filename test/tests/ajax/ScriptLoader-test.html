@@ -38,19 +38,6 @@ var Assert = YAHOO.util.Assert,
             ScriptLoader.instances = {};
         },
 
-        testGet : function(){
-            var sl = ScriptLoader.getById("foo");
-            var done;
-            sl.onsuccess = function(){                
-                done = true;
-            };
-            
-            sl.get("jsonp.jsp");
-            this.wait(function(){
-                Assert.isTrue(done, "not done");
-            }, 1600);
-        },
-
         testJsonP : function() {
             var sl = ScriptLoader.getById("bar"),
                 param = "penguin" + (+new Date);
@@ -65,7 +52,21 @@ var Assert = YAHOO.util.Assert,
                     + encodeURIComponent("('" + param + "')"));
             this.wait(function() {
                 Assert.areSame(param, resp);
-            }, 2000);
+            }, 2100);
+        },
+
+        testScriptOnloadFiresOnce : function(){
+            var sl = ScriptLoader.getById("foo");
+            var loadCount = 0;
+            
+            sl.onsuccess = function(){                
+                loadCount++;
+            };
+            
+            sl.get("jsonp.jsp");
+            this.wait(function(){
+                Assert.areSame(1, loadCount);
+            }, 1800);
         }
 });
 

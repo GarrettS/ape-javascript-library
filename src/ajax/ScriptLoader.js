@@ -3,7 +3,8 @@ APE.namespace("APE.ajax").createFactory(
         
         var noop = Function.prototype,
             appendToURI = APE.ajax.appendToURI,
-            scriptOnloadSupported = null;
+            imageLoaded,
+            scriptOnloadSupported;
         
         
         /** @constructor.
@@ -31,7 +32,7 @@ APE.namespace("APE.ajax").createFactory(
             // IE6, "loaded" state means script has loaded, but has 
             // not yet been evaluated, Opera never reaches complete.
             if(ev && ev.type === "load" || this.readyState === "complete") {
-                scriptOnloadSupported = true;
+                scriptOnloadSupported = true;                
                 loadHandler(this);
                 loadImageForScript = noop;
             }
@@ -45,8 +46,16 @@ APE.namespace("APE.ajax").createFactory(
                 uniqueParam = "ScriptLoader="
                     + script.id + ((+new Date + "").slice(-4));
             image.onload = function() {
-                loadHandler(script);
-                script = null;
+                // Avoid unlikely race condition: 
+                // if script onload fires first, when 
+                // scriptOnloadSupported === undefined,
+                // the let scriptLoadHandler handle it; 
+                // don't call loadHandler twice. 
+                if(!scriptOnloadSupported) {
+                    imageLoaded = true;
+                    loadHandler(script);
+                    script = null;
+                }
             };
             
             // onload won't fire if cached.
