@@ -9,7 +9,6 @@ APE.namespace("APE.ajax").mixin({
         
         var noop = Function.prototype,
             appendToURI = APE.ajax.appendToURI,
-            imageLoaded,
             scriptOnloadSupported;
         
         
@@ -38,7 +37,7 @@ APE.namespace("APE.ajax").mixin({
             // IE6, "loaded" state means script has loaded, but has 
             // not yet been evaluated, Opera never reaches complete.
             if(ev && ev.type === "load" || this.readyState === "complete") {
-                scriptOnloadSupported = true;                
+                scriptOnloadSupported = true;
                 loadHandler(this);
                 loadImageForScript = noop;
             }
@@ -58,7 +57,6 @@ APE.namespace("APE.ajax").mixin({
                 // the let scriptLoadHandler handle it; 
                 // don't call loadHandler twice. 
                 if(!scriptOnloadSupported) {
-                    imageLoaded = true;
                     loadHandler(script);
                     script = null;
                 }
