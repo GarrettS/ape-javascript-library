@@ -184,6 +184,29 @@ var creationalTest = new YAHOO.tool.TestCase({
         Assert.areSame(1, c.j, "j wrong.");
     },
 
+    testCustomFactoryStaticMember : function(){
+        APE.createCustomFactory("Aquabib", function(Aquabib) {
+                Aquabib.staticMember = "water";
+                return getConstructor;
+                function getConstructor() {
+                    function Aquabib(){};
+                }
+        });
+        Assert.areSame("water", APE.Aquabib.staticMember, "staticMember wrong.");
+    },
+    
+    testCustomFactoryCreateInstance : function(){
+        APE.createCustomFactory("Aquabib", function(Aquabib) {
+                return getConstructor;
+                function getConstructor() {
+                    return Aquabib;
+                    function Aquabib(id){ this.id = id; };
+                }
+        });
+        var instance = APE.Aquabib.getById("exlineal");
+        Assert.areSame("exlineal", instance.id);
+    },
+    
     testGetByNodeCreatesId : function(){
        var d = document.createElement("div");
        CNFactory.getByNode(d);

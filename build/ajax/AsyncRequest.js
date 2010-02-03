@@ -3,7 +3,7 @@ APE.namespace("APE.ajax").mixin({
         var ch = baseUri ? baseUri.indexOf("?") !== -1 ? "&" : "?" : "";
         return (baseUri || "") + ch + queryParams;
     },
-    jsonp : Function.prototype
+    jsonp : function(data) { return data; }
 });APE.namespace("APE.ajax").createCustomFactory(
     "AsyncRequest", 
     
@@ -130,6 +130,8 @@ APE.namespace("APE.ajax").mixin({
                     succeeded = httpStatus >= 200 && httpStatus < 300 
                     || httpStatus == 304 || httpStatus == 1223;
         
+                asyncRequest.timerId = clearInterval(asyncRequest.timerId);
+
                 // if the request was successful,
                 if(succeeded) {
                     // fire oncomplete, then onsucceed.
@@ -141,7 +143,6 @@ APE.namespace("APE.ajax").mixin({
                     oncomplete(asyncRequest, false);
                     asyncRequest.onfail(req);
                 }
-                asyncRequest.timerId = clearInterval(asyncRequest.timerId);
             }
         
             function oncomplete(ar, successful) {

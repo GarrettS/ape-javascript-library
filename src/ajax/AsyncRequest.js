@@ -124,6 +124,8 @@ APE.namespace("APE.ajax").createCustomFactory(
                     succeeded = httpStatus >= 200 && httpStatus < 300 
                     || httpStatus == 304 || httpStatus == 1223;
         
+                asyncRequest.timerId = clearInterval(asyncRequest.timerId);
+
                 // if the request was successful,
                 if(succeeded) {
                     // fire oncomplete, then onsucceed.
@@ -135,7 +137,6 @@ APE.namespace("APE.ajax").createCustomFactory(
                     oncomplete(asyncRequest, false);
                     asyncRequest.onfail(req);
                 }
-                asyncRequest.timerId = clearInterval(asyncRequest.timerId);
             }
         
             function oncomplete(ar, successful) {
