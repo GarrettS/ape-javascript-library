@@ -3,7 +3,7 @@ APE.namespace("APE.ajax").mixin({
         var ch = baseUri ? baseUri.indexOf("?") !== -1 ? "&" : "?" : "";
         return (baseUri || "") + ch + queryParams;
     },
-    jsonp : Function.prototype
+    jsonp : function(data) { return data; }
 });APE.namespace("APE.ajax").createFactory(
     "ScriptLoader", function(ScriptLoader) {
         
