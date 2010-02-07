@@ -1,1 +1,1 @@
-APE.namespace("APE.dom.Event").getCoords=function(B){var C=APE.dom,A;if("pageX" in B){A=function(D){return{x:D.pageX,y:D.pageY}}}else{A=function(E){var D=C.getScrollOffsets();E=E||window.event;return{x:E.clientX+D.left,y:E.clientY+D.top}}}return(Event.getCoords=A)(B)};
+APE.namespace("APE.dom.Event").getCoords=function(B){var C=APE.dom,A;if("pageX" in B){A=function(D){return{x:D.pageX,y:D.pageY}}}else{A=function(E){var D=C.getScrollOffsets();E=E||window.event;return{x:E.clientX+D.left,y:E.clientY+D.top}}}return(C.Event.getCoords=A)(B)};
