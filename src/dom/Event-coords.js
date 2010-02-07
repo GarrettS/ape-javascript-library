@@ -18,5 +18,5 @@ APE.namespace("APE.dom.Event").getCoords = function(ev) {
             };
         };
     }
-    return (Event.getCoords = getCoords)(ev);
+    return(dom.Event.getCoords = getCoords)(ev);
 };

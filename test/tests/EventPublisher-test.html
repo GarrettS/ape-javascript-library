@@ -104,23 +104,15 @@ var eventPublisherTest = new YAHOO.tool.TestCase({
     // Add 2 callbacks, remove the first, 
     // then make sure that only the second one fires.
     testRemove : function(){
-        var called1 = false, called2 = false;
+        var called = false;
 
         function cb( ev ) {
-            called1 = true;
-            Assert.isTrue( ev.isTest );
-        };
-        function cb2( ev ) {
-            called2 = true;
-            Assert.isTrue( ev.isTest );
-        };
-        ep.add(cb);
-        ep.add(cb2);
-        ep.remove(cb);
+            called = true;
+        }
+       ep.add(cb).remove(cb);
 
-        testObject.fire( { isTest: true} );
-        Assert.isFalse( called1 );
-        Assert.isTrue( called2 );
+        testObject.fire();
+        Assert.isFalse( called );
     },
 
     testRemoveInFire : function() {

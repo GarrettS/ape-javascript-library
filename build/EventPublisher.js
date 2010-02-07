@@ -112,10 +112,10 @@ EventPublisher.prototype = {
         for(i = 0; i < cs.length; i++) {
             call = cs[i];
             if(call[0] === fp && call[1] === thisArg) {
-                return cs.splice(i, 1);
+                cs.splice(i, 1);
             }
         }
-        return null;
+        return this;
     },
 
 /**  Removes fp from callstack's beforeFire.
@@ -181,7 +181,7 @@ function add(src, sEvent, fp, thisArg) {
 }
 
 function remove(src, sEvent, fp, thisArg) {
-    return get(src, sEvent).add(fp, thisArg);
+    return get(src, sEvent).remove(fp, thisArg);
 }
 
 /** 
