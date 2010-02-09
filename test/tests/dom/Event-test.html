@@ -82,8 +82,8 @@ var eventTestCase = new YAHOO.tool.TestCase({
 
     testRemoveCallback : function() {
         var called = false;
-        var cb = dom.Event.addCallback(document.body, "click", bodyClicked);
-        dom.Event.removeCallback(document.body, "click", cb);
+        dom.Event.addCallback(document.body, "click", bodyClicked);
+        dom.Event.removeCallback(document.body, "click", bodyClicked);
         
         Action.click(document.body);
         
@@ -100,7 +100,7 @@ var eventTestCase = new YAHOO.tool.TestCase({
         var called = false,
             testNode = document.getElementById("testNode");
 
-        dom.Event.addDelegatedFocus(testNode, tnFocused);
+        dom.Event.addCallback(testNode, "focus", tnFocused);
         Action.focus(document.getElementById("testInp"));
         Assert.isTrue(called, "focus handler was not called.");
         function tnFocused() {
@@ -109,10 +109,10 @@ var eventTestCase = new YAHOO.tool.TestCase({
     },
 
     testRemoveDelegatedFocus : function(){
-        var called = false,
-            bound = dom.Event.addDelegatedFocus(testNode, tnFocused);
+        var called = false;
+        dom.Event.addCallback(testNode, "focus", tnFocused);
 
-        dom.Event.removeDelegatedFocus(testNode, bound);
+        dom.Event.removeCallback(testNode, "focus", tnFocused);
         Action.focus(testInp);
         this.wait(function(){
             Assert.isFalse(called, 
@@ -126,7 +126,7 @@ var eventTestCase = new YAHOO.tool.TestCase({
     testAddDelegatedBlur : function(){
         var called = false;
 
-        dom.Event.addDelegatedFocus(testNode, tnBlurHandler);
+        dom.Event.addCallback(testNode, "blur", tnBlurHandler);
         Action.focus(testInp);
         Action.blur(testInp);
         Assert.isTrue(called, "blur handler was not called.");
@@ -136,10 +136,11 @@ var eventTestCase = new YAHOO.tool.TestCase({
     },
 
     testRemoveDelegatedBlur : function(){
-        var called = false,
-            bound = dom.Event.addDelegatedFocus(testNode, tnBlurHandler);
+        var called = false;
 
-        dom.Event.removeDelegatedFocus(testNode, bound);
+        dom.Event.addCallback(testNode, "blur",tnBlurHandler);
+
+        dom.Event.removeCallback(testNode, "blur",tnBlurHandler);
         Action.focus(testInp);
         Action.blur(testInp);
         this.wait(function(){
@@ -164,6 +165,10 @@ var eventTestCase = new YAHOO.tool.TestCase({
             Assert.isFalse(called, 
                  "click handler bubbled up to testInp, but should not have.");
         }, 100);
+    },
+
+    testGetDomEventPublisher : function(){
+        var dep = Event.get(testNode, "click");
     }
 });
 
