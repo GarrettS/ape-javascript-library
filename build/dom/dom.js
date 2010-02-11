@@ -812,11 +812,10 @@ APE.namespace("APE.dom").mixin(function() {
         TARGET = HAS_EVENT_TARGET ? "target" : "srcElement",
         FOCUS_DELEGATED = HAS_EVENT_TARGET ? "focus" : "focusin",
         BLUR_DELEGATED = HAS_EVENT_TARGET ? "blur" : "focusout",
-        Event = APE.dom.Event,
         Registry = {},
         isMaybeLeak/*@cc_on=(@_jscript_version<5.7)@*/,
         useCaptureMap = {"focus":FOCUS_DELEGATED, "blur":BLUR_DELEGATED},
-        mixin = {
+        Event = {
             get : get,
             getTarget : getTarget, 
             add : addCallback,
@@ -824,86 +823,126 @@ APE.namespace("APE.dom").mixin(function() {
             remove : removeCallback,
             removeCallback : removeCallback,
             preventDefault : preventDefault,
-            stopPropagation : stopPropagation
+            stopPropagation : stopPropagation,
+            toString : function() {
+                return"APE.dom.Event";
+            }
     };
     
-    if(isMaybeLeak){
-        get(window, "unload").add(cleanUp);
-    }
-    
-    function DomEventPublisher(src, type){
-        if(!src.addEventListener && !src.attachEvent) {
-            throw TypeError(src+ " is not a compatible object.");
-        }
-        this.src = src;
-        this.type = type;
-        this._callStack = [];
-    }
-    
-    DomEventPublisher.prototype = {
-        add : function(callback) {
-            var o = this.src,
-                captureAdapterType = useCaptureMap[this.type],
-                type = captureAdapterType||this.type;
-            if (HAS_EVENT_TARGET) {
-                o.addEventListener(type, callback, !!captureAdapterType);
-            } else {
-                callback = getBoundCallback(o, callback);
-                o.attachEvent("on" + type, callback);
-            }
-            this._callStack.push(callback);
-            return this;
-        },
+    /** Gets a DomEventPublisher */
+    function get(src, sEvent) {
+        // Function rewriting, keeping DomEventPublisher in scope.
+        // function _get is reassinged, invoked below. 
+        get = Event.get = _get;
         
-        remove : function(callback) {
-            callback = removeFromCallStack(this._callStack, callback);
-            if(callback) { // IE TypeMismatch if not a function
-                if (HAS_EVENT_TARGET) {
-                    this.src.removeEventListener(this.type, callback, this.type in useCaptureMap);
-                } else {
-                    this.src.detachEvent("on" + this.type, callback);
+        // Keep this in [[Scope]] of get method, but rewrite get.
+        function DomEventPublisher(src, type) {
+            if(!src.addEventListener && !src.attachEvent) {
+                throw TypeError(src+ " is not a compatible object.");
+            }
+            this.src = src;
+            this.type = type;
+            this._callStack = [];
+        }
+        
+        DomEventPublisher.prototype = {
+            add : function(callback) {
+                this.add = add;
+                return this.add(callback);
+                function add(callback) {
+                    var o = this.src,
+                        captureAdapterType = useCaptureMap[this.type],
+                        type = captureAdapterType||this.type;
+                    if (HAS_EVENT_TARGET) {
+                        o.addEventListener(type, callback, !!captureAdapterType);
+                    } else {
+                        callback = getBoundCallback(o, callback);
+        
+                        o.attachEvent("on" + type, callback);
+                    }
+                    this._callStack.push(callback);
+                    return this;   
+                }
+                /**
+                * A closure is used to wrap a call to the callback
+                * in context of o.
+                * @param {Object} o the desired would-be EventTarget
+                * @param {Function} cb the callback.
+                */
+               function getBoundCallback(o, cb) {
+                // no binding for window, because: 
+                // 1) context is already global and
+                // 2) removing onunload handlers is skipped (see cleanUp);
+                   if(o === window) return cb;
+                   function bound(ev) {
+                       bound.original.call(bound.context, ev);
+                   }
+                   bound.original = cb;
+                   bound.context = o;
+                   cb = o = null;
+                   return bound;
+               }
+            },
+            
+            remove : function(callback) {
+                this.remove = remove;
+                this.remove(callback);
+                function remove(callback) {
+                    callback = removeFromCallStack(this._callStack, callback);
+                    if(callback) { // IE TypeMismatch if not a function
+                        if (HAS_EVENT_TARGET) {
+                            this.src.removeEventListener(this.type, callback, this.type in useCaptureMap);
+                        } else {
+                            this.src.detachEvent("on" + this.type, callback);
+                        }
+                    }
+                    return this;
+                }
+                function removeFromCallStack(callStack, callback) {
+                    var cb, i, len;
+                    for(i = 0, len = callStack.length; i < len; i++) {
+                        cb = callStack[i];
+                        if((cb.original || cb) === callback) {
+                            delete cb.original;
+                            delete cb.context;
+                            return callStack.splice(i, 1)[0];
+                        }
+                    }
+                    return null;
+                }
+            },
+            
+            toString : function(){
+                return "DomEventPublisher: src: " + this.src + ", type: " + this.type;
+            }
+        };
+        
+        function _get(src, sEvent) {
+            var publisherList = Registry[sEvent] || (Registry[sEvent] = []),
+                i, len,
+                publisher;
+            
+            for(i = 0, len = publisherList.length; i < len; i++) {
+                publisher = publisherList[i];
+                if(publisher.src === src) {
+                    return publisher;
                 }
             }
-            return this;
-        },
-        
-        toString : function(){
-            return "DomEventPublisher: src: " + this.src + ", type: " + this.type;
-        }
-    };
-    
-    function get(src, sEvent) {
-
-        var publisherList = Registry[sEvent] || (Registry[sEvent] = []),
-            i, len,
-            publisher;
-        
-        for(i = 0, len = publisherList.length; i < len; i++) {
-            publisher = publisherList[i];
-            if(publisher.src === src) {
-                return publisher;
+            
+            // not found.
+            publisher = new DomEventPublisher(src, sEvent);
+            publisherList[len] = publisher;
+            
+            if(isMaybeLeak){
+                get(window, "unload").add(cleanUp);
+                isMaybeLeak = false;
             }
+            
+            return publisher;
         }
-        
-        // not found.
-        publisher = new DomEventPublisher(src, sEvent);
-        publisherList[len] = publisher;
-        return publisher;
+        return get(src, sEvent);
     }
     
-    function removeFromCallStack(callStack, callback) {
-        var cb, i, len;
-        for(i = 0, len = callStack.length; i < len; i++) {
-            cb = callStack[i];
-            if((cb.original || cb) === callback) {
-                delete cb.original;
-                delete cb.context;
-                return callStack.splice(i, 1)[0];
-            }
-        }
-        return null;
-    }
-
     function getTarget(ev) {
         ev = ev || window.event;
         if(!ev) return null;
@@ -914,26 +953,6 @@ APE.namespace("APE.dom").mixin(function() {
             t = t.parentNode;
         }
         return t;
-    }
-
-    /**
-     * A closure is used to wrap a call to the callback
-     * in context of o.
-     * @param {Object} o the desired would-be EventTarget
-     * @param {Function} cb the callback.
-     */
-    function getBoundCallback(o, cb) {
-     // no binding for window, because: 
-     // 1) context is already global and
-     // 2) removing onunload handlers is skipped (see cleanUp);
-        if(o === window) return cb;
-        var bound = function(ev) {
-            bound.original.call(bound.context, ev);
-        };
-        bound.original = cb;
-        bound.context = o;
-        cb = o = null;
-        return bound;
     }
     
     /**
@@ -977,12 +996,11 @@ APE.namespace("APE.dom").mixin(function() {
         }
     }
     
-    function cleanUp(){
+    function cleanUp() {
         var sEvent, 
             publisherList,
             i, len,
-            publisher,
-            bound;
+            publisher;
 
         for(sEvent in Registry) {
             publisherList = Registry[sEvent];
@@ -997,19 +1015,18 @@ APE.namespace("APE.dom").mixin(function() {
             delete Registry[sEvent];
         }
         removeCallback(window, "onunload", cleanup);
-    }
-    
-    function unbindCallstack(publisher) {
-        var callStack = publisher._callStack, i, len, bound;
-        for( i = 0, len = callstack.length; i < len; i++) {
-            bound = callstack[i];
-            publisher.remove(bound);
+        
+        function unbindCallstack(publisher) {
+            var callStack = publisher._callStack, i, len, bound;
+            for(i = 0, len = callstack.length; i < len; i++) {
+                bound = callstack[i];
+                publisher.remove(bound);
+            }
+            delete publisher._callStack;
         }
-        delete publisher._callStack;
     }
-    
-    return mixin;
-}());/** @requires viewport-f.js (for scrollOffsets in IE). */
+    return Event;
+})();/** @requires viewport-f.js (for scrollOffsets in IE). */
 APE.namespace("APE.dom.Event").getCoords = function(ev) {
     var dom = APE.dom, getCoords;
     if ("pageX" in ev) {
