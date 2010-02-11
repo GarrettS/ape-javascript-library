@@ -832,8 +832,9 @@ APE.namespace("APE.dom").mixin(function() {
     /** Gets a DomEventPublisher */
     function get(src, sEvent) {
         // Function rewriting, keeping DomEventPublisher in scope.
-        // function _get is reassinged, invoked below. 
-        get = Event.get = _get;
+        // Event.get is reassigned here and invoked below and the value of 
+        // that is returned is returned to first caller of this function.
+        Event.get = get;
         
         // Keep this in [[Scope]] of get method, but rewrite get.
         function DomEventPublisher(src, type) {
@@ -848,7 +849,7 @@ APE.namespace("APE.dom").mixin(function() {
         DomEventPublisher.prototype = {
             add : function(callback) {
                 this.add = add;
-                return this.add(callback);
+                this.add(callback);
                 function add(callback) {
                     var o = this.src,
                         captureAdapterType = useCaptureMap[this.type],
@@ -861,7 +862,6 @@ APE.namespace("APE.dom").mixin(function() {
                         o.attachEvent("on" + type, callback);
                     }
                     this._callStack.push(callback);
-                    return this;   
                 }
                 /**
                 * A closure is used to wrap a call to the callback
@@ -896,7 +896,6 @@ APE.namespace("APE.dom").mixin(function() {
                             this.src.detachEvent("on" + this.type, callback);
                         }
                     }
-                    return this;
                 }
                 function removeFromCallStack(callStack, callback) {
                     var cb, i, len;
@@ -917,7 +916,7 @@ APE.namespace("APE.dom").mixin(function() {
             }
         };
         
-        function _get(src, sEvent) {
+        function get(src, sEvent) {
             var publisherList = Registry[sEvent] || (Registry[sEvent] = []),
                 i, len,
                 publisher;
@@ -963,7 +962,7 @@ APE.namespace("APE.dom").mixin(function() {
      * @return {DomEventPublisher} this object.
      */
     function addCallback(o, type, cb) {
-        get(o, type).add(cb);
+        Event.get(o, type).add(cb);
     }
 
     /**
@@ -974,8 +973,7 @@ APE.namespace("APE.dom").mixin(function() {
      * @param {boolean} [useCapture] for internal use for delegated focus.
      */
     function removeCallback(o, type, bound, useCapture) {
-        var p = get(o, type);
-        p.remove(bound);
+         Event.get(o, type).remove(bound);
     }
     
     /** @param {Event} */
