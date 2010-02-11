@@ -204,7 +204,7 @@ APE.namespace("APE.dom").Event = (function() {
             }
             delete Registry[sEvent];
         }
-        removeCallback(window, "onunload", cleanUp);
+        removeCallback(window, "unload", cleanUp);
         
         function unbindCallstack(publisher) {
             var callStack = publisher._callStack, i, len, bound;
