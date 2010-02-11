@@ -1313,7 +1313,7 @@ APE.namespace("APE.dom").mixin(function() {
         
         DomEventPublisher.prototype = {
             add : function(callback) {
-                this.add = add;
+                DomEventPublisher.prototype.add = add;
                 this.add(callback);
                 function add(callback) {
                     var o = this.src,
@@ -1350,7 +1350,7 @@ APE.namespace("APE.dom").mixin(function() {
             },
             
             remove : function(callback) {
-                this.remove = remove;
+                DomEventPublisher.prototype.remove = remove;
                 this.remove(callback);
                 function remove(callback) {
                     callback = removeFromCallStack(this._callStack, callback);
@@ -1410,7 +1410,6 @@ APE.namespace("APE.dom").mixin(function() {
                     publisherList = Registry[sEvent];
                     for(i = publisherList.length; i --> 0; publisherList.length = i) {
                         publisher = publisherList[i];
-                        alert([i, publisherList.length, publisher])
                         // Do not remove any window load listeners on unload;
                         // callbacks fire out of order in IE.
                         if(publisher.src != publisher.src.window) {
