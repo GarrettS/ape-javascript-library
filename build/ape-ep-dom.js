@@ -1273,11 +1273,6 @@ APE.namespace("APE.dom").mixin(function() {
 
     var HAS_EVENT_TARGET = "addEventListener"in this,
         TARGET = HAS_EVENT_TARGET ? "target" : "srcElement",
-        FOCUS_DELEGATED = HAS_EVENT_TARGET ? "focus" : "focusin",
-        BLUR_DELEGATED = HAS_EVENT_TARGET ? "blur" : "focusout",
-        Registry = {},
-        isMaybeLeak/*@cc_on=(@_jscript_version<5.7)@*/,
-        useCaptureMap = {"focus":FOCUS_DELEGATED, "blur":BLUR_DELEGATED},
         Event = {
             get : get,
             getTarget : getTarget, 
@@ -1299,6 +1294,13 @@ APE.namespace("APE.dom").mixin(function() {
         // that is returned is returned to first caller of this function.
         Event.get = get;
         
+        var FOCUS_DELEGATED = HAS_EVENT_TARGET ? "focus" : "focusin",
+            BLUR_DELEGATED = HAS_EVENT_TARGET ? "blur" : "focusout",
+            Registry = {},
+            isMaybeLeak/*@cc_on=(@_jscript_version<5.7)@*/,
+            useCaptureMap = {"focus":FOCUS_DELEGATED, "blur":BLUR_DELEGATED},
+            cleanUp;
+
         // Keep this in [[Scope]] of get method, but rewrite get.
         function DomEventPublisher(src, type) {
             if(!src.addEventListener && !src.attachEvent) {
@@ -1394,13 +1396,40 @@ APE.namespace("APE.dom").mixin(function() {
             // not found.
             publisher = new DomEventPublisher(src, sEvent);
             publisherList[len] = publisher;
-            
-            if(isMaybeLeak){
-                get(window, "unload").add(cleanUp);
-                isMaybeLeak = false;
-            }
-            
             return publisher;
+        }
+        
+        if(isMaybeLeak) {
+            get(window, "unload").add(cleanUp = function(){
+                var sEvent, 
+                    publisherList,
+                    i,
+                    publisher;
+                
+                for(sEvent in Registry) {
+                    publisherList = Registry[sEvent];
+                    for(i = publisherList.length; i --> 0; publisherList.length = i) {
+                        publisher = publisherList[i];
+                        alert([i, publisherList.length, publisher])
+                        // Do not remove any window load listeners on unload;
+                        // callbacks fire out of order in IE.
+                        if(publisher.src != publisher.src.window) {
+                            unbindCallstack(publisher);
+                        }
+                    }
+                    delete Registry[sEvent];
+                }
+                removeCallback(window, "unload", cleanUp);
+                
+                function unbindCallstack(publisher) {
+                    var callStack = publisher._callStack, i, len, bound;
+                    for(i = 0, len = callStack.length; i < len; i++) {
+                        bound = callStack[i];
+                        publisher.remove(bound);
+                    }
+                    delete publisher._callStack;
+                }
+            });
         }
         return get(src, sEvent);
     }
@@ -1454,36 +1483,6 @@ APE.namespace("APE.dom").mixin(function() {
             ev.stopPropagation();
         } else {
             (window.event || ev).cancelBubble = true;
-        }
-    }
-    
-    function cleanUp() {
-        var sEvent, 
-            publisherList,
-            i,
-            publisher;
-
-        for(sEvent in Registry) {
-            publisherList = Registry[sEvent];
-            for(i = publisherList.length; i-- ;publisherList.length = i) {
-                publisher = publisherList[i];
-                // Do not remove any window load listeners on unload;
-                // callbacks fire out of order in IE.
-                if(publisher.src != publisher.src.window) {
-                    unbindCallstack(publisher);
-                }
-            }
-            delete Registry[sEvent];
-        }
-        removeCallback(window, "unload", cleanUp);
-        
-        function unbindCallstack(publisher) {
-            var callStack = publisher._callStack, i, len, bound;
-            for(i = 0, len = callStack.length; i < len; i++) {
-                bound = callStack[i];
-                publisher.remove(bound);
-            }
-            delete publisher._callStack;
         }
     }
     return Event;
