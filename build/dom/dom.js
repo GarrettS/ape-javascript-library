@@ -806,39 +806,110 @@ APE.namespace("APE.dom").mixin(function() {
         ret.length = j;
         return ret;
     }
-})();/**
- * @requires APE.dom.Viewport
- */
-/** @namespace APE.dom */
-APE.namespace("APE.dom.Event").mixin(function() {
+})();APE.namespace("APE.dom").Event = (function() {
 
     var HAS_EVENT_TARGET = "addEventListener"in this,
         TARGET = HAS_EVENT_TARGET ? "target" : "srcElement",
         FOCUS_DELEGATED = HAS_EVENT_TARGET ? "focus" : "focusin",
-        BLUR_DELEGATED = HAS_EVENT_TARGET ? "blur" : "focusout";
-
-    return{
+        BLUR_DELEGATED = HAS_EVENT_TARGET ? "blur" : "focusout",
+        Event = APE.dom.Event,
+        Registry = {},
+        isMaybeLeak/*@cc_on=(@_jscript_version<5.7)@*/,
+        useCaptureMap = {"focus":FOCUS_DELEGATED, "blur":BLUR_DELEGATED},
+        mixin = {
+            get : get,
             getTarget : getTarget, 
+            add : addCallback,
             addCallback : addCallback,
+            remove : removeCallback,
             removeCallback : removeCallback,
-            addDelegatedFocus : addDelegatedFocus,
-            addDelegatedBlur : addDelegatedBlur,
-            removeDelegatedFocus : removeDelegatedFocus,
-            removeDelegatedBlur : removeDelegatedBlur,
             preventDefault : preventDefault,
             stopPropagation : stopPropagation
     };
     
+    if(isMaybeLeak){
+        get(window, "unload").add(cleanUp);
+    }
+    
+    function DomEventPublisher(src, type){
+        if(!src.addEventListener && !src.attachEvent) {
+            throw TypeError(src+ " is not a compatible object.");
+        }
+        this.src = src;
+        this.type = type;
+        this._callStack = [];
+    }
+    
+    DomEventPublisher.prototype = {
+        add : function(callback) {
+            var o = this.src,
+                captureAdapterType = useCaptureMap[this.type],
+                type = captureAdapterType||this.type;
+            if (HAS_EVENT_TARGET) {
+                o.addEventListener(type, callback, !!captureAdapterType);
+            } else {
+                callback = getBoundCallback(o, callback);
+                o.attachEvent("on" + type, callback);
+            }
+            this._callStack.push(callback);
+            return this;
+        },
+        
+        remove : function(callback) {
+            callback = removeFromCallStack(this._callStack, callback);
+            if(callback) { // IE TypeMismatch if not a function
+                if (HAS_EVENT_TARGET) {
+                    this.src.removeEventListener(this.type, callback, this.type in useCaptureMap);
+                } else {
+                    this.src.detachEvent("on" + this.type, callback);
+                }
+            }
+            return this;
+        },
+        
+        toString : function(){
+            return "DomEventPublisher: src: " + this.src + ", type: " + this.type;
+        }
+    };
+    
+    function get(src, sEvent) {
+
+        var publisherList = Registry[sEvent] || (Registry[sEvent] = []),
+            i, len,
+            publisher;
+        
+        for(i = 0, len = publisherList.length; i < len; i++) {
+            publisher = publisherList[i];
+            if(publisher.src === src) {
+                return publisher;
+            }
+        }
+        
+        // not found.
+        publisher = new DomEventPublisher(src, sEvent);
+        publisherList[len] = publisher;
+        return publisher;
+    }
+    
+    function removeFromCallStack(callStack, callback) {
+        var cb, i, len;
+        for(i = 0, len = callStack.length; i < len; i++) {
+            cb = callStack[i];
+            if((cb.original || cb) === callback) {
+                delete cb.original;
+                delete cb.context;
+                return callStack.splice(i, 1)[0];
+            }
+        }
+        return null;
+    }
+
     function getTarget(ev) {
         ev = ev || window.event;
         if(!ev) return null;
         
-        // Sometimes window.event is null here,
-        // as during the Calendar test "onfocusout" 
-        // event handler.
         var t = (ev || window.event)[TARGET];
-        if(t == null) return null;
-        if(t.nodeName === "#text") {
+        if(t && t.nodeName === "#text") {
             // For Safari 2.0, 2.0.4.
             t = t.parentNode;
         }
@@ -852,29 +923,28 @@ APE.namespace("APE.dom.Event").mixin(function() {
      * @param {Function} cb the callback.
      */
     function getBoundCallback(o, cb) {
-        return function(ev) {
-            cb.call(o, ev);
+     // no binding for window, because: 
+     // 1) context is already global and
+     // 2) removing onunload handlers is skipped (see cleanUp);
+        if(o === window) return cb;
+        var bound = function(ev) {
+            bound.original.call(bound.context, ev);
         };
+        bound.original = cb;
+        bound.context = o;
+        cb = o = null;
+        return bound;
     }
-
+    
     /**
      * addEventListener/attachEvent for DOM objects.
      * @param {Object} o host object, Element, Document, Window.
      * @param (string} type
      * @param {Function} cb
-     * @param {boolean} [useCapture] for internal use for delegated focus.
-     * @return {Function} cb If EventTarget is not supported,
-     * a bound callback is created and returned. Otherwise,
-     * cb (input param) is returned.
+     * @return {DomEventPublisher} this object.
      */
-    function addCallback(o, type, cb, useCapture) {
-        if (HAS_EVENT_TARGET) {
-            o.addEventListener(type, cb, !!useCapture);
-        } else {
-            var bound = getBoundCallback(o, cb);
-            o.attachEvent("on" + type, bound);
-        }
-        return bound||cb;
+    function addCallback(o, type, cb) {
+        get(o, type).add(cb);
     }
 
     /**
@@ -883,33 +953,10 @@ APE.namespace("APE.dom.Event").mixin(function() {
      * @param (string} type
      * @param {Function} cb
      * @param {boolean} [useCapture] for internal use for delegated focus.
-     * @return {Function} bound If EventTarget is not supported,
-     * a bound callback is created and returned. Otherwise,
-     * cb (input param) is returned.
      */
     function removeCallback(o, type, bound, useCapture) {
-        if (HAS_EVENT_TARGET) {
-            o.removeEventListener(type, bound, !!useCapture);
-        } else {
-            o.detachEvent("on" + type, bound);
-        }
-        return bound;
-    }
-    
-    function addDelegatedFocus(o, cb){
-        return addCallback(o, FOCUS_DELEGATED, cb, true);
-    }
-     
-    function addDelegatedBlur(o, cb){
-        return addCallback(o, BLUR_DELEGATED, cb, true);
-    }    
-    
-    function removeDelegatedFocus(o, bound){
-        removeCallback(o, FOCUS_DELEGATED, bound, true);
-    }
-     
-    function removeDelegatedBlur(o, bound){
-        removeCallback(o, BLUR_DELEGATED, bound, true);
+        var p = get(o, type);
+        p.remove(bound);
     }
     
     /** @param {Event} */
@@ -929,6 +976,39 @@ APE.namespace("APE.dom.Event").mixin(function() {
             (window.event || ev).cancelBubble = true;
         }
     }
+    
+    function cleanUp(){
+        var sEvent, 
+            publisherList,
+            i, len,
+            publisher,
+            bound;
+
+        for(sEvent in Registry) {
+            publisherList = Registry[sEvent];
+            for(i = 0, len = publisherList.length; i < len; i++) {
+                publisher = publisherList[i];
+                // Do not remove any window load listeners on unload;
+                // callbacks fire out of order in IE.
+                if(publisher.src != publisher.src.window) {
+                    unbindCallstack(publisher);
+                }
+            }
+            delete Registry[sEvent];
+        }
+        removeCallback(window, "onunload", cleanup);
+    }
+    
+    function unbindCallstack(publisher) {
+        var callStack = publisher._callStack, i, len, bound;
+        for( i = 0, len = callstack.length; i < len; i++) {
+            bound = callstack[i];
+            publisher.remove(bound);
+        }
+        delete publisher._callStack;
+    }
+    
+    return mixin;
 }());/** @requires viewport-f.js (for scrollOffsets in IE). */
 APE.namespace("APE.dom.Event").getCoords = function(ev) {
     var dom = APE.dom, getCoords;

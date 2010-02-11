@@ -173,7 +173,7 @@ var creationalTest = new YAHOO.tool.TestCase({
     },
     
     setUp : function(){
-        APE.createFactory("C", function(){return C;});
+        APE.defineFactory("C", function(){return C;});
         CNFactory = APE.C;
     },
     
@@ -185,7 +185,7 @@ var creationalTest = new YAHOO.tool.TestCase({
     },
 
     testCustomFactoryStaticMember : function(){
-        APE.createCustomFactory("Aquabib", function(Aquabib) {
+        APE.defineCustomFactory("Aquabib", function(Aquabib) {
                 Aquabib.staticMember = "water";
                 return getConstructor;
                 function getConstructor() {
@@ -196,7 +196,7 @@ var creationalTest = new YAHOO.tool.TestCase({
     },
     
     testCustomFactoryCreateInstance : function(){
-        APE.createCustomFactory("Aquabib", function(Aquabib) {
+        APE.defineCustomFactory("Aquabib", function(Aquabib) {
                 return getConstructor;
                 function getConstructor() {
                     return Aquabib;
@@ -240,7 +240,7 @@ var creationalTest = new YAHOO.tool.TestCase({
             this.toString = function() { return el.id + ": " + s; }
         }
 
-        APE.createFactory(
+        APE.defineFactory(
             "CFactory", 
             function(){return C;}
         );
@@ -257,7 +257,7 @@ var creationalTest = new YAHOO.tool.TestCase({
     },
     
     testCreateFactory : function() {
-        APE.createFactory( 
+        APE.defineFactory( 
             "CFactory", 
             function(){return C;}
         );
@@ -271,20 +271,27 @@ var creationalTest = new YAHOO.tool.TestCase({
     },
     
     testCreateFactoryNode : function() {
-        APE.createFactory( 
+        var CF = APE.createFactory( 
             "CFactory", 
             function(){return C;}
         );
-        function getC() {
-            return C;
-        }
         
-        var c = APE.CFactory.getById('c', 3);
-        var c2 = APE.CFactory.getById({id:'c'}, 2);
+        var c = CF.getById('c', 3);
+        var c2 = CF.getById({id:'c'}, 2);
         Assert.areSame(c, c2);
         
     },
 
+    testDefineFactory : function(){
+        APE.namespace("foo").defineFactory( 
+                "CFactory", 
+                function(){return C;}
+            );
+        
+        var c = foo.CFactory.getById('c', 3);
+        Assert.isNotNull(c);
+    },
+    
     testDeferError: function() {
     // this will fail in Webkit (false fail), due to:
     // https://bugs.webkit.org/show_bug.cgi?id=8519

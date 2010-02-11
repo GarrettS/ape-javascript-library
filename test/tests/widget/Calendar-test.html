@@ -14,6 +14,7 @@
 
     <script type="text/javascript" src="../../../build/ape-ep-dom.js"></script>
     <script type="text/javascript" src="../../../build/anim/anim.js"></script>
+    <script type="text/javascript" src="../../../build/widget/DelegateFactory.js"></script>
     <script type="text/javascript" src="../../../build/widget/Calendar/Calendar_en.js"></script>
     <script type="text/javascript" src="../../../build/widget/Calendar/Calendar.js"></script>
 </head>
@@ -112,10 +113,14 @@ window.onload = function(){
         },
 
         testRegisterDelegate : function(){
-            Calendar.registerDelegateFor("start");
+            try {
+                //debugger
+            Calendar.addDelegateFor("start");
+            } catch(x){console.log(x);}
             start.focus();
             this.wait(function(){
-                Assert.isNotNull(Calendar.instances.start);
+                Assert.isObject(Calendar.instances, "no instances");
+                Assert.isNotNull(Calendar.instances.start, "no 'start' instance");
             }, 30);
         },
         

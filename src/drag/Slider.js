@@ -1,7 +1,7 @@
 /** slider.js
  * requires: Draggable, EventPublisher, className-f.js (in dom.js)
  */
-APE.namespace("APE.drag").createFactory(
+APE.namespace("APE.drag").defineFactory(
     "Slider",
     function(Slider){
         var APE = self.APE,

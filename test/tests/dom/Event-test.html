@@ -20,7 +20,7 @@
 </head>
 <body style="position:relative;top: 10px">
 <div id="template">
-    <div id="testNode"><input id="testInp"></div>
+    <div id="testNode"><input id="testInp"><input id="testInp2"></div>
 </div>
 <div id="testLogger"></div>
 
@@ -127,8 +127,17 @@ var eventTestCase = new YAHOO.tool.TestCase({
         var called = false;
 
         dom.Event.addCallback(testNode, "blur", tnBlurHandler);
+
         Action.focus(testInp);
+        testInp.focus();
+
+        // Opera needs this.
         Action.blur(testInp);
+
+        // IE needs this.
+        testInp.blur();
+        
+        Action.focus(document.getElementById("testInp2"));
         Assert.isTrue(called, "blur handler was not called.");
         function tnBlurHandler() {
             called = true;

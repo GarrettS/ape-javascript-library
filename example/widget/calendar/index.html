@@ -38,14 +38,14 @@
 <script src="../../../build/ape-ep-dom.js" type="text/javascript"></script>
 
 <script src="../../../build/anim/anim.js" type="text/javascript"></script>
+<script src="../../../build/widget/DelegateFactory.js" type="text/javascript"></script>
 <script src="../../../build/widget/Calendar/Calendar.js" type="text/javascript"></script>
 <script src="../../../build/widget/Calendar/Calendar_en.js" type="text/javascript"></script>
 <script type="text/javascript">
 // TODO: not implemented.
 // APE.widget.Calendar.registerDelegateListFor([{id:"start", config : {useAnim: false}}, "end"]);
-
-APE.widget.Calendar.registerDelegateFor("start", {useAnim: false});
-APE.widget.Calendar.registerDelegateFor("end");
+APE.widget.Calendar.addDelegateFor("start", {useAnim: false});
+APE.widget.Calendar.addDelegateFor("end");
 </script>
 <p>the first calendar has <code>useAnim : false</code>, the second does not, 
 so it gets default animation.

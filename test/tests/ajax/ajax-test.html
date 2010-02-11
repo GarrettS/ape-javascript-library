@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+    <title>APE.ajax.ScriptLoader Test</title>
+
+    <link rel="stylesheet" type="text/css" href="../../yui-test/build/logger/assets/logger.css">
+    <link rel="stylesheet" type="text/css" href="../../yui-test/assets/testlogger.css">
+
+    <script type="text/javascript" src="../../yui-test/build/yahoo-dom-event/yahoo-dom-event.js"></script>
+    <script type="text/javascript" src="../../yui-test/build/logger/logger.js"></script>
+    <script type="text/javascript" src="../../yui-test/build/yuitest/yuitest-beta.js"></script>
+
+    <script type="text/javascript" src="../../../build/APE.js"></script>
+    <script type="text/javascript" src="../../../build/EventPublisher.js"></script>
+    <script type="text/javascript" src="../../../build/ajax/ajax-base.js"></script>
+    <script type="text/javascript" src="../../../build/ajax/ScriptLoader.js"></script>
+
+</head>
+<body>
+<div id="testLogger"></div>
+<script type="text/javascript">
+(function(){
+var Assert = YAHOO.util.Assert,
+    // hrefStart = location.protocol + "//" + location.hostname + "/";
+    ajaxBaseTest = new YAHOO.tool.TestCase({
+        name : "ajax-base Tests",
+        
+        setUp : function(){
+        
+        },
+        
+        tearDown : function(){
+        },
+
+        testAppendToURI : function() {
+            var uri = "http://foo.com",
+                q = "blah=12",
+                expected = uri + "?" + q,
+                actual = APE.ajax.appendToURI(uri, q);
+            Assert.areSame(expected, actual);
+        },
+
+        testAppendToParam : function() {
+            var uri = "http://foo.com?bar",
+                q = "blah=12",
+                expected = uri + "&" + q,
+                actual = APE.ajax.appendToURI(uri, q);
+            Assert.areSame(expected, actual);
+        },
+
+        testAppendToEmpty : function() {
+            var uri = "",
+                q = "/path",
+                expected = uri + q,
+                actual = APE.ajax.appendToURI(uri, q);
+            Assert.areSame(expected, actual);
+        },
+
+        testAppendToUndefined : function() {
+            var uri,
+                q = "/path",
+                expected = uri + q,
+                actual = APE.ajax.appendToURI(uri, q);
+            Assert.areSame(""+q, actual);
+        }
+});
+
+//create the logger
+new YAHOO.tool.TestLogger("testLogger");
+YAHOO.tool.TestRunner.add(ajaxBaseTest );
+
+// run the tests, or put them in the TestRunner.
+if (parent != window && parent.YAHOO && parent.YAHOO.tool) {
+    YAHOO.tool.TestManager.load();
+} else {
+    YAHOO.tool.TestRunner.run();
+}
+})();</script>
+</body>
+</html>

@@ -4,7 +4,7 @@
  * @requires APE.dom, APE.EventPublisher, APE.color.ColorRGB
  * @namespace APE.widget
  */
-APE.namespace("APE.widget").createFactory(
+APE.namespace("APE.widget").defineFactory(
     "HsvPicker", 
      function(HsvPicker) {
         var APE = self.APE,

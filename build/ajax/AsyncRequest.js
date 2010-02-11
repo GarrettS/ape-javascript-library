@@ -4,7 +4,7 @@ APE.namespace("APE.ajax").mixin({
         return (baseUri || "") + ch + queryParams;
     },
     jsonp : function(data) { return data; }
-});APE.namespace("APE.ajax").createCustomFactory(
+});APE.namespace("APE.ajax").defineCustomFactory(
     "AsyncRequest", 
     
     function(AsyncRequest) {

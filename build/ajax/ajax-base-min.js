@@ -1,0 +1,1 @@
+APE.namespace("APE.ajax").mixin({appendToURI:function(C,B){var A=C?C.indexOf("?")!==-1?"&":"?":"";return(C||"")+A+B},jsonp:function(A){return A}});

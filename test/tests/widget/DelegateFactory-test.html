@@ -1,0 +1,111 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+    <title>DelegateFactory Test</title>
+    <link rel="stylesheet" type="text/css" href="../../yui-test/build/logger/assets/logger.css">
+    <link rel="stylesheet" type="text/css" href="../../yui-test/build/yuitest/assets/yuitest.css">
+    <link rel="stylesheet" type="text/css" href="../../yui-test/assets/testlogger.css">
+
+    <script type="text/javascript" src="../../yui-test/build/yahoo-dom-event/yahoo-dom-event.js"></script>
+    <script type="text/javascript" src="../../yui-test/build/logger/logger.js"></script>
+    <script type="text/javascript" src="../../yui-test/build/yuitest/yuitest-beta.js"></script>
+
+    <script type="text/javascript" src="../../../build/ape-ep-dom.js"></script>
+    <script type="text/javascript" src="../../../build/widget/DelegateFactory.js"></script>
+</head>
+<body>
+<div id="testLogger"></div>
+<div id="template">
+<div id="testNode">Blah instance div</div>
+</div>
+<script type="text/javascript">
+window.onload = function(){
+
+    var Assert = YAHOO.util.Assert;
+    
+    var Blah, 
+        testNode,
+        template = document.getElementById("template"),
+        templateHTML = template.innerHTML,
+        Action = YAHOO.util.UserAction;
+    
+    var delegateFactoryTest = new YAHOO.tool.TestCase({
+ 
+        //name of the test case - if not provided, one is auto-generated
+        name : "DelegateFactory test",
+ 
+        setUp : function () {
+            Blah = APE.createFactory("Blah", function(){
+                return BlahC;
+
+                function BlahC(id) { 
+                    this.id = id;
+                } 
+            });
+            APE.widget.createDelegateFactory(Blah, APE.dom.Event , "click");
+
+            template.innerHTML = templateHTML;
+            testNode = document.getElementById("testNode");
+        },
+ 
+        tearDown : function () {
+            
+        },
+
+        _should : {
+            ignore : {
+                
+            }
+        },
+        
+        testAddDelegateFor : function(){
+            Blah.addDelegateFor("testNode");
+            Action.click( testNode );
+            
+            Assert.isTrue("testNode" in Blah.instances);
+        },
+
+        testRemoveDelegateFor : function(){
+            Blah.addDelegateFor("testNode");
+            Blah.removeDelegateFor("testNode");
+            Action.click(testNode);
+            Assert.isUndefined(Blah.instances);
+        },
+        
+        testCreateFromDelegate : function(){
+            Blah.addDelegateFor("testNode");
+            Action.click( testNode );
+            Assert.isTrue("testNode" in Blah.instances);
+        },
+
+        testCreateDelegateCustomMatcher : function() {
+            APE.widget.createDelegateFactory(Blah, APE.EventPublisher, "onclick", matcher);
+
+            testNode.title = "tail";
+            function matcher(ev, target) {
+                return target.title === "tail" && target;
+            }
+            Blah.addDelegateFor("testNode", config);
+            Action.click( testNode );
+            Assert.isTrue("testNode" in Blah.instances);
+        }
+    });
+    
+    //create the logger
+    new YAHOO.tool.TestLogger("testLogger");
+ 
+    //run the tests
+    YAHOO.tool.TestRunner.add( delegateFactoryTest );
+     //run the tests
+    if (parent !== self 
+            && "YAHOO" in parent
+            && parent.YAHOO.tool ) {
+        YAHOO.tool.TestManager.load();
+    } else {
+        YAHOO.tool.TestRunner.run();
+    }
+ 
+};</script>
+</body>
+</html>

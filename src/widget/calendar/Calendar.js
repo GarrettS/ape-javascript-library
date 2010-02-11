@@ -8,44 +8,24 @@
  * </pre>
  */
 
-APE.namespace("APE.widget").createCustomFactory(
+APE.namespace("APE.widget").defineCustomFactory(
     "Calendar", 
     function(Calendar) {
         
         var inputTypeDate = document.createElement("input"),
             APE = window.APE,
             dom = APE.dom,
-            Event = dom.Event,
-            cbMap = {};
+            Event = dom.Event;
+        
+        // Augment Calendar.
+        APE.widget.createDelegateFactory(Calendar, Event, "focus");
         
         inputTypeDate.setAttribute("type", "date");
-        APE.createMixin(Calendar, { 
-            IS_NATIVE : /date/i.test(inputTypeDate.type),
-            registerDelegateFor : registerDelegateFor});
+        Calendar.IS_NATIVE = /date/i.test(inputTypeDate.type);
+        inputTypeDate = null;
         
         return getConstructor;
-        
-        function registerDelegateFor(id, config, filter) {
-            cbMap[id] = cbMap[id] || Event.addDelegatedFocus(document.documentElement, 
-                    getDelegate(id, config, filter));
-        }
-        
-        // Returns curried delegation handler for focus event.
-        function getDelegate(id, config, filter) {
-            return function(ev){
-                delegate(ev, id, config, filter);
-            };
-        }
-        
-        function delegate(ev, id, config, filter) {
-            var target = Event.getTarget(ev);
-            if(target.id === id && (!filter || filter(target) != false)) {
-                Event.removeDelegatedFocus(document.documentElement, cbMap[id]);
-                delete cbMap[id];
-                Calendar.getById( id, config );
-            }
-        }
-
+                
         function getConstructor(Calendar){
             /**
              * @constructor

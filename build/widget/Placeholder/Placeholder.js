@@ -4,7 +4,7 @@
  * @requires APE.EventPublisher, APE.dom (classname-f.js)
  */
 
-APE.namespace("APE.widget").createCustomFactory("Placeholder",
+APE.namespace("APE.widget").defineCustomFactory("Placeholder",
     function(Placeholder){
     var IS_NATIVE, 
         PLACEHOLDER = "placeholder";
@@ -26,8 +26,7 @@ APE.namespace("APE.widget").createCustomFactory("Placeholder",
         var APE = self.APE,
             dom = APE.dom,
             // Private instance data.
-            inpValue = {}, 
-            events = {};
+            inpValue = {};
         
         PlaceholderC.prototype = {
             initEvents : function() {
@@ -40,11 +39,9 @@ APE.namespace("APE.widget").createCustomFactory("Placeholder",
                 if(isEmpty(inp)) {
                     showPlaceholderText(inp);
                 }
-                events[inp.id] = { 
-                    "focus" : addCallback(inp, "focus", inpFocused),
-                    "blur" : addCallback(inp, "blur", inpBlurred),
-                    "drop" : addCallback(inp, "drop", inpPotentialChange)// drop some text.
-                }; 
+                addCallback(inp, "focus", inpFocused);
+                addCallback(inp, "blur", inpBlurred);
+                addCallback(inp, "drop", inpPotentialChange);// drop some text.
             },
             
             detachEvents : function() {
@@ -52,14 +49,9 @@ APE.namespace("APE.widget").createCustomFactory("Placeholder",
                     inp = document.getElementById(this.id),
                     inpEvents;
                 if(inp){
-                    inpEvents = events[inp.id];
-                    if(inpEvents) {
-                        removeCallback(inp, "focus", inpEvents.focus);
-                        removeCallback(inp, "blur", inpEvents.blur);
-                        removeCallback(inp, "drop", inpEvents.drop);  
-                        delete events[inp.id];
-                        delete inpValue[inp.id];
-                    }
+                    removeCallback(inp, "focus", inpFocused);
+                    removeCallback(inp, "blur", inpBlurred);
+                    removeCallback(inp, "drop", inpPotentialChange);  
                 }
             }
         };

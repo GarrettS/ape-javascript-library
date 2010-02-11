@@ -4,13 +4,12 @@ APE.namespace("APE.ajax").mixin({
         return (baseUri || "") + ch + queryParams;
     },
     jsonp : function(data) { return data; }
-});APE.namespace("APE.ajax").createFactory(
+});APE.namespace("APE.ajax").defineFactory(
     "ScriptLoader", function(ScriptLoader) {
         
         var noop = Function.prototype,
             appendToURI = APE.ajax.appendToURI,
             scriptOnloadSupported;
-        
         
         /** @constructor.
          * config properties:
@@ -18,10 +17,9 @@ APE.namespace("APE.ajax").mixin({
          * uri : string - optional base uri. 
          */
         function ScriptLoaderC(id, config) {
-            this.id = id;
             this.script = document.createElement("script");
-            this.script.id = this.id;
-            config && APE.createMixin(this, config);
+            this.id = this.script.id = id;
+            APE.createMixin(this, config);
         }
         
         function loadHandler(script) {

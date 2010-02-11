@@ -3,7 +3,7 @@
     
     var dom = APE.dom,
         drag = APE.drag,
-        SortList = drag.SortList = APE.createFactory(SortListC),
+        SortList = drag.SortList = APE.defineFactory(SortListC),
         Draggable = drag.Draggable;
 
     /** Makes an HTML List sortable by drag drop. 
@@ -87,12 +87,12 @@
                     return b.compareDocumentPosition(a) - 3;
             };
         } else {
-                f = function(a, b){
-                    for(var next = a.nextSibling; next !== null;next = next.nextSibling) {
-                        if(next == b) return -1;
-                    }
-                    return 1;
-                };
+            f = function(a, b){
+                for(var next = a.nextSibling; next !== null;next = next.nextSibling) {
+                    if(next == b) return -1;
+                }
+                return 1;
+            };
         }
         node = null;
         return (sortBySourceOrder = f)(a, b);

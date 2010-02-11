@@ -56,6 +56,7 @@
      * @return {Object} r the receiver.
      */
     function mixin(s) {
+        if(!s) return;
         var prop,
             i = 0,
             skipped;
@@ -101,19 +102,19 @@
         },
         
         /** Creates a Factory method and adds it to the Package.
-         *  @param {String} name the name of the factory to be created.
-         *  @param {Function} getConstructor function that returns constructor
-         */
-        createFactory : function(name, getConstructor){
+        *  @param {String} name the name of the factory to be created.
+        *  @param {Function} getConstructor function that returns constructor
+        */
+        defineFactory : function(name, getConstructor){
             return this[name] = new Factory(name, getConstructor);
         },
-
+        
         /** Creates a Factory method and adds it to the Package.
         *  @param {String} name the name of the factory to be created.
         *  @param {Function} staticInitializer function runs
         *  static initializer code and returns a getConstructor function.
         */
-        createCustomFactory : function(name, staticInitializer) {
+        defineCustomFactory : function(name, staticInitializer) {
             return this[name] = new Factory(name, staticInitializer, true);
         },
         
@@ -178,10 +179,13 @@
         };
     }
     
-    APE = namespace("APE").mixin({
+    namespace("APE").mixin({
         /** APE is a global Package with these special methods: */
         namespace : namespace,
         createSubclass : createSubclass,
+        createFactory : function(name, getConstructor) {
+            return new Factory(name, getConstructor);
+        },
         createMixin : createMixin
     });
 })();

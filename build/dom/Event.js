@@ -7,7 +7,7 @@ APE.namespace("APE.dom").Event = (function() {
         Event = APE.dom.Event,
         Registry = {},
         isMaybeLeak/*@cc_on=(@_jscript_version<5.7)@*/,
-        useCaptureMap = {"focus":1, "blur":1}
+        useCaptureMap = {"focus":FOCUS_DELEGATED, "blur":BLUR_DELEGATED},
         mixin = {
             get : get,
             getTarget : getTarget, 
@@ -24,6 +24,9 @@ APE.namespace("APE.dom").Event = (function() {
     }
     
     function DomEventPublisher(src, type){
+        if(!src.addEventListener && !src.attachEvent) {
+            throw TypeError(src+ " is not a compatible object.");
+        }
         this.src = src;
         this.type = type;
         this._callStack = [];
@@ -31,12 +34,14 @@ APE.namespace("APE.dom").Event = (function() {
     
     DomEventPublisher.prototype = {
         add : function(callback) {
-            var o = this.src;
+            var o = this.src,
+                captureAdapterType = useCaptureMap[this.type],
+                type = captureAdapterType||this.type;
             if (HAS_EVENT_TARGET) {
-                o.addEventListener(this.type, callback, this.type in useCaptureMap);
+                o.addEventListener(type, callback, !!captureAdapterType);
             } else {
                 callback = getBoundCallback(o, callback);
-                o.attachEvent("on" + this.type, callback);
+                o.attachEvent("on" + type, callback);
             }
             this._callStack.push(callback);
             return this;
@@ -113,9 +118,9 @@ APE.namespace("APE.dom").Event = (function() {
      // no binding for window, because: 
      // 1) context is already global and
      // 2) removing onunload handlers is skipped (see cleanUp);
-        if(o == o.window) return cb; 
+        if(o === window) return cb;
         var bound = function(ev) {
-            cb.call(bound.context, ev);
+            bound.original.call(bound.context, ev);
         };
         bound.original = cb;
         bound.context = o;
@@ -168,9 +173,7 @@ APE.namespace("APE.dom").Event = (function() {
         var sEvent, 
             publisherList,
             i, len,
-            j, jLen,
             publisher,
-            callStack,
             bound;
 
         for(sEvent in Registry) {
@@ -179,17 +182,22 @@ APE.namespace("APE.dom").Event = (function() {
                 publisher = publisherList[i];
                 // Do not remove any window load listeners on unload;
                 // callbacks fire out of order in IE.
-                if(publisher.src == publisher.src.window) continue;
-                callStack = publisher._callStack;
-                for(j = 0, jLen = callstack.length; j < jLen; j++) {
-                    bound = callstack[j];
-                    publisher.remove(bound);
+                if(publisher.src != publisher.src.window) {
+                    unbindCallstack(publisher);
                 }
-                delete publisher._callStack;
             }
             delete Registry[sEvent];
         }
         removeCallback(window, "onunload", cleanup);
+    }
+    
+    function unbindCallstack(publisher) {
+        var callStack = publisher._callStack, i, len, bound;
+        for( i = 0, len = callstack.length; i < len; i++) {
+            bound = callstack[i];
+            publisher.remove(bound);
+        }
+        delete publisher._callStack;
     }
     
     return mixin;

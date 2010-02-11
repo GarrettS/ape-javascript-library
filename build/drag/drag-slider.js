@@ -28,14 +28,14 @@ APE.namespace("APE.drag");
         noop = Function.prototype, 
         parseInt = self.parseInt, 
         grabbed, FUNCTION = "function",
-        DropTarget = drag.createFactory(
+        DropTarget = drag.defineFactory(
             "DropTarget", 
             createDropTarget
         );
 
-    drag.createCustomFactory(
+    drag.defineCustomFactory(
         "Draggable", 
-        function(Draggable){
+        function(){
             return createDraggable;
         }
     );
@@ -91,7 +91,6 @@ APE.namespace("APE.drag");
             }
             draggableList = {};
         }
-
 
         // Static initializer code.
         var d = document, 
@@ -1237,7 +1236,7 @@ APE.namespace("APE.drag");
 })();/** slider.js
  * requires: Draggable, EventPublisher, className-f.js (in dom.js)
  */
-APE.namespace("APE.drag").createFactory(
+APE.namespace("APE.drag").defineFactory(
     "Slider",
     function(Slider){
         var APE = self.APE,

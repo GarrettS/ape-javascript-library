@@ -1,4 +1,4 @@
-APE.namespace("APE.widget").createFactory(
+APE.namespace("APE.widget").defineFactory(
     "Scroller", 
     function(Scroller) {
         var APE = self.APE,
