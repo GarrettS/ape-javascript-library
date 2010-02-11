@@ -999,12 +999,12 @@ APE.namespace("APE.dom").mixin(function() {
     function cleanUp() {
         var sEvent, 
             publisherList,
-            i, len,
+            i,
             publisher;
 
         for(sEvent in Registry) {
             publisherList = Registry[sEvent];
-            for(i = 0, len = publisherList.length; i < len; i++) {
+            for(i = publisherList.length; i-- ;publisherList.length = i) {
                 publisher = publisherList[i];
                 // Do not remove any window load listeners on unload;
                 // callbacks fire out of order in IE.
@@ -1014,12 +1014,12 @@ APE.namespace("APE.dom").mixin(function() {
             }
             delete Registry[sEvent];
         }
-        removeCallback(window, "onunload", cleanup);
+        removeCallback(window, "onunload", cleanUp);
         
         function unbindCallstack(publisher) {
             var callStack = publisher._callStack, i, len, bound;
-            for(i = 0, len = callstack.length; i < len; i++) {
-                bound = callstack[i];
+            for(i = 0, len = callStack.length; i < len; i++) {
+                bound = callStack[i];
                 publisher.remove(bound);
             }
             delete publisher._callStack;
