@@ -1280,13 +1280,14 @@ APE.namespace("APE.dom").mixin(function() {
             addCallback : addCallback,
             remove : removeCallback,
             removeCallback : removeCallback,
+            purgeEvents : purgeEvents,
             preventDefault : preventDefault,
             stopPropagation : stopPropagation,
             toString : function() {
                 return"APE.dom.Event";
             }
     };
-    
+
     /** Gets a DomEventPublisher */
     function get(src, sEvent) {
         // Function rewriting, keeping DomEventPublisher in scope.
@@ -1376,6 +1377,14 @@ APE.namespace("APE.dom").mixin(function() {
                 }
             },
             
+            purge : function() {
+                var callStack = this._callStack, cb, i;
+                for(i = callStack.length; i --> 0; callStack.length = i) {
+                    cb = callStack[i];
+                    this.remove(cb.original || cb);
+                }
+            },
+            
             toString : function(){
                 return "DomEventPublisher: src: " + this.src + ", type: " + this.type;
             }
@@ -1413,21 +1422,12 @@ APE.namespace("APE.dom").mixin(function() {
                         // Do not remove any window load listeners on unload;
                         // callbacks fire out of order in IE.
                         if(publisher.src != publisher.src.window) {
-                            unbindCallstack(publisher);
+                            publisher.purge();
                         }
                     }
                     delete Registry[sEvent];
                 }
-                removeCallback(window, "unload", cleanUp);
-                
-                function unbindCallstack(publisher) {
-                    var callStack = publisher._callStack, i, len, bound;
-                    for(i = 0, len = callStack.length; i < len; i++) {
-                        bound = callStack[i];
-                        publisher.remove(bound);
-                    }
-                    delete publisher._callStack;
-                }
+                removeCallback(window, "unload", cleanUp);                
             });
         }
         return get(src, sEvent);
@@ -1456,15 +1456,26 @@ APE.namespace("APE.dom").mixin(function() {
         Event.get(o, type).add(cb);
     }
 
+    /** Removes all events supplied */
+    function purgeEvents(obj, eventList) {
+        if(typeof eventList == "string") {
+            Event.get(obj, eventList).purge();
+        } else {
+            for(var i = 0, len = eventList.length; i < len; i++) {
+                Event.get(obj, eventList[i]).purge();
+            }
+        }
+    }
+    
     /**
      * removeEventListener/detachEvent for DOM objects.
      * @param {EventTarget} o host object, Element, Document, Window.
-     * @param (string} type
-     * @param {Function} cb
+     * @param (string} type event type (no "on" prefix here).
+     * @param {Function} cb function to remove.
      * @param {boolean} [useCapture] for internal use for delegated focus.
      */
-    function removeCallback(o, type, bound, useCapture) {
-         Event.get(o, type).remove(bound);
+    function removeCallback(o, type, cb, useCapture) {
+         Event.get(o, type).remove(cb);
     }
     
     /** @param {Event} */

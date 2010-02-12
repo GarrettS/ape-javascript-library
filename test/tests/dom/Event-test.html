@@ -176,6 +176,42 @@ var eventTestCase = new YAHOO.tool.TestCase({
         }, 100);
     },
 
+    testAddMultiple : function() {
+        var pub = Event.get(testNode, "click"),
+            called1, called2;
+        
+        pub.add(tnClick);
+        pub.add(tnClick2);
+        function tnClick() { called1 = true;  }
+        function tnClick2(ev){ called2 = true;  }
+        Action.click(testNode);
+        Assert.isTrue(called1, "first was not called");
+        Assert.isTrue(called2, "second was not called");
+    },
+
+    testPurge : function() {
+        var pub = Event.get(testNode, "click"),
+            calls = 0;
+        
+        Event.add(testNode, "click", tnClick);
+        Event.add(testNode, "click", tnClick2);
+        Event.add(testNode, "mousedown", tnClick3);
+        Event.add(testNode, "mouseup", tnClick4);
+        
+        function tnClick() { calls++;  }
+        function tnClick2(ev){ calls++;  }
+        function tnClick3(ev){ calls++;  }
+        function tnClick4(ev){ calls++;  }
+
+        Event.purgeEvents(testNode, ["click", "mousedown", "mouseup"]);
+        
+        Action.mousedown(testNode);
+        Action.mouseup(testNode);
+        Action.click(testNode);
+        
+        Assert.areSame(0, calls, "calls was not 0");
+    },
+    
     testGetDomEventPublisher : function(){
         var dep = Event.get(testNode, "click");
     }
