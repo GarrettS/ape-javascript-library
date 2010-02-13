@@ -16,8 +16,6 @@ APE.namespace("APE.widget").defineFactory(
             noop = Function.prototype,
             ERR_INVALID_COLOR = "Please enter a valid color value.";
             
-        color = null;
-            
         function HsvPick(id) {
         	
         	this.id = id;
@@ -72,8 +70,9 @@ APE.namespace("APE.widget").defineFactory(
     
     	function textInputBlur(e) {
     		var hsvPicker = HsvPicker.getById(this.id.split("-")[0]);
-    		if(!hsvPicker.enabled) return;
-    		return hsvPicker.trySetValue(this.value, e||event);
+    		if(hsvPicker.enabled) {
+    		    return hsvPicker.trySetValue(this.value, e||event);
+    		}
     	}
     
     	function checkEnabled() {

@@ -89,19 +89,19 @@ arrow keys to adjust
 <script type="text/javascript">
 
 (function () {
-    var Slider = APE.drag.Slider;
+    var Slider = APE.drag.Slider,
 
- 	var slider = Slider.getById("weight-handle", {
+    slider = Slider.getById("weight-handle", {
             dir:"x", 
             minValue : 0,
             maxValue : 1000
-        ),
-    	slider2 = Slider.getById("weight-vertical-handle", {
-                dir : "y",
-                minValue : 0,
-                maxValue : 453.59237
-            }
-        );
+ 	}),
+    
+	slider2 = Slider.getById("weight-vertical-handle", {
+            dir : "y",
+            minValue : 0,
+            maxValue : 453.59237
+        });
  	
  	slider.onslide = function() {
 		updateSliders(this, slider2);
