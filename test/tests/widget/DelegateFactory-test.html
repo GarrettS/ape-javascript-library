@@ -43,7 +43,7 @@ window.onload = function(){
                     this.id = id;
                 } 
             });
-            APE.widget.createDelegateFactory(Blah, APE.dom.Event , "click");
+            APE.widget.DelegateFactory.create(Blah, APE.dom.Event , "click");
 
             template.innerHTML = templateHTML;
             testNode = document.getElementById("testNode");
@@ -80,13 +80,13 @@ window.onload = function(){
         },
 
         testCreateDelegateCustomMatcher : function() {
-            APE.widget.createDelegateFactory(Blah, APE.EventPublisher, "onclick", matcher);
+            APE.widget.DelegateFactory.create(Blah, APE.EventPublisher, "onclick", matcher);
 
             testNode.title = "tail";
             function matcher(ev, target) {
                 return target.title === "tail" && target;
             }
-            Blah.addDelegateFor("testNode", config);
+            Blah.addDelegateFor("testNode");
             Action.click( testNode );
             Assert.isTrue("testNode" in Blah.instances);
         }

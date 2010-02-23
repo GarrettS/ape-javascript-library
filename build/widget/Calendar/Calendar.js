@@ -18,7 +18,7 @@ APE.namespace("APE.widget").defineCustomFactory(
             Event = dom.Event;
         
         // Augment Calendar.
-        APE.widget.createDelegateFactory(Calendar, Event, "focus");
+        APE.widget.DelegateFactory.create(Calendar, Event, "focus" /*defaultMatcher*/);
         
         inputTypeDate.setAttribute("type", "date");
         Calendar.IS_NATIVE = /date/i.test(inputTypeDate.type);
@@ -643,7 +643,7 @@ APE.namespace("APE.widget").defineCustomFactory(
                 // This is a document event handler. Anything can happen.
                 // Sometimes during unit test, target is null (IE6).
                 if(target && target.id !== activeCalendar.id && 
-                        !calendarEl || !dom.contains(calendarEl, target, true)) {
+                        !calendarEl || !dom.isOrContains(calendarEl, target)) {
                     
                     _hideCalendar(activeCalendar);
                     activeCalendar = null;

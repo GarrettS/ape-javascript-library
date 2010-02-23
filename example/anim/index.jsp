@@ -4,7 +4,6 @@
 <head>
 <title>APE Animation</title>
 <link type="text/css" rel="stylesheet" href="../../resources/ape.css">
-
 </head>
 
 <body>
@@ -28,7 +27,7 @@ anim.js:
 </pre>
 
 <p>
-    <code>Animation</code> is purely a timing mechanism. To acheive CSS transition effects, 
+    <code>Animation</code> is purely a timing mechanism. To achieve CSS transition effects, 
     use <code>StyleTransition</code>.
 </p>
 
@@ -38,11 +37,13 @@ anim.js:
 
 <ul>
 	<li>
-		<a href="../../build/dom/style-f.js">style-f.js</a> &mdash; <kbd>style-f.js</kbd> is included in 
+		<a href="../../build/dom/style-f.js">style-f.js</a> &mdash; 
+        <kbd>style-f.js</kbd> is included in 
 		<a href="../../build/dom/dom.js">dom.js</a> (which is included in 
 		<a href="../../build/dom/ape-ep-dom.js">ape-ep-dom.js</a>).
 	</li>
-	<li> <a href="../../build/color/ColorRGB.js">ColorRGB.js</a> &mdash; only required for color transitions <li>
+	<li> <a href="../../build/color/ColorRGB.js">ColorRGB.js</a> &mdash; 
+    only required for color transitions <li>
 </ul>
 
 <h2>Examples</h2>

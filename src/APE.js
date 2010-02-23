@@ -143,7 +143,7 @@
     }
     
     Factory[PROTOTYPE].toString = function(){ 
-        return this.name;
+        return"Factory "+this.name;
     };
 
     /** Crutches for Safari 2, which does not have native impl.

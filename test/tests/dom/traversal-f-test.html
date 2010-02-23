@@ -79,17 +79,17 @@ var viewportTestCase = new YAHOO.tool.TestCase({
     },
     
     testContainsIncludeElChildEl : function() {
-        Assert.isTrue(dom.contains(body, testNode, true), 
+        Assert.isTrue(dom.isOrContains(body, testNode), 
                 "testNode can contain itself; includeEl is true");
     },
     
     testContainsIncludeElSameEl : function() {
-        Assert.isTrue(dom.contains(testNode, testNode, true), 
+        Assert.isTrue(dom.isOrContains(testNode, testNode), 
                 "testNode can contain itself; includeEl is true");
     },
     
     testContainsIncludeElParent : function() {
-        Assert.isFalse(dom.contains(testNode, body, true), 
+        Assert.isFalse(dom.isOrContains(testNode, body), 
             "testNode can never contain body.");
     },
     

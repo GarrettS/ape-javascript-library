@@ -1,22 +1,21 @@
-APE.namespace("APE.dom");
-(function(){
+APE.namespace("APE.dom").mixin(function(){
 
     var docEl = document.documentElement,
         hasNamedItem = "getNamedItem" in docEl.attributes,
-        NODE_TYPE = "nodeType",
-        COMPARE_POSITION = "compareDocumentPosition",
         PARENT_NODE = "parentNode",
         caseTransform = /^H/.test(docEl.tagName) ? 'toUpperCase' : 'toLowerCase';
 
-    APE.dom.mixin({
-        contains : getContains(),
+    docEl = null;
+
+    return{
+        contains : contains,
+        isOrContains : isOrContains,
         findAncestorWithAttribute : findAncestorWithAttribute,
         findAncestorWithTagName : findAncestorWithTagName,
         findNextSiblingElement : findNextSiblingElement,
         findPreviousSiblingElement : findPreviousSiblingElement,
         getChildElements : getChildElements
-    });
-    docEl = null;
+    };
     
     /** 
      * @memberOf APE.dom
@@ -29,26 +28,28 @@ APE.namespace("APE.dom");
      * code body.contains(body); 
      * In Safari <= 3, body.contains(body) returns false.
      */
-    function getContains(){
-        if(COMPARE_POSITION in docEl)
-            return function(el, b, includeEl) {
-                return el && (includeEl && (el === b) || 
-                  (el[COMPARE_POSITION](b) & 16) !== 0);
-        };
-        else if('contains'in docEl) {
-                return function(el, b, includeEl) {
-                    return el !== null 
-                        && (includeEl ? el === b || el.contains(b) :
-                            el !== b && el.contains(b));
+    function contains(el, b) {
+        var docEl = document.documentElement,
+            COMPARE_POSITION = "compareDocumentPosition",
+            f = (COMPARE_POSITION in docEl) ? 
+                function(el, b) {
+                    return el && ((el[COMPARE_POSITION](b) & 16) !== 0);
+                } : ('contains'in docEl) ? 
+                function(el, b) {
+                    return el && el !== b && el.contains(b);
+                } : function(el, b) {
+                    if(!el || el === b) return false;
+                    while(el && el !== b && (b = b[PARENT_NODE]) !== null);
+                    return el === b;
             };
-        }
-        return function(el, b, includeEl) {
-            if(!el || !includeEl && el === b) return false;
-            while(el && el !== b && (b = b[PARENT_NODE]) !== null);
-            return el === b;
-        };
+        docEl = null;
+        return (contains = APE.dom.contains = f)(el, b); 
     }
 
+    function isOrContains(el, b) {
+        return el === b || APE.dom.contains(el, b);
+    }
+    
     /** 
      * @memberOf APE.dom
      * @param {HTMLElement} el the element to start from.
@@ -87,16 +88,17 @@ APE.namespace("APE.dom");
 
     /** Filter out text nodes and, in IE, comment nodes. */
     function findNextSiblingElement(el) {
-        for(var ns = el.nextSibling; ns !== null; ns = ns.nextSibling)
-            if(ns[NODE_TYPE] === 1) 
-                return ns;
-        return null;
+        return horizontalTraverse(el, "nextSibling");
     }
 
     function findPreviousSiblingElement(el) {
-        for(var ps = el.previousSibling; ps !== null; ps = ps.previousSibling) {
-            if(ps[NODE_TYPE] === 1) 
-                return ps;
+        return horizontalTraverse(el, "previousSibling");
+    }
+    
+    function horizontalTraverse(el, sibName) {
+        for(var n = el[sibName]; n !== null; n = n[sibName]) {
+            if(n.nodeType === 1) 
+                return n;
         }
         return null;
     }
@@ -110,10 +112,10 @@ APE.namespace("APE.dom");
         // IE also includes comment nodes.
         for(i = j = 0; i < len; i++) {
             c = cn[i];
-            if(c[NODE_TYPE] !== 1) continue;
+            if(c.nodeType !== 1) continue;
             ret[j++] = c;
         }
         ret.length = j;
         return ret;
     }
-})();
+}());

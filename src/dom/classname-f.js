@@ -7,7 +7,6 @@
  * </p>
  */
 
-;
 APE.namespace("APE.dom").mixin(function() {
     var className = "className",
         Exps = { };
