@@ -97,27 +97,37 @@ var viewportTestCase = new YAHOO.tool.TestCase({
         var ancestor = dom.findAncestorWithAttribute(testNode,"action");
         Assert.isNull(ancestor);
         ancestor = dom.findAncestorWithAttribute(testNode, "style");
-        Assert.areEqual(body, ancestor);
+        Assert.areSame(body, ancestor);
     },
 
     testFindAncestorWithTagName : function() {
         var ancestor = dom.findAncestorWithTagName(testNode, "html");
-        Assert.areEqual(documentElement, ancestor);
+        Assert.areSame(documentElement, ancestor);
     },
 
+    testFindAncestorWithTagNameLimitAbove : function() {
+        var ancestor = dom.findAncestorWithTagName(testNode, "html", document.body);
+        Assert.isNull(ancestor);
+    },
+
+    testFindAncestorWithTagNameLimit : function() {
+        var ancestor = dom.findAncestorWithTagName(testNode, "body", document.documentElement);
+        Assert.areSame(document.body, ancestor);
+    },
+    
     testFindAncestorWithTagNameUC : function() {
         var ancestor = dom.findAncestorWithTagName(testNode, "BODY");
-        Assert.areEqual(document.body, ancestor);
+        Assert.areSame(document.body, ancestor);
     },
 
-    testFindAncestorWithTagName : function() {
+    testDontFindAncestorWithTagName : function() {
         var ancestor = dom.findAncestorWithTagName(testNode, "div");
         Assert.isNull(ancestor);
     },
 
     testFindPreviousSiblingElement : function() {
         var prev = dom.findPreviousSiblingElement(afterTestNode);
-        Assert.areEqual(testNode, prev, "found " + prev.id);
+        Assert.areSame(testNode, prev, "found " + prev.id);
     },
 
     testFindNextSiblingElement : function() {

@@ -765,9 +765,10 @@ APE.namespace("APE.dom").mixin(function() {
         return null;
     }
 
-    function findAncestorWithTagName(el, tag) {
+    function findAncestorWithTagName(el, tag, limit) {
         tag = tag[caseTransform]();
-        for(var parent = el[PARENT_NODE];parent !== null; ){
+        limit = limit || null;
+        for(var parent = el[PARENT_NODE];parent !== limit; ){
             if( parent.tagName === tag )
                 return parent;
             parent = parent[PARENT_NODE];
