@@ -70,7 +70,7 @@ APE.namespace("APE.dom").Event = (function() {
                 // 2) removing onunload handlers is skipped (see cleanUp);
                    if(o === window) return cb;
                    function bound(ev) {
-                       bound.original.call(bound.context, ev);
+                       bound.original.call(bound.context, ev||window.event);
                    }
                    bound.original = cb;
                    bound.context = o;

@@ -66,6 +66,20 @@ var eventTestCase = new YAHOO.tool.TestCase({
         }, 10);
     },
 
+    testEventPayload : function() {
+        // IE doesn't pass event to callbacks, so this mainly verifies 
+        // that the API takes care of that.
+        var isClick;
+
+        function cb(ev) {
+            isClick = ev.type === "click";
+        }
+
+        dom.Event.addCallback(document.body, "click", cb);
+        Action.click(document.body);
+        Assert.isTrue(isClick);
+    },
+    
     testAddCallback : function() {
         var context;
         dom.Event.addCallback(document.body, "click", bodyClicked);
