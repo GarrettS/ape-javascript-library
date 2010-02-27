@@ -110,9 +110,15 @@ var viewportTestCase = new YAHOO.tool.TestCase({
         Assert.isNull(ancestor);
     },
 
-    testFindAncestorWithTagNameLimit : function() {
+    testFindAncestorWithTagNameWithinLimit : function() {
         var ancestor = dom.findAncestorWithTagName(testNode, "body", document.documentElement);
         Assert.areSame(document.body, ancestor);
+    },
+
+    testFindAncestorWithTagNameAtLimit : function() {
+        // Body is not within body, so the result should be null.
+        var ancestor = dom.findAncestorWithTagName(testNode, "body", document.body);
+        Assert.isNull(ancestor);
     },
     
     testFindAncestorWithTagNameUC : function() {

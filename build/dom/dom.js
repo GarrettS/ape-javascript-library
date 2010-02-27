@@ -768,12 +768,13 @@ APE.namespace("APE.dom").mixin(function() {
     /** 
      * @param {HTMLElement} el base element to search from
      * @param {string} tag tagName to search for.
-     * @param {HTMLElement} [limit] node to stop traversing at
+     * @param {HTMLElement} [limit] ancestor node to stop traversing before
+     * Note: limit node is not included .
      */
     function findAncestorWithTagName(el, tag, limit) {
         tag = tag[caseTransform]();
         limit = limit || null;
-        for(var parent = el[PARENT_NODE];parent !== limit; ){
+        for(var parent = el[PARENT_NODE];parent && parent !== limit; ){
             if( parent.tagName === tag )
                 return parent;
             parent = parent[PARENT_NODE];

@@ -53,7 +53,7 @@ APE.namespace("APE.ajax").mixin({
         /**
          *  Usage:
          *   var req = APE.ajax.AsyncRequest.getById("", "data.json");
-         *   req.onsucceed = function( req ) {
+         *   req.c = function( req ) {
          *     alert( req.responseText );
          *   };
          *   req.send();

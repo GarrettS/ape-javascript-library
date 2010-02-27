@@ -3,7 +3,7 @@
     <property name="src" location="src"/>
     <property name="test" location="test"/>
     <property name="example" location="example"/>
-	<property name="build" location="build"/>
+    <property name="build" location="build"/>
     <property name="deploy" location="C:/Program Files/Apache/Tomcat/webapps/ROOT/ape/"/>
     
     <target name="js.rollups" depends="js.copy">
@@ -66,7 +66,7 @@ traversal-f.js, Event.js, Event-coords.js, style-f.js'/>
     </target>
 
     <target name="js.minify" depends="js.rollups">
-    	<apply executable="java" parallel="false" dest="${build}" taskname="yui">
+        <apply executable="java" parallel="false" dest="${build}" taskname="yui">
             <fileset dir="${build}" includes="**/*.js"/>
             <arg line="-jar"/>
             <arg path="yuicompressor-2.4\build\yuicompressor-2.4.jar"/>
@@ -75,9 +75,20 @@ traversal-f.js, Event.js, Event-coords.js, style-f.js'/>
             <arg line="-o"/>
             <mapper type="glob" from="*.js" to="*-min.js"/>
             <targetfile/>
-    	</apply>
-    	
-    	<!--
+        </apply>
+
+        <apply executable="java" parallel="false" dest="${build}" taskname="yui">
+            <fileset dir="${build}" includes="**/*.css"/>
+            <arg line="-jar"/>
+            <arg path="yuicompressor-2.4\build\yuicompressor-2.4.jar"/>
+            <arg line="-v"/>
+            <srcfile/>
+            <arg line="-o"/>
+            <mapper type="glob" from="*.css" to="*-min.css"/>
+            <targetfile/>
+        </apply>
+        
+        <!--
         <apply executable="java" parallel="false" verbose="true" dest="${build}" taskname="js.compile">
             <fileset dir="${build}" includes="**/*.js"/>
             <arg line="-jar"/>
@@ -101,7 +112,7 @@ traversal-f.js, Event.js, Event-coords.js, style-f.js'/>
     <target name="deploy" depends="js.minify, deploy.copy"
         description="copy test, build, example, to webserver directory">
     </target>
-	
+    
     <target name="deploy.copy" depends="js.rollups"
         description="copy test, build, example, to webserver directory">
         <copy todir="${deploy}">
