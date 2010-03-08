@@ -33,12 +33,12 @@ APE.namespace("APE.dom").mixin(function(){
             COMPARE_POSITION = "compareDocumentPosition",
             f = (COMPARE_POSITION in docEl) ? 
                 function(el, b) {
-                    return el && ((el[COMPARE_POSITION](b) & 16) !== 0);
+                    return el && b && ((el[COMPARE_POSITION](b) & 16) !== 0);
                 } : ('contains'in docEl) ? 
                 function(el, b) {
                     return el && el !== b && el.contains(b);
                 } : function(el, b) {
-                    if(!el || el === b) return false;
+                    if(!el || !b || el === b) return false;
                     while(el && el !== b && (b = b[PARENT_NODE]) !== null);
                     return el === b;
             };

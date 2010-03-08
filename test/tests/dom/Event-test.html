@@ -34,8 +34,8 @@ var dom = APE.dom,
     testNode,
     testInp,
     template = document.getElementById("template"),
-    templateHTML = template.innerHTML;
-    
+    templateHTML = template.innerHTML,
+    isEventModelFucked = !document.addEventListener;
 
 var eventTestCase = new YAHOO.tool.TestCase({
     name : "Event Test Case",
@@ -45,6 +45,13 @@ var eventTestCase = new YAHOO.tool.TestCase({
         testInp = document.getElementById("testInp");
     },
 
+    _should : {
+        ignore : {
+            testGetRelatedTargetMouseout : isEventModelFucked,
+            testGetRelatedTargetMouseover : isEventModelFucked
+        }    
+    },
+    
     tearDown : function() {
         template.innerHTML = templateHTML;
         testNode = testInp = null;
@@ -53,12 +60,12 @@ var eventTestCase = new YAHOO.tool.TestCase({
     testGetTarget : function() {
         var target;
         if(testNode.addEventListener) {
-            testNode.addEventListener("click", gotTarget, false);
+            testNode.addEventListener("mouseover", gotTarget, false);
         } else {
-            testNode.onclick = gotTarget;
+            testNode.attachEvent("onmouseover", gotTarget);
         }
-        Action.click(testNode);
-        function gotTarget(e){
+        Action.mouseover(testNode);
+        function gotTarget(e) {
             target = dom.Event.getTarget(e);
         }
         this.wait(function() {
@@ -66,6 +73,36 @@ var eventTestCase = new YAHOO.tool.TestCase({
         }, 10);
     },
 
+    testGetRelatedTargetMouseover : function() {
+        var rt;
+        testNode.onmouseover = gotTarget;
+        Action.mouseover(testNode.parentNode);
+        Action.mouseout(testNode.parentNode);
+        Action.mouseover(testNode, {relatedTarget : testNode.parentNode});
+        
+        function gotTarget(e){
+            rt = dom.Event.getRelatedTarget(e);
+        }
+        
+        this.wait(function() {
+            Assert.areEqual(testNode.parentNode, rt);
+        }, 10);
+    },
+    
+    testGetRelatedTargetMouseout : function() {
+        var rt;
+        testNode.onmouseout = gotTarget;
+        Action.mouseout(testNode, {relatedTarget : testNode.parentNode});
+        
+        function gotTarget(e){
+            rt = dom.Event.getRelatedTarget(e);
+        }
+        
+        this.wait(function() {
+            Assert.areEqual(testNode.parentNode, rt);
+        }, 10);
+    },
+    
     testEventPayload : function() {
         // IE doesn't pass event to callbacks, so this mainly verifies 
         // that the API takes care of that.

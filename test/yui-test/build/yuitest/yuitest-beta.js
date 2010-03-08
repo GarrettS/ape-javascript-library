@@ -2543,6 +2543,9 @@ YAHOO.util.UserAction = {
                 // } catch(ex) {
                 // }
 
+                // (GS) The standard requires these to throw errors.
+                // This doesn't happen in Safari 2. If errors occur, this 
+                // may need to be wrapped this in a try/catch.
                 customEvent.ctrlKey = ctrlKey;
                 customEvent.altKey = altKey;
                 customEvent.metaKey = metaKey;
@@ -2551,23 +2554,9 @@ YAHOO.util.UserAction = {
                 customEvent.relatedTarget = relatedTarget||null;
             }
             
-            /*
-             * Check to see if relatedTarget has been assigned. Firefox
-             * versions less than 2.0 don't allow it to be assigned via
-             * initMouseEvent() and the property is readonly after event
-             * creation, so in order to keep YAHOO.util.getRelatedTarget()
-             * working, assign to the IE proprietary toElement property
-             * for mouseout event and fromElement property for mouseover
-             * event.
-             */
-            if (relatedTarget !== null && !customEvent.relatedTarget){
-                if (type == "mouseout"){
-                    customEvent.toElement = relatedTarget||null;
-                } else if (type == "mouseover"){
-                    customEvent.fromElement = relatedTarget||null;
-                }
+            if(relatedTarget && !customEvent.relatedTarget) {
+                setRelatedTargetAlternative(customEvent, relatedTarget, type);
             }
-            
             //fire the event
             var ret = target.dispatchEvent(customEvent);
             
@@ -2613,10 +2602,9 @@ YAHOO.util.UserAction = {
              * YAHOO.util.customEvent.getRelatedTarget() functional.
              */
             customEvent.relatedTarget = relatedTarget;
-            
+
             //fire the event
-            return target.fireEvent("on" + type, customEvent);
-                    
+            return target.fireEvent("on" + type, customEvent);            
         } else {
             throw new Error("simulateMouseEvent(): No event simulation framework present.");
         }
@@ -3428,7 +3416,28 @@ YAHOO.lang.extend(YAHOO.tool.TestLogger, YAHOO.widget.LogReader, {
     
         YAHOO.log(message, messageType, "TestRunner");    
     }
-    
 });
+
+function setRelatedTargetAlternative(customEvent, relatedTarget, type) {
+    if(!relatedTarget && customEvent.relatedTarget) return;
+    // Assign a value should raise a dom exception, so instead 
+    // use __defineGetter__ to define the property. This fixes 
+    // the issue in Gecko rv:1.8.1.22 (FF2.x).
+    if(customEvent.__defineGetter__) {
+        customEvent.__defineGetter__("relatedTarget", 
+                function(){ return relatedTarget; } );
+    } else if (relatedTarget && !customEvent.relatedTarget) {
+        /*
+         * In order to keep legacy YAHOO.util.getRelatedTarget()
+         * working, ietary toElement property for mouseout event and 
+         * fromElement property for mouseover event.
+         */
+        var pName = type == "mouseout" ? "toElement" : "fromElement",
+            message = "customEvent's relatedTarget was not set. "
+            + "Setting " + pName + " instead.\nOriginal Error:";
+        YAHOO.log(message, "warn", "TestRunner");
+        customEvent[pName] = relatedTarget;
+    }
+}
 
 YAHOO.register("yuitest", YAHOO.tool.TestRunner, {version: "2.4.0", build: "733"});

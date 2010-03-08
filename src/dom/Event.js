@@ -5,6 +5,7 @@ APE.namespace("APE.dom").Event = (function() {
         Event = {
             get : get,
             getTarget : getTarget, 
+            getRelatedTarget : getRelatedTarget,
             add : addCallback,
             addCallback : addCallback,
             remove : removeCallback,
@@ -161,17 +162,53 @@ APE.namespace("APE.dom").Event = (function() {
         }
         return get(src, sEvent);
     }
-    
+
     function getTarget(ev) {
-        ev = ev || window.event;
-        if(!ev) return null;
-        
-        var t = (ev || window.event)[TARGET];
-        if(t && t.nodeName === "#text") {
-            // For Safari 2.0, 2.0.4.
-            t = t.parentNode;
+        return (Event.getTarget = HAS_EVENT_TARGET ? function(ev) {
+            return ev && getEventElementProperty(ev, TARGET);
+        } : function(ev) {
+            ev = window.event;
+            return ev && ev.srcElement;
+        })(ev);
+    }
+    
+    function getRelatedTarget(ev) {
+        if(!HAS_EVENT_TARGET) {
+            var relatedTargetMap = {
+                "mouseover" : "fromElement",
+                "mouseenter" : "fromElement",
+                "mouseout" : "toElement",
+                "mouseleave" : "toElement"
+            };
+            return(Event.getRelatedTarget = function(ev) {
+                ev = ev || window.event;
+                if(ev) {
+                    var name = relatedTargetMap[ev.type],
+                        val = getEventElementProperty(ev, name);
+                    return val;
+                }
+            })(ev);
         }
-        return t;
+        if(ev) {
+            // If relatedTarget is null (sometimes in Mozilla),
+            // it is on a "titleTip" window, and probably the one 
+            // triggered by the "target".
+            // https://developer.mozilla.org/en/DOM/event.relatedTarget
+            return ev.relatedTarget || ev.target;
+        }
+    }
+    
+    /** @param {Event} A w3c DOM Event or an IE "window.event". 
+     * @param {propertyName} property name to get from the Event.
+     */
+    function getEventElementProperty(ev, propertyName) {
+
+        var node = ev[propertyName];
+        if(node && node.nodeName === "#text") {
+            // For Safari 2.0, 2.0.4.
+            node = node.parentNode;
+        }
+        return node;
     }
     
     /**
