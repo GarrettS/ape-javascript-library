@@ -1054,7 +1054,7 @@ APE.namespace("APE.dom");
  */
 
 APE.namespace("APE.dom").mixin(function() {
-    var className = "className",
+    var CLASSNAME = "className",
         Exps = { };
 
     return {
@@ -1071,7 +1071,7 @@ APE.namespace("APE.dom").mixin(function() {
      * @example if(dom.hasToken(el.className, "menu")) // element has class "menu".
      */
     function hasToken (s, token) {
-        return getTokenizedExp(token,"").test(s);
+        return getTokenizedExp(token, "").test(s);
     }
 
     /** @param {HTMLElement} el
@@ -1079,14 +1079,10 @@ APE.namespace("APE.dom").mixin(function() {
      * @description removes all occurances of <code>klass</code> from element's className.
      */
     function removeClass(el, klass) {
-        var cn = el[className];
+        var cn = el[CLASSNAME];
         if(!cn) return;
-        if(cn === klass) {
-            el[className] = "";
-            return;
-        }
-
-        el[className] = normalizeString(cn.replace(getTokenizedExp(klass, "g")," "));
+        el[CLASSNAME] = cn === klass ? "" :
+            normalizeString(cn.replace(getTokenizedExp(klass, "g")," "));
     }
     /** @param {HTMLElement} el
      * @param {String} klass className token(s) to be added.
@@ -1094,13 +1090,15 @@ APE.namespace("APE.dom").mixin(function() {
      * exist.
      */
     function addClass(el, klass) {
-        if(!el[className]) el[className] = klass;
-        if(!getTokenizedExp(klass).test(el[className])) el[className] += " " + klass;
+        if(!el[CLASSNAME]) el[CLASSNAME] = klass;
+        else if(!getTokenizedExp(klass).test(el[CLASSNAME])) {
+            el[CLASSNAME] += " " + klass;
+        }
     }
 
     function getTokenizedExp(token, flag){
         var p = token + "$" + flag;
-        return (Exps[p] || (Exps[p] = RegExp("(?:^|\\s)"+token+"(?:$|\\s)", flag)));
+        return Exps[p] || (Exps[p] = RegExp("(?:^|\\s)"+token+"(?:$|\\s)", flag));
     }
     
     /** @param {HTMLElement} el
@@ -1125,7 +1123,7 @@ APE.namespace("APE.dom").mixin(function() {
             i;
         
         for(i = 0; i < len; i++){
-            if(exp.test(collection[i][className]))
+            if(exp.test(collection[i][CLASSNAME]))
                 ret[counter++] = collection[i];
         }
         ret.length = counter; // trim array.
@@ -1140,7 +1138,7 @@ APE.namespace("APE.dom").mixin(function() {
             return null;
         var exp = getTokenizedExp(klass,""), parent;
         for(parent = el.parentNode;parent != container;){
-            if( exp.test(parent[className]) )
+            if( exp.test(parent[CLASSNAME]) )
                 return parent;
             parent = parent.parentNode;
         }
@@ -1181,21 +1179,25 @@ APE.namespace("APE.dom").mixin(function() {
      * In Safari <= 3, body.contains(body) returns false.
      */
     function contains(el, b) {
-        var docEl = document.documentElement,
-            COMPARE_POSITION = "compareDocumentPosition",
-            f = (COMPARE_POSITION in docEl) ? 
+        if(!el) return false;
+        var COMPARE_POSITION = "compareDocumentPosition",
+            _contains = (COMPARE_POSITION in el) ? 
                 function(el, b) {
-                    return el && b && ((el[COMPARE_POSITION](b) & 16) !== 0);
-                } : ('contains'in docEl) ? 
+                    try {
+                        return !!(el && b) && ((el[COMPARE_POSITION](b) & 16) !== 0);
+                    } catch(mozillaChromeObjectSecurityError_code9) {
+                        // Gecko chrome tooltip object triggers a security error.
+                        return false;
+                    }
+                } : ('contains'in el) ? 
                 function(el, b) {
-                    return el && el !== b && el.contains(b);
+                    return !!el && el !== b && el.contains(b);
                 } : function(el, b) {
                     if(!el || !b || el === b) return false;
                     while(el && el !== b && (b = b[PARENT_NODE]) !== null);
                     return el === b;
             };
-        docEl = null;
-        return (contains = APE.dom.contains = f)(el, b); 
+        return (contains = APE.dom.contains = _contains)(el, b); 
     }
 
     function isOrContains(el, b) {

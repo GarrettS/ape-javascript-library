@@ -8,7 +8,7 @@
  */
 
 APE.namespace("APE.dom").mixin(function() {
-    var className = "className",
+    var CLASSNAME = "className",
         Exps = { };
 
     return {
@@ -25,7 +25,7 @@ APE.namespace("APE.dom").mixin(function() {
      * @example if(dom.hasToken(el.className, "menu")) // element has class "menu".
      */
     function hasToken (s, token) {
-        return getTokenizedExp(token,"").test(s);
+        return getTokenizedExp(token, "").test(s);
     }
 
     /** @param {HTMLElement} el
@@ -33,14 +33,10 @@ APE.namespace("APE.dom").mixin(function() {
      * @description removes all occurances of <code>klass</code> from element's className.
      */
     function removeClass(el, klass) {
-        var cn = el[className];
+        var cn = el[CLASSNAME];
         if(!cn) return;
-        if(cn === klass) {
-            el[className] = "";
-            return;
-        }
-
-        el[className] = normalizeString(cn.replace(getTokenizedExp(klass, "g")," "));
+        el[CLASSNAME] = cn === klass ? "" :
+            normalizeString(cn.replace(getTokenizedExp(klass, "g")," "));
     }
     /** @param {HTMLElement} el
      * @param {String} klass className token(s) to be added.
@@ -48,13 +44,15 @@ APE.namespace("APE.dom").mixin(function() {
      * exist.
      */
     function addClass(el, klass) {
-        if(!el[className]) el[className] = klass;
-        if(!getTokenizedExp(klass).test(el[className])) el[className] += " " + klass;
+        if(!el[CLASSNAME]) el[CLASSNAME] = klass;
+        else if(!getTokenizedExp(klass).test(el[CLASSNAME])) {
+            el[CLASSNAME] += " " + klass;
+        }
     }
 
     function getTokenizedExp(token, flag){
         var p = token + "$" + flag;
-        return (Exps[p] || (Exps[p] = RegExp("(?:^|\\s)"+token+"(?:$|\\s)", flag)));
+        return Exps[p] || (Exps[p] = RegExp("(?:^|\\s)"+token+"(?:$|\\s)", flag));
     }
     
     /** @param {HTMLElement} el
@@ -79,7 +77,7 @@ APE.namespace("APE.dom").mixin(function() {
             i;
         
         for(i = 0; i < len; i++){
-            if(exp.test(collection[i][className]))
+            if(exp.test(collection[i][CLASSNAME]))
                 ret[counter++] = collection[i];
         }
         ret.length = counter; // trim array.
@@ -94,7 +92,7 @@ APE.namespace("APE.dom").mixin(function() {
             return null;
         var exp = getTokenizedExp(klass,""), parent;
         for(parent = el.parentNode;parent != container;){
-            if( exp.test(parent[className]) )
+            if( exp.test(parent[CLASSNAME]) )
                 return parent;
             parent = parent.parentNode;
         }
