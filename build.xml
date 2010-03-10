@@ -105,7 +105,7 @@ traversal-f.js, Event.js, Event-coords.js, style-f.js'/>
 
     <target name="js.clean">
         <delete>
-            <fileset dir="${build}" includes="**/*.js"/>
+            <fileset dir="${build}" includes="**/*.js, **/*.css"/>
         </delete>
     </target>
     

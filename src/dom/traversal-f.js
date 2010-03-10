@@ -37,6 +37,9 @@ APE.namespace("APE.dom").mixin(function(){
                         return !!(el && b) && ((el[COMPARE_POSITION](b) & 16) !== 0);
                     } catch(mozillaChromeObjectSecurityError_code9) {
                         // Gecko chrome tooltip object triggers a security error.
+                        // Sometimes this object is null, others it is an actual
+                        // Chrome object, leaked into the dom.
+                        // See dom.contains, in traversal-f.js for more info.
                         return false;
                     }
                 } : ('contains'in el) ? 

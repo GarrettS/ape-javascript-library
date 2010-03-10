@@ -4,8 +4,7 @@
  * @requires APE.EventPublisher, APE.dom (classname-f.js)
  */
 
-APE.namespace("APE.widget").defineCustomFactory("Placeholder",
-    function(Placeholder){
+APE.namespace("APE.widget").defineCustomFactory("Placeholder", function(Placeholder){
     var IS_NATIVE, 
         PLACEHOLDER = "placeholder";
         
