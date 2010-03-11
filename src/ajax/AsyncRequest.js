@@ -230,14 +230,24 @@ APE.namespace("APE.ajax").defineCustomFactory(
                  */
                 abort : function() {
                     if(!supported) return;
-                    this.req.abort();
-        
-                    // Clear the timeout timer.
                     clearTimeout(this.timeoutID);
-                    this.onabort(this.req); // others can know.
-                    oncomplete(this, false);
+
+                    // Stop success from firing.
+                    clearInterval(this.timerId);
+
+                    // If the request is cached, then IE will 
+                    // set readystate to 4 immediately after calling send. 
+                    // Do not fire onabort unless the req was actually aborted 
+                    // (this happens once per send).
+                    // Calling req.abort sets readyState to 0, 
+                    // so the next call won't fire it.
+                    if(this.req.readyState !== 0) {
+                        this.req.abort();
+                        this.onabort(this.req); 
+                        oncomplete(this, false);
+                    }
                 },
-        
+                
                 toString : function() {
                     var s = "AsyncRequest: \n"
                         + "isSupported(): " + supported

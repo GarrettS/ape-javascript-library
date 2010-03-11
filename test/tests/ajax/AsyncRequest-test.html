@@ -61,6 +61,63 @@ var Assert = YAHOO.util.Assert,
     // Test methods - names must begin with "test"
     //---------------------------------------------------------------------
 
+    testAbort : function() {
+        var req = AsyncRequest.getById("", {action:"data.json.txt", method:"POST"} ),
+            data = null,
+            failed = false,
+            completed = false,
+            aborted = false;
+
+        req.onsucceed = function( response ) {
+            data = Function("return("+response.responseText+");")();
+        };
+        req.oncomplete = function( doneEvent ) {
+            completed = true;
+        };
+
+        req.onfail = function( response ) {
+            failed = true;
+        };
+
+        req.onabort = function( req ) {
+            // can't get response text in IE:
+            // "the data necessary to complete this operation is not yet available"
+            //('responseText'in response ? response.responseText : null);
+            aborted = true;
+        };
+
+        req.send();
+        req.abort();
+        this.wait(function(){
+            Assert.isTrue(completed, "completed");
+            Assert.isTrue(aborted, "aborted");
+            Assert.isFalse(failed, "failed");
+            Assert.isNull(data, "data");
+        }, 100);
+    },
+
+    testAbortMultipleSends : function(){
+        var req = AsyncRequest.getById("", {action:"process.jsp", method:"POST"} ),
+            scount = 0,
+            ccount = 0;
+    
+        req.onsucceed = function( response ) {
+            scount++;
+        };
+    
+        req.send(1);
+        req.abort();
+        req.action +="?a"
+        req.send(2);
+        req.abort();
+        this.wait(function(){
+            req.action +="&c"
+            req.send(3);
+            req.abort();
+            Assert.areSame(0, scount, 'onsucceed count should be 0');
+        }, 500);
+    },
+    
     // make sure that oncomplete fires {successful: true}
     testDone : function() {
     
@@ -132,7 +189,7 @@ var Assert = YAHOO.util.Assert,
             data = {};
         req.send(null, 2400);
         req.onsucceed = function(actualRequest){
-            data = eval("("+actualRequest.responseText +")");
+            data = Function("return("+actualRequest.responseText +");")();
         };
         
         function probablyDone(){
@@ -221,6 +278,28 @@ var Assert = YAHOO.util.Assert,
         this.wait(probablyLongEnough, 2500);
     },
 
+    testAbortBeforeSend : function() {
+        var req = AsyncRequest.getById("pussy", {action:"data.json.txt", method:"GET"} ),
+        acount = 0;
+        req.oncomplete = function(){
+            acount++;
+        };
+        req.abort();
+        Assert.areSame(0, acount); 
+    },
+    
+    testAbortFiresOncomplete : function() {
+        var req = AsyncRequest.getById("pussy", {action:"data.json.txt", method:"GET"} ),
+        acount = 0;
+        req.oncomplete = function(){
+            acount++;
+        };
+        req.send("bitch");
+        req.abort();
+        req.abort();
+        Assert.areSame(1, acount);
+    },
+    
     // onsucceed should not fire with a bad URI.
     testFailSuccess : function(){
         var fired = false;
@@ -305,41 +384,6 @@ var Assert = YAHOO.util.Assert,
             Assert.isTrue(completed, "completed should have fired, but did not.");
         }
         this.wait(didNotTimeout, 500);
-    },
-
-    testAbort : function() {
-        var req = AsyncRequest.getById("", {action:"data.json.txt", method:"POST"} ),
-            data = null,
-            failed = false,
-            completed = false,
-            aborted = false;
-
-        req.onsucceed = function( response ) {
-            data = eval("('"+response.responseText +")");
-        };
-        req.oncomplete = function( doneEvent ) {
-            completed = true;
-        };
-
-        req.onfail = function( response ) {
-            failed = true;
-        };
-
-        req.onabort = function( req ) {
-            // can't get response text in IE:
-            // "the data necessary to complete this operation is not yet available"
-            //('responseText'in response ? response.responseText : null);
-            aborted = true;
-        };
-
-        req.send();
-        req.abort();
-        this.wait(function(){
-            Assert.isTrue(completed, "completed");
-            Assert.isTrue(aborted, "aborted");
-            Assert.isFalse(failed, "failed");
-            Assert.isNull(data, "data");
-        }, 100);
     },
 
     testToString : function() {
