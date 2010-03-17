@@ -318,8 +318,16 @@ APE.namespace("APE.widget").defineCustomFactory(
                 
                 if(keyCode === key.ESC) {
                     if(!calendar._isHidden) {
+                        // onfocus fires later, asynchronously in IE, 
+                        // and this causes onfocus handler to fire, causing 
+                        // the calendar to show, when the user really wants 
+                        // it to hide. To workaround that, 
+                        // call focus, then _hideCalendar in a setTimeout.
+
                         document.getElementById(inputId).focus();
-                        _hideCalendar(calendar);
+                        setTimeout(function() {
+                            _hideCalendar(calendar);
+                        }, 1);
                     }
                 } else if(keyCode === key.ENTER) { 
                     target = Event.getTarget(ev);
@@ -567,7 +575,7 @@ APE.namespace("APE.widget").defineCustomFactory(
                 calendarObject.onselect();
                 if(calendarObject.hideOnSelect) {
                     document.getElementById(calendarObject.id).focus();
-                    setTimeout(function(){
+                    setTimeout(function() {
                         _hideCalendar(calendarObject, ev);
                         calendarObject = target = selected = null;
                     }, 150);
