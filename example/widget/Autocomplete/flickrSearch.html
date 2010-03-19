@@ -1,0 +1,101 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en-US">
+<head>
+<title>Flickr Search Autocomplete Example</title>
+<link type="text/css" rel="stylesheet" href="../../../build/widget/Autocomplete/css/Autocomplete.css">
+<link type="text/css" rel="stylesheet" href="../../../build/widget/Placeholder/css/Placeholder.css">
+<style type="text/css">
+#flickrSearch-list {
+    font-size: xx-large;
+}
+
+#flickrSearch-list img {
+    width: 75px;
+    height: 75px;
+}
+
+#flickrSearch img {
+    border-color:#CCCCCC #000000 #000000 #CCCCCC;
+    border-style:solid;
+    border-width:2px;
+}
+</style>
+
+<script type="text/javascript" src="../../../build/ape-ep-dom.js"></script>
+<script type="text/javascript" src="../../../build/anim/Animation.js"></script>
+<script type="text/javascript" src="../../../build/ajax/AsyncRequest.js"></script>
+<script type="text/javascript" src="../../../build/widget/DelegateFactory.js"></script>
+<script type="text/javascript" src="../../../build/widget/Placeholder/Placeholder.js"></script>
+<script type="text/javascript" src="../../../build/widget/Placeholder/Placeholder.js"></script>
+<script type="text/javascript" src="../../../build/widget/Autocomplete/Autocomplete.js"></script>
+<script type="text/javascript">
+    window.onload = function() {
+        var Autocomplete = APE.widget.Autocomplete,
+            flickrSearchConfig = {
+                    matcher : Autocomplete.textMatcher,
+                    dataSource : "flickrSearch.jsp",
+                    paramName : "tags",
+                    /* jsonpParamName : "nojsoncallback", */
+                    getListData : getListData,
+                    itemRenderer : itemRenderer,
+                    getInputValueFromSelectedItem : Function.prototype, // noop
+                    loader : APE.ajax.AsyncRequest,
+                    onselect : displayMainPhoto,
+                    onchange : returnFalse,
+                    requestInputPattern : /\S{3}/
+            };
+
+        Autocomplete.addDelegateFor("flickrSearch", flickrSearchConfig);
+        APE.widget.Placeholder.getById("flickrSearch-input");
+        
+        function returnFalse() {
+            return false;
+        }
+        
+        function displayMainPhoto() {
+            var url = getImageUrlFromSelectedItem(this.selectedItem, "m"),
+                mainImg = document.getElementById("flickrDisplayMain");
+            mainImg.src = url;
+            mainImg.title = this.selectedItem.title;
+            return false;
+        }
+
+        // Update the display photo, based on what the user selected 
+        // in the list.
+        function getImageUrlFromSelectedItem(selectedItem, size) {
+            var url = selectedItem.firstChild.src;
+            return url.replace(/s\.jpg$/, (size || "") + ".jpg");
+        }
+        
+        function getListData(rawObject) {
+            if(rawObject.stat !== "fail") {
+                return rawObject.photos.photo;
+            }
+        }
+        
+        function itemRenderer(itemData) {
+            var title = itemData.title;
+            return"<img src='" + getImgUrl(itemData) + "' title='" +
+                title +"'>" + title;
+        }
+        
+        function getImgUrl(photo, size) {
+            size = size || "s";
+            return"http://static.flickr.com/" 
+                    + photo.server + "/" 
+                    + photo.id + "_" + photo.secret + "_" + size +".jpg";
+        }
+    };
+</script>
+</head>
+<body>
+<label id="flickrSearch" class="ape-autocomplete">
+    Search: 
+    <input type="text" id="flickrSearch-input" name="flickrTags" 
+    autocomplete="off" placeholder="enter tags">
+</label>
+<img id="flickrDisplayMain" src="">
+
+</body>
+</html>

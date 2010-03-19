@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en-US">
+<head>
+<title>Google Search Autocomplete Example</title>
+
+<link type="text/css" rel="stylesheet" href="../../../build/widget/Autocomplete/css/Autocomplete.css">
+<style type="text/css">
+#gsearch-list {
+    font-size: 12px;
+}
+</style>
+
+<script type="text/javascript" src="../../../build/ape-ep-dom.js"></script>
+<script type="text/javascript" src="../../../build/anim/Animation.js"></script>
+<script type="text/javascript" src="../../../build/ajax/AsyncRequest.js"></script>
+<script type="text/javascript" src="../../../build/widget/DelegateFactory.js"></script>
+<script type="text/javascript" src="../../../build/widget/Autocomplete/Autocomplete.js"></script>
+<script type="text/javascript">
+    window.onload = function() {
+        var Autocomplete = APE.widget.Autocomplete,
+            gSearchConfig = {
+                    matcher : Autocomplete.textMatcher,
+                    dataSource : "gsearch.jsp",
+                    paramName : "q",
+                    jsonpParamName : "jsonp",
+                    getListData : getListData,
+                    itemRenderer : itemRenderer,
+                    getInputValueFromSelectedItem : getInputValueFromSelectedItem,
+                    loader : APE.ajax.AsyncRequest
+            },
+            gsearchWidget = Autocomplete.getById("gsearch", gSearchConfig);
+
+        function getInputValueFromSelectedItem() {
+            var selectedDataItem = this.getSelectedDataItem();
+            return selectedDataItem[0];
+        }
+        
+        function getListData(rawObject) {
+            return rawObject[1];
+        }
+
+        function itemRenderer(itemData) {
+            return itemData[0] + ", " + itemData[1];
+        }    
+    };
+</script>
+</head>
+<body>
+<label id="gsearch" class="ape-autocomplete">
+    Search: 
+    <input type="text" id="gsearch-input" size = "30" autocomplete="off">
+</label>
+</body>
+</html>

@@ -1,0 +1,199 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+    <title>Autocomplete Test</title>
+    <link rel="stylesheet" type="text/css" href="../../yui-test/build/logger/assets/logger.css">
+    <link rel="stylesheet" type="text/css" href="../../yui-test/assets/testlogger.css">
+
+    <script type="text/javascript" src="../../yui-test/build/yahoo-dom-event/yahoo-dom-event.js"></script>
+    <script type="text/javascript" src="../../yui-test/build/logger/logger.js"></script>
+    <script type="text/javascript" src="../../yui-test/build/yuitest/yuitest-beta.js"></script>
+
+    <script type="text/javascript" src="../../../build/ape-ep-dom.js"></script>
+    <script type="text/javascript" src="../../../build/widget/DelegateFactory.js"></script>
+    <script type="text/javascript" src="../../../build/ajax/ajax.js"></script>
+    <script type="text/javascript" src="../../../build/widget/Autocomplete/Autocomplete.js"></script>
+</head>
+<body>
+<div id="testLogger"></div>
+<div id="template">
+<div id="testNode">
+    <input type="text" id="testNode-input" autocomplete="off">
+</div>
+</div>
+<script type="text/javascript">
+window.onload = function(){
+
+    var Assert = YAHOO.util.Assert,
+        Autocomplete = APE.widget.Autocomplete,
+        dom = APE.dom,
+        testInput,
+        template = document.getElementById("template"),
+        templateHTML = template.innerHTML,
+        Action = YAHOO.util.UserAction,
+        dummyData = {
+                dataSource : 'test', 
+                paramName : 'test', 
+                jsonpParamName : 'test'
+            },
+
+        gSearchData  = {
+                matcher : Autocomplete.textMatcher,
+                dataSource : "gSearch.jsp",
+                paramName : "q",
+                jsonpParamName : "jsonp",
+                getListData : getListData,
+                itemRenderer : itemRenderer,
+                getInputValueFromSelectedItem : getInputValueFromSelectedItem,
+                loader : APE.ajax.AsyncRequest
+        };
+
+    function populateList(ac, callback) {
+        ac.onrender = callback;
+        Action.focus( testInput );
+        testInput.focus();
+        Action.keydown(testInput, {keyCode : "97"});
+        testInput.value = String.fromCharCode(97);
+        Action.keyup(testInput, {keyCode : "97"});
+    }
+    
+    function getInputValueFromSelectedItem() {
+        return this.getSelectedDataItem()[0];
+    }
+    
+    function getListData(rawObject) {
+        return rawObject[1];
+    }
+
+    function itemRenderer(itemData) {
+        return itemData[0] + ", " + itemData[1];
+    }
+
+    var autocompleteTest = new YAHOO.tool.TestCase({
+ 
+        //name of the test case - if not provided, one is auto-generated
+        name : "Autocomplete test",
+ 
+        setUp : function () {
+            template.innerHTML = templateHTML;
+            testInput = document.getElementById("testNode-input");
+        },
+ 
+        tearDown : function () {
+            Autocomplete.instances = {};
+        },
+
+        _should : {
+            ignore : {
+                
+            },
+            error : {
+                testRequiredDataMissing : true
+            }
+        },
+
+        testRequiredDataMissing : function() {
+            Autocomplete.getById("testNode");
+        },
+
+        testShowUsage : function() {
+            Assert.isTypeOf("string", Autocomplete.showUsage());
+        },
+
+        // Test to make sure that showUsage provides required 
+        // signature.
+        testFillInBlanks : function(){
+            var usage = Autocomplete.getRequiredFields();
+            Autocomplete.getById("testNode", usage);
+        },
+        
+        testCreatedOnFocus : function() {
+            Autocomplete.addDelegateFor("testNode", gSearchData);
+            try {
+            Action.focus( testInput );
+            testInput.focus();
+            } catch(ex){
+                console.log(ex);
+            }
+            Assert.isNotNull(Autocomplete.instances.testNode, "instance not created");
+        },
+        
+        testNotCreatedBeforeFocus : function() {
+            Autocomplete.addDelegateFor("testNode", dummyData);
+            Assert.isUndefined(Autocomplete.instances.testNode);
+        },
+
+        testListCreated : function() {
+            Autocomplete.addDelegateFor("testNode", gSearchData);
+            Action.focus( testInput );
+            testInput.focus();
+            Action.keydown(testInput, {keyCode : "97"});
+            testInput.value = String.fromCharCode(97);
+            Action.keyup(testInput, {keyCode : "97"});
+            this.wait(function(){
+                Assert.isNotNull(document.getElementById("testNode-list"));
+            }, 2000);
+        },
+
+        testOnHighlight : function(){
+            var ac = Autocomplete.getById("testNode", gSearchData),
+                populated, selected;
+
+            // Select an item after the test is populated.
+            populateList(ac, function(){
+                populated = true;
+                ac.onhighlight = function(ev) {
+                    selected = true;
+                    Assert.areSame(0, this.getSelectedIndex());
+                };
+                Action.keydown(testInput, {keyCode : dom.key.DOWN});
+                Action.keyup(testInput, {keyCode : dom.key.DOWN});
+            });
+            
+            this.wait(function() {
+                ac = null;
+                Assert.isTrue(populated, "List Was Not Populated");
+                Assert.isTrue(selected, "Item Was Not Selected");
+                ac = null;
+            }, 2000);
+        },
+
+        testOnchange : function(){
+            var ac = Autocomplete.getById("testNode", gSearchData),
+                populated, changed;
+            populateList(ac, function(){
+                populated = true;
+                ac.onchange = function(ev) {
+                    changed = true;
+                };
+                Action.keydown(testInput, {keyCode : dom.key.DOWN});
+                Action.keydown(testInput, {keyCode : dom.key.ENTER});
+            });
+            
+            this.wait(function(){
+                ac = null;
+                Assert.isTrue(populated, "List Was Not Populated");
+                Assert.isTrue(changed, "onchange did not fire");
+                ac = null;
+            }, 3000);
+        }
+    });
+    
+    //create the logger
+    new YAHOO.tool.TestLogger("testLogger");
+ 
+    //run the tests
+    YAHOO.tool.TestRunner.add( autocompleteTest );
+     //run the tests
+    if (parent !== self 
+            && "YAHOO" in parent
+            && parent.YAHOO.tool ) {
+        YAHOO.tool.TestManager.load();
+    } else {
+        YAHOO.tool.TestRunner.run();
+    }
+ 
+};</script>
+</body>
+</html>
