@@ -378,7 +378,7 @@ APE.namespace("APE.widget").defineCustomFactory("Autocomplete", function(Autocom
         }
         
         //http://suggestqueries.google.com/complete/search?qu=taco&jsonp=f
-        function transportSuccessHandler(){
+        function transportSuccessHandler() {
             var ac = Autocomplete.getById(this.id),
                 input = document.getElementById(ac.id + "-input"),
                 rawObject = getCallbackData(ac, this.req.responseText);
@@ -396,10 +396,13 @@ APE.namespace("APE.widget").defineCustomFactory("Autocomplete", function(Autocom
             }
         }
         
-        function getCallbackData(ac, responseText) {            
-            // Grouping operator here used to avoid ASI errors.
-            var wrapped = new Function("return("+responseText+");");
-            return wrapped();
+        function getCallbackData(ac, responseText) {
+            if(responseText) {
+                // Grouping operator here used to avoid ASI errors.
+                var wrapped = new Function("return("+responseText+");");
+                return wrapped();
+            } 
+            return"";
         }
     
         function showList(ac) {

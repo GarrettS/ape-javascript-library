@@ -8,6 +8,7 @@
 <style type="text/css">
 #flickrSearch-list {
     font-size: xx-large;
+    
 }
 
 #flickrSearch-list img {
@@ -41,8 +42,10 @@
                     itemRenderer : itemRenderer,
                     getInputValueFromSelectedItem : Function.prototype, // noop
                     loader : APE.ajax.AsyncRequest,
-                    onselect : displayMainPhoto,
-                    onchange : returnFalse,
+                    onchange : displayMainPhoto,
+
+                    // Prevent updating the text input.
+                    onhighlight : returnFalse,
                     requestInputPattern : /\S{3}/
             };
 

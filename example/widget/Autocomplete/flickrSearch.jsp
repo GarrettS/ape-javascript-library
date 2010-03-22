@@ -1,4 +1,4 @@
-<%@ taglib uri="http://java.sun.com/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ page contentType="text/plain; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
 <c:url var="url" 
     value="http://api.flickr.com/services/rest/?method=flickr.photos.search">
