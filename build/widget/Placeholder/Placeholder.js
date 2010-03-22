@@ -35,7 +35,7 @@ APE.namespace("APE.widget").defineCustomFactory("Placeholder", function(Placehol
                     addCallback = APE.dom.Event.addCallback;
     
                 inpValue[inp.id] = inp.value;
-                if(isEmpty(inp)) {
+                if(isEmpty(inp) && document.activeElement !== inp) {
                     showPlaceholderText(inp);
                 }
                 addCallback(inp, "focus", inpFocused);

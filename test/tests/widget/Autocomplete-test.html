@@ -45,7 +45,7 @@ window.onload = function(){
                 jsonpParamName : "jsonp",
                 getListData : getListData,
                 itemRenderer : itemRenderer,
-                getInputValueFromSelectedItem : getInputValueFromSelectedItem,
+                getInputValueFromHighlightedItem : getInputValueFromHighlightedItem,
                 loader : APE.ajax.AsyncRequest
         };
 
@@ -58,7 +58,7 @@ window.onload = function(){
         Action.keyup(testInput, {keyCode : "97"});
     }
     
-    function getInputValueFromSelectedItem() {
+    function getInputValueFromHighlightedItem() {
         return this.getSelectedDataItem()[0];
     }
     

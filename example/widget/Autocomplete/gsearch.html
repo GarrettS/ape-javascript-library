@@ -26,12 +26,12 @@
                     jsonpParamName : "jsonp",
                     getListData : getListData,
                     itemRenderer : itemRenderer,
-                    getInputValueFromSelectedItem : getInputValueFromSelectedItem,
+                    getInputValueFromHighlightedItem : getInputValueFromHighlightedItem,
                     loader : APE.ajax.AsyncRequest
             },
             gsearchWidget = Autocomplete.getById("gsearch", gSearchConfig);
 
-        function getInputValueFromSelectedItem() {
+        function getInputValueFromHighlightedItem() {
             var selectedDataItem = this.getSelectedDataItem();
             return selectedDataItem[0];
         }
@@ -51,5 +51,10 @@
     Search: 
     <input type="text" id="gsearch-input" size = "30" autocomplete="off">
 </label>
+<p>
+This is an example of a google autocomplete widget. The 
+form submission is disabled. This is only a demonstration 
+of APE.widget.Autocomplete. 
+</p>
 </body>
 </html>

@@ -36,8 +36,8 @@ APE.namespace("APE.widget").defineCustomFactory("Autocomplete", function(Autocom
                     " default: Autocomplete.prototype.getListData(rawObject)",
             itemRenderer : "{Function} renders each item in the list default: " +
                     "Autocomplete.prototype.itemRenderer(itemData)",
-            getInputValueFromSelectedItem : "{Function} " +
-                    "default: Autocomplete.prototype.getInputValueFromSelectedItem()",
+            getInputValueFromHighlightedItem : "{Function} " +
+                    "default: Autocomplete.prototype.getInputValueFromHighlightedItem()",
             loader : "{Object} APE.ajax.AsyncRequest (default) or APE.ajax.ScriptLoader",
             matcher : "{Function} [optional] Do something to each LI based on input value."
                 + "default: noop. Try: Autocomplete.textMatcher(listItemElement, value)"
@@ -154,7 +154,7 @@ APE.namespace("APE.widget").defineCustomFactory("Autocomplete", function(Autocom
             
             /** when an item is selected, the inputs value is updated. 
              * @return {String} value to update the input with. */
-            getInputValueFromSelectedItem : function() {
+            getInputValueFromHighlightedItem : function() {
                 return this.data[this.getSelectedIndex()];
             },
             
@@ -319,7 +319,7 @@ APE.namespace("APE.widget").defineCustomFactory("Autocomplete", function(Autocom
                 }
                 if(ac.onhighlight() !== false) {
                     var input = document.getElementById(ac.id + "-input");
-                    input.value = ac.getInputValueFromSelectedItem();
+                    input.value = ac.getInputValueFromHighlightedItem();
                 }
             } else {
                 showList(ac);

@@ -40,7 +40,7 @@
                     /* jsonpParamName : "nojsoncallback", */
                     getListData : getListData,
                     itemRenderer : itemRenderer,
-                    getInputValueFromSelectedItem : Function.prototype, // noop
+                    getInputValueFromHighlightedItem : Function.prototype, // noop
                     loader : APE.ajax.AsyncRequest,
                     onchange : displayMainPhoto,
 
@@ -99,6 +99,18 @@
     autocomplete="off" placeholder="enter tags">
 </label>
 <img id="flickrDisplayMain" src="">
-
+<p>
+When <code>onhighlight</code> fires, the default action is to 
+update the input value by calling <code>getInputValueFromHighlightedItem</code>.
+However in this example, <code>onhighlight</code> returns false, preventing that 
+from happening.
+</p>
+<p>
+The event <code>onchange</code> fires when the user clicks an item, or when 
+the <kbd>Enter</kbd> key is pressed when a an item is highlighted. 
+</p>
+<p>
+An item is highlighted by the user pressing the <code>UP</code> or <code>DOWN</code> arrow keys.
+</p>
 </body>
 </html>

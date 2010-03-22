@@ -65,10 +65,12 @@ window.onload = function(){
                 testBlur : Placeholder.IS_NATIVE,
                 testFocusBlurFocus : Placeholder.IS_NATIVE,
                 testDetachEvents : Placeholder.IS_NATIVE,
-                testInit :  Placeholder.IS_NATIVE
+                testInit :  Placeholder.IS_NATIVE,
+                testActiveElement : Placeholder.IS_NATIVE || 
+                    !document.activeElement
             }
         },
-
+        
         testGetById : function(){
             var ph = Placeholder.getById("search");
         },
@@ -79,10 +81,19 @@ window.onload = function(){
             Assert.areSame("search", search.value);
         },
 
+        testActiveElement : function() {
+            Action.focus(search);
+            search.value = "tuna";
+            var ph = Placeholder.getById("search");
+            Assert.areSame("tuna", search.value);
+        },
+
         testBlur : function() {
             var ph = Placeholder.getById("search");
             Action.focus(search);
+            search.focus();
             Action.blur(search);
+            search.blur();
             Assert.areSame("search", search.value);
         },
 
