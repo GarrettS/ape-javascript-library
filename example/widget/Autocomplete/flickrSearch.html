@@ -1,5 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
-"http://www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE HTML>
 <html lang="en-US">
 <head>
 <title>Flickr Search Autocomplete Example</title>
@@ -8,7 +7,6 @@
 <style type="text/css">
 #flickrSearch-list {
     font-size: xx-large;
-    
 }
 
 #flickrSearch-list img {
@@ -17,9 +15,9 @@
 }
 
 #flickrSearch img {
-    border-color:#CCCCCC #000000 #000000 #CCCCCC;
-    border-style:solid;
-    border-width:2px;
+    border-color: #CCCCCC #000000 #000000 #CCCCCC;
+    border-style: solid;
+    border-width: 2px;
 }
 </style>
 
@@ -93,12 +91,13 @@
 </script>
 </head>
 <body>
+<h1>Flickr Tags Autocomplete Demo</h1>
 <label id="flickrSearch" class="ape-autocomplete">
     Search: 
     <input type="text" id="flickrSearch-input" name="flickrTags" 
     autocomplete="off" placeholder="enter tags">
 </label>
-<img id="flickrDisplayMain" src="">
+<img id="flickrDisplayMain" src="pixel.gif">
 <p>
 When <code>onhighlight</code> fires, the default action is to 
 update the input value by calling <code>getInputValueFromHighlightedItem</code>.
@@ -107,7 +106,7 @@ from happening.
 </p>
 <p>
 The event <code>onchange</code> fires when the user clicks an item, or when 
-the <kbd>Enter</kbd> key is pressed when a an item is highlighted. 
+the <kbd>Enter</kbd> key is pressed when an item is highlighted. 
 </p>
 <p>
 An item is highlighted by the user pressing the <code>UP</code> or <code>DOWN</code> arrow keys.
