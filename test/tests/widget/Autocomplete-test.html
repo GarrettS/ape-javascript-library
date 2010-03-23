@@ -81,7 +81,10 @@ window.onload = function(){
         },
  
         tearDown : function () {
-            Autocomplete.instances = {};
+            var instances = Autocomplete.instances;
+            for(var x in instances) {
+                delete instances[x];
+            }
         },
 
         _should : {
@@ -133,7 +136,7 @@ window.onload = function(){
             Action.keyup(testInput, {keyCode : "97"});
             this.wait(function(){
                 Assert.isNotNull(document.getElementById("testNode-list"));
-            }, 2000);
+            }, 3000);
         },
 
         testOnHighlight : function(){
@@ -176,8 +179,19 @@ window.onload = function(){
                 Assert.isTrue(populated, "List Was Not Populated");
                 Assert.isTrue(changed, "onchange did not fire");
                 ac = null;
-            }, 3000);
+            }, 2200);
+        },
+
+        testHideOnBlur : function() {
+            var ac = Autocomplete.getById("testNode", gSearchData);
+            populateList(ac, function() {
+                var list = document.getElementById("testNode-list");
+                testInput.blur();
+                Action.blur(testInput);
+                Assert.areSame("none", list.style.display, "List was not hidden.");
+            });
         }
+        
     });
     
     //create the logger

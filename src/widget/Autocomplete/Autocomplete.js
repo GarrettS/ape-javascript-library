@@ -99,7 +99,7 @@ APE.namespace("APE.widget").defineCustomFactory("Autocomplete", function(Autocom
     
     /** If the config is incorrect, an object is returned */
     function validateConfig(config) {
-        var prop = "";
+        var prop = "config";
         if(!config || (prop = getMissingString(config))) {
             return Autocomplete.toString() + 
                 prop && "\n(missing: " + prop + ")";
@@ -119,7 +119,7 @@ APE.namespace("APE.widget").defineCustomFactory("Autocomplete", function(Autocom
             var prop, err, input;
             err = validateConfig(config);
             if(err) { 
-                throw new Error(id + ", " + err);
+                throw new Error("Autocomplete Constructor: " + id + ", " + err);
             }
             this.id = id;
             for(prop in config) {
@@ -180,6 +180,7 @@ APE.namespace("APE.widget").defineCustomFactory("Autocomplete", function(Autocom
             var el = document.getElementById(autocomplete.id + "-input");
             Event.addCallback(el, "keyup", keyUpHandler);
             Event.addCallback(el, "keydown", keyDownHandler);
+            Event.addCallback(el, "blur", inputBlurHandler);
             autocomplete.selectedItem = null;
             autocomplete.value = el.value || null;
         }
@@ -223,6 +224,11 @@ APE.namespace("APE.widget").defineCustomFactory("Autocomplete", function(Autocom
                 itemSelected(ac);
                 Event.preventDefault(ev);
             }
+        }
+        
+        function inputBlurHandler() {
+            var id = this.id.substring(0, this.id.indexOf("-"));
+            hideList(Autocomplete.getById(id));
         }
         
         function itemSelected(ac) {
