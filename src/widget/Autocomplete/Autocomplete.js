@@ -334,8 +334,9 @@ APE.namespace("APE.widget").defineCustomFactory("Autocomplete", function(Autocom
         }
         
         function unHiliteSelectedItem(ac) {
-            if(ac.selectedItem === null) return;
-            dom.removeClass(ac.selectedItem, SELECTED_CLASS);
+            if(ac.selectedItem) {
+                dom.removeClass(ac.selectedItem, SELECTED_CLASS);
+            }
         }
         
         function hiliteSelectedItem(ac) {
