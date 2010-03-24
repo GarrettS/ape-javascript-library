@@ -134,32 +134,45 @@ window.onload = function(){
             Action.keydown(testInput, {keyCode : "97"});
             testInput.value = String.fromCharCode(97);
             Action.keyup(testInput, {keyCode : "97"});
-            this.wait(function(){
-                Assert.isNotNull(document.getElementById("testNode-list"));
-            }, 3000);
+
+            var list;
+            waitForCondition(this, condition, seg);
+
+            function condition(){
+                list = document.getElementById("testNode-list");
+                return list !== null;
+            }
+            
+            function seg(){
+                Assert.isTrue(condition(), "list was null.");
+                ac = null;
+            };
+            
         },
 
         testOnHighlight : function(){
             var ac = Autocomplete.getById("testNode", gSearchData),
-                populated, selected;
+                populated, highlighted;
 
             // Select an item after the test is populated.
             populateList(ac, function(){
                 populated = true;
                 ac.onhighlight = function(ev) {
-                    selected = true;
+                    highlighted = true;
                     Assert.areSame(0, this.getSelectedIndex());
                 };
                 Action.keydown(testInput, {keyCode : dom.key.DOWN});
                 Action.keyup(testInput, {keyCode : dom.key.DOWN});
             });
+
+            waitForCondition(this, condition, seg);
+
+            function condition(){ return populated; }
             
-            this.wait(function() {
+            function seg(){
+                Assert.isTrue(highlighted, "Item Was Not Selected");
                 ac = null;
-                Assert.isTrue(populated, "List Was Not Populated");
-                Assert.isTrue(selected, "Item Was Not Selected");
-                ac = null;
-            }, 2000);
+            };
         },
 
         testOnchange : function(){
@@ -173,26 +186,89 @@ window.onload = function(){
                 Action.keydown(testInput, {keyCode : dom.key.DOWN});
                 Action.keydown(testInput, {keyCode : dom.key.ENTER});
             });
+
             
-            this.wait(function(){
-                ac = null;
-                Assert.isTrue(populated, "List Was Not Populated");
+            waitForCondition(this, condition, seg);
+
+            function condition(){ return populated; }
+            function seg(){
                 Assert.isTrue(changed, "onchange did not fire");
                 ac = null;
-            }, 2200);
+            };
         },
 
         testHideOnBlur : function() {
+            var ac = Autocomplete.getById("testNode", gSearchData),
+                populated;
+            populateList(ac, function() {
+                populated = true;
+            });
+            waitForCondition(this, condition, deferredSeg);
+
+            function condition() {
+                return populated === true;
+            }
+
+            function deferredSeg() {
+                Action.blur(testInput);
+                testInput.blur();
+                var list = document.getElementById("testNode-list");
+                Assert.areSame("none", list.style.display, "List was not hidden.");
+            }
+        },
+
+        testEscape : function() {
+            var populated;
             var ac = Autocomplete.getById("testNode", gSearchData);
             populateList(ac, function() {
-                var list = document.getElementById("testNode-list");
-                testInput.blur();
-                Action.blur(testInput);
-                Assert.areSame("none", list.style.display, "List was not hidden.");
+                populated = true;
             });
+
+            waitForCondition(this, condition, deferredSeg);
+            
+            this.wait(deferredSeg, 4000);
+
+            function condition() {
+                return populated === true;
+            }
+            
+            function deferredSeg() {
+                var list = document.getElementById("testNode-list"),
+                input = document.getElementById("testNode-input"),
+                expectedValue = String.fromCharCode(97);
+                Action.keydown(testInput, {keyCode : dom.key.DOWN}); 
+                Assert.areNotSame(expectedValue, input.value, "value did not change");
+                Action.keydown(testInput, {keyCode : dom.key.ESC});
+                Assert.areSame(expectedValue, input.value, "value was not reset.");
+                Assert.areSame("none", list.style.display, "List was not hidden.");
+            }
         }
-        
     });
+
+    // Wait for condition.
+    // What a pain in the fucking balls.
+    function waitForCondition(test, condition, deferredSeg, maxDelay) {
+        var timer = setInterval(function() {
+            //console.log('testing...');
+            if(condition()){
+                //console.log('resuming...')
+                clearInterval(timer);
+
+                // This causes poor YUI Test to throw error after maxDelay.
+                // Oh well.
+                test.resume(deferredSeg);
+                resumed = true;
+            }
+        }, 100),
+            resumed;
+        
+        test.wait(function(){
+            console.log("resumed",resumed);
+            if(!resumed) {
+                deferredSeg();
+            }
+        }, maxDelay||4000);
+    }
     
     //create the logger
     new YAHOO.tool.TestLogger("testLogger");

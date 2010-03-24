@@ -220,6 +220,7 @@ APE.namespace("APE.widget").defineCustomFactory("Autocomplete", function(Autocom
             }
             if(keyCode === key.ESC && isListShown(ac)) {
                 itemSelected(ac);
+                this.value = this.defaultValue;
             } else if(keyCode === key.ENTER && isListShown(ac)) {
                 itemSelected(ac);
                 Event.preventDefault(ev);

@@ -25,10 +25,11 @@
     <li><a href="event-publisher-test.html">event-publisher-test.html</a></li>
     <li>widget/
         <ul>
-            <li class="d"><a href="widget/calendar">widget/calendar</a></li>
+            <li class="d"><a href="widget/Calendar">widget/Calendar</a></li>
             <li class="d"><a href="widget/Scroller">widget/Scroller</a></li>
             <li class="d"><a href="widget/Placeholder">widget/Placeholder</a></li>
             <li class="d"><a href="widget/HSVPicker">widget/HSVPicker</a></li>
+            <li class="d"><a href="widget/Autocomplete">widget/Autocomplete</a></li>
         </ul>
     </li>
 </ul>

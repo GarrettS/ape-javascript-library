@@ -616,6 +616,12 @@ YAHOO.tool.TestRunner = (function(){
             
             //get relevant information
             var node /*:TestNode*/ = this._cur;
+            
+            // (GS) What a fucking mess this long function...
+         // Already resumed, this is history, and the timeout should have 
+            // been cleared. Have to investigate further.
+            if(!node) return; 
+            
             var testName /*:String*/ = node.testObject; 
             var testCase /*:YAHOO.tool.TestCase*/ = node.parent.testObject;
             
