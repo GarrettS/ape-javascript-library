@@ -24,7 +24,7 @@
     <button id='failure' onclick="AjaxDemo.testAbort()">testAbort();</button>
     <button id='post' onclick="AjaxDemo.testPost()">testPost();</button>
 
-    <img id="ajax" style="visibility:hidden; height: 40px" src="ajax.jpg"/>
+    <img id="ajax" style="visibility:hidden; height: 40px" src="ajax.jpg" alt="Ajax Soap">
 </div>
 
 <div id="console">
@@ -34,106 +34,105 @@
 var AjaxDemo = {};
 (function(){
 
-    APE.mixin(AjaxDemo, {
+    APE.createMixin(AjaxDemo, {
         testGet : testGet,
         testAbort : testAbort,
         testPost : testPost
         });
 
-var ajax = document.getElementById('ajax'),
-    AsyncRequest = APE.ajax.AsyncRequest;
-
-function testGet(i) {
-    var req = AsyncRequest.getById(123, {action:"data.json?" + (i||0)} );
-    consoleMessage('...');
-    showBusyMessage();
-    req.onsucceed = function( req ) {
-        consoleMessage("data received " + req.responseText);
-    };
-    req.oncomplete = function( doneEvent ) {
-        hideBusyMessage();
-    };
-    req.onfail = function( ) {
-        consoleMessage( "failure should not have occurred: " + req );
+    var ajax = document.getElementById('ajax'),
+        AsyncRequest = APE.ajax.AsyncRequest;
+    
+    function testGet(i) {
+        var req = AsyncRequest.getById(123, {action:"data.json?" + (i||0)} );
+        consoleMessage('...');
+        showBusyMessage();
+        req.onsucceed = function( req ) {
+            consoleMessage("data received " + req.responseText);
+        };
+        req.oncomplete = function( doneEvent ) {
+            hideBusyMessage();
+        };
+        req.onfail = function( ) {
+            consoleMessage( "failure should not have occurred: " + req );
+        }
+        req.send();
     }
-    req.send();
-}
-
-function testAbort() {
-    var req = AsyncRequest.getById(234, {action:"data.json", method:"POST"} );
-    consoleMessage('...');
-    showBusyMessage();
-    req.onsucceed = function( response ) {
-        var data = eval("("+response.responseText +")");
-        consoleMessage("Got response text. data.name == 'Garrett': " + (data.name == "Garrett"));
+    
+    function testAbort() {
+        var req = AsyncRequest.getById(234, {action:"data.json", method:"POST"} );
+        consoleMessage('...');
+        showBusyMessage();
+        req.onsucceed = function( response ) {
+            var data = eval("("+response.responseText +")");
+            consoleMessage("Got response text. data.name == 'Garrett': " + (data.name == "Garrett"));
+        };
+        req.oncomplete = function( doneEvent ) {
+            consoleMessage(doneEvent.successful == false, doneEvent);
+            hideBusyMessage();
+        };
+    
+        req.onfail = function( response ) {
+            consoleMessage( "Error: failure should not have occurred: " + req );
+        };
+    
+        req.onabort = function( req ) {
+            // can't get response text in IE:
+            // "the data necessary to complete this operation is not yet available" 
+            //('responseText'in response ? response.responseText : null);
+            consoleMessage('aborted: ' + (null) );
+        };
+    
+        req.send();
+        req.abort();
+    }
+    
+    function testFailure() {
+        consoleMessage('...');
+        showBusyMessage();
+        req.onfail = function( response ) {
+            consoleMessage("Error: " + eval("("+response.responseText +")") );
+        };
+        req.oncomplete = function( doneEvent ) {
+            hideBusyMessage();
+        };
+    }
+    
+    /** 
+     * Server takes params first and last, returns "first, last".
+     */
+    function testPost() {
+        consoleMessage('...');
+        var data = "first=Garrett&last=Smith",
+            req = AsyncRequest.getById(345, {action:"process.jsp", method:"POST"} );
+        showBusyMessage();
+        req.onsucceed = function( req ) {
+            consoleMessage("req.responseText : " + req.responseText);
+        };
+        req.oncomplete = function( doneEvent ) {
+            hideBusyMessage();
+        };
+        req.send( data );
     };
-    req.oncomplete = function( doneEvent ) {
-        consoleMessage(doneEvent.successful == false, doneEvent);
-        hideBusyMessage();
-    };
-
-    req.onfail = function( response ) {
-        consoleMessage( "Error: failure should not have occurred: " + req );
-    };
-
-    req.onabort = function( req ) {
-        // can't get response text in IE:
-        // "the data necessary to complete this operation is not yet available" 
-        //('responseText'in response ? response.responseText : null);
-        consoleMessage('aborted: ' + (null) );
-    };
-
-    req.send();
-    req.abort();
-}
-
-function testFailure() {
-    consoleMessage('...');
-    showBusyMessage();
-    req.onfail = function( response ) {
-        consoleMessage("Error: " + eval("("+response.responseText +")") );
-    };
-    req.oncomplete = function( doneEvent ) {
-        hideBusyMessage();
-    };
-}
-
-/** 
- * Server takes params first and last, returns "first, last".
- */
-function testPost() {
-    consoleMessage('...');
-    var data = "first=Garrett&last=Smith",
-        req = AsyncRequest.getById(345, {action:"process.jsp", method:"POST"} );
-    showBusyMessage();
-    req.onsucceed = function( req ) {
-        consoleMessage("req.responseText : " + req.responseText);
-    };
-    req.oncomplete = function( doneEvent ) {
-        hideBusyMessage();
-    };
-    req.send( data );
-};
-
-function consoleMessage(s) {
-    document.getElementById('console').innerHTML = s;
-}
-
-function showBusyMessage() {
-    ajax.style.visibility = "visible";
-}
-
-function hideBusyMessage() {
-
-    // Sometimes its so fast that the user
-    // can't tell if anything happened.
-    // Call in a setTimeout to slow things down 
-    // to a perceptible level.
-    setTimeout(function(){
-        ajax.style.visibility = "hidden";
-    }, 150);
-}
-
+    
+    function consoleMessage(s) {
+        document.getElementById('console').innerHTML = s;
+    }
+    
+    function showBusyMessage() {
+        ajax.style.visibility = "visible";
+    }
+    
+    function hideBusyMessage() {
+    
+        // Sometimes its so fast that the user
+        // can't tell if anything happened.
+        // Call in a setTimeout to slow things down 
+        // to a perceptible level.
+        setTimeout(function(){
+            ajax.style.visibility = "hidden";
+        }, 150);
+    }
 })();
 </script>
 </body>
