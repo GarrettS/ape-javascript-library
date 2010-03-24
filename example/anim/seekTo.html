@@ -93,8 +93,7 @@ function pause() {
     if(button.anim.paused) {
         button.anim.resume( );
         document.getElementById("pause").firstChild.data = "pause";
-    }
-    else {
+    } else if(button.anim.playing) {
         button.anim.pause( );
         document.getElementById("pause").firstChild.data = "resume";
     }

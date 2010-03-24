@@ -174,6 +174,22 @@ var animationTestCase = new YAHOO.tool.TestCase({
         }, 130);
     },
 
+    // Should throw no errors.
+    testPausePause : function() {
+        var a = new Animation( .4 );
+        a.pause();
+        a.pause();
+        Assert.areSame(0, a.rationalValue);
+    },
+
+    // Should throw no errors.
+    testResumeResume : function() {
+        var a = new Animation( .4 );
+        a.resume();
+        a.resume();
+        Assert.areSame(0, a.rationalValue);
+    },
+    
     // THis animation plays tothe end,
     // then plays back. 
     // We need to make sure onend fires each time an 

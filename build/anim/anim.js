@@ -143,7 +143,6 @@ APE.namespace("APE.anim");
         start : function() {
             if (this.paused)
                 return;
-            this.playing = true;
             this.timeLimit = this.duration;
             this.endOffset = this.transition(this.endValue);
             this._start();
@@ -165,7 +164,6 @@ APE.namespace("APE.anim");
          * onstart(), registers Animation.
          * 
          * @fires onstart
-         * @private
          */
         _start : function() {
             // Unregister the animation before setting startTime.
@@ -174,6 +172,7 @@ APE.namespace("APE.anim");
             this.onstart();
             Manager.register(this);
             this.started = true;
+            this.playing = true;
             clearTimeout(this.startAfterTimer);
             delete this.startAfterTimer;
         },
@@ -246,6 +245,7 @@ APE.namespace("APE.anim");
          * pauses the animation.
          */
         pause : function() {
+            if(this.paused || !this.playing) return;
             this.paused = true;
             this.elapsedTime = new Date - this._startTime;
             Manager.unregister(this);
@@ -255,6 +255,7 @@ APE.namespace("APE.anim");
          * unpauses the animation.
          */
         resume : function() {
+            if(!this.paused) return;
             this.paused = false;
 
             // Pick up from last time frame.
@@ -270,9 +271,9 @@ APE.namespace("APE.anim");
         /**
          * Ends the anim.
          * 
-         * @param {boolean}
-         *            ended, if true, calls onend(). Note, this is not a pause()
-         *            method.
+         * @param {boolean} ended, if true, calls onend(). 
+         * This is not a pause() method; calling stop() 
+         * then resume() will not cause the Animation to restart.
          */
         stop : function(ended) {
             clearTimeout(this.startAfterTimer);
