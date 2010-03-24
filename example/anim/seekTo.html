@@ -65,50 +65,46 @@ html {
 <script type="text/javascript" src="../../build/anim/StyleTransition.js"></script>
 
 <script type="text/javascript">
-setTimeout(function(){
-
 window.seekToPosition = seekToPosition;
-window.pause = pause;
+var Button = APE.createFactory("Button",
+    function() {
+        var newStyle = {
+                color: "#002",
+                backgroundColor: "#bfc",
+                width: "60em",
+                opacity: .4, // StyleAdapter takes care of opacity for IE.
+                borderWidth: "5px", // Shorthand values will not transition smoothly.
+                borderColor: "#36c", // keywords won't transition.
+                letterSpacing: "3em"
+            };
+        return Button;
+        function Button(id) {
+            this.id = id;
+            this.anim = new APE.anim.StyleTransition(id, newStyle, 4, APE.anim.Transitions.accel);
+        
+            // Helpful debugging info.
+            if(console && console.log)
+            ;//    console.log(this.anim);
+        }
+});
 
-
-var newStyle = {
-    color: "#002",
-    backgroundColor: "#bfc",
-    width: "60em",
-    opacity: .4, // StyleAdapter takes care of opacity for IE.
-    borderWidth: "5px", // Shorthand values will not transition smoothly.
-    borderColor: "#36c", // keywords won't transition.
-    letterSpacing: "3em"
-};
-
-function Button(id) {
-    this.id = id;
-    this.anim = new APE.anim.StyleTransition(id, newStyle, 4, APE.anim.Transitions.accel);
-
-    // Helpful debugging info.
-    if(console && console.log)
-        console.log(this.anim);
+function pause() {
+    var button = Button.getById( 'linear' );
+    if(button.anim.paused) {
+        button.anim.resume( );
+        document.getElementById("pause").firstChild.data = "pause";
+    }
+    else {
+        button.anim.pause( );
+        document.getElementById("pause").firstChild.data = "resume";
+    }
 }
-Button.getById = APE.getById;
 
 function seekToPosition( ) {
     var position = parseFloat(document.getElementById("seekTo").value, 10);
     var anim = Button.getById( 'linear' ).anim;
     anim.seekTo(position);
 };
-
-function pause() {
-    var button = Button.getById( 'linear' );
-    if(button.anim.paused) {
-        button.anim.resume( );
-        document.getElementById("pause").innerHTML = "pause";
-    }
-    else {
-        button.anim.pause( );
-        document.getElementById("pause").innerHTML = "resume";
-    }
-}
-}, 10);
 </script>
 </body>
 </html>

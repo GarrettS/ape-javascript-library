@@ -131,97 +131,97 @@ window.onload = function(){
 	function isButton(el) {
 	    return /anim-div/.test(el.parentNode.className);
 	}
-    ButtonFactory = APE.createFactory(Button, createButtonPrototype);
-	function Button(id){
-	    this.id = id;
-	    this.init();
-	}
-
-	APE.extend(Button, APE.anim.Animation);
-	function createButtonPrototype(){
-
-	    var anim = APE.anim;
-	    return {
-	        init : init,
-	        performTransition : performTransition
-	    };
-
-	    function init() {
-	        var a = new anim.Animation( 1 ),// Duration: 1 sec.
-	            id = this.id,
-	            buttonEl = document.getElementById(id),
-	            endPosition = buttonEl.parentNode.offsetWidth - buttonEl.offsetWidth;
-
-	        a.endPosition = endPosition;
-	        a.transition = getTransition(this);
-	                    
-	        a.run = run;
-	        a.onstart = onstart;
-	        a.onend = onend;
-
-	        function onstart(){
-	            this.style = document.getElementById(id).style;
-	        }
-
-	        function onend(){
-	            this.style = null;
-	        }
-	        this.anim = a;
-	    }
-
-	    /** 
-	     * @param buttonID {String} 
-	     * The button ID is also the name of a transition function 
-	     * in APE.anim.Transitions.
-	     *
-	     * An APE.anim.Transitions function is
-	     * a function used for effecting the rationalValue in run();
-	     */
-	    function performTransition() {
-
-	        var a = this.anim,
-	         // User-set the duration based on INPUT value.
-	            seconds = parseFloat(document.getElementById( "seconds" ).value);
-	        
-	        if(isFinite( seconds )) {
-	            a.duration = seconds * 1000;
-	        }
-	        
-	        // This starts the anim.
-	        if(a.transition === anim.Transitions.loop) {
-	            a.start();
-	        } else {
-	            a.toggleDirection();
-	        }
-	    }
-	    
-	    function run(rationalValue) {         
-	        this.style.left = (rationalValue * this.endPosition) + "px";
-
-	        // Calculate saturation and the inverse.
-	        var sat = Math.floor(255 * rationalValue),
-	            revSat = 255-sat;
-
-	        this.style.backgroundColor = "rgb(" + sat + ", "+ sat +", "+ sat +")";
-	        this.style.color = "rgb(" + revSat + ", "+ revSat +", "+ revSat +")";
-	    }
-
-	    function getTransition(button) {
-	        var Transitions = APE.anim.Transitions, 
-	            id = button.id,
-	            sig = /^sigmoid(\d?)/.exec(id),
-	            transition;
-	        
-	        if(sig) {
-	            transition = Transitions.getSigmoid(+sig[1]);
-	        } else {
-	            transition = Transitions[id];
-	        }
-	        return transition;
-	    }
-	}
-};
-
+    
+    ButtonFactory = APE.createFactory("Button", getButtonCtor);
+    function getButtonCtor() {
+    	function Button(id){
+    	    this.id = id;
+    	    this.init();
+    	}
+    
+    	APE.createSubclass(Button, APE.anim.Animation,  {
+            init : init,
+            performTransition : performTransition
+        });
+    
+        var anim = APE.anim;
+        return Button;
+    
+        function init() {
+            var a = new anim.Animation( 1 ),// Duration: 1 sec.
+                id = this.id,
+                buttonEl = document.getElementById(id),
+                endPosition = buttonEl.parentNode.offsetWidth - buttonEl.offsetWidth;
+    
+            a.endPosition = endPosition;
+            a.transition = getTransition(this);
+                        
+            a.run = run;
+            a.onstart = onstart;
+            a.onend = onend;
+    
+            function onstart(){
+                this.style = document.getElementById(id).style;
+            }
+    
+            function onend(){
+                this.style = null;
+            }
+            this.anim = a;
+        }
+    
+        /** 
+         * @param buttonID {String} 
+         * The button ID is also the name of a transition function 
+         * in APE.anim.Transitions.
+         *
+         * An APE.anim.Transitions function is
+         * a function used for effecting the rationalValue in run();
+         */
+        function performTransition() {
+    
+            var a = this.anim,
+             // User-set the duration based on INPUT value.
+                seconds = parseFloat(document.getElementById( "seconds" ).value);
+            
+            if(isFinite( seconds )) {
+                a.duration = seconds * 1000;
+            }
+            
+            // This starts the anim.
+            if(a.transition === anim.Transitions.loop) {
+                a.start();
+            } else {
+                a.toggleDirection();
+            }
+        }
+        
+        function run(rationalValue) {         
+            this.style.left = (rationalValue * this.endPosition) + "px";
+    
+            // Calculate saturation and the inverse.
+            var sat = Math.floor(255 * rationalValue),
+                revSat = 255-sat;
+    
+            this.style.backgroundColor = "rgb(" + sat + ", "+ sat +", "+ sat +")";
+            this.style.color = "rgb(" + revSat + ", "+ revSat +", "+ revSat +")";
+        }
+    
+        function getTransition(button) {
+            var Transitions = APE.anim.Transitions, 
+                id = button.id,
+                sig = /^sigmoid(\d?)/.exec(id),
+                transition;
+            
+            if(sig) {
+                transition = Transitions.getSigmoid(+sig[1]);
+            } else {
+                transition = Transitions[id];
+            }
+            return transition;
+        }
+    }
+}
 </script>
 <h1>Animation Transitions Example</h1>
 <form action="" onsubmit="return false">
