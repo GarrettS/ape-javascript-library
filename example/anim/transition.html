@@ -55,12 +55,21 @@ window.onload = function(){
             return ButtonFactory.getById(this.id).start();
         };
 
-    var ButtonFactory = APE.createFactory(Button, function(){
-        return {
-            start: function(){
-                this.anim.toggleDirection( );
-            }
-        };
+    var ButtonFactory = APE.createFactory("Button", function() {
+
+        return Button;
+        
+        function Button(id, styleObj) {
+    	    this.id = id;
+    	    this.anim = new APE.anim.StyleTransition(id, styleObj, 2, APE.anim.Transitions[id]);
+            this.start = start;
+    	
+    	    // console.log(this.anim.toString());
+    	}
+        
+        function start() {
+            this.anim.toggleDirection( );
+        }
     });
     
     ButtonFactory.getById("accel", {
@@ -88,13 +97,6 @@ window.onload = function(){
          fontWeight : 900,
          fontSize : "90px"
      });
-    
-	function Button(id, styleObj) {
-	    this.id = id;
-	    this.anim = new APE.anim.StyleTransition(id, styleObj, 2, APE.anim.Transitions[id]);
-	
-	    // console.log(this.anim.toString());
-	}
 		
 	function animateBack(){
 	    // Helpful debuggin info.
