@@ -229,7 +229,7 @@ APE.namespace("APE.widget").defineCustomFactory("Autocomplete", function(Autocom
         
         function inputBlurHandler() {
             var id = this.id.substring(0, this.id.indexOf("-"));
-            hideList(Autocomplete.getById(id));
+            hideList(Autocomplete.getById(id)); 
         }
         
         function itemSelected(ac) {
@@ -472,12 +472,12 @@ APE.namespace("APE.widget").defineCustomFactory("Autocomplete", function(Autocom
             list.innerHTML = html.join("");
             document.getElementById(ac.id).appendChild(list);
             CAN_SCROLL_INTO_VIEW = !!list.childNodes[0].scrollIntoView;
-            Event.addCallback(list, "click", listClickHandler);
+            Event.addCallback(list, "mousedown", listMousedownHandler);
             Event.addCallback(list, "mouseover", listMouseOverHandler);
             return list;
         }
         
-        function listClickHandler(ev) {
+        function listMousedownHandler(ev) { 
             var ac, li = getLiFromTarget(ev, this);
             if(li) { 
                 ac = Autocomplete.getById(this.id.replace(/-list$/,""));

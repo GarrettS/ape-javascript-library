@@ -242,6 +242,33 @@ window.onload = function(){
                 Assert.areSame(expectedValue, input.value, "value was not reset.");
                 Assert.areSame("none", list.style.display, "List was not hidden.");
             }
+        },
+
+        testListMousedown : function() {
+            var populated;
+            var ac = Autocomplete.getById("testNode", gSearchData);
+            populateList(ac, function() {
+                populated = true;
+            });
+
+            waitForCondition(this, condition, deferredSeg);
+            
+            this.wait(deferredSeg, 4000);
+
+            function condition() {
+                return populated;
+            }
+
+            // Make sure that the input's value matches what is in the LI
+            // e.g. "[a    ]" becomes "[amazing pussy]".
+            function deferredSeg() {
+                var list = document.getElementById("testNode-list"),
+                    input = document.getElementById("testNode-input"),
+                    li = list.firstChild,
+                    text = li.firstChild.data;
+                Action.mousedown(li); 
+                Assert.areSame(input.value, text.substring(0, text.indexOf(",")));
+            }
         }
     });
 
