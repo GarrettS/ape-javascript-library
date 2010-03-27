@@ -71,6 +71,36 @@ YAHOO.tool.TestCase.prototype = {
         throw new YAHOO.tool.TestCase.Wait(segment, delay);
     },
 
+    /**
+     * Polls condition() repeatedy, and, when that returns true-ish, 
+     * deferredSeg is called.
+     * 
+     * @param {Function} condition function that is run periodically. 
+     * When it returns true, deferredSeg is called.
+     * 
+     * @param {Function} [deferredSeg] Optional function to run 
+     * after condition is met. If condition is not met, fail() is called.
+     * 
+     * @param {int} [maxDelay] Optional number of milliseconds poll for 
+     * condition. Default is 4000.
+     */
+    waitForCondition : function(condition, deferredSeg, maxDelay) {
+        var test = this,
+            resumed,
+            maxDelay = maxDelay||4000,
+            timer = setInterval(function() {
+                if(condition()){
+                    clearInterval(timer);
+                    test.resume(deferredSeg);
+                    resumed = true;
+                }
+            }, 100);
+        
+        this.wait(function(){
+            test.fail("Condition not met after " + maxDelay + "ms");
+        }, maxDelay);
+    },
+    
     //-------------------------------------------------------------------------
     // Stub Methods
     //-------------------------------------------------------------------------
@@ -772,7 +802,7 @@ YAHOO.tool.TestRunner = (function(){
                 this._resumeTest(test);                
             }
 
-        },        
+        },
         
         //-------------------------------------------------------------------------
         // Protected Methods

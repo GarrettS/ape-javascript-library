@@ -482,9 +482,13 @@ APE.namespace("APE.widget").defineCustomFactory("Autocomplete", function(Autocom
             if(li) { 
                 ac = Autocomplete.getById(this.id.replace(/-list$/,""));
                 selectItem(ac, li);
-                setTimeout(function(){
-                    itemSelected(ac);
-                    document.getElementById(ac.id + "-input").focus();
+                setTimeout(function() {
+                    var inp = document.getElementById(ac.id + "-input");
+                    if(inp) {
+                        // In case innerHTML changed.
+                        itemSelected(ac);
+                        inp.focus();
+                    }
                 }, 140);
                 li = null;
             }
