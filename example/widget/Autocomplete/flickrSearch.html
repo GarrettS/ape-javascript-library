@@ -26,68 +26,71 @@
 <script type="text/javascript" src="../../../build/ajax/AsyncRequest.js"></script>
 <script type="text/javascript" src="../../../build/widget/DelegateFactory.js"></script>
 <script type="text/javascript" src="../../../build/widget/Placeholder/Placeholder.js"></script>
-<script type="text/javascript" src="../../../build/widget/Placeholder/Placeholder.js"></script>
 <script type="text/javascript" src="../../../build/widget/Autocomplete/Autocomplete.js"></script>
 <script type="text/javascript">
-    window.onload = function() {
-        var Autocomplete = APE.widget.Autocomplete,
-            flickrSearchConfig = {
-                    matcher : Autocomplete.textMatcher,
-                    dataSource : "flickrSearch.jsp",
-                    paramName : "tags",
-                    /* jsonpParamName : "nojsoncallback", */
-                    getListData : getListData,
-                    itemRenderer : itemRenderer,
-                    getInputValueFromHighlightedItem : Function.prototype, // noop
-                    loader : APE.ajax.AsyncRequest,
-                    onchange : displayMainPhoto,
+window.onload = function() {
+    var Autocomplete = APE.widget.Autocomplete,
+        flickrSearchConfig = {
+                matcher : Autocomplete.textMatcher,
+                dataSource : "flickrSearch.jsp",
+                paramName : "tags",
+                /* jsonpParamName : "nojsoncallback", */
+                getListData : getListData,
+                itemRenderer : itemRenderer,
+                getInputValueFromHighlightedItem : Function.prototype, // noop
+                loader : APE.ajax.AsyncRequest,
+                onchange : displayMainPhoto,
 
-                    // Prevent updating the text input.
-                    onhighlight : returnFalse,
-                    requestInputPattern : /\S{3}/
-            };
+                // Prevent updating the text input.
+                onhighlight : returnFalse,
+                requestInputPattern : /\S{3}/
+        };
 
-        Autocomplete.addDelegateFor("flickrSearch", flickrSearchConfig);
-        APE.widget.Placeholder.getById("flickrSearch-input");
-        
-        function returnFalse() {
-            return false;
-        }
-        
-        function displayMainPhoto() {
-            var url = getImageUrlFromSelectedItem(this.selectedItem, "m"),
-                mainImg = document.getElementById("flickrDisplayMain");
-            mainImg.src = url;
-            mainImg.title = this.selectedItem.title;
-            return false;
-        }
+    Autocomplete.addDelegateFor("flickrSearch", flickrSearchConfig);
+    APE.widget.Placeholder.getById("flickrSearch-input");
+    
+    function returnFalse() {
+        return false;
+    }
+    
+    function displayMainPhoto() {
+        var url = getImageUrlFromSelectedItem(this.selectedItem, "m"),
+            mainImg = document.getElementById("flickrDisplayMain");
+        mainImg.src = url;
+        mainImg.title = this.selectedItem.title;
+        return false;
+    }
 
-        // Update the display photo, based on what the user selected 
-        // in the list.
-        function getImageUrlFromSelectedItem(selectedItem, size) {
-            var url = selectedItem.firstChild.src;
-            return url.replace(/s\.jpg$/, (size || "") + ".jpg");
+    // Update the display photo, based on what the user selected 
+    // in the list.
+    function getImageUrlFromSelectedItem(selectedItem, size) {
+        var url = selectedItem.firstChild.src;
+        return url.replace(/s\.jpg$/, (size || "") + ".jpg");
+    }
+    
+    /** @param {Object} rawObject json returned from the flickr service
+     * at: http://api.flickr.com/services/rest/?method=flickr.photos.search 
+     * and proxied by flickrSearch.jsp
+     */
+    function getListData(rawObject) {
+        if(rawObject.stat !== "fail") {
+            return rawObject.photos.photo;
         }
-        
-        function getListData(rawObject) {
-            if(rawObject.stat !== "fail") {
-                return rawObject.photos.photo;
-            }
-        }
-        
-        function itemRenderer(itemData) {
-            var title = itemData.title;
-            return"<img src='" + getImgUrl(itemData) + "' title='" +
-                title +"'>" + title;
-        }
-        
-        function getImgUrl(photo, size) {
-            size = size || "s";
-            return"http://static.flickr.com/" 
-                    + photo.server + "/" 
-                    + photo.id + "_" + photo.secret + "_" + size +".jpg";
-        }
-    };
+    }
+    
+    function itemRenderer(itemData) {
+        var title = itemData.title;
+        return"<img src='" + getImgUrl(itemData) + "' title='" +
+            title +"'>" + title;
+    }
+    
+    function getImgUrl(photo, size) {
+        size = size || "s";
+        return"http://static.flickr.com/" 
+                + photo.server + "/" 
+                + photo.id + "_" + photo.secret + "_" + size +".jpg";
+    }
+};
 </script>
 </head>
 <body>
