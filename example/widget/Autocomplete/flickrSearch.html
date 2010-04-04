@@ -14,10 +14,15 @@
     height: 75px;
 }
 
-#flickrSearch img {
+#flickrDisplayMain {
     border-color: #CCCCCC #000000 #000000 #CCCCCC;
     border-style: solid;
     border-width: 2px;
+    float: left;
+    margin-right: 12px;
+    background-color: #eee;
+    min-height: 100px;
+    max-height: 100px;
 }
 </style>
 
@@ -31,19 +36,22 @@
 window.onload = function() {
     var Autocomplete = APE.widget.Autocomplete,
         flickrSearchConfig = {
-                matcher : Autocomplete.textMatcher,
-                dataSource : "flickrSearch.jsp",
-                paramName : "tags",
-                /* jsonpParamName : "nojsoncallback", */
-                getListData : getListData,
-                itemRenderer : itemRenderer,
-                getInputValueFromHighlightedItem : Function.prototype, // noop
-                loader : APE.ajax.AsyncRequest,
-                onchange : displayMainPhoto,
+            matcher : Autocomplete.textMatcher,
+            dataSource : "flickrSearch.jsp",
+            paramName : "tags",
+            /* jsonpParamName : "nojsoncallback", */
+            getListData : getListData,
+            itemRenderer : itemRenderer,
+            getInputValueFromHighlightedItem : Function.prototype, // noop
+            loader : APE.ajax.AsyncRequest,
+            onchange : displayMainPhoto,
 
-                // Prevent updating the text input.
-                onhighlight : returnFalse,
-                requestInputPattern : /\S{3}/
+            // Prevent updating the text input.
+            onhighlight : returnFalse,
+
+            // User must type 3 or more characters to trigger autocomplete 
+            // action.
+            requestInputPattern : /\S{3}/
         };
 
     Autocomplete.addDelegateFor("flickrSearch", flickrSearchConfig);
@@ -98,9 +106,9 @@ window.onload = function() {
 <label id="flickrSearch" class="ape-autocomplete">
     Search: 
     <input type="text" id="flickrSearch-input" name="flickrTags" 
-    autocomplete="off" placeholder="enter tags">
+    autocomplete="off" placeholder="tags (3+ characters)">
 </label>
-<img id="flickrDisplayMain" src="pixel.gif">
+<img id="flickrDisplayMain" src="pixel.gif" alt="">
 <p>
 When <code>onhighlight</code> fires, the default action is to 
 update the input value by calling <code>getInputValueFromHighlightedItem</code>.
