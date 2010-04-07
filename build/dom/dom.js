@@ -592,12 +592,29 @@ APE.namespace("APE.dom");
 
 APE.namespace("APE.dom").mixin(function() {
     var CLASSNAME = "className",
-        Exps = { };
+        Exps,
+        undef,
+        dom = APE.dom,
+        getTokenizedExp,
+        normalizeString,
+        supportsClassList = document.documentElement.classList != undef; 
 
-    return {
-        hasToken : hasToken,
+    if(!supportsClassList) {
+        Exps = {};
+        getTokenizedExp = function(token, flag){
+            var p = token + "$" + flag;
+            return Exps[p] || (Exps[p] = RegExp("(?:^|\\s)"+token+"(?:$|\\s)", flag));
+        };
+        normalizeString = function(s) { 
+            return s.replace(/^\s+|\s+$/g,"").replace(/\s\s+/g, " "); 
+        };
+    }
+    
+    return{
+        hasClass : hasClass,
         removeClass : removeClass,
         addClass : addClass,
+        toggleClass : toggleClass,
         getElementsByClassName : getElementsByClassName,
         findAncestorWithClass : findAncestorWithClass
     };
@@ -607,37 +624,49 @@ APE.namespace("APE.dom").mixin(function() {
      * This is generally used with element className:
      * @example if(dom.hasToken(el.className, "menu")) // element has class "menu".
      */
-    function hasToken (s, token) {
-        return getTokenizedExp(token, "").test(s);
+    function hasClass(el, klass) {
+        return (dom.hasClass = supportsClassList ? function(el, klass) {
+            return el.classList.contains(klass);
+            } : function(el, klass) {
+            return getTokenizedExp(klass, "").test(el.className);
+        })(el, klass);
     }
 
+    function toggleClass(el, klass) {
+        (hasClass(el, klass) ? removeClass : addClass)(el, klass);
+    }
+    
     /** @param {HTMLElement} el
      * @param {String} klass className token(s) to be removed.
      * @description removes all occurances of <code>klass</code> from element's className.
      */
     function removeClass(el, klass) {
-        var cn = el[CLASSNAME];
-        if(!cn) return;
-        el[CLASSNAME] = cn === klass ? "" :
-            normalizeString(cn.replace(getTokenizedExp(klass, "g")," "));
-    }
+        (dom.removeClass = supportsClassList ? 
+                function(el, klass) {
+            el.classList.remove(klass);
+        } : function(el, klass) { 
+            var cn = el[CLASSNAME];
+            if(!cn) return;
+            el[CLASSNAME] = cn === klass ? "" :
+                normalizeString(cn.replace(getTokenizedExp(klass, "g")," "));
+        })(el, klass);
+     }
     /** @param {HTMLElement} el
      * @param {String} klass className token(s) to be added.
      * @description adds <code>klass</code> to the element's class attribute, if it does not
      * exist.
      */
     function addClass(el, klass) {
-        if(!el[CLASSNAME]) el[CLASSNAME] = klass;
-        else if(!getTokenizedExp(klass).test(el[CLASSNAME])) {
-            el[CLASSNAME] += " " + klass;
-        }
+        (dom.addClass = supportsClassList ? function(el, klass) {
+                return el.classList.add(klass);
+            } : function(el, klass) {
+                if(!el[CLASSNAME]) el[CLASSNAME] = klass;
+                else if(!getTokenizedExp(klass).test(el[CLASSNAME])) {
+                    el[CLASSNAME] += " " + klass;
+                }
+         })(el, klass);
     }
 
-    function getTokenizedExp(token, flag){
-        var p = token + "$" + flag;
-        return Exps[p] || (Exps[p] = RegExp("(?:^|\\s)"+token+"(?:$|\\s)", flag));
-    }
-    
     /** @param {HTMLElement} el
      * @param {String} tagName tagName to be searched. Use "*" for any tag.
      * @param {String} klass className token(s) to be added.
@@ -673,18 +702,14 @@ APE.namespace("APE.dom").mixin(function() {
     function findAncestorWithClass(el, klass, container) {
         if(el == null || el === container)
             return null;
-        var exp = getTokenizedExp(klass,""), parent;
-        for(parent = el.parentNode;parent != container;){
-            if( exp.test(parent[CLASSNAME]) )
+        for(var parent = el.parentNode;parent && parent != container && parent.className;){
+            if(hasClass(parent, klass)) {
                 return parent;
+            }
             parent = parent.parentNode;
         }
         return null;
-    }
-    
-    function normalizeString(s) { 
-        return s.replace(/^\s+|\s+$/g,"").replace(/\s\s+/g, " "); 
-    }
+    }    
 }());APE.namespace("APE.dom").mixin(function(){
 
     var docEl = document.documentElement,

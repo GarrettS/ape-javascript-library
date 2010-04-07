@@ -49,13 +49,38 @@ var classNameTestCase = new YAHOO.tool.TestCase({
 
     name : "className functions", 
 
-    testHasToken : function() {
-        template.innerHTML = "<dfn class=' food' id='foo'>f</dfn>";
+    testHasClass : function() {
+        template.innerHTML = "<dfn class='food' id='foo'>f</dfn>";
         var foo = document.getElementById('foo');
-        Assert.isTrue(dom.hasToken(foo.className, 'food'));
-        Assert.isFalse(dom.hasToken(foo.className, 'foo'));
+        Assert.isTrue(dom.hasClass(foo, 'food'));
     },
 
+    "testHasClass \\r" : function() {
+        template.innerHTML = "<dfn class='foo\rbar' id='foo'>f</dfn>";
+        var foo = document.getElementById('foo');
+        Assert.isTrue(dom.hasClass(foo, 'bar'));
+    },
+
+    testHasClassFail : function() {
+        template.innerHTML = "<dfn class=' food' id='foo'>f</dfn>";
+        var foo = document.getElementById('foo');
+        Assert.isFalse(dom.hasClass(foo, 'foo'));
+    },
+
+    testToggleClassOff : function() {
+        template.innerHTML = "<dfn class='dog crap' id='foo'>f</dfn>";
+        var foo = document.getElementById('foo');
+        dom.toggleClass(foo, "crap");
+        Assert.isFalse(dom.hasClass(foo, 'crap'));
+    },
+
+    testToggleClassOn : function() {
+        template.innerHTML = "<dfn class='dog' id='foo'>f</dfn>";
+        var foo = document.getElementById('foo');
+        dom.toggleClass(foo, "crap");
+        Assert.isTrue(dom.hasClass(foo, 'crap'));
+    },
+    
     testRemoveClass : function() {
         var s = "<dfn class='skinny tall skinny' id='aaa'>f</dfn>";
         template.innerHTML = s;
