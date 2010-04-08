@@ -38,6 +38,10 @@ APE.namespace("APE.dom").mixin(function() {
             }  
         };
 
+        toggleClass = function(el, klass) {
+            (hasClass(el, klass) ? removeClass : addClass)(el, klass);
+        };
+
         Exps = {};
         getTokenizedExp = function(token, flag){
             var p = token + "$" + flag;
