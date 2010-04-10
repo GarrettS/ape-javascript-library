@@ -1,9 +1,5 @@
-(function(){
-    /* Requires Draggable.js */
-    
-    APE.drag.SortList = APE.createFactory("SortList", getConstructor);
-
-    function getConstructor(SortList) {
+APE.drag.defineFactory("SortList", function(SortList) {
+        /* Requires Draggable.js */
         var dom = APE.dom,
             drag = APE.drag,
             Draggable = drag.Draggable;
@@ -100,5 +96,4 @@
             return (sortBySourceOrder = f)(a, b);
         }
         return SortListC;
-    }
-})();
+});

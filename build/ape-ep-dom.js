@@ -1069,19 +1069,19 @@ APE.namespace("APE.dom").mixin(function() {
             return getTokenizedExp(klass, "").test(el.className);
         };
         
+        addClass = function(el, klass) {
+            if(!el.className) el.className = klass;
+            else if(!getTokenizedExp(klass).test(el.className)) {
+                el.className += " " + klass;
+            }  
+        };
+        
         removeClass = function(el, klass) { 
             var cn = el.className;
             if(cn) {
                 el.className = cn === klass ? "" :
                     normalizeString(cn.replace(getTokenizedExp(klass, "g")," "));
             }
-        };
-        
-        addClass = function(el, klass) {
-            if(!el.className) el.className = klass;
-            else if(!getTokenizedExp(klass).test(el.className)) {
-                el.className += " " + klass;
-            }  
         };
 
         toggleClass = function(el, klass) {
