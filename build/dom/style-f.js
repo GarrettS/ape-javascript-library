@@ -2,6 +2,7 @@
  * Getting computed styles, opacity functions.
  *
  * @author Garrett Smith
+ * @requires dom constants - constants.js
  */
 /**@name APE.dom 
  * @namespace*/
@@ -12,8 +13,7 @@ APE.namespace("APE.dom");
     dom.getStyle = getStyle;
     dom.setOpacity = setOpacity;
 
-    var getCS = "getComputedStyle",
-        IS_COMPUTED_STYLE = dom.IS_COMPUTED_STYLE,
+    var IS_COMPUTED_STYLE = dom.IS_COMPUTED_STYLE,
         CURRENT_STYLE = "currentStyle",
         OPACITY = "opacity",
         STYLE = "style",
@@ -89,7 +89,7 @@ APE.namespace("APE.dom");
             p = floatProp;
         }
         if(IS_COMPUTED_STYLE) {
-            cs = doc.defaultView[getCS](el, "");
+            cs = doc.defaultView.getComputedStyle(el, "");
 
             if(!(p in cs))return"";
             value = cs[p];

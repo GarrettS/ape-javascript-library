@@ -19,7 +19,9 @@
  */
 
 APE.namespace("APE.drag").defineFactory("Draggable", function(Draggable) {
-    var APE = self.APE, dom = APE.dom, getStyle = dom.getStyle, drag = APE.drag, 
+    var APE = self.APE, dom = APE.dom, getStyle = dom.getStyle, 
+        drag = APE.drag, 
+        DropTarget = drag.DropTarget,
         Event = dom.Event, 
         highestZIndex = 1000, 
         draggableList = {}, 
@@ -27,8 +29,7 @@ APE.namespace("APE.drag").defineFactory("Draggable", function(Draggable) {
         noop = Function.prototype, 
         parseInt = self.parseInt, 
         grabbed, 
-        FUNCTION = "function",
-        DropTarget = drag.defineFactory("DropTarget", createDropTarget);
+        FUNCTION = "function";
 
     Draggable.instanceDestructor = instanceDestructor;
 
@@ -1177,50 +1178,54 @@ APE.namespace("APE.drag").defineFactory("Draggable", function(Draggable) {
         toString : function() {
             return "Draggable(id=" + this.id + ")";
         }
-    };
+    };    
+    return Drag;
+});
+
+APE.drag.defineFactory("DropTarget", 
     
     function createDropTarget() {
-         /** @param {id} element id. */
-         function DropTargetC(id) {
-             this.el = document.getElementById(id);
-             this.id = id;
-         }
+        var getOffsetCoords = APE.dom.getOffsetCoords;
 
-         DropTargetC.prototype = {
-             /* the className to add when selected. */
-             dragOverClassName : "",
-
-             initCoords : function() {
-                 var coords = this.coords || (this.coords = {}), 
-                     el = this.el;
-                 dom.getOffsetCoords(el, document, coords);
-                 coords.w = el.clientWidth;
-                 coords.h = el.clientHeight;
-             },
-
-             /** returns true if x and y are both inside dropTarget
-              * @param {Object} curs {x,y} coordinates of the event.
-              */
-             containsCoords : function(curs) {
-                 // check for x, then y.
-             var coords = this.coords, dt_x = coords.x, dt_y = coords.y;
-
-             return (curs.x >= dt_x && curs.x <= dt_x + coords.w) && // now check for y.
-                     (curs.y >= dt_y && curs.y <= dt_y + coords.h);
-         },
-
-         /** @event Dragged over a droptarget */
-         ondragover : false,
-
-         /** @event Dragged off a droptarget */
-         ondragout : undef,
-
-         /** @event Hit a drop target. Fires for each object being dragged. */
-         ondrop : undef
-         };
-         return DropTargetC;
-    }
-    return Drag;
+    /** @param {id} element id. */
+        function DropTargetC(id) {
+            this.el = document.getElementById(id);
+            this.id = id;
+        }
+    
+        DropTargetC.prototype = {
+            /* the className to add when selected. */
+            dragOverClassName : "",
+    
+            initCoords : function() {
+                var coords = this.coords || (this.coords = {}), 
+                    el = this.el;
+                getOffsetCoords(el, document, coords);
+                coords.w = el.clientWidth;
+                coords.h = el.clientHeight;
+            },
+    
+            /** returns true if x and y are both inside dropTarget
+             * @param {Object} curs {x,y} coordinates of the event.
+             */
+            containsCoords : function(curs) {
+                // check for x, then y.
+            var coords = this.coords, dt_x = coords.x, dt_y = coords.y;
+    
+            return (curs.x >= dt_x && curs.x <= dt_x + coords.w) && // now check for y.
+                    (curs.y >= dt_y && curs.y <= dt_y + coords.h);
+        },
+    
+        /** @event Dragged over a droptarget */
+        ondragover : false,
+    
+        /** @event Dragged off a droptarget */
+        ondragout : 0,
+    
+        /** @event Hit a drop target. Fires for each object being dragged. */
+        ondrop : 0
+        };
+        return DropTargetC;
 });/** slider.js
  * requires: Draggable, EventPublisher, className-f.js (in dom.js)
  */
