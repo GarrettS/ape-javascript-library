@@ -1,19 +1,19 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
-        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<!DOCTYPE HTML>
+<html lang="en-US">
 <head>
-    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
     <title>Form Test</title>
 
-    <link rel="stylesheet" type="text/css" href="../../yui-test/build/logger/assets/logger.css" />
-    <link rel="stylesheet" type="text/css" href="../../yui-test/build/yuitest/assets/yuitest.css" />
-    <link rel="stylesheet" type="text/css" href="../../yui-test/assets/testlogger.css" />
+    <link rel="stylesheet" type="text/css" href="../../yui-test/build/logger/assets/logger.css">
+    <link rel="stylesheet" type="text/css" href="../../yui-test/build/yuitest/assets/yuitest.css">
+    <link rel="stylesheet" type="text/css" href="../../yui-test/assets/testlogger.css">
 
     <script type="text/javascript" src="../../yui-test/build/yahoo-dom-event/yahoo-dom-event.js"></script>
     <script type="text/javascript" src="../../yui-test/build/logger/logger.js"></script>
     <script type="text/javascript" src="../../yui-test/build/yuitest/yuitest-beta.js"></script>
 
     <script type="text/javascript" src="../../../build/APE.js"></script>
+    <script type="text/javascript" src="../../../build/dom/dom.js"></script>
     <script type="text/javascript" src="../../../build/form/Form.js"></script>
 
 </head>
@@ -50,7 +50,8 @@
     <input type="submit" value="input submit">
     
     <button type="button" name="bb" value="bb1">button button</button>
-    <input type="image" value="ib" style="height: 30px;padding:0" id="sbImg" src="../../../resources/leaf.jpg" name="sbImg" alt="[sbImg]"/>
+    <input type="image" value="ib" style="height: 30px;padding:0" id="sbImg" 
+        src="../../../resources/leaf.jpg" name="sbImg" alt="[sbImg]"/>
 
 </fieldset>
 
@@ -82,10 +83,10 @@
 </form>
 
 <form id="form2">
-<select name="back" multiple="multiple">
-<option selected='selected'>1</option>
-<option selected='selected'>2</option>
-<option selected='selected' value="3"></option>
+<select name="back" multiple>
+    <option selected>1</option>
+    <option selected>2</option>
+    <option selected value="3"></option>
 </select>
 </form>
 <div id="testNode"></div>
@@ -93,7 +94,7 @@
 <div id="testLogger"></div>
 
 <script type="text/javascript">
-setTimeout(function(){
+window.onload = function(){
 
 var util = YAHOO.util,
     Assert = util.Assert,
@@ -118,6 +119,12 @@ var formTestCase = new YAHOO.tool.TestCase({
         formNode.innerHTML = template;
     },
 
+    _should : { 
+        ignore : {
+            testGetMultipartFormData : true
+        }
+    },
+    
     testSerialize : function() {
         var form = new Form(formNode);
         var actualString = form.serialize();
@@ -142,11 +149,12 @@ var formTestCase = new YAHOO.tool.TestCase({
         var form = new Form(formNode);
         var actualString;
 
-        document.getElementById('sbImg').onclick = function() {
+        document.getElementById('sbImg').onclick = function(ev) {
             actualString = form.serialize(this);
             return false;
         };
-        UserAction.simulateMouseEvent(document.getElementById('sbImg'), "click", 0, 0);
+        
+        UserAction.click(document.getElementById('sbImg'), 0, 0);
 
         // XXX IE the simulated click won't submit the form.
         //document.getElementById('sbImg').click();
@@ -187,10 +195,10 @@ var formTestCase = new YAHOO.tool.TestCase({
 
     testGetMultipartFormData : function() {
         var form = new Form(mockFormWithFile("testFile", "test.txt", 
-            "Rika is sexy."));
+            "ignored"));
 
         var actual = form.getMultipartFormData();
-        var expected = /Content-Disposition: form-data; name="testFile"; filename="test.txt"\s*\r\n\r\nRika is sexy\./
+        var expected = /Content-Disposition: form-data; name="testFile"; filename="test.txt"\s*\r\n\r\nignored\./
         util.ArrayAssert.containsMatch(function(x){return expected.test(x);}, actual);
     },
     
@@ -211,7 +219,9 @@ var formTestCase = new YAHOO.tool.TestCase({
     testSubmit : function(){
         var b = document.getElementsByName("btn1")[0];
         var actualString = new Form(formNode).getQueryString(b);
-        var expected = expectedString+"&btn1="+ encodeURIComponent(b.value);
+
+        // Spidermonkey bug: encodeURIComponent("a+b") = "a+b". Should be "a%20b".
+        var expected = expectedString+"&btn1="+ encodeURIComponent(b.value).replace(/%20/g, "+");
             expected = expected.split("&").sort();
         var actual = actualString.split("&").sort();
         
@@ -232,13 +242,14 @@ var formTestCase = new YAHOO.tool.TestCase({
 
 });
 
-// Can't really simulate the browse button action on any browser.
 function mockFormWithFile(inputName, fileName, value) {
     return {
+        tagName : "form",
         elements : [
             {
                 type : "file",
                 name : inputName,
+                tagName : "input",
                 files : [
                     {
                         getAsBinary : function() {
@@ -261,6 +272,6 @@ if (parent && parent != window) {
 } else {
     YAHOO.tool.TestRunner.run();
 }
-}, 100);</script>
+};</script>
 </body>
 </html>

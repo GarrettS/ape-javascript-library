@@ -1968,7 +1968,7 @@ YAHOO.util.ObjectAssert = {
         for(p in actual) {
             if(!(p in expected))
                 Assert.fail( 
-                    "Property " + p + " not found in expected.");
+                    "Unexpected property '" + p + "' found in actual.");
             if(!equals(expected[p], actual[p]))
                 Assert.fail(
                       "Property '" + p + "' not equal value. "
