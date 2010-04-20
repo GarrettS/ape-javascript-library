@@ -97,7 +97,7 @@ YAHOO.tool.TestCase.prototype = {
             }, 100);
         
         this.wait(function(){
-            test.fail("Condition not met after " + maxDelay + "ms");
+            YAHOO.util.Assert.fail("Condition not met after " + maxDelay + "ms");
         }, maxDelay);
     },
     

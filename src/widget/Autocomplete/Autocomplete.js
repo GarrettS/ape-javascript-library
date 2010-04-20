@@ -504,7 +504,7 @@ APE.namespace("APE.widget").defineCustomFactory("Autocomplete", function(Autocom
         
         function listItemMouseoutHandler(ev) {
             var relatedTarget = Event.getRelatedTarget(ev);
-            if(!dom.contains(this, relatedTarget)) {
+            if(relatedTarget && !dom.contains(this, relatedTarget)) {
                 dom.removeClass(this, HOVER_CLASS);
             }
         }

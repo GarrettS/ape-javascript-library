@@ -198,7 +198,7 @@ APE.namespace("APE.dom").Event = ( function() {
             // accessing any properties (toString, constructor, nodeName, etc).
             // Sometimes the tooltip results in null relatedTarget, other times 
             // it is a browser chrome object. When it is null, we return the target.
-            var relatedTarget = ev.relatedTarget || ev.target;
+            var relatedTarget = ev.relatedTarget;
             // console.log() won't fire if it is a chrome object, 
             // but we will see a stack trace.
             // if(!relatedTarget) console.log("using target")
@@ -206,7 +206,6 @@ APE.namespace("APE.dom").Event = ( function() {
                 relatedTarget.nodeName;
             } catch(mozillaChromeObjectSecurityError_code9) {
             //  console.trace();
-                relatedTarget = ev.target;
             }
             return relatedTarget;
         }
