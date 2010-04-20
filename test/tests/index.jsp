@@ -41,7 +41,7 @@
     <li>dom
         <ul>
             <li><a href="dom/classname-f-test.html">className</a></li>
-            <li><a>event</a></li>
+            <li><a href="dom/Event-test.html">Event</a></li>
             <li><a href="dom/position-f-test.html">positioning</a></li>
 
             <li><a href="dom/style-f-test.html">style</a></li>
