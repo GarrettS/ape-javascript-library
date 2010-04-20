@@ -591,15 +591,20 @@ APE.namespace("APE.dom");
  */
 
 APE.namespace("APE.dom").mixin(function() {
-    var Exps,
+    var Exps = {},
         dom = APE.dom,
-        getTokenizedExp,
         normalizeString,
         hasClass, 
         addClass,
         removeClass,
         toggleClass,
         supportsClassList = document.documentElement.classList != undefined; 
+
+    // Needed also for getElementsByClassName.
+    function getTokenizedExp(token, flag){
+        var p = token + "$" + flag;
+        return Exps[p] || (Exps[p] = RegExp("(?:^|\\s)"+token+"(?:$|\\s)", flag));
+    }
 
     if(!supportsClassList) {
         hasClass = function(el, klass) {
@@ -625,11 +630,6 @@ APE.namespace("APE.dom").mixin(function() {
             (hasClass(el, klass) ? removeClass : addClass)(el, klass);
         };
 
-        Exps = {};
-        getTokenizedExp = function(token, flag){
-            var p = token + "$" + flag;
-            return Exps[p] || (Exps[p] = RegExp("(?:^|\\s)"+token+"(?:$|\\s)", flag));
-        };
         normalizeString = function(s) { 
             return s.replace(/^\s+|\s+$/g,"").replace(/\s\s+/g, " "); 
         };

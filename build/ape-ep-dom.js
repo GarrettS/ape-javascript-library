@@ -189,11 +189,11 @@
         createMixin : createMixin
     });
 })();/** 
- * @fileoverview 
  * EventPublisher
  *
  * Released under Academic Free Licence 3.0.
  * @author Garrett Smith
+ *
  * @class 
  * <code>APE.EventPublisher</code> can be used for native browser events or custom events.
  *
@@ -226,118 +226,118 @@
  * to the registry (see comments below). I have not yet found a real need for this.
  * </p>
  */
-/**
- * @constructor
- * @description creates an <code>EventPublisher</code> with methods <code>add()</code>,
- * <code>fire</code>, et c.
- */
 (function(){
 var APE = self.APE,
    /** Map of [APE.EventPublisher], keyed by type. */
     Registry = {},
     isMaybeLeak/*@cc_on=(@_jscript_version<5.7)@*/;
 
-APE.EventPublisher = EventPublisher;
-APE.createMixin(EventPublisher, {
-    get : get,
-    add : add,
-    remove : remove,
-    fire : fire,
-    cleanUp : cleanUp
-});
 
+/**
+ * @constructor
+ * @description creates an <code>EventPublisher</code> with methods <code>add()</code>,
+ * <code>fire</code>, etc.
+ * @memberof APE
+ */
 function EventPublisher(src, type) {
     this.src = src;
     this._callStack = [];
     this.type = type;
 }
 
-EventPublisher.prototype = {
+APE.EventPublisher = APE.createMixin(EventPublisher, {
+    get : get,
+    add : add,
+    remove : remove,
+    fire : fire,
+    cleanUp : cleanUp,
+    prototype : {
 
-/**  
- *  @param {Function} fp the callback function that gets called when src[sEvent] is called.
- *  @param {Object} thisArg the context that the function executes in.
- *  @return {EventPublisher} this.
- */
-    add : function(fp, thisArg) {
-        this._callStack.push([fp, thisArg||this.src]);
-        return this;
-    },
-/**  Adds beforeAdvice to the callStack. This fires before the callstack. 
- *  @param {Function} fp the callback function that gets called when src[sEvent] is called.
- *  function's returnValue proceed false stops the callstack and returns false to the original call.
- *  @param {Object} thisArg the context that the function executes in.
- *  @return {EventPublisher} this.
- */
-    addBefore : function(f, thisArg) {
-        return add(this, "beforeFire", f, thisArg||this.src); 
-    },
-    
-/**  Adds afterAdvice to the callStack. This fires after the callstack. 
- *  @param {Function} fp the callback function that gets called when src[sEvent] is called.
- *  function's returnValue of false returns false to the original call.
- *  @param {Object} thisArg the context that the function executes in.
- *  @return {EventPublisher} this.
- */
-    addAfter : function(f, thisArg) {
-        return add(this, "afterFire", f, thisArg||this.src); 
-    },
-
-    /** 
-     * @param {String} "beforeFire", "afterFire" conveneince.
-     * @return {EventPublisher} this;
+    /**  
+     *  @param {Function} fp the callback function that gets called when src[sEvent] is called.
+     *  @param {Object} thisArg the context that the function executes in.
+     *  @return {EventPublisher} this.
      */
-    getEvent : function(type) {
-        return get(this, type);
-    },
+        add : function(fp, thisArg) {
+            this._callStack.push([fp, thisArg||this.src]);
+            return this;
+        },
+    /**  Adds beforeAdvice to the callStack. This fires before the callstack. 
+     *  @param {Function} fp the callback function that gets called when src[sEvent] is called.
+     *  function's returnValue proceed false stops the callstack and returns false to the original call.
+     *  @param {Object} thisArg the context that the function executes in.
+     *  @return {EventPublisher} this.
+     */
+        addBefore : function(f, thisArg) {
+            return add(this, "beforeFire", f, thisArg||this.src); 
+        },
+        
+    /**  Adds afterAdvice to the callStack. This fires after the callstack. 
+     *  @param {Function} fp the callback function that gets called when src[sEvent] is called.
+     *  function's returnValue of false returns false to the original call.
+     *  @param {Object} thisArg the context that the function executes in.
+     *  @return {EventPublisher} this.
+     */
+        addAfter : function(f, thisArg) {
+            return add(this, "afterFire", f, thisArg||this.src); 
+        },
 
-/**  Removes fp from callstack.
- *  @param {Function} fp the callback function to remove.
- *  @param {Object} [thisArg] the context that the function executes in.
- *  @return {EventPublisher} this.
- */
-    remove : function(fp, thisArg) {
-        var cs = this._callStack, i, call;
-        thisArg = thisArg || this.src;
-        for(i = 0; i < cs.length; i++) {
-            call = cs[i];
-            if(call[0] === fp && call[1] === thisArg) {
-                cs.splice(i, 1);
+        /** 
+         * @param {String} "beforeFire", "afterFire" conveneince.
+         * @return {EventPublisher} this;
+         */
+        getEvent : function(type) {
+            return get(this, type);
+        },
+
+    /**  Removes fp from callstack.
+     *  @param {Function} fp the callback function to remove.
+     *  @param {Object} [thisArg] the context that the function executes in.
+     *  @return {EventPublisher} this.
+     */
+        remove : function(fp, thisArg) {
+            var cs = this._callStack, i, call;
+            thisArg = thisArg || this.src;
+            for(i = 0; i < cs.length; i++) {
+                call = cs[i];
+                if(call[0] === fp && call[1] === thisArg) {
+                    cs.splice(i, 1);
+                }
             }
+            return this;
+        },
+
+    /**  Removes fp from callstack's beforeFire.
+     *  @param {Function} fp the callback function to remove.
+     *  @param {Object} [thisArg] the context that the function executes in.
+     *  @return {EventPublisher} this.
+     */
+        removeBefore : function(fp, thisArg) {
+            return get(this, "beforeFire").remove(fp, thisArg||this.src);
+        },
+
+
+    /**  Removes fp from callstack's afterFire.
+     *  @param {Function} fp the callback function to .
+     *  @param {Object} [thisArg] the context that the function executes in.
+     *  @return {EventPublisher} this.
+     */
+        removeAfter : function(fp, thisArg) {
+            return get(this, "afterFire").remove(fp, thisArg||this.src);
+        },
+
+    /** Fires the event. */
+        fire : function(payload) {
+            return fire(this)(payload);
+        },
+
+    /** helpful debugging info */
+        toString : function() {
+            return  "APE.EventPublisher: {src=" + this.src + ", type=" + this.type +
+                 ", length="+this._callStack.length+"}";
         }
-        return this;
-    },
-
-/**  Removes fp from callstack's beforeFire.
- *  @param {Function} fp the callback function to remove.
- *  @param {Object} [thisArg] the context that the function executes in.
- *  @return {EventPublisher} this.
- */
-    removeBefore : function(fp, thisArg) {
-        return get(this, "beforeFire").remove(fp, thisArg||this.src);
-    },
-
-
-/**  Removes fp from callstack's afterFire.
- *  @param {Function} fp the callback function to .
- *  @param {Object} [thisArg] the context that the function executes in.
- *  @return {EventPublisher} this.
- */
-    removeAfter : function(fp, thisArg) {
-        return get(this, "afterFire").remove(fp, thisArg||this.src);
-    },
-
-/** Fires the event. */
-    fire : function(payload) {
-        return fire(this)(payload);
-    },
-
-/** helpful debugging info */
-    toString : function() {
-        return  "APE.EventPublisher: {src=" + this.src + ", type=" + this.type +
-             ", length="+this._callStack.length+"}";
     }
-};
+});
 
 /**
  * @static
@@ -1054,15 +1054,20 @@ APE.namespace("APE.dom");
  */
 
 APE.namespace("APE.dom").mixin(function() {
-    var Exps,
+    var Exps = {},
         dom = APE.dom,
-        getTokenizedExp,
         normalizeString,
         hasClass, 
         addClass,
         removeClass,
         toggleClass,
         supportsClassList = document.documentElement.classList != undefined; 
+
+    // Needed also for getElementsByClassName.
+    function getTokenizedExp(token, flag){
+        var p = token + "$" + flag;
+        return Exps[p] || (Exps[p] = RegExp("(?:^|\\s)"+token+"(?:$|\\s)", flag));
+    }
 
     if(!supportsClassList) {
         hasClass = function(el, klass) {
@@ -1088,11 +1093,6 @@ APE.namespace("APE.dom").mixin(function() {
             (hasClass(el, klass) ? removeClass : addClass)(el, klass);
         };
 
-        Exps = {};
-        getTokenizedExp = function(token, flag){
-            var p = token + "$" + flag;
-            return Exps[p] || (Exps[p] = RegExp("(?:^|\\s)"+token+"(?:$|\\s)", flag));
-        };
         normalizeString = function(s) { 
             return s.replace(/^\s+|\s+$/g,"").replace(/\s\s+/g, " "); 
         };

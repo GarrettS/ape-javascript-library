@@ -1,9 +1,9 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
-        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
-<html>
+ <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+            "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en-us">
 <head>
 <title>Tests: APE JavaScript Library</title>
-<link type="text/css" rel="stylesheet" href="../../resources/ape.css"/>
+<link type="text/css" rel="stylesheet" href="../../resources/ape.css">
 
 </html>
 <body>
@@ -26,6 +26,7 @@
 
         </ul>
     </li>
+    
     <li>ajax
         <ul>
             <li><a href="ajax/AsyncRequest-test.html">AsyncRequest</a></li>
@@ -34,8 +35,7 @@
     <li>anim
         <ul>
             <li><a href="anim/Animation-test.html">Animation</a></li>
-
-            <li><a href="anim/Animation-test.html">StyleTransition</a></li>
+            <li><a href="anim/StyleTransition-test.html">StyleTransition</a></li>
         </ul>
     </li>
     <li>dom
@@ -53,6 +53,7 @@
 		<ul>
 			<li><a href="drag/Draggable-test.html">Draggable</a></li>
 			<li><a href="drag/Slider-test.html">Slider</a></li>
+            <li><a href="drag/SortList-test.html">SortList</a></li>
 		</ul>
 	</li>
     <li>color
@@ -63,7 +64,12 @@
 
 	<li>widget
         <ul>
+            <li><a href="widget/Autocomplete-test.html">Autocomplete</a></li>
             <li><a href="widget/Calendar-test.html">Calendar</a></li>
+            <li><a href="widget/DelegateFactory-test.html">DelegateFactory</a></li>
+            <li><a href="widget/HSVPicker-test.html">HSVPicker</a></li>
+            <li><a href="widget/Placeholder-test.html">Placeholder</a></li>
+            <li><a href="widget/Scroller-test.html">Scroller</a></li>
         </ul>
 	</li>
 </ul>

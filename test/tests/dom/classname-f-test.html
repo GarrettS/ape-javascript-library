@@ -119,18 +119,24 @@ var classNameTestCase = new YAHOO.tool.TestCase({
         template.innerHTML = "<a class='red red red'>a</a><u class='red'>u</u>";
         var reds = dom.getElementsByClassName(document.body, '*', 'red');
 
-        Assert.areEqual(2, reds.length);
-        Assert.areEqual('u', reds[1].tagName.toLowerCase());
+        Assert.areSame(2, reds.length);
+        Assert.areSame('u', reds[1].tagName.toLowerCase());
     },
 
     testGetElementsByClassNameEmpty : function() {
         template.innerHTML =  "<a class='red red red'>a</a><u class='red'>u</u>";
         var emptys = dom.getElementsByClassName(document.body, '*', '');
 
-        Assert.areEqual(0, emptys.length);
+        Assert.areSame(0, emptys.length);
     },
 
+    testGetElementsByClassNameWithTag : function() {
+        template.innerHTML = "<a class='red red red'>a</a><u class='red'>u</u>";
+        var reds = dom.getElementsByClassName(document.body, 'a', 'red');
 
+        Assert.areSame(1, reds.length);
+    },
+   
     testFindAncestorWithClass : function() {
         var s = "<div class='Aika'>"
             + "<div class='Aika Miura' id='gf'>"
