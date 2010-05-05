@@ -1,3 +1,4 @@
+{r=1, g=4, b=6};
 /**
  * @fileoverview
  * <code>APE</code> provides core features, including namespacing and object creational aspects.
@@ -7,9 +8,7 @@
  * Released under Academic Free Licence 3.0.
  * </p>
  */
-(function(){
-    if(typeof APE !== "undefined") throw Error("APE is already defined.");
-    
+(function(){    
     var INSTANCES = "instances",
         PROTOTYPE = "prototype",
         OP = Object[PROTOTYPE], 
@@ -106,6 +105,7 @@
         *  @param {Function} getConstructor function that returns constructor
         */
         defineFactory : function(name, getConstructor){
+            checkRedundancy(this, name);
             return this[name] = new Factory(name, getConstructor);
         },
         
@@ -115,11 +115,18 @@
         *  static initializer code and returns a getConstructor function.
         */
         defineCustomFactory : function(name, staticInitializer) {
+            checkRedundancy(this, name);
             return this[name] = new Factory(name, staticInitializer, true);
         },
         
         mixin : mixin
-    };    
+    };
+    
+    function checkRedundancy(base, name) {
+        if(hasOwnProp(base, name)) {
+            throw Error(name + " is already defined on " + base);
+        }
+    }
     
     function Factory(name, getConstructor, hasStaticInitializer){ 
         var i = 0, ctor;

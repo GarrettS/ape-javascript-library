@@ -26,10 +26,6 @@ var apeTest = new YAHOO.tool.TestCase({
 
     //name of the test case - if not provided, one is auto-generated
     name : "APE tests",
-
-    //---------------------------------------------------------------------
-    // Test methods - names must begin with "test"
-    //---------------------------------------------------------------------
         
     _should : {
         // Patch to Object.prototype.hasOwnProperty for Opera
@@ -175,6 +171,15 @@ var creationalTest = new YAHOO.tool.TestCase({
     setUp : function(){
         APE.defineFactory("C", function(){return C;});
         CNFactory = APE.C;
+    },
+
+    tearDown : function() {
+        for(var prop in APE) {
+            // If it's a Factory, remove it.
+            if(APE[prop].getById) {
+                delete APE[prop];
+            }
+        }
     },
     
     testGetByNode : function() {        
@@ -324,6 +329,30 @@ var creationalTest = new YAHOO.tool.TestCase({
             // Make sure we caught the error and all callbacks fired.
             Assert.areSame(msg, caughtError);
         }
+    },
+    
+    testRedeclaredFactory : function() {
+        var thrown = false;
+        APE.namespace("APE.test");
+        APE.test.ass = 1;
+        try {
+            APE.test.defineFactory("ass", function(){});
+        } catch(ex) {
+            thrown = true;
+        }
+        Assert.isTrue(thrown, "defineFactory: Error was not thrown, but should have been.");
+    },
+
+    testRedeclaredCustomFactory : function() {
+        var thrown = false;
+        APE.namespace("APE.test");
+        APE.test.fudge = 1;
+        try {
+            APE.test.defineCustomFactory("fudge", function(){});
+        } catch(ex) {
+            thrown = true;
+        }
+        Assert.isTrue(thrown, "defineCustomFactory: Error should have been thrown.");
     }
 });
 
