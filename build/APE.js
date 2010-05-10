@@ -1,11 +1,10 @@
-{r=1, g=4, b=6};
 /**
  * @fileoverview
  * <code>APE</code> provides core features, including namespacing and object creational aspects.
  *
  * <h3>APE JavaScript Library</h3>
  * <p>
- * Released under Academic Free Licence 3.0.
+ * Released under FreeBSD license.
  * </p>
  */
 (function(){    
