@@ -63,7 +63,7 @@ APE.namespace("APE.widget").DelegateFactory = {
                 i, len, target,
                 node = document.documentElement;
             for(i = 0, len = df.eventTypeList.length; i < len; i++) {
-                df.eventRegistry.remove(node, df.eventTypeList[i], node, df.delegateCallback);
+                df.eventRegistry.remove(node, df.eventTypeList[i], df.delegateCallback);
             }
             delete df.delegateCallback;
         }
@@ -85,15 +85,19 @@ APE.namespace("APE.widget").DelegateFactory = {
         
         function isEmpty(obj) {
             return (isEmpty = APE.__count__ ? function(obj) {
-                return obj.__count__ === 0;
+                return isNativeObject(obj) && obj.__count__ === 0;
             } : typeof Object.keys === "function" ? function(obj) {
-                    return typeof obj === "object" && Object.keys(obj).length === 0;
+                    return isNativeObject(obj) && Object.keys(obj).length === 0;
             } : function(obj) {
-                    if(typeof obj === "object") {
+                    if(isNativeObject(obj)) {
                         for(var p in obj) return true;
                     }
                     return false;
             })(obj);
+            
+            function isNativeObject(obj) {
+                return typeof obj == "object" && !!obj;
+            }
         }
         
         function addDelegateFor(id, config) {
@@ -105,9 +109,10 @@ APE.namespace("APE.widget").DelegateFactory = {
         }
         
         function getCallbackForFactory(delegateFactory) {
-            return function(ev) {
-                callback(ev, delegateFactory);
-            };
+            return delegateFactory.delegateCallback || 
+                (delegateFactory.delegateCallback = function(ev) {
+                    callback(ev, delegateFactory);
+            });
         }
         
         function callback(ev, df) {
