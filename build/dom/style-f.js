@@ -13,7 +13,7 @@ APE.namespace("APE.dom");
     dom.getStyle = getStyle;
     dom.setOpacity = setOpacity;
 
-    var IS_COMPUTED_STYLE = dom.IS_COMPUTED_STYLE,
+    var IS_COMPUTED_STYLE = dom.IS_COMPUTED_STYLE_SUPPORTED,
         CURRENT_STYLE = "currentStyle",
         OPACITY = "opacity",
         STYLE = "style",

@@ -54,7 +54,7 @@
      * @return {Object} r the receiver.
      */
     function mixin(s) {
-        if(!s) return;
+        if(typeof s !== "object") return this;
         var prop,
             i = 0,
             skipped;

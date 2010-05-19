@@ -10,7 +10,7 @@ APE.namespace("APE.dom");
         // and right/bottom values are given.
         var s = el.style, cs, emptyAutoExp = /^(?:auto)?$/;;
         
-        if(dom.IS_COMPUTED_STYLE) {
+        if(dom.IS_COMPUTED_STYLE_SUPPORTED) {
             cs = el.ownerDocument.defaultView.getComputedStyle(el,"");
         } else {
             cs = el.currentStyle || s;

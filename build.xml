@@ -11,7 +11,9 @@
     <!-- concat all dom-f.js files, EXCEPT the first (style-f.js).
          Remove the APE.namespace(APE.dom) from each file (except the first)
     -->
-        <property name='domFiles' value='constants.js, keys.js, viewport-f.js, position-f.js, classname-f.js, 
+        <property name='domFiles' 
+        	value='constants.js, keys.js, viewport-f.js, position-f.js, 
+        	position-f-fallback.js, classname-f.js, 
 traversal-f.js, Event.js, Event-coords.js, style-f.js'/>
         <concat destfile="${build}/dom/dom.js">
             <filelist dir="${build}/dom" files="${domFiles}"/>

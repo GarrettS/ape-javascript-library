@@ -9,7 +9,7 @@ APE.namespace("APE.dom");
     dom.getPixelCoords = getPixelCoords;
 	function getPixelCoords(el){
         var ret,
-            f = (dom.IS_COMPUTED_STYLE ? function(el) {
+            f = (dom.IS_COMPUTED_STYLE_SUPPORTED ? function(el) {
             var cs = el.ownerDocument.defaultView.getComputedStyle(el, "");
             return {
                 x : parseInt(cs.left, 10)||0,

@@ -5,7 +5,6 @@ APE.namespace("APE.dom");
 (function() {
 
     var DOCUMENT_ELEMENT = "documentElement", 
-        IS_BODY_ACTING_ROOT = document[DOCUMENT_ELEMENT].clientWidth === 0,
         dom = APE.dom;
 
     // Public exports.
@@ -31,7 +30,7 @@ APE.namespace("APE.dom");
         else {
             f = function(win) {
               win = win || window;
-              var node = win.document[IS_BODY_ACTING_ROOT ? "body" : DOCUMENT_ELEMENT];
+              var node = win.document[dom.IS_BODY_ACTING_ROOT ? "body" : DOCUMENT_ELEMENT];
               return{ left : node.scrollLeft, top : node.scrollTop };
             };
         }
@@ -59,7 +58,7 @@ APE.namespace("APE.dom");
         }
 
     // Opera < 9.5, or IE in quirks mode.
-        else if(IS_BODY_ACTING_ROOT) {
+        else if(dom.IS_BODY_ACTING_ROOT) {
             baseName = DOCUMENT_ELEMENT;
             nodeName = "body";
 

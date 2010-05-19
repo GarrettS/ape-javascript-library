@@ -130,6 +130,12 @@ var apeTest = new YAHOO.tool.TestCase({
         ObjectAssert.doesNotHaveProperty("nodef", mixed);
     },
 
+    testMixinOneArg : function() {
+        var o = {a:1};
+        var mixed = APE.createMixin(o);
+        Assert.areSame(o, mixed);
+    },
+    
     testHasOwnProperty : function() {
         var isApe = Object.prototype.hasOwnProperty.call(window, "APE");
         Assert.isTrue(isApe);
