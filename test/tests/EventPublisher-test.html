@@ -253,9 +253,18 @@ var eventPublisherTest = new YAHOO.tool.TestCase({
 
         // Next, wrap the error, so we can see if EventPublisher.fire 
         // caught it and passed it to deferError.
+        // 
+        // IE needs assignment to window; unqualified assigment in global 
+        // context result in error and because of that, it is also wrapped 
+        // in a try-catch, just in case any other versions of other browsers
+        // implement setTimeout as a setter (or equivalent).
         window.setTimeout = function errorStoppingMethod(func, delay) {
             caughtErrorMessage = "err back!";
-            setTimeout = old; // Put it back.
+            try {
+                window.setTimeout = old; // Put it back.
+            } catch(ex) {
+                YAHOO.log("could not restore old setTimeout", "warn");
+            }
         };
         
         // Now, fire the event, to run the above.

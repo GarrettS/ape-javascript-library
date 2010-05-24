@@ -4,7 +4,7 @@
     <property name="test" location="test"/>
     <property name="example" location="example"/>
     <property name="build" location="build"/>
-    <property name="deploy" location="C:/Program Files/Apache/Tomcat/webapps/ROOT/ape/"/>
+    <property name="deploy" location='C:\Program Files\Apache Software Foundation\Tomcat 6.0\webapps\ROOT\ape/'/>
     
     <target name="js.rollups" depends="js.copy">
 

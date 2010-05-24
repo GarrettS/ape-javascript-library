@@ -90,13 +90,14 @@ APE.namespace("APE.widget").DelegateFactory = {
                     return isNativeObject(obj) && Object.keys(obj).length === 0;
             } : function(obj) {
                     if(isNativeObject(obj)) {
+                        // DontEnum?
                         for(var p in obj) return true;
                     }
                     return false;
             })(obj);
             
             function isNativeObject(obj) {
-                return typeof obj == "object" && !!obj;
+                return typeof obj == "object" && obj !== null;
             }
         }
         
