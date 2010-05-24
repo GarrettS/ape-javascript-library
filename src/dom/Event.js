@@ -1,20 +1,21 @@
-APE.namespace("APE.dom").Event = ( function() {
+APE.namespace("APE.dom").Event = function(){
 
-    var HAS_EVENT_TARGET = "addEventListener" in this, TARGET = HAS_EVENT_TARGET ? "target"
-            : "srcElement", Event = {
-        get : get,
-        getTarget : getTarget,
-        getRelatedTarget : getRelatedTarget,
-        add : addCallback,
-        addCallback : addCallback,
-        remove : removeCallback,
-        removeCallback : removeCallback,
-        purgeEvents : purgeEvents,
-        preventDefault : preventDefault,
-        stopPropagation : stopPropagation,
-        toString : function() {
-            return "APE.dom.Event";
-        }
+    var HAS_EVENT_TARGET = "addEventListener" in this, 
+        TARGET = HAS_EVENT_TARGET ? "target" : "srcElement", 
+        Event = {
+            get : get,
+            getTarget : getTarget,
+            getRelatedTarget : getRelatedTarget,
+            add : addCallback,
+            addCallback : addCallback,
+            remove : removeCallback,
+            removeCallback : removeCallback,
+            purgeEvents : purgeEvents,
+            preventDefault : preventDefault,
+            stopPropagation : stopPropagation,
+            toString : function() {
+                return"APE.dom.Event";
+            }
     };
 
     /** Gets a DomEventPublisher */
@@ -86,39 +87,39 @@ APE.namespace("APE.dom").Event = ( function() {
                 function remove(callback) {
                     callback = removeFromCallStack(this._callStack, callback);
                     if (callback) { // IE TypeMismatch if not a function
-                if (HAS_EVENT_TARGET) {
-                    this.src.removeEventListener(this.type, callback,
-                            this.type in useCaptureMap);
-                } else {
-                    this.src.detachEvent("on" + this.type, callback);
+                        if (HAS_EVENT_TARGET) {
+                            this.src.removeEventListener(this.type, callback,
+                                    this.type in useCaptureMap);
+                        } else {
+                            this.src.detachEvent("on" + this.type, callback);
+                        }
+                    }
                 }
-            }
-        }
-        function removeFromCallStack(callStack, callback) {
-            var cb, i, len;
-            for (i = 0, len = callStack.length; i < len; i++) {
-                cb = callStack[i];
-                if ((cb.original || cb) === callback) {
-                    delete cb.original;
-                    delete cb.context;
-                    return callStack.splice(i, 1)[0];
+                function removeFromCallStack(callStack, callback) {
+                    var cb, i, len;
+                    for (i = 0, len = callStack.length; i < len; i++) {
+                        cb = callStack[i];
+                        if ((cb.original || cb) === callback) {
+                            delete cb.original;
+                            delete cb.context;
+                            return callStack.splice(i, 1)[0];
+                        }
+                    }
+                    return null;
                 }
+            },
+        
+            purge : function() {
+                var callStack = this._callStack, cb, i;
+                for (i = callStack.length; i-- > 0; callStack.length = i) {
+                    cb = callStack[i];
+                    this.remove(cb.original || cb);
+                }
+            },
+        
+            toString : function() {
+                return "DomEventPublisher: src: " + this.src + ", type: " + this.type;
             }
-            return null;
-        }
-    },
-
-    purge : function() {
-        var callStack = this._callStack, cb, i;
-        for (i = callStack.length; i-- > 0; callStack.length = i) {
-            cb = callStack[i];
-            this.remove(cb.original || cb);
-        }
-    },
-
-    toString : function() {
-        return "DomEventPublisher: src: " + this.src + ", type: " + this.type;
-    }
         };
 
         function get(src, sEvent) {
@@ -275,4 +276,4 @@ APE.namespace("APE.dom").Event = ( function() {
         }
     }
     return Event;
-})();
+}();

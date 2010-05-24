@@ -1,9 +1,9 @@
 /** @requires viewport-f.js (for scrollOffsets in IE). */
-APE.namespace("APE.dom.Event").getCoords = function(ev) {
-    var dom = APE.dom, getCoords;
+APE.dom.Event.getCoords = function(ev) {
+    var dom = APE.dom, getCoords, result;
     if ("pageX" in ev) {
         getCoords = function(ev) {
-            return {
+            return{
                 x : ev.pageX,
                 y : ev.pageY
             };
@@ -12,11 +12,13 @@ APE.namespace("APE.dom.Event").getCoords = function(ev) {
         getCoords = function(ev) {
             var scrollOffsets = dom.getScrollOffsets(); 
             ev = ev || window.event;
-            return {
+            return{
                 x : ev.clientX + scrollOffsets.left,
                 y : ev.clientY + scrollOffsets.top
             };
         };
     }
-    return(dom.Event.getCoords = getCoords)(ev);
+    result = (dom.Event.getCoords = getCoords)(ev);
+    ev = null;
+    return result;
 };
