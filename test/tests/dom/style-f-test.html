@@ -31,7 +31,9 @@
 
 </head>
 <body style="position: relative;margin:0;padding:0;">
-<div id="testLogger" style="margin-top: 30px"></div><!-- In IE, a relatively positioned descendant gets position offset by font-size! -->
+<div id="testLogger" style="margin-top: 30px"></div>
+
+<!-- In IE, a relatively positioned descendant gets position offset by font-size! -->
 <div id="container" style="position: absolute; top: 0; left: 0;font-size: 0;">
     <!-- isInsideElement -->
     <!-- 20 + 11 = 33 -->
@@ -48,7 +50,7 @@
 
  </div>
 <script type="text/javascript">
-setTimeout(function(){
+window.onload = function(){
     
 var container = document.getElementById("container"),
     template = container.innerHTML,
@@ -77,7 +79,6 @@ var getStyleTestCase = new TestCase({
 
     setUp : function() {
     },
-
 
     _should : {
         ignore : { 
@@ -309,29 +310,6 @@ var getStyleTestCase = new TestCase({
         Assert.areEqual("", r);
     },
     
-    testGetPixelCoords : function() {
-        var target = document.getElementById("target");
-        target.style.left = "12px";
-        target.style.top = "13px";
-        var coords = dom.getPixelCoords(target);
-        Assert.areEqual(12, coords.x);
-        Assert.areEqual(13, coords.y);
-    },
-
-    testGetPixelCoordsNoStyleValue : function() {
-        var testNode = document.getElementById('testNode');
-        rule.style.left = "100px";
-        rule.style.top = "50px";
-        
-        // Webkit returns "auto" otherwise.
-        rule.style.position = "relative";
-        rule.style.margin = "200px";
-        
-        var coords = dom.getPixelCoords(testNode);
-        Assert.areEqual(100, coords.x);
-        Assert.areEqual(50, coords.y);
-    },
-
     testGetShorthandValues : function() {
         var c1 = document.getElementById("c1"),
             inp = "12px 11px 10px 9px";
@@ -451,7 +429,6 @@ var getContainingBlockTestCase = new TestCase({
 //create the logger
 var logger = new YAHOO.tool.TestLogger("testLogger");
 YAHOO.tool.TestRunner.add( getStyleTestCase );
-//YAHOO.tool.TestRunner.add( cascadedStyleTestCase );
 YAHOO.tool.TestRunner.add( getContainingBlockTestCase );
 
 // run the tests, or put them in the TestRunner.
@@ -460,7 +437,7 @@ if (parent && parent != window) {
 } else {
     YAHOO.tool.TestRunner.run();
 }
-}, 100);
+};
 </script>
 
 </body>

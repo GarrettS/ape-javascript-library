@@ -14,7 +14,7 @@
         <property name='domFiles' 
         	value='constants.js, keys.js, viewport-f.js, position-f.js, 
         	position-f-fallback.js, classname-f.js, 
-traversal-f.js, Event.js, Event-coords.js, style-f.js'/>
+traversal-f.js, Event.js, Event-coords.js, style-f.js, getPixelCoords.js'/>
         <concat destfile="${build}/dom/dom.js">
             <filelist dir="${build}/dom" files="${domFiles}"/>
             <!--filterchain>
