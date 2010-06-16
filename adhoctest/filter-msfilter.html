@@ -1,0 +1,75 @@
+<!doctype html>
+<html>
+<head><title>IE opacity filters</title>
+<style type="text/css">
+.op {
+    zoom: 1;
+    background: #9cF;
+}
+#a {
+    filter: "alpha( Opacity = 40 );";
+}
+#b {
+    filter: "progid:DXImageTransform.Microsoft.Alpha(opacity=40)";
+}
+#c {
+    -ms-filter: "alpha( opacity = 40)";
+}
+
+#d {
+    -ms-filter: alpha( opacity = 40);
+}
+#e {
+    -ms-filter: progid:DXImageTransform.Microsoft.Alpha(opacity=40);
+}
+
+#f {
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(opacity=40)";
+}
+#g {
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=40);
+}
+#h {
+    filter: alpha( opacity = 40);
+}
+</style>
+</head>
+<body>
+<h1>filter alpha on page</h1>
+
+<p>
+All elements have  opacity 70
+</p>
+
+<div id="a" class="op">#a filter: "alpha"</div>
+<div id="b" class="op">#b filter: "filter:progid:"</div>
+<div id="c" class="op">#c -ms-filter: "alpha"</div>
+<div id="d" class="op">#d -ms-filter: alpha</div>
+<div id="e" class="op">#e -ms-filter: filter:progid</div>
+<div id="f" class="op">#f -ms-filter: "filter:progid"</div>
+<div id="g" class="op">#g filter: filter:progid"</div>
+<div id="h" class="op">#h filter: alpha</div>
+<pre id="m">-</pre>
+<script type="text/javascript">
+onload = function(){
+    var divs = document.getElementsByTagName("div"),
+        m = document.getElementById("m"),
+        d, s = [];
+    for(var i = 0; i < divs.length; i++) {
+        d = divs[i];
+        if(d.className !== "op") continue;
+        s.push(d.id + ".currentStyle.filter: " + d.currentStyle.filter);
+        try {
+            s.push("d.filters.alpha: " + !!d.filters.alpha,
+                    "d.filters['DXImageTransform.Microsoft.Alpha']: " 
+                    + !!d.filters['DXImageTransform.Microsoft.Alpha'],
+                    "---------------------------------");
+        } catch(ex) {
+            s.push("Error: " + ex.type + "; " + ex.message);
+        }
+    }
+    m.innerHTML = s.join("<br>"+ssd);
+};
+</script>
+</body>
+</html>

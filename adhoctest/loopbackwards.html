@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<title>loop test</title>
+</head>
+<body>
+<script type="text/javascript">
+var ITERATIONS = 1000000;
+function forwards(){
+  var x = [], d = +new Date, noise = Math.PI,
+      i, len = ITERATIONS, time;
+  x.length = len;
+  for(i = 0; i < len; i++){
+    x[i] = i + noise;
+  }
+  time = new Date-d;
+  document.getElementById("f").innerHTML = String(time);
+}
+
+function backwards(){
+  var x = [], d = +new Date, noise = Math.PI,
+    len = ITERATIONS, time;
+  x.length = len;
+  for(i = len; i-- > 0;){
+    x[i] = i + noise; 
+  }
+  time = new Date-d;
+  document.getElementById("b").innerHTML = String(time);
+}
+</script>
+<button onclick="forwards();">forwards()</button>
+<pre id="f">-</pre>
+
+<button onclick="backwards();">backwards()</button>
+<pre id="b">-</pre>
+</body>
+</html>
+

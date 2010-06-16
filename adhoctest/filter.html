@@ -1,0 +1,41 @@
+<!doctype html>
+<html>
+<head><title>IE opacity filters</title>
+<style type="text/css">
+.op {
+    zoom: 1;
+    background: #9cF;
+}
+#b {
+    filter: alpha( Opacity = 70 );
+}
+</style>
+</head>
+<body>
+<h1>filter alpha on page</h1>
+<div id="a" class="op" 
+style="filter:progid:DXImageTransform.Microsoft.Alpha(opacity=40)"
+>#a opacity 40 (DXImageTransform)</div>
+
+<div id="b" class="op">#b opacity 70</div>
+<pre id="m" style="font-size: 40px">-</pre>
+<script type="text/javascript">
+
+function getOpacity(ref) {
+    try {
+        return ref.filters.item("alpha").opacity;
+    } catch(ex) {
+        return "Error: " + ex.message;
+    }
+};
+onload = function(){
+    var a = document.getElementById("a"),
+        b = document.getElementById("b"),
+        m = document.getElementById("m");
+    m.innerHTML = ["getOpacity(a) = " + getOpacity(a), 
+                  "getOpacity(b) = " + getOpacity(b)].
+                 join("<BR>");
+};
+</script>
+</body>
+</html>
