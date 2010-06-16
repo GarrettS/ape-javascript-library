@@ -137,11 +137,13 @@ var apeTest = new YAHOO.tool.TestCase({
     },
     
     testHasOwnProperty : function() {
-        var isApe = Object.prototype.hasOwnProperty.call(window, "APE");
+        // Embedded IE8+ reports `false` on indirect hasOwnProperty
+        // checks for global object or window object having a globally 
+        // defined variable.
+        // This happens in Sleipnir and in IETester IE9 and IE8.
+        // Using `self` works, but window and global both fail.
+        var isApe = Object.prototype.hasOwnProperty.call(self, "APE");
         Assert.isTrue(isApe);
-        var bogusProp = "no_siuch$_property_exists_here123545468635s";
-        var isBogusProp = Object.prototype.hasOwnProperty.call(window, bogusProp);
-        Assert.isFalse(isBogusProp);
     },
 
     testToString : function() {
