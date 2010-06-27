@@ -15,11 +15,22 @@
     <script type="text/javascript" src="../../../build/APE.js"></script>
     <script type="text/javascript" src="../../../build/dom/constants.js"></script>
 
+<style type="text/css">
+iframe {
+    z-index: 0;
+    position:absolute;
+}
+</style>
 </head>
 <body>
+<iframe name="iframeQuirks" src="quirks.html"></iframe>
+<iframe name="iframeStandards" src="standards.html"></iframe>
+<!--  This causes IE's to prompt for download/open 
+iframe name="iframeXML" src="xml.html"></iframe -->
+
 <div id="testLogger" style="margin-top: 30px"></div><!-- In IE, a relatively positioned descendant gets position offset by font-size! -->
 <script type="text/javascript">
-onload = function(){
+onload = function() {
 
 var Assert = YAHOO.util.Assert,
     TestCase = YAHOO.tool.TestCase,
@@ -48,6 +59,25 @@ var domconstants = new TestCase({
 
     testOwnerDocument : function() {
         Assert.areSame(document, document.body[dom.OWNER_DOCUMENT]);
+    },
+
+    testHTMLDocNotQuirks : function() {
+        var iframeStandards = frames['iframeStandards'],
+            constants = APE.dom.getConstants(iframeStandards.document);
+        Assert.isFalse(constants.IS_QUIRKS_MODE);
+    },
+
+    testQuirksDoc : function() {
+        var iframeQuirks = frames['iframeQuirks'],
+            constants = APE.dom.getConstants(iframeQuirks.document);
+        Assert.isTrue(constants.IS_QUIRKS_MODE);
+    },
+
+    testXMLDocIS_XML_DOM : function() {
+       // loading this frame causes errors in IE versions.
+       // var iframeXml = frames['iframeXML'],
+       // constants = APE.dom.getConstants(iframeXml.document);
+        Assert.isTypeOf("boolean", APE.dom.IS_XML_DOM);
     }
 });
 var logger = new YAHOO.tool.TestLogger("testLogger");
