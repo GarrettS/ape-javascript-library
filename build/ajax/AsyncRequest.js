@@ -113,8 +113,8 @@ APE.namespace("APE.ajax").mixin({
                         oncomplete(ar);
                         ar.req.onreadystatechange = F;
                     };
-                    ar.timeoutID = setTimeout( userTimeout, ar.timeoutMillis );
-                }    
+                    ar.timeoutId = setTimeout( userTimeout, ar.timeoutMillis );
+                }
                 /** Called repeatedly until readyState i== 4, then calls processResponse. */
                 function readyStateChangePoll() {
                     if( ar.req.readyState === 4 ) {
@@ -122,7 +122,7 @@ APE.namespace("APE.ajax").mixin({
                     }
                 }
             }
-        
+            
             /** processes a response after readyState == 4. */
             function processResponse(asyncRequest) {
                 var req = asyncRequest.req,
@@ -130,22 +130,17 @@ APE.namespace("APE.ajax").mixin({
                     succeeded = httpStatus >= 200 && httpStatus < 300 
                     || httpStatus == 304 || httpStatus == 1223;
         
-                asyncRequest.timerId = clearInterval(asyncRequest.timerId);
-
                 // if the request was successful,
-                if(succeeded) {
-                    // fire oncomplete, then onsucceed.
-                    oncomplete(asyncRequest, true);
-                    
-                    asyncRequest.onsucceed(req);
-                } else {
-                    // fire oncomplete, then onfail.
-                    oncomplete(asyncRequest, false);
-                    asyncRequest.onfail(req);
-                }
+                // fire oncomplete, then onsucceed/onfail.
+                oncomplete(asyncRequest, succeeded);
+                asyncRequest[succeeded ? "onsucceed" : "onfail"](req);
             }
-        
+            
             function oncomplete(ar, successful) {
+                clearInterval(ar.timerId);
+                if(ar.timeoutId) {
+                    ar.timeoutId = clearTimeout(ar.timeoutId);
+                }
                 ar.oncomplete({successful : successful});
             }
         
@@ -236,7 +231,9 @@ APE.namespace("APE.ajax").mixin({
                  */
                 abort : function() {
                     if(!supported) return;
-                    clearTimeout(this.timeoutID);
+                    if(this.timeoutId) {
+                        this.timeoutId = clearTimeout(this.timeoutId);
+                    }
 
                     // Stop success from firing.
                     clearInterval(this.timerId);

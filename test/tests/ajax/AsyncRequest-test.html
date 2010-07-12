@@ -105,13 +105,13 @@ var Assert = YAHOO.util.Assert,
             scount++;
         };
     
-        req.send(1);
+        req.send(null, 1);
         req.abort();
-        req.action +="?a"
-        req.send(2);
+        req.action += "?a";
+        req.send(null, 2);
         req.abort();
         this.wait(function(){
-            req.action +="&c"
+            req.action +="&c";
             req.send(3);
             req.abort();
             Assert.areSame(0, scount, 'onsucceed count should be 0');
@@ -151,18 +151,21 @@ var Assert = YAHOO.util.Assert,
 
         var req = AsyncRequest.getById("", {action: "/invalid: does - not - exist", method:"GET"} );
 
-        // When the request is done, resume the test.
         req.oncomplete = function(doneEvent) {
             completed = true;
         };
 
-        // send the request.
         req.send();
 
-        function maybeLongEnough() {
+        function isDone() { 
+            return completed;
+        }
+        
+        function oncompleteFired() {
             Assert.isTrue(completed, "xhr did not complete. (this may be a server issue)");
         }
-        this.wait(maybeLongEnough, 2000);
+        
+        this.waitForCondition(isDone, oncompleteFired, 2000);
     },
 
     // make sure that onsucceed fires when it should.
@@ -272,10 +275,18 @@ var Assert = YAHOO.util.Assert,
         };
         // send the request.
         req.send(null, 2400);
-        function probablyLongEnough() {
+        req.oncomplete = function() {
+            completed = true;
+        };
+        function isDone() {
+            return completed;
+        }
+        
+        function didNotAbort() {
             Assert.isFalse(aborted, "onabort fired, but should not have.");
         }
-        this.wait(probablyLongEnough, 2500);
+        
+        this.waitForCondition(isDone, didNotAbort, 2500);
     },
 
     testAbortBeforeSend : function() {
@@ -350,9 +361,20 @@ var Assert = YAHOO.util.Assert,
         req.onsucceed = function( xhr ) {
             responseText = xhr.responseText;
         };
+        
         req.send( data );
-        this.wait(function() {
-            Assert.areEqual("Smith, Garrett", responseText);
+        
+        req.oncomplete = function() {
+            completed = true;
+        };
+        function isDone() {
+            return completed;
+        }
+        
+        this.waitForCondition(isDone, function() {
+            this.wait(function(){
+                Assert.areEqual("Smith, Garrett", responseText);
+            }, 100);
         }, 2000);
     },
 
@@ -375,6 +397,9 @@ var Assert = YAHOO.util.Assert,
         };
         req.oncomplete = function() {
             completed = true;
+        };
+        function isDone() {
+            return completed;
         }
         req.send(null, 1); // timeout immediately. Note: setting 0 will have no effect.
         function didNotTimeout() {
@@ -383,9 +408,27 @@ var Assert = YAHOO.util.Assert,
             Assert.isTrue(timedOut, "ontimeout should have fired, but did not.");
             Assert.isTrue(completed, "completed should have fired, but did not.");
         }
-        this.wait(didNotTimeout, 500);
+        function isDone() {
+            return completed;
+        }
+        this.waitForCondition(isDone, didNotTimeout);
     },
 
+    testTimeoutNotAfterComplete : function() {
+        var r = APE.ajax.AsyncRequest.getById("123", {action:"data.json.txt", method:"GET"}),
+            timeout = false, done;
+        r.oncomplete = function(){ done = true; };
+        r.ontimeout = function(){ timeout = true; };
+        r.send(null, 3000);
+        this.waitForCondition(isDone, noTimeout, 3100);
+        function isDone(){
+            return done;
+        } 
+        function noTimeout() {
+            Assert.isFalse(timeout, "req ontimeout fired, but should not have.");
+        }
+    },
+    
     testToString : function() {
         var req = AsyncRequest.getById("", {action:"data.json.txt", method:"POST" });
         Assert.isTypeOf("string", req.toString());
