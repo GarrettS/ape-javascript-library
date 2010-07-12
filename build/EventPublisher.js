@@ -56,6 +56,10 @@ function EventPublisher(src, type) {
 }
 
 APE.EventPublisher = APE.createMixin(EventPublisher, {
+    
+    addCallback : add,
+    removeCallback : remove,
+    
     get : get,
     add : add,
     remove : remove,
@@ -68,7 +72,7 @@ APE.EventPublisher = APE.createMixin(EventPublisher, {
      *  @param {Object} thisArg the context that the function executes in.
      *  @return {EventPublisher} this.
      */
-        add : function(fp, thisArg) {
+        addCallback : function(fp, thisArg) {
             this._callStack.push([fp, thisArg||this.src]);
             return this;
         },
@@ -105,7 +109,7 @@ APE.EventPublisher = APE.createMixin(EventPublisher, {
      *  @param {Object} [thisArg] the context that the function executes in.
      *  @return {EventPublisher} this.
      */
-        remove : function(fp, thisArg) {
+        removeCallback : function(fp, thisArg) {
             var cs = this._callStack, i, call;
             thisArg = thisArg || this.src;
             for(i = 0; i < cs.length; i++) {
@@ -123,7 +127,7 @@ APE.EventPublisher = APE.createMixin(EventPublisher, {
      *  @return {EventPublisher} this.
      */
         removeBefore : function(fp, thisArg) {
-            return get(this, "beforeFire").remove(fp, thisArg||this.src);
+            return get(this, "beforeFire").removeCallback(fp, thisArg||this.src);
         },
 
 
@@ -133,7 +137,7 @@ APE.EventPublisher = APE.createMixin(EventPublisher, {
      *  @return {EventPublisher} this.
      */
         removeAfter : function(fp, thisArg) {
-            return get(this, "afterFire").remove(fp, thisArg||this.src);
+            return get(this, "afterFire").removeCallback(fp, thisArg||this.src);
         },
 
     /** Fires the event. */
@@ -177,11 +181,11 @@ function cleanUp() {
  *  @param {Object} thisArg the context that the function executes in.
  */
 function add(src, sEvent, fp, thisArg) {
-    return get(src, sEvent).add(fp, thisArg);
+    return get(src, sEvent).addCallback(fp, thisArg);
 }
 
 function remove(src, sEvent, fp, thisArg) {
-    return get(src, sEvent).remove(fp, thisArg);
+    return get(src, sEvent).removeCallback(fp, thisArg);
 }
 
 /** 
@@ -262,7 +266,7 @@ function get(src, sEvent) {
     publisher = new EventPublisher(src, sEvent);
     // Steal. 
     if(src[sEvent]) {
-        publisher.add(src[sEvent], src);
+        publisher.addCallback(src[sEvent], src);
     }
     src[sEvent] = fire(publisher);
     publisherList[len] = publisher;

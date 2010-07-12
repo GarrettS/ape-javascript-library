@@ -32,15 +32,17 @@ var eventPublisherTest = new YAHOO.tool.TestCase({
         ep = APE.EventPublisher.get(testObject, "fire");
     },
 
-    testAdd : function(){
+
+    testAddCallback : function() {
         var called = false;
-        ep.add(function( ev ) {
+        ep.addCallback(function( ev ) {
             called = true;
             Assert.isTrue( ev.isTest );
         });
         testObject.fire( { isTest: true} );
         Assert.isTrue( called );
     },
+
     
     testEventPublisherAddContext : function(){
         var called = false;
@@ -59,7 +61,7 @@ var eventPublisherTest = new YAHOO.tool.TestCase({
         var called = false, calledBefore = false;
 
         // this function should be called first.
-        ep.add(function( ev ) {
+        ep.addCallback(function( ev ) {
             called = true;
             Assert.isTrue( calledBefore );
         });
@@ -77,7 +79,7 @@ var eventPublisherTest = new YAHOO.tool.TestCase({
     
     testAddAfter : function() {
         var called = false, calledAfter = false, context;
-        ep.add(function( ev ) {
+        ep.addCallback(function( ev ) {
             called = true;
             Assert.isFalse( calledAfter );
         });
@@ -93,23 +95,32 @@ var eventPublisherTest = new YAHOO.tool.TestCase({
     },
 
     testGetEvent : function() {
-
         var f = ep.getEvent("beforeFire");
-        Assert.isFunction( f.add );
+        Assert.isFunction( f.addCallback );
 
         f = ep.getEvent("afterFire");
-        Assert.isFunction( f.add );
+        Assert.isFunction( f.addCallback );
     },
     
-    // Add 2 callbacks, remove the first, 
-    // then make sure that only the second one fires.
     testRemove : function(){
         var called = false;
 
         function cb( ev ) {
             called = true;
         }
-       ep.add(cb).remove(cb);
+        ep.addCallback(cb).removeCallback(cb);
+
+        testObject.fire();
+        Assert.isFalse( called );
+    },
+
+    testRemoveCallback : function(){
+        var called = false;
+
+        function cb( ev ) {
+            called = true;
+        }
+        ep.addCallback(cb).removeCallback(cb);
 
         testObject.fire();
         Assert.isFalse( called );
@@ -120,15 +131,15 @@ var eventPublisherTest = new YAHOO.tool.TestCase({
 
         function cb( ev ) {
             called1 = true;
-            ep.remove(cb2);
+            ep.removeCallback(cb2);
         };
         
         function cb2( ev ) {
             called2 = true;
         };
         
-        ep.add(cb);
-        ep.add(cb2);
+        ep.addCallback(cb);
+        ep.addCallback(cb2);
 
         testObject.fire( { isTest: true} );
         Assert.isTrue( called1 );
@@ -144,7 +155,7 @@ var eventPublisherTest = new YAHOO.tool.TestCase({
             }
         };
         contextArg.ep = new APE.EventPublisher(contextArg, "suck");
-        contextArg.ep.add(
+        contextArg.ep.addCallback(
             function(e){
                 firedSuccessfully = true;
                 Assert.areEqual(contextArg, this,"contextArg");
@@ -171,7 +182,7 @@ var eventPublisherTest = new YAHOO.tool.TestCase({
         function cb2( ev ) {
             cb2Fired = true;
         }
-        ep.add(cb);
+        ep.addCallback(cb);
         ep.addBefore(cb2);
 
         ep.removeBefore(cb2);
@@ -197,7 +208,7 @@ var eventPublisherTest = new YAHOO.tool.TestCase({
         function cb2( ev ) {
             b2Called = true;
         }
-        ep.add(cb);
+        ep.addCallback(cb);
         ep.addAfter(cb2);
         ep.removeAfter(cb2);
 
@@ -243,9 +254,9 @@ var eventPublisherTest = new YAHOO.tool.TestCase({
             called2 = true;
             order.push(cb2);
         };
-        ep.add(cb);
-        ep.add(errBack);
-        ep.add(cb2);
+        ep.addCallback(cb);
+        ep.addCallback(errBack);
+        ep.addCallback(cb2);
 
         // We're going to steal setTimeout so we can trap the error.
         // First, store the reference to setTimeout.
