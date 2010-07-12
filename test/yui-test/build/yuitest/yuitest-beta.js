@@ -86,17 +86,20 @@ YAHOO.tool.TestCase.prototype = {
      */
     waitForCondition : function(condition, deferredSeg, maxDelay) {
         var test = this,
-            resumed,
             maxDelay = maxDelay||4000,
+            resumed,
             timer = setInterval(function() {
                 if(condition()){
+                    resumed = true;
                     clearInterval(timer);
                     test.resume(deferredSeg);
-                    resumed = true;
                 }
             }, 100);
         
         this.wait(function(){
+            clearInterval(timer);
+         // (GS) Method resume does not cancel a wait? 
+            if(resumed) return; 
             YAHOO.util.Assert.fail("Condition not met after " + maxDelay + "ms");
         }, maxDelay);
     },
@@ -678,7 +681,11 @@ YAHOO.tool.TestRunner = (function(){
                     failed = true;
                 }
                            
-            } catch (thrown /*:Error*/){
+            } catch (thrownX /*:Error*/){
+                // IE9pr3 bug
+                // http://groups.google.com/group/comp.lang.javascript/browse_thread/thread/e0b47064d5f012e7#
+                var thrown = thrownX; 
+                
                 if (thrown instanceof YAHOO.util.AssertionError) {
                     if (!shouldFail){
                         error = thrown;
@@ -688,8 +695,8 @@ YAHOO.tool.TestRunner = (function(){
                 
                     if (YAHOO.lang.isFunction(thrown.segment)){
                         if (YAHOO.lang.isNumber(thrown.delay)){
-                        
                             //some environments don't support setTimeout
+                            // (GS) Which ones?
                             if (typeof setTimeout != "undefined"){
                                 setTimeout(function(){
                                     YAHOO.tool.TestRunner._resumeTest(thrown.segment);
