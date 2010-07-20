@@ -53,7 +53,7 @@ var dom = APE.dom,
     afterTestNode = document.getElementById('afterTestNode'),
     form = document.getElementById('monkey');
 
-var viewportTestCase = new YAHOO.tool.TestCase({
+var traversalTestCase = new YAHOO.tool.TestCase({
     name : "Traversal Test Case",
 
     testMethods : function() {
@@ -93,10 +93,13 @@ var viewportTestCase = new YAHOO.tool.TestCase({
             "testNode can never contain body.");
     },
     
-    testFindAncestorWithAttribute : function() {
-        var ancestor = dom.findAncestorWithAttribute(testNode,"action");
+    testFindAncestorWithAttributeFail : function() {
+        var ancestor = dom.findAncestorWithAttribute(testNode, "action");
         Assert.isNull(ancestor);
-        ancestor = dom.findAncestorWithAttribute(testNode, "style");
+    },
+    
+    testFindAncestorWithAttribute : function() {
+        var ancestor = dom.findAncestorWithAttribute(testNode, "style");
         Assert.areSame(body, ancestor);
     },
 
@@ -148,7 +151,7 @@ var viewportTestCase = new YAHOO.tool.TestCase({
 });
 
 var logger = new YAHOO.tool.TestLogger("testLogger");
-YAHOO.tool.TestRunner.add( viewportTestCase );
+YAHOO.tool.TestRunner.add( traversalTestCase );
 
 // run the tests, or put them in the TestRunner.
 if (parent && parent != window) {

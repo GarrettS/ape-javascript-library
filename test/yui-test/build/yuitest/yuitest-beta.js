@@ -2588,7 +2588,7 @@ YAHOO.util.UserAction = {
 
                 // (GS) The standard requires these to throw errors.
                 // This doesn't happen in Safari 2. If errors occur, this 
-                // may need to be wrapped this in a try/catch.
+                // may need to be wrapped in a try/catch.
                 customEvent.ctrlKey = ctrlKey;
                 customEvent.altKey = altKey;
                 customEvent.metaKey = metaKey;

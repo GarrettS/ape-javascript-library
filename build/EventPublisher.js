@@ -147,7 +147,7 @@ APE.EventPublisher = APE.createMixin(EventPublisher, {
 
     /** helpful debugging info */
         toString : function() {
-            return  "APE.EventPublisher: {src=" + this.src + ", type=" + this.type +
+            return"EventPublisher src=" + this.src + ", type=" + this.type +
                  ", length="+this._callStack.length+"}";
         }
     }

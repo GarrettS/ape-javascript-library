@@ -1,9 +1,9 @@
 APE.namespace("APE.dom").mixin(function(){
 
     var docEl = document.documentElement,
-        hasNamedItem = "getNamedItem" in docEl.attributes,
         PARENT_NODE = "parentNode",
-        caseTransform = /^H/.test(docEl.tagName) ? 'toUpperCase' : 'toLowerCase';
+        dom = APE.dom,
+        caseTransform = dom.IS_XML_DOM ? 'toLowerCase' : 'toUpperCase';
 
     docEl = null;
 
@@ -50,11 +50,11 @@ APE.namespace("APE.dom").mixin(function(){
                     while(el && el !== b && (b = b[PARENT_NODE]) !== null);
                     return el === b;
             };
-        return (contains = APE.dom.contains = _contains)(el, b); 
+        return (contains = dom.contains = _contains)(el, b); 
     }
 
     function isOrContains(el, b) {
-        return el === b || APE.dom.contains(el, b);
+        return el === b || dom.contains(el, b);
     }
     
     /** 
@@ -67,15 +67,20 @@ APE.namespace("APE.dom").mixin(function(){
      * Returns null if not found.
      */
     function findAncestorWithAttribute(el, attName, value) {
-        for(var att, map, parent = el[PARENT_NODE];parent !== null;){
+        for(var att, undef, map, parent = el[PARENT_NODE]; parent !== null;) {
             map = parent.attributes;
-            if(!map || !hasNamedItem) {
+            if(!map) {
                 return null;
             }
-            att = map.getNamedItem(attName);
+            att = map[attName];
             if(att && att.specified) {
-                if(att.value === value || (value === undefined)) {
+                if(att.value === value || value === undef) {
                     return parent;
+                }
+            } else if(parent.getAttribute) {
+                att = parent.getAttribute(attName, 2);
+                if(att === value || value === undef && att !== null) {
+                    return parent
                 }
             }
             parent = parent[PARENT_NODE];
@@ -111,7 +116,7 @@ APE.namespace("APE.dom").mixin(function(){
     
     function horizontalTraverse(el, sibName) {
         for(var n = el[sibName]; n !== null; n = n[sibName]) {
-            if(n.nodeType === 1) 
+            if(n.nodeType === 1 && n.tagName !== "!") 
                 return n;
         }
         return null;
@@ -126,7 +131,7 @@ APE.namespace("APE.dom").mixin(function(){
         // IE also includes comment nodes.
         for(i = j = 0; i < len; i++) {
             c = cn[i];
-            if(c.nodeType !== 1) continue;
+            if(c.nodeType !== 1 || c.tagName === "!") continue;
             ret[j++] = c;
         }
         ret.length = j;
