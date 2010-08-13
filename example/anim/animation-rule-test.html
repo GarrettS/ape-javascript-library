@@ -1,15 +1,14 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
-   "http://www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE HTML>
 <html lang="en-US">
 <head>
-	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+	<meta http-equiv="content-type" content="text/html; charset=utf-8">
     <title>Animation Test</title>
     <link type="text/css" rel="stylesheet" href="../resources/example.css">
 
 <script type="text/javascript" src="../../build/APE.js"></script>
 <script type="text/javascript" src="../../build/anim/Animation.js"></script>
 <script type="text/javascript" src="../../build/dom/StyleSheetAdapter.js"></script>
-<style id="AnimationStyles">
+<style id="AnimationStyles" type="text/css">
 #blindsDiv {
     margin: 0;
     padding: 0;
@@ -58,48 +57,54 @@
 <body>
 <h1>Animation Test</h1>
 
-<script style="white-space:pre;font-family:monospace">
+<script type="text/javascript">
 
-var anim = new APE.anim.Animation(.5);
+onload = function() {
+    document.getElementById("startButton").disabled = false;
+};
+var anim;
+function startAnim(button) {
 
-function setUp() { 
-     
-    if(setUp.done) return;
-    setUp.done=true;
+    if(button.disabled) return;
 
+    button.disabled = true;
+    
+    anim = new APE.anim.Animation(.5);
+    var timer, atStart = true;
+     		
     // A 20x20 grid. 
     // Animate 400 blocks in .5 seconds?
-    var cellsPerRow = 20;
-    var numRows = 20;
+    var CELLS_PER_ROW = 20;
+    var ROW_COUNT = 20;
     var blindsDiv = document.getElementById("blindsDiv");
-    makeBlinds(blindsDiv, numRows, cellsPerRow);
+    makeBlinds(blindsDiv, ROW_COUNT, CELLS_PER_ROW);
 
     var styleSheetAdapter = new APE.dom.StyleSheetAdapter( "AnimationStyles" );
 
     var blindRowsRule = styleSheetAdapter.addRule("tr", 
-        "height: " + Math.round(blindsDiv.clientHeight/numRows) + "px");
+        "height: " + Math.round(blindsDiv.clientHeight/ROW_COUNT) + "px");
 
     // Create a rule to effect.
     var blindTransition = styleSheetAdapter.addRule(".blind");
 
     anim.onstart = function() {
-        
+        timer = null;
     };
 
     var T = APE.anim.Transitions; 
 
     // Horizontal blinds.
-    var maxWidth = ( blindsDiv.clientWidth / cellsPerRow  );
+    var maxWidth = ( blindsDiv.clientWidth / CELLS_PER_ROW  );
 
     // Vertical blinds.
-    var maxHeight = ( blindsDiv.clientHeight / numRows );
+    var maxHeight = ( blindsDiv.clientHeight / ROW_COUNT );
 
     // Main loop for Animation. 
     // set values on the newRule, based upon a blend of 
     // start and end, using rationalValue.
     anim.run = function(rationalValue) {
         var newValue;
-        if(!!this.atStart) {
+        if(atStart) {
             rationalValue = 1-rationalValue;
             newValue = T.accel(rationalValue)
         } else {
@@ -116,27 +121,57 @@ function setUp() {
         bs.height = Math.ceil(newValue * maxHeight) + "px";
     };
 
-    anim.onend = function() {
-        // start again.
-        var pause = this.atStart ? 2 : .3;
-        setTimeout(function(){anim.start();}, pause * 1000);
-        this.atStart = !this.atStart;
-   };
+    anim.onend = animationReverse;
 
-    function makeBlinds(blindsDiv, numRows, numCols) {
+    function animationReverse() {
+        // start again.
+        var pause = atStart ? 2 : .3;
+        timer = setTimeout(function(){anim.start();}, pause * 100);
+        atStart = !atStart;
+    }
+    
+    function makeBlinds(blindsDiv, ROW_COUNT, numCols) {
         var s = "<table class='blinds'><tbody>\n";
-        var e = "</tbody></table>";
+        var e = "<\/tbody><\/table>";
         var join = Array.prototype.join;
-        var td = join.call({length:numCols+1}, "<td><b class='blind'></b></td>");
-        var trs = join.call({length:(numRows||0)+1}, "<tr>"+td+"</tr>\n")        
+        var td = join.call({length:numCols+1}, "<td><b class='blind'><\/b><\/td>");
+        var trs = join.call({length:(ROW_COUNT||0)+1}, "<tr>"+td+"<\/tr>\n")        
         var html = s + trs + e;
         blindsDiv.innerHTML = html;
     }
-};
 
+    anim.pauseResume = pauseResume;
+    var isPaused = false;
+    function pauseResume() {
+        if(isPaused) {
+            resume(this);
+        } else {
+            pause(this);
+        }
+        isPaused = !isPaused;
+    }
+    
+    function resume(anim) {
+	    if(!timer) {
+	        anim.start();
+	    }
+        anim.resume();
+    }
+    
+    function pause(anim) {
+        if(timer) {
+            timer = clearTimeout(timer);
+        } else {
+            anim.pause();
+        }
+    }
+    anim.start();
+}
 </script>
-<button id='success' onclick="setUp();anim.start()">start();</button>
-<button id='success' onclick="anim[anim.paused ? 'resume' : 'pause']()">pause/resume</button>
+<p><strong>Warning!</strong> Staring at this page may cause nausea and headache.</p>
+
+<button id="startButton" onclick="startAnim(this)"><div>start();</div></button>
+<button onclick="anim.pauseResume()"><div>pause/resume</div></button>
 
 <div id="blindsDiv"></div>
 </body>
