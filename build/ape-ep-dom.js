@@ -1404,11 +1404,10 @@ APE.namespace("APE.dom").mixin(function() {
                 DomEventPublisher.prototype.add = add;
                 this.add(callback);
                 function add(callback) {
-                    var o = this.src, captureAdapterType = useCaptureMap[this.type], type = captureAdapterType
-                            || this.type;
+                    var o = this.src, captureAdapterType = useCaptureMap[this.type], 
+                        type = captureAdapterType || this.type;
                     if (HAS_EVENT_TARGET) {
-                        o
-                                .addEventListener(type, callback,
+                        o.addEventListener(type, callback,
                                         !!captureAdapterType);
                     } else {
                         callback = getBoundCallback(o, callback);
@@ -1668,11 +1667,8 @@ APE.dom.Event.getCoords = function(ev) {
 APE.namespace("APE.dom");
 (function(){
 
-    var dom = APE.dom;
-    dom.getStyle = getStyle;
-    dom.setOpacity = setOpacity;
-
-    var IS_COMPUTED_STYLE = dom.IS_COMPUTED_STYLE_SUPPORTED,
+    var dom = APE.dom,
+        IS_COMPUTED_STYLE = dom.IS_COMPUTED_STYLE_SUPPORTED,
         CURRENT_STYLE = "currentStyle",
         OPACITY = "opacity",
         STYLE = "style",
@@ -1790,7 +1786,7 @@ APE.namespace("APE.dom");
     function getCurrentStyleValueFromAutoOrPercent(el, p) {
         var s = el[STYLE], v, pp, borderWidth, 
             clientTop, clientLeft, paddingWidth;
-        if("pixelWidth"in s && /width|height|top|left/.test(p)) {
+        if(/^width|height|top|left$/.test(p) && typeof s.pixelWidth != "undefined") {
             pp = "pixel" + (p.charAt(0).toUpperCase()) + p.substring(1);
             v = s[pp];
         }
@@ -1810,7 +1806,7 @@ APE.namespace("APE.dom");
             paddingWidth = parseFloat(getStyle(el, "paddingTop"))||0
                 + parseFloat(getStyle(el, "paddingBottom"))||0;
             return el.offsetHeight - clientTop - borderWidth + PX;
-        } else if(p == "margin" && el[CURRENT_STYLE].position != "absolute") {
+        } else if(p === "margin" && el[CURRENT_STYLE].position != "absolute") {
             v = parseFloat(getStyle(el.parentNode, 'width')) - el.offsetWidth;
             if(v === 0) return"0px";
             v = "0px " + v;
@@ -1890,6 +1886,8 @@ APE.namespace("APE.dom");
             return val;
         }
     }
+    dom.getStyle = getStyle;
+    dom.setOpacity = setOpacity;
 })();/**
  * @requires APE.dom.style-f.js
  */

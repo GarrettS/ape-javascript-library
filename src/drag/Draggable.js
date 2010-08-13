@@ -84,7 +84,7 @@ APE.namespace("APE.drag").defineFactory("Draggable", function(Draggable) {
     // Static initializer code.
     var d = document, 
         EventPublisher = APE.EventPublisher, 
-        addCallback = EventPublisher.add, 
+        addCallback = EventPublisher.addCallback, 
         preventDefault = Event.preventDefault, 
         DOC_EL = "documentElement", 
         ds = d[DOC_EL].style, 
@@ -134,7 +134,7 @@ APE.namespace("APE.drag").defineFactory("Draggable", function(Draggable) {
     addCallback(d, "onkeydown", dragCancel);
     addCallback(d, EV_DRAG_END, mouseUp);
     initGuardUserSelection(d, ds);
-    docMouseDown.add(mouseDown).addAfter(setUpDragOver);
+    docMouseDown.addCallback(mouseDown).addAfter(setUpDragOver);
     d = ds = null;
     
     /** prevent text selection while dragging. */

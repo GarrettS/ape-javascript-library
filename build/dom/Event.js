@@ -46,11 +46,10 @@ APE.namespace("APE.dom").Event = function(){
                 DomEventPublisher.prototype.add = add;
                 this.add(callback);
                 function add(callback) {
-                    var o = this.src, captureAdapterType = useCaptureMap[this.type], type = captureAdapterType
-                            || this.type;
+                    var o = this.src, captureAdapterType = useCaptureMap[this.type], 
+                        type = captureAdapterType || this.type;
                     if (HAS_EVENT_TARGET) {
-                        o
-                                .addEventListener(type, callback,
+                        o.addEventListener(type, callback,
                                         !!captureAdapterType);
                     } else {
                         callback = getBoundCallback(o, callback);
