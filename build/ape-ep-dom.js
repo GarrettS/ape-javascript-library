@@ -1786,7 +1786,7 @@ APE.namespace("APE.dom");
     function getCurrentStyleValueFromAutoOrPercent(el, p) {
         var s = el[STYLE], v, pp, borderWidth, 
             clientTop, clientLeft, paddingWidth;
-        if(/^width|height|top|left$/.test(p) && typeof s.pixelWidth != "undefined") {
+        if(/^(?:width|height|top|left)$/.test(p) && typeof s.pixelWidth != "undefined") {
             pp = "pixel" + (p.charAt(0).toUpperCase()) + p.substring(1);
             v = s[pp];
         }
