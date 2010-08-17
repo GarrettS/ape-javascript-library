@@ -21,6 +21,7 @@
 <body style="position:relative;top: 10px">
 <div id="template">
     <div id="testNode"><input id="testInp"><input id="testInp2"></div>
+    <iframe style="position: absolute;" id="iframe-load-test"></iframe>
 </div>
 <div id="testLogger"></div>
 
@@ -147,6 +148,27 @@ var eventTestCase = new YAHOO.tool.TestCase({
         }
     },
 
+    testAddIframeLoadHandler : function() {
+        var isIframe = false,
+            isLoaded,
+            iframe = document.getElementById("iframe-load-test");
+        
+        dom.Event.addCallback(iframe, "load", iframeLoadHandler);
+        
+        iframe.src = "./iframe-load-test.html";
+        
+        function condition() {
+            return isLoaded;
+        }
+        function iframeLoadHandler() {
+            isLoaded = true;
+            isIframe = this === iframe;
+        }
+        this.waitForCondition(condition, function() {
+            Assert.isTrue(isIframe);
+        });
+    },
+    
     testAddDelegatedFocus : function(){
         var called = false,
             testNode = document.getElementById("testNode");
