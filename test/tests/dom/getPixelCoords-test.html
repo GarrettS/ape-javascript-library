@@ -1,0 +1,141 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" >
+    <title>DOM Style Test</title>
+
+    <link rel="stylesheet" type="text/css" href="../../yui-test/build/logger/assets/logger.css" >
+    <link rel="stylesheet" type="text/css" href="../../yui-test/build/yuitest/assets/yuitest.css" >
+    <link rel="stylesheet" type="text/css" href="../../yui-test/assets/testlogger.css" >
+
+    <script type="text/javascript" src="../../yui-test/build/yahoo-dom-event/yahoo-dom-event.js"></script>
+    <script type="text/javascript" src="../../yui-test/build/logger/logger.js"></script>
+    <script type="text/javascript" src="../../yui-test/build/yuitest/yuitest-beta.js"></script>
+
+    <script type="text/javascript" src="../../../build/APE.js"></script>
+    <script type="text/javascript" src="../../../build/dom/constants.js"></script>
+    <script type="text/javascript" src="../../../build/dom/dom.js"></script>
+    <script type="text/javascript" src="../../../build/dom/StyleSheetAdapter.js"></script>
+
+    <style id="testSheet" type="text/css">
+        #testNode {
+            font-size: 12px;
+            font-family: fantasy;
+            padding: 6em;
+            height: 1000em;
+        }
+    </style>
+
+</head>
+<body style="position: relative;margin:0;padding:0;">
+<div id="testLogger" style="margin-top: 30px"></div>
+
+<!-- In IE, a relatively positioned descendant gets position offset by font-size! -->
+<div id="container" style="position: absolute; top: 0; left: 0;font-size: 0;">
+    <!-- isInsideElement -->
+    <!-- 20 + 11 = 33 -->
+    <a id="overlapping" style='position: absoulte; top: 20px; right: 0; height: 0;border: 11px solid #ccc;background: #900'></a>
+ 
+    <!-- +12 -->
+        <div id="c1" style="position: absolute; top: 2px;height: 6px;background: #00c;left: 0;">
+    <!-- +3 -->
+        <a id="target" style='position: absolute; top: 3px; left: 1px;display: block;height: 1px; background:#FF0;'></a>
+
+        </div>
+
+        <div id="testNode"></div>
+
+ </div>
+
+<script type="text/javascript">
+window.onload = function(){
+    var container = document.getElementById("container"),
+	    template = container.innerHTML,
+	    containerCssText = container.style.cssText,
+	    htmlCssText = document.documentElement.style.cssText,
+	    bodyCssText = document.body.style.cssText,
+	    dSheets = document.styleSheets,
+	    styleSheet = dSheets[dSheets.length - 1],
+	    sheet = new APE.dom.StyleSheetAdapter( styleSheet ),
+	    rule = sheet.getRule("#testNode") || sheet.addRule( "#testNode", "" );
+
+	var Assert = YAHOO.util.Assert,
+	    TestCase = YAHOO.tool.TestCase,
+	    ArrayAssert = YAHOO.util.ArrayAssert,
+	    dom = APE.dom;
+	
+	/* StyleTransition.js uses these. 
+	* move to new file. 
+	* StyleTransition.js seems too generalized.
+	getCascadedStyle : getCascadedStyle,
+	getStyleUnit : getStyleUnit,
+	findInheritedStyle : findInheritedStyle,
+	*/
+	
+	var getPixelCoordsTestCase = new TestCase({
+	
+	    tearDown : function () {
+        document.body.style.cssText = bodyCssText;
+        document.documentElement.style.cssText = htmlCssText;
+        container.style.cssText = containerCssText;
+        container.innerHTML = template;
+
+        var style = rule.style;
+
+        // Iterating through "length" in a for loop 
+        // returns camel-cased property names. 
+        // Use a for-in loop and swallow errors on things like functions or length,
+        // or "clip" for IE.
+        for(var prop in style) {
+            try{ 
+              if(typeof style[prop] == 'string') {
+                style[prop] = "";
+              }
+            } catch(ex) { 
+                // IE will throw errors on "clip" if it is an empty string.
+                // alert("error setting " + prop + ex.message);
+            }
+        }
+        style = null;
+    },
+
+    testGetPixelCoords : function() {
+	        var target = document.getElementById("target"),
+	            getPixelCoords = dom.getPixelCoords;
+	        target.style.left = "12px";
+	        target.style.top = "13px";
+	        var coords = getPixelCoords(target);
+	        Assert.areEqual(12, coords.x);
+	        Assert.areEqual(13, coords.y);
+	    },
+	
+	    testGetPixelCoordsNoStyleValue : function() {
+	        var testNode = document.getElementById('testNode');
+	        rule.style.left = "100px";
+	        rule.style.top = "50px";
+	        
+	        // Webkit returns "auto" otherwise.
+	        rule.style.position = "relative";
+	        rule.style.margin = "200px";
+	        
+	        var coords = dom.getPixelCoords(testNode);
+	        Assert.areEqual(100, coords.x);
+	        Assert.areEqual(50, coords.y);
+	    }
+	});
+	//create the logger
+	var logger = new YAHOO.tool.TestLogger("testLogger");
+	YAHOO.tool.TestRunner.add( getPixelCoordsTestCase );
+	
+	// run the tests, or put them in the TestRunner.
+	if (parent != window) {
+	    YAHOO.tool.TestManager.load();
+	} else {
+	    YAHOO.tool.TestRunner.run();
+	}
+};
+</script>
+
+</body>
+</html>
