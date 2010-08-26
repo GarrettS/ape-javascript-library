@@ -93,6 +93,6 @@
 don't alter the copyright notice.
 </p>
 
-<jsp:include page="/ape/nav.jsp"/>
+<jsp:include page="nav.jsp?"/>
 
 </body></html>

@@ -70,9 +70,8 @@ APE.namespace("APE.ajax").defineFactory(
                 }
                 script.src = appendToURI(this.uri, uri);
                 head.appendChild(script);
-                
                 // XXX Safari 2 this must come second, or a crash occurs.
-                loadImageForScript(uri, script);                
+                loadImageForScript(uri, script);
             },
             
             onsuccess : noop

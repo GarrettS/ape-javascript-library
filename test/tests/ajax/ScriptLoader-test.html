@@ -55,7 +55,7 @@ var Assert = YAHOO.util.Assert,
             }, 2100);
         },
 
-        testScriptOnloadFiresOnce : function(){
+        testScriptOnloadFiresOnce : function() {
             var sl = ScriptLoader.getById("foo");
             var loadCount = 0;
             
@@ -64,9 +64,12 @@ var Assert = YAHOO.util.Assert,
             };
             
             sl.get("jsonp.jsp");
-            this.wait(function(){
-                Assert.areSame(1, loadCount);
-            }, 1800);
+            this.waitForCondition(function(){
+                return loadCount === 1;
+            }, function() {
+                Assert.areSame(1, loadCount, "onload should have fired exactly 1 time.");
+            },
+            2200);
         }
 });
 

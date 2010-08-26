@@ -78,6 +78,10 @@ var domconstants = new TestCase({
        // var iframeXml = frames['iframeXML'],
        // constants = APE.dom.getConstants(iframeXml.document);
         Assert.isTypeOf("boolean", APE.dom.IS_XML_DOM);
+    },
+
+    testIsScrollSupported : function() {
+        Assert.isTypeOf("boolean", APE.dom.IS_SCROLL_SUPPORTED);
     }
 });
 var logger = new YAHOO.tool.TestLogger("testLogger");

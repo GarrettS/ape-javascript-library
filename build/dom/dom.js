@@ -8,8 +8,9 @@ APE.namespace("APE.dom").getConstants = function(doc) {
         view = doc.defaultView,
         compatMode = doc.compatMode,
         testStyle,
+        testNode = doc.createElement("div"),
         IS_STANDARDS_MODE = compatMode ? compatMode != "BackCompat" :
-            ((testStyle = doc.createElement("p").style).width = "1", !testStyle.width);
+            ((testStyle = testNode.style).width = "1", !testStyle.width);
         
     return{
         TEXT_CONTENT : typeof docEl.textContent === "string" ? "textContent" : "innerText",
@@ -26,9 +27,10 @@ APE.namespace("APE.dom").getConstants = function(doc) {
         // IE, Safari, and Opera support clientTop. FF 2 doesn't
         IS_CLIENT_TOP_SUPPORTED : typeof docEl.clientTop != UNDEFINED,
         
-        // Not supported.
+        // XML dom is not supported.
         IS_XML_DOM : docEl.tagName === "html",
-        IS_QUIRKS_MODE : !IS_STANDARDS_MODE
+        IS_QUIRKS_MODE : !IS_STANDARDS_MODE,
+        IS_SCROLL_SUPPORTED : typeof testNode.scrollLeft == "number"
     };
 };
 APE.dom.mixin(APE.dom.getConstants(document));APE.namespace("APE.dom").key = {
@@ -128,22 +130,10 @@ APE.namespace("APE.dom");
  * APE.dom package functions for calculating element position properties.
  */
 /** @name APE.dom */
-APE.namespace("APE.dom");
-(function() {
+APE.namespace("APE.dom").getOffsetCoords = function(el, container, coords) {
     
     var dom = APE.dom,
-        round = Math.round, max = Math.max,
-    	IS_SCROLL = typeof document.createElement("p").scrollLeft == "number";
-    APE.createMixin(
-        dom, {
-            getOffsetCoords : getOffsetCoords,
-            isAboveElement : isAboveElement,
-            isBelowElement : isBelowElement,
-            isInsideElement: isInsideElement,
-            
-            // Blackberry9000 does not, and does not support scrollLeft, scrollTop.
-            IS_SCROLL_SUPPORTED : IS_SCROLL
-    });
+        max = Math.max;
     
     function getOffsetCoords(el, container, coords) {
 
@@ -203,122 +193,89 @@ APE.namespace("APE.dom");
 
         return coords;
     }
-
-  // TODO: add an optional commonAncestor parameter to the below.
-    /**
-     * @memberOf APE.dom
-     * @return {boolean} true if a is vertically within b's content area (and does not overlap,
-     * top nor bottom).
-     */
-    function isInsideElement(a, b) {
-        var aTop = dom.getOffsetCoords(a).y,
-            bTop = dom.getOffsetCoords(b).y;
-        return aTop + a.offsetHeight <= bTop + b.offsetHeight && aTop >= bTop;
-    }
-
-    /**
-     * @memberOf APE.dom
-     * @return {boolean} true if a overlaps the top of b's content area.
-     */
-    function isAboveElement(a, b) {
-        return (dom.getOffsetCoords(a).y <= dom.getOffsetCoords(b).y);
-    }
-
-    /**
-     * @memberOf APE.dom
-     * @return {boolean} true if a overlaps the bottom of b's content area.
-     */
-    function isBelowElement(a, b) {
-        return (dom.getOffsetCoords(a).y + a.offsetHeight >= 
-            dom.getOffsetCoords(b).y + b.offsetHeight);
-    }
-})();
-/**
+    return(dom.getOffsetCoords = getOffsetCoords)(el, container, coords);
+};/**
  * @fileoverview
  * @static
  * @author Garrett Smith
  * APE.dom package functions for calculating element position properties.
  */
 /** @name APE.dom */
+if(!document.documentElement.getBoundingClientRect && APE.dom.IS_COMPUTED_STYLE_SUPPORTED) {
 (function() {
     var dom = APE.dom,
               doc = this.document,
               inited,
               documentElement = doc.documentElement;
         
-    if(dom.IS_COMPUTED_STYLE_SUPPORTED && !documentElement.getBoundingClientRect) {
-        dom.getOffsetCoords = getOffsetCoordsFallback;
-        var round = Math.round, max = Math.max,
-            parseFloat = self.parseFloat,
-            GET_COMPUTED_STYLE = "getComputedStyle",
-            DEFAULT_VIEW = "defaultView",
-            IS_SCROLL = typeof document.createElement("p").scrollLeft == "number",
-            
-        // Load-time constants.
-            IS_BODY_ACTING_ROOT = documentElement && documentElement.clientWidth === 0,
-            
-            TABLE = /^h/.test(documentElement.tagName) ? "table" : "TABLE",
+    dom.getOffsetCoords = getOffsetCoordsFallback;
+    var round = Math.round, max = Math.max,
+        parseFloat = self.parseFloat,
+        GET_COMPUTED_STYLE = "getComputedStyle",
         
-        // XXX Opera <= 9.2 - parent border widths are included in offsetTop.
-            IS_PARENT_BODY_BORDER_INCLUDED_IN_OFFSET,
+    // Load-time constants.            
+        TABLE = dom.IS_XML_DOM ? "table" : "TABLE",
     
-        // XXX Opera <= 9.2 - body offsetTop is inherited to children's offsetTop
-        // when body position is not static.
-        // opera will inherit the offsetTop/offsetLeft of body for relative offsetParents.
+    // XXX Opera <= 9.2 - parent border widths are included in offsetTop.
+        IS_PARENT_BODY_BORDER_INCLUDED_IN_OFFSET,
+
+    // XXX Opera <= 9.2 - body offsetTop is inherited to children's offsetTop
+    // when body position is not static.
+    // opera will inherit the offsetTop/offsetLeft of body for relative offsetParents.
+
+        IS_BODY_MARGIN_INHERITED,
+        IS_BODY_TOP_INHERITED,
+        IS_BODY_OFFSET_EXCLUDING_MARGIN,
+
+    // XXX Mozilla includes a table border in the TD's offsetLeft.
+    // There is 1 exception:
+    //   When the TR has position: relative and the TD has block level content.
+    //   In that case, the TD does not include the TABLE's border in it's offsetLeft.
+    // We do not account for this peculiar bug.
+        IS_TABLE_BORDER_INCLUDED_IN_TD_OFFSET,
+        IS_STATIC_BODY_OFFSET_PARENT_BUT_ABSOLUTE_CHILD_SUBTRACTS_BODY_BORDER_WIDTH,
+
+        IS_BODY_OFFSET_IGNORED_WHEN_BODY_RELATIVE_AND_LAST_CHILD_POSITIONED,
+
+        IS_CONTAINER_BODY_STATIC_INCLUDING_HTML_PADDING,
+        IS_CONTAINER_BODY_RELATIVE_INCLUDING_HTML_PADDING_REL_CHILD,
+        IS_CONTAINER_BODY_RELATIVE_INCLUDING_HTML_PADDING_ABS_CHILD,
+        IS_CONTAINER_BODY_INCLUDING_HTML_MARGIN,
+
+        // In Safari 2.0.4, BODY can have offsetTop when offsetParent is null.
+        // but offsetParent will be HTML (root) when HTML has position.
+        // IS_BODY_OFFSET_TOP_NO_OFFSETPARENT,
+        
+        relative = "relative",
+        borderTopWidth = "borderTopWidth",
+        borderLeftWidth = "borderLeftWidth",
+        positionedExp = /^(?:r|a)/,
+        absoluteExp = /^(?:a|f)/;
+        
+    // release from closure.
+    doc = documentElement = null;    
     
-            IS_BODY_MARGIN_INHERITED,
-            IS_BODY_TOP_INHERITED,
-            IS_BODY_OFFSET_EXCLUDING_MARGIN,
+    /**
+     * @memberOf APE.dom
+     * @param {HTMLElement} el you want coords of.
+     * @param {HTMLElement} positionedContainer container to look up to. The container must have
+     * position: (relative|absolute|fixed);
+     *
+     * @param {x:Number, y:Number} coords object to pass in.
+     * @return {x:Number, y:Number} coords of el from container.
+     *
+     * <p>
+     *  Passing in re-used coords can improve performance in all browsers.
+     *  There is a side effect to passing in coords:
+     *  For drag drop operations, reuse coords:
+     * </p>
+     * <pre>
+     * // Update our coords:
+     * dom.getOffsetCoords(el, container, this.coords);
+     * </pre>
+     * Where <code>this.coords = {};</code>
+     */
     
-        // XXX Mozilla includes a table border in the TD's offsetLeft.
-        // There is 1 exception:
-        //   When the TR has position: relative and the TD has block level content.
-        //   In that case, the TD does not include the TABLE's border in it's offsetLeft.
-        // We do not account for this peculiar bug.
-            IS_TABLE_BORDER_INCLUDED_IN_TD_OFFSET,
-            IS_STATIC_BODY_OFFSET_PARENT_BUT_ABSOLUTE_CHILD_SUBTRACTS_BODY_BORDER_WIDTH,
-    
-            IS_BODY_OFFSET_IGNORED_WHEN_BODY_RELATIVE_AND_LAST_CHILD_POSITIONED,
-    
-            IS_CONTAINER_BODY_STATIC_INCLUDING_HTML_PADDING,
-            IS_CONTAINER_BODY_RELATIVE_INCLUDING_HTML_PADDING_REL_CHILD,
-            IS_CONTAINER_BODY_RELATIVE_INCLUDING_HTML_PADDING_ABS_CHILD,
-            IS_CONTAINER_BODY_INCLUDING_HTML_MARGIN,
-    
-            // In Safari 2.0.4, BODY can have offsetTop when offsetParent is null.
-            // but offsetParent will be HTML (root) when HTML has position.
-            // IS_BODY_OFFSET_TOP_NO_OFFSETPARENT,
-            
-            relative = "relative",
-            borderTopWidth = "borderTopWidth",
-            borderLeftWidth = "borderLeftWidth",
-            positionedExp = /^(?:r|a)/,
-            absoluteExp = /^(?:a|f)/;
-            
-        // release from closure.
-        doc = documentElement = null;
-    
-        /**
-         * @memberOf APE.dom
-         * @param {HTMLElement} el you want coords of.
-         * @param {HTMLElement} positionedContainer container to look up to. The container must have
-         * position: (relative|absolute|fixed);
-         *
-         * @param {x:Number, y:Number} coords object to pass in.
-         * @return {x:Number, y:Number} coords of el from container.
-         *
-         * <p>
-         *  Passing in re-used coords can improve performance in all browsers.
-         *  There is a side effect to passing in coords:
-         *  For drag drop operations, reuse coords:
-         * </p>
-         * <pre>
-         * // Update our coords:
-         * dom.getOffsetCoords(el, container, this.coords);
-         * </pre>
-         * Where <code>this.coords = {};</code>
-         */
-    }
     function getOffsetCoordsFallback(el, container, coords) {
 
         var doc = el[dom.OWNER_DOCUMENT],
@@ -339,11 +296,11 @@ APE.namespace("APE.dom");
         if(!inited) init();
         var offsetLeft = el.offsetLeft,
             offsetTop = el.offsetTop,
-            defaultView = doc[DEFAULT_VIEW],
+            defaultView = doc.defaultView,
             // Blackbery9000 cs is null sometimes. Needs reduction. 
             cs = defaultView[GET_COMPUTED_STYLE](el, '') || el.style;
         
-         if(cs.position == "fixed" && IS_SCROLL) {
+         if(cs.position == "fixed" && dom.IS_SCROLL_SUPPORTED) {
             coords.x = offsetLeft + documentElement.scrollLeft;
             coords.y = offsetTop + documentElement.scrollTop;
             return coords;
@@ -359,7 +316,7 @@ APE.namespace("APE.dom");
         // when we get to a parent that's an offsetParent, update
         // the current offsetParent marker.
         for( ; parent && parent !== container; parent = parent.parentNode) {
-            if(parent !== body && parent !== documentElement && IS_SCROLL) {
+            if(parent !== body && parent !== documentElement && dom.IS_SCROLL_SUPPORTED) {
                 offsetLeft -= parent.scrollLeft;
                 offsetTop -= parent.scrollTop;
             }
@@ -578,7 +535,7 @@ APE.namespace("APE.dom");
 
         xs[position] = "absolute";
         s[position] = stat;
-         if(x.offsetParent === body) {
+        if(x.offsetParent === body) {
             s[border] = bv;
             xs.top = "2px";
             // XXX Safari gets offsetParent wrong (says 'body' when body is static,
@@ -617,7 +574,7 @@ APE.namespace("APE.dom");
         ds.cssText = dCssText||"";
     }
 })();
-/**
+}/**
  * @fileoverview dom ClassName Functions.
  * @namespace APE.dom
  * @author Garrett Smith
@@ -1418,7 +1375,7 @@ APE.namespace("APE.dom");
 })();/**
  * @requires APE.dom.style-f.js
  */
-APE.dom.getPixelCoords = function (el){
+APE.dom.getPixelCoords = function(el) {
     var ret, dom = APE.dom,
         parseInt = self.parseInt,
         f = (dom.IS_COMPUTED_STYLE_SUPPORTED ? function(el) {
@@ -1427,17 +1384,18 @@ APE.dom.getPixelCoords = function (el){
             x : parseInt(cs.left, 10)||0,
             y : parseInt(cs.top, 10)||0
         };
-    } : function(el){
-        var style = el.style;
+    } : function(el, getStyle){
+        var style = el.style,
+            getStyle = getStyle || dom.getStyle;
         return{
             // pixelLeft, in IE returns 0 when the element does not have 
             // left: in the style attribute, so if that fails, try to read 
             // the style using dom.getStyle.
-            x : style.pixelLeft || parseInt(dom.getStyle(el,"left"), 10)||0,
-            y : style.pixelTop || parseInt(dom.getStyle(el,"top"), 10)||0
+            x : style.pixelLeft || parseInt(getStyle(el,"left"), 10)||0,
+            y : style.pixelTop || parseInt(getStyle(el,"top"), 10)||0
         };
     });
-    ret = (dom.getPixelCoords = f)(el);
+    ret = (dom.getPixelCoords = f)(el, getStyle);
     el = null;
     return ret;
 };

@@ -23,7 +23,7 @@
         <a href="../../build/dom/Event.js">Event.js</a>
     </li>
     <li>
-        <a href="../../build/dom/position-f.js">position-f.js</a>
+        <a href="../../build/dom/getOffsetCoords.js">getOffsetCoords.js</a>
     </li>
     <li>
         <a href="../../build/dom/style-f.js">style-f.js</a>

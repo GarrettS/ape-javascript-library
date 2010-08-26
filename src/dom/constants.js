@@ -8,8 +8,9 @@ APE.namespace("APE.dom").getConstants = function(doc) {
         view = doc.defaultView,
         compatMode = doc.compatMode,
         testStyle,
+        testNode = doc.createElement("div"),
         IS_STANDARDS_MODE = compatMode ? compatMode != "BackCompat" :
-            ((testStyle = doc.createElement("p").style).width = "1", !testStyle.width);
+            ((testStyle = testNode.style).width = "1", !testStyle.width);
         
     return{
         TEXT_CONTENT : typeof docEl.textContent === "string" ? "textContent" : "innerText",
@@ -26,9 +27,10 @@ APE.namespace("APE.dom").getConstants = function(doc) {
         // IE, Safari, and Opera support clientTop. FF 2 doesn't
         IS_CLIENT_TOP_SUPPORTED : typeof docEl.clientTop != UNDEFINED,
         
-        // Not supported.
+        // XML dom is not supported.
         IS_XML_DOM : docEl.tagName === "html",
-        IS_QUIRKS_MODE : !IS_STANDARDS_MODE
+        IS_QUIRKS_MODE : !IS_STANDARDS_MODE,
+        IS_SCROLL_SUPPORTED : typeof testNode.scrollLeft == "number"
     };
 };
 APE.dom.mixin(APE.dom.getConstants(document));

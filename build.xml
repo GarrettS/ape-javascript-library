@@ -12,8 +12,8 @@
          Remove the APE.namespace(APE.dom) from each file (except the first)
     -->
         <property name='domFiles' 
-        	value='constants.js, keys.js, viewport-f.js, position-f.js, 
-        	position-f-fallback.js, classname-f.js, 
+        	value='constants.js, keys.js, viewport-f.js, getOffsetCoords.js, 
+        	getOffsetCoords-fallback.js, classname-f.js, 
 traversal-f.js, Event.js, Event-coords.js, style-f.js, getPixelCoords.js'/>
         <concat destfile="${build}/dom/dom.js">
             <filelist dir="${build}/dom" files="${domFiles}"/>

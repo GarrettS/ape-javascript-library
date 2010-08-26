@@ -14,8 +14,8 @@
 <script type="text/javascript" src="../../../build/APE.js"></script>
 <script type="text/javascript" src="../../../build/aop/Advice.js"></script>
 <script type="text/javascript" src="../../../build/dom/constants.js"></script>
-<script type="text/javascript" src="../../../build/dom/position-f.js"></script>
-<script type="text/javascript" src="../../../build/dom/position-f-fallback.js"></script>
+<script type="text/javascript" src="../../../build/dom/getOffsetCoords.js"></script>
+<script type="text/javascript" src="../../../build/dom/getOffsetCoords-fallback.js"></script>
 </head>
 
 <body style="position: relative; margin: 0; padding: 0;">
@@ -176,67 +176,6 @@ onload = function(){
         },
         
         //Test methods ---------------------------------------------------------------------
-        
-        testIsInsideElement : function() {
-            var target = document.getElementById("target");
-            var c1 = document.getElementById("c1");
-            this.wait(function(){
-	            Assert.isTrue( APE.dom.isInsideElement(target, c1) );
-            }, BLACKBERRY_DELAY);
-        },
-
-        testIsScrollSupported : function() {
-            this.wait(function(){
-                Assert.areSame("boolean", typeof dom.IS_SCROLL_SUPPORTED);
-            }, BLACKBERRY_DELAY);
-        },
-        
-        testIsInsideElementFail : function() {
-            var target = document.getElementById("target");
-
-            // target is top: 6; height: 1;
-            target.style.top = "6px";
-            var c1 = document.getElementById("c1");
-            this.wait(function(){
-            	Assert.isFalse( APE.dom.isInsideElement(target, c1) );
-            }, BLACKBERRY_DELAY);
-        },
-        
-        isAboveElement : function() {
-            var target = document.getElementById("target");
-            target.style.top = "2px";
-            var c1 = document.getElementById("c1");
-            this.wait(function(){
-                Assert.isTrue( APE.dom.isAboveElement(target, c1) );
-            }, BLACKBERRY_DELAY);
-        },
-        
-        isAboveElementFail : function() {
-            var target = document.getElementById("target");
-            target.style.top = "3px";
-            var c1 = document.getElementById("c1");
-            this.wait(function(){
-                Assert.isFalse( APE.dom.isAboveElement(target, c1) );
-           }, BLACKBERRY_DELAY);
-        },
-        
-        isBelowElement : function() {
-            var target = document.getElementById("target");
-            target.style.top = "4px";
-            var c1 = document.getElementById("c1");
-            this.wait(function(){
-                Assert.isTrue( APE.dom.isAboveElement(target, c1) );
-            }, BLACKBERRY_DELAY);
-        },
-        
-        isBelowElementFail : function() {
-            var target = document.getElementById("target");
-            target.style.top = "3px";
-            var c1 = document.getElementById("c1");
-            this.wait(function(){
-                Assert.isFalse( APE.dom.isAboveElement(target, c1) );
-            }, BLACKBERRY_DELAY);
-        },
         
         testGetOffsetTop : function() {
             var target = document.getElementById("target");

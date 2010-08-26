@@ -1,0 +1,174 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+<title>DOM positioning Test</title>
+<link rel="stylesheet" type="text/css" href="../../yui-test/build/logger/assets/logger.css">
+<link rel="stylesheet" type="text/css" href="../../yui-test/assets/testlogger.css">
+
+<script type="text/javascript" src="../../yui-test/build/yahoo-dom-event/yahoo-dom-event.js"></script>
+<script type="text/javascript" src="../../yui-test/build/logger/logger.js"></script>
+<script type="text/javascript" src="../../yui-test/build/yuitest/yuitest-beta.js"></script>
+
+<script type="text/javascript" src="../../../build/APE.js"></script>
+<script type="text/javascript" src="../../../build/aop/Advice.js"></script>
+<script type="text/javascript" src="../../../build/dom/constants.js"></script>
+<script type="text/javascript" src="../../../build/dom/getOffsetCoords.js"></script>
+<script type="text/javascript" src="../../../build/dom/getOffsetCoords-fallback.js"></script>
+<script type="text/javascript" src="../../../build/dom/position-bounds.js"></script>
+</head>
+
+<body style="position: relative; margin: 0; padding: 0;">
+<div id="testLogger" style="position: absolute"></div>
+<!-- In IE, a relatively positioned descendant gets position offset by font-size! -->
+<div id="container"
+    style="position: absolute; top: 0; left: 0; font-size: 0;"><!-- isInsideElement -->
+<!-- 20 + 11 = 33 --> <a id="overlapping"
+    style='position: absolute; top: 20px; right: 0; height: 0; border: 11px solid #ccc; background: #900'></a>
+
+
+
+<!-- +12 -->
+<div id="c1"
+    style="position: absolute; top: 2px; height: 6px; background: #00c; left: 0;">
+<!-- +3 --> <a id="target"
+    style='position: absolute; top: 3px; left: 1px; display: block; height: 1px; background: #FF0;'>a</a>
+
+</div>
+
+<!-- scroll offsets -->
+
+<div
+    style="height: 50px; width: 50px; overflow: scroll; position: absolute; top: 1px; left: 2px;">
+<div id="scrolledInner"
+    style="height: 20px; width: 20px; position: absolute; top: 2px; left: 3px;"></div>
+<div style="height: 300px; width: 100px;">padder - causes
+scrollbars to appear on scrolledInner.parentNode</div>
+</div>
+
+<div id="testNode"></div>
+
+<div id="tableContainer"
+    style="left: 100px; top: 0; position: absolute; width: 200px; height: 30px;">
+<table
+    style="width: 400px; height: 200px; padding: 0; border-spacing: 0; border: 10px solid #Fc0; background: #efd;"
+    border="0" cellspacing="0">
+    <!-- IE7 needs cellspacing=0 -->
+    <caption>Test Caption</caption>
+    <thead>
+        <tr>
+            <th style="width: 50%">blah</th>
+            <th style="width: 50%">blah</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>blah</td>
+            <td><span>blah</span></td>
+        </tr>
+        <tr id="testrow">
+            <td>blah</td>
+            <td id="testcell" style="padding: 5px">
+            <div id="testdiv">
+            <table id="innerTable" cellpadding="0" cellspacing="0">
+                <tbody>
+                    <tr>
+                        <td>
+                        <div id="innerDiv">blah</div>
+                        </td>
+                    </tr>
+                </tbody>
+                </table>
+                </div>
+                </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+<script type="text/javascript">
+window.onload = function(){
+
+    var el = document.getElementById('scrolledInner');
+    el.parentNode.scrollLeft = 10;
+    document.body.style.position = "static";
+    //alert(el.parentNode.scrollLeft); // => 0.
+    
+    
+    var container = document.getElementById("container"),
+        target = document.getElementById("target"),
+        c1 = document.getElementById("c1"),
+    
+        // Save original state in template.
+        template = container.innerHTML,
+        containerCssText = container.style.cssText,
+        htmlCssText = document.documentElement.style.cssText,
+        bodyCssText = document.body.style.cssText;
+
+    var Assert = YAHOO.util.Assert,
+        dom = APE.dom,
+        positionComparator = dom.getPositionComparator(dom.getOffsetCoords),
+        
+        // getComputedStyle and offsetTop are updated 
+        // asynchronously in Blackberry9000. The delay 
+        // allows for catch-up.
+        BLACKBERRY_DELAY = 50,
+        IGNORE_SCROLL_TESTCASES = !dom.IS_SCROLL_SUPPORTED;
+
+    // This test is special in that it's copied, then the setUp method is 
+    // AOPized with after advice to scroll the window.
+    var positionTestCase = new YAHOO.tool.TestCase({
+                                    
+        testIsAboveElement : function() {
+            var target = document.getElementById("target");
+            target.style.top = "-1px";
+            var c1 = document.getElementById("c1");
+            console.log(dom.getOffsetCoords(c1).y);
+            console.log(dom.getOffsetCoords(target).y);
+            this.wait(function() {
+                Assert.isTrue( positionComparator.isAbove(target, c1) );
+            }, BLACKBERRY_DELAY);
+        },
+        
+        testIsAboveElementFail : function() {
+            var target = document.getElementById("target");
+            target.style.top = "1px";
+            var c1 = document.getElementById("c1");
+            this.wait(function(){
+                Assert.isFalse( positionComparator.isAbove(target, c1) );
+           }, BLACKBERRY_DELAY);
+        },
+        
+        testIsBelowElement : function() {
+            var target = document.getElementById("target");
+            target.style.top = "14px";
+            var c1 = document.getElementById("c1");
+            this.wait(function(){
+                Assert.isTrue( positionComparator.isBelow(target, c1) );
+            }, BLACKBERRY_DELAY);
+        },
+        
+        testIsBelowElementFail : function() {
+            var target = document.getElementById("target");
+            target.style.top = "3px";
+            var c1 = document.getElementById("c1");
+            this.wait(function(){
+                Assert.isFalse( positionComparator.isBelow(target, c1) );
+            }, BLACKBERRY_DELAY);
+        }
+    });
+    
+    var logger = new YAHOO.tool.TestLogger("testLogger");
+    YAHOO.tool.TestRunner.add( positionTestCase );
+    
+    // run the tests, or put them in the TestRunner.
+    if (parent && parent != window) {
+        YAHOO.tool.TestManager.load();
+    } else {
+        YAHOO.tool.TestRunner.run();
+    }
+};
+</script>
+</body>
+</html>

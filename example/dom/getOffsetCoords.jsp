@@ -8,7 +8,8 @@
 <link type="text/css" rel="stylesheet" href="../../resources/ape.css"/>
 
 <script type="text/javascript" src="../../build/APE.js"></script>
-<script type="text/javascript" src="../../build/dom/position-f.js"></script>
+<script type="text/javascript" src="../../build/dom/getOffsetCoords.js"></script>
+<script type="text/javascript" src="../../build/dom/getOffsetCoords-fallback.js"></script>
 
 <script type="text/javascript">
     function moveMarker() {
