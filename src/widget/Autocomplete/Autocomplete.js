@@ -208,7 +208,9 @@ APE.namespace("APE.widget").defineCustomFactory("Autocomplete", function(Autocom
         function keyDownHandler(ev) {
             var keyCode = ev.keyCode,
                 ac = Autocomplete.getById(this.id.replace("-input", ""));
-
+            if(key.ARROW_KEY_EXP.test(keyCode)) {
+                Event.preventDefault(ev);
+            }
             if(!hasListForInputDefaultValue(ac, this.defaultValue)) return;
     
             if(!keyAnim || !keyAnim.playing) {
