@@ -51,9 +51,10 @@ window.onload = function(){
 
     var accel = document.getElementById("accel"),
         spring = document.getElementById("spring");
-        spring.onclick = accel.onclick = function(){
-            return ButtonFactory.getById(this.id).start();
-        };
+
+    spring.onclick = accel.onclick = function(){
+        return ButtonFactory.getById(this.id).start();
+    };
 
     var ButtonFactory = APE.createFactory("Button", function() {
 
@@ -114,7 +115,7 @@ window.onload = function(){
 <div class='anim-div'>
     spring &nbsp;example
     <div id='spring' style="width: 10em;background-color: #131;border: 1px solid #030" 
-        onclick="doIt('spring', fatRed)">Pomegranate</div>
+        >Pomegranate</div>
 </div>
 
 <script type="text/javascript" src="../../build/anim/Animation.js"></script>
