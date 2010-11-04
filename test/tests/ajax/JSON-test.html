@@ -1,0 +1,78 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+    <title>JSON test</title>
+    
+    <script src="../../../build/ape-ep-dom.js" type="text/javascript"></script>
+    <script src="../../../build/test/TestRunner.js" type="text/javascript"></script>
+    <script src="../../../build/test/TestReporter.js" type="text/javascript"></script>
+    <script src="../../../build/test/Assert.js" type="text/javascript"></script>
+    <script src="../../../build/test/NativeConstraints.js" type="text/javascript"></script>
+    <link type="text/css" rel="stylesheet" href="../../../build/test/css/TestReporter.css">
+    
+</head>
+<body>
+<script type="text/javascript">
+var i = 0;
+function testJSON(json, name) {
+	var test = APE.test,
+	    Assert = test.Assert,
+	    cond = test.NativeConstraints,
+	    testRunner = APE.test.TestRunner.getById("TestRunner" + i++);
+
+	var testJSONNumber = {
+
+	    name : name,
+
+        'test JSON.parse("1.") @throws SyntaxError' : function() {
+            json.parse("1.");
+        },
+
+        'test JSON.parse(".0") @throws SyntaxError' : function() {
+            json.parse(".0");
+        },
+
+        'test JSON.parse("+1") @throws SyntaxError' : function() {
+            json.parse(".0");
+        }
+    };
+
+	/*
+	   JSONStringCharacter ::  
+	    JSONSourceCharacter but not double-quote " or backslash \ or U+0000 thru U+001F
+	    \ JSONEscapeSequence 
+	*/
+	var testJSONString = {
+	    'test JSON.parse invalidChars' : function() {
+
+	        var i, ch, failedChars = [];
+	        for(i = 0; i < 0x1f; i++) {
+	            try {
+	                ch = String.fromCharCode(i);
+	                JSON.parse('"' + ch + '"');
+	            } catch(ex) { ch = null; }
+	            if(ch !== null) {
+		            failedChars.push(i.toString(16));
+	            }
+	        }
+	        Assert(failedChars, isEmptyArray);
+	    }
+	};
+
+	function isEmptyArray(array, customMessage) {
+		if(!array || array.length) {
+		    return customMessage || "array not empty, " + array.toString();
+		}
+	}
+	
+	var testReporter = new APE.test.TestReporter(testRunner);
+	//testRunner.addTestCase(testJSONNumber);
+    testRunner.addTestCase(testJSONString);
+	testRunner.start();
+};
+
+testJSON(JSON, "TestCase: JSON (native)");
+</script>
+</body>

@@ -1,0 +1,1 @@
+APE.test.NativeConstraints={isTrue:function(A,B){return A===true?"":"found "+A+" ("+(typeof A)+"), expected true"}};
