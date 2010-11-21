@@ -18,8 +18,7 @@ APE.namespace("APE.test").defineCustomFactory("TestRunner", function(TestRunner)
             if(testCaseData.oncomplete) {
                 testCaseData.oncomplete();
             } else {
-                reporter = new APE.test.TestReporter(runner);
-                reporter.insertBefore(document.body);
+                reporter = new APE.test.TestReporter(runner, document.body);
             }
         }
         runner.start();
@@ -179,7 +178,7 @@ APE.namespace("APE.test").defineCustomFactory("TestRunner", function(TestRunner)
         }
     }
     
-    var throwsExp = /@throws\s*([a-zA-Z_$]+[a-zA-Z_$]|$)/;
+    var throwsExp = /@throws\s+([a-zA-Z_$]+[a-zA-Z_$]|$)/;
     function Test(name, func, parent) {
         this.name = name || func.name || parent.testableList.length;
         this.parent = parent;
@@ -187,7 +186,8 @@ APE.namespace("APE.test").defineCustomFactory("TestRunner", function(TestRunner)
         this.func = func;
         this.shouldThrow = throwsExp.test(name);
         if(this.shouldThrow) { 
-            this.expectedErrorName = expectedErrorName[1]||"";
+        	var expectedErrorName = throwsExp.exec(name);
+            this.expectedErrorName = expectedErrorName && expectedErrorName[1]||"";
         }
         
         this.testableList = [];
@@ -317,5 +317,5 @@ APE.namespace("APE.test").defineCustomFactory("TestRunner", function(TestRunner)
             clearTimeout(seg.startTimer);
         });
     }
-    return getConstructor; 
+    return getConstructor;
 });
