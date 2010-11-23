@@ -5,11 +5,11 @@ APE.namespace("APE.test").defineCustomFactory("TestRunner", function(TestRunner)
     };
     
     function getConstructor(TestRunnerFactory) {
-        TestRunnerFactory.testSimple = testSimple;
+        TestRunnerFactory.runTests = runTests;
         return TestRunnerC;
     }
     
-    function testSimple(testCaseData) {
+    function runTests(testCaseData) {
         var runner = TestRunnerFactory.getById("Test Runner"),
             reporter;
         runner.addTestCase(testCaseData);
@@ -38,7 +38,13 @@ APE.namespace("APE.test").defineCustomFactory("TestRunner", function(TestRunner)
             toString : function() {
                 return this.name;
             }
-        };
+    };
+    
+    function reset(testable) {
+    	testable.testableList = 
+    		testable.queuedTestLoads = 
+    			testable.errorList.length = [];
+    }
 
     /* Add anything matching ITestable interface (start, run). */
     function testableAdd(parent, testable, name) {
@@ -64,7 +70,6 @@ APE.namespace("APE.test").defineCustomFactory("TestRunner", function(TestRunner)
         this.start = ITestable.start;
         this.toString = ITestable.toString;
         this.addCallback = addCallback;
-        this.errorList = [];
     }
 
     // # ID and NAME tokens must begin with a letter ([A-Za-z]) 
@@ -84,6 +89,7 @@ APE.namespace("APE.test").defineCustomFactory("TestRunner", function(TestRunner)
         this.id = makeId(name);
         this.testableList = [];
         this.queuedTestLoads = [];
+        this.errorList = [];
     }
 
     TestRunnerC.prototype = APE.createMixin(new Testable(), {
@@ -140,6 +146,7 @@ APE.namespace("APE.test").defineCustomFactory("TestRunner", function(TestRunner)
         this.name = testCaseData.name || ("TestCase:" + parent.testableList.length);
         this.id = makeId(name);
         this.parent = parent;
+        this.errorList = [];
     }
     
     function buildTestableList(testCase, testCaseData) {
@@ -155,27 +162,40 @@ APE.namespace("APE.test").defineCustomFactory("TestRunner", function(TestRunner)
     function loadRemoteTest(testCase, testName, testURI) {
         var reqData = {method: "GET", action: testURI},
             req = APE.ajax.AsyncRequest.getById(testURI, reqData),
-            testIndex = testCase.testableList;
+            testIndex = testCase.testableList.length;
 
         testCase.queuedTestLoads.push(req);
         EventPublisher.add(req, "oncomplete", addRemoteTestToList);
         req.send();
 
         function addRemoteTestToList() {
-            alert("addRemoteTestToList called")
             var source = req.req.responseText, 
-                testFunction;
+                reqId = req.id,
+                testData,
+                testableList;
+            
             if(source) {
-                testFunction = Function(source);
+            	testData = Function("return ("+source + ")");
             } else {
-                testFunction = function(){return"Test did not load. "+req.id;};
+            	testData = {};
+            	testData["test " + reqId] = function(){return"Remote TestCase did not load. " + reqId;};
             }
+            testCase.add(testData);
+            //newTestList = buildTestableList(testCase, testData);
             if(testCase.queuedTestLoads.length == 0) {
-                testCase.onload();
+                // testCase.onload();
             }
-            testCase.queuedTestLoads.splice(testIndex, 1);
-            testCase.testableList[testIndex] = new Test(testName, testFunction);
+            
+            //testCase.testableList = insertItemsToArray(testCase.testableList, newTestList, testIndex);
+            
         }
+    }
+    
+    function insertItemsToArray(array, newItems, start) {
+        var tail = array.slice(start);
+        var a = array.slice(0, start);
+        a = a.concat(newItems, tail);
+        return a;
     }
     
     var throwsExp = /@throws\s+([a-zA-Z_$]+[a-zA-Z_$]|$)/;
@@ -213,7 +233,6 @@ APE.namespace("APE.test").defineCustomFactory("TestRunner", function(TestRunner)
                             message: error + " expected but not thrown",
                             stack : stack
                         }, test));
-                console.log(test.errorList[0])
             }
         }
         waitForDeferredSegments(test);

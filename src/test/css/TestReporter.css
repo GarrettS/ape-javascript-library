@@ -36,3 +36,8 @@
 .test-reporter .expandedNode > ul {
     display: block;
 }
+
+.test-pass {
+	color: #000;
+	background: #fff;
+}

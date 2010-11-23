@@ -35,9 +35,17 @@ function testJSON(json, name) {
         },
 
         'test JSON.parse("+1") @throws SyntaxError' : function() {
-            json.parse(".0");
+            json.parse("+1");
+        },
+        
+        'test JSON.parse("00") @throws SyntaxError' : function() {
+            json.parse("00");
+        },
+
+        'test JSON.parse("0")' : function() {
+            json.parse("0");
         }
-    };
+};
 
 	/*
 	   JSONStringCharacter ::  
@@ -68,7 +76,7 @@ function testJSON(json, name) {
 	}
 	
 	var testReporter = new APE.test.TestReporter(testRunner);
-	//testRunner.addTestCase(testJSONNumber);
+	testRunner.addTestCase(testJSONNumber);
     testRunner.addTestCase(testJSONString);
 	testRunner.start();
 };

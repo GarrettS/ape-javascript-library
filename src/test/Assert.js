@@ -1,6 +1,8 @@
 APE.namespace("APE.test").mixin(new function() {
     
+	// depreceted, renamed to "assert"
     this.Assert = that;
+    this.assert = that;
     this.fail = fail;
     
     function that(actualValue, constraint, message) {
