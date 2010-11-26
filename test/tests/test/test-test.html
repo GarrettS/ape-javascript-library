@@ -126,7 +126,6 @@ window.onload = function(){
 
            tr.start();
 //           Assert.areSame(1, tr.errorList.length);
-           console.log( tr.errorList[0])
         },
 
         testDone : function() {
@@ -195,7 +194,6 @@ window.onload = function(){
             tr.add("xhr-testFunctionFail.js");
             tr.oncomplete = function() {
                 Assert.areSame(1, tr.errorList.length);
-                console.log(this.errorList)
             };
             tr.start();
         }

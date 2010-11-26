@@ -33,6 +33,13 @@
 	color: brown;
 }
 
+.test-reporter .errorStack pre {
+	background: #FCFCFC;
+    color: #111111;
+    font-weight: normal;
+    line-height: 3ex;
+}
+
 .test-reporter .expandedNode > ul {
     display: block;
 }

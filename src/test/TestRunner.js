@@ -3,9 +3,9 @@ APE.namespace("APE.test").defineCustomFactory("TestRunner", function(TestRunner)
     TestRunner.newInstance = function(){ 
         return TestRunner.getById(new Date);
     };
-    
-    function getConstructor(TestRunnerFactory) {
-        TestRunnerFactory.runTests = runTests;
+    TestRunner.runTests = runTests;
+
+    function getConstructor(TestRunnerFactory) {        
         return TestRunnerC;
     }
     

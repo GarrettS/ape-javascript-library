@@ -17,7 +17,6 @@ APE.test.TestReporter = function(testRunner, insertBefore) {
 
     this.insertBefore = function(el, refNode) {
         var ul = makeTree(testRunner, el.ownerDocument);
-        ul.className = "test-reporter";
         el.insertBefore(ul, refNode || el.firstChild);
     };
     
@@ -32,6 +31,7 @@ APE.test.TestReporter = function(testRunner, insertBefore) {
             li = makeItem(testableList[i], doc);
             ul.appendChild(li);
         }
+//        ul.className = "test-reporter";
         ul.onclick = listClicked;
         return ul;
     }
@@ -51,12 +51,20 @@ APE.test.TestReporter = function(testRunner, insertBefore) {
     function makeErrorItem(ex) {
         var li = document.createElement("li"),
             ul = document.createElement("ul"),
-            name, message, stack;
+            name, message, stack, errorStack = ex.stack,
+            stackPre;
+        
         message = li.cloneNode(false);
         stack = li.cloneNode(false);
         stack.className = "errorStack";
         message.appendChild(document.createTextNode("message: "+ex.message));
-        stack.appendChild(document.createTextNode("stack: "+ex.stack));
+        if(ex.stack) {
+        	stack.appendChild(document.createTextNode("stack: "));
+        	errorStack = errorStack.replace("@", "<br>@");
+        	stackPre = document.createElement("pre");
+        	stackPre.innerHTML = errorStack;
+        	stack.appendChild(stackPre);
+        }
         li.appendChild(document.createTextNode(ex.name + ":"));
         ul.appendChild(message);
         ul.appendChild(stack);
@@ -90,7 +98,6 @@ APE.test.TestReporter = function(testRunner, insertBefore) {
     function listClicked(ev) {
         var target = APE.dom.Event.getTarget(ev);
         if(target.tagName === "LI") {
-            console.log(target)
             toggleListItem(target);
         }
         APE.dom.Event.stopPropagation(ev);

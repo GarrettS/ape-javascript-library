@@ -72,7 +72,7 @@ if(typeof document.createTouchList !== "undefined") {
         }
     
         function fireTouchEvent(type, target, options){
-            var c = new TouchEventData(target, options),
+            var c = getTouchEventData(target, options),
                 doc = target.ownerDocument || target.document || target;
             //setup default values.
 
@@ -109,7 +109,7 @@ if(typeof document.createTouchList !== "undefined") {
             return canceled;
         }
         
-        function TouchEventData(target, options) {
+        function getTouchEventData(target, options) {
             options = options || {};
             var doc = target.ownerDocument || target.document || target;
             return {
