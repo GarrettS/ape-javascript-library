@@ -10,6 +10,8 @@
     <script src="../../../build/test/TestRunner.js" type="text/javascript"></script>
     <script src="../../../build/test/TestReporter.js" type="text/javascript"></script>
     <script src="../../../build/test/Assert.js" type="text/javascript"></script>
+    <script src="../../../build/test/NativeConstraints.js" type="text/javascript"></script>
+    
     <link type="text/css" rel="stylesheet" href="../../../build/test/css/TestReporter.css">
     
 </head>
@@ -19,15 +21,22 @@ function testMouse() {
     var test = APE.test,
         Assert = test.Assert,
         cond = test.NativeConstraints,
-        testRunner = APE.test.TestRunner.getById("TestRunner"),
-        Mouse = APE.eventsynth.Mouse;
+        testRunner = test.TestRunner.getById("TestRunner"),
+        Mouse = APE.eventsynth.Mouse,
+        Constraints = test.NativeConstraints;
 
     var mouseTestCase = {
 
         name : "Mouse test",
 
         'test click' : function() {
+        	var target;
+        	document.body.onclick = function(ev) {
+        		target = ev ? ev.target : window.event.srcElement;
+        	}
         	Mouse.click(document.body);
+            Assert.that(Constraints.areSame(target, document.body));
+
         }
     };
     
