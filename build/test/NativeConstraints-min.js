@@ -1,1 +1,1 @@
-APE.test.NativeConstraints={isTrue:function(A){return A===true?"":"found "+A+" ("+(typeof A)+"), expected true"}};
+APE.test.NativeConstraints={isTrue:function(A){return function(){return A===true?"":"found "+A+" ("+(typeof A)+"), expected true"}},areSame:function(B,A){return function(){var C="";if(B!==A){C="a !== b";B=A=null}return C}}};

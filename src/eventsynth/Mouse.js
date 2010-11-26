@@ -63,15 +63,15 @@ APE.namespace("APE.eventsynth").Mouse = function() {
 	}
 
 	function createMouseEvent(type, doc, data) {
-		var canceled = false, mouseEvent;
+		var mouseEvent;
 
 		if (doc.createEvent) {
 			mouseEvent = doc.createEvent("MouseEvent");
 			if (mouseEvent.initMouseEvent) {
 				mouseEvent.initMouseEvent(type, data.bubbles,
 						data.cancelable, data.view, data.detail,
-						data.screenX, data.screenY, data.cleintX,
-						data.cleintY, data.ctrlKey, data.altKey,
+						data.screenX, data.screenY, data.clientX,
+						data.clientY, data.ctrlKey, data.altKey,
 						data.shiftKey, data.metaKey, data.button,
 						data.relatedTarget);
 			} else if (mouseEvent.initEvent) {

@@ -1,14 +1,12 @@
-APE.namespace("APE.test").mixin(new function() {
+APE.namespace("APE.test").Assert = new function() {
     
-	// depreceted, renamed to "assert"
-    this.Assert = that;
-    this.assert = that;
+    this.that = that;
     this.fail = fail;
     
-    function that(actualValue, constraint, message) {
+    function that(constraint, message) {
         var errorMessage;
         try {
-            errorMessage = constraint(actualValue);
+            errorMessage = constraint();
         } catch(ex) {
             throw new Error("constraint could not complete. ");
         }
@@ -27,4 +25,4 @@ APE.namespace("APE.test").mixin(new function() {
             (customMessage ? "; " + customMessage : "");
         this.name = "AssertionError";
     }
-});
+};
