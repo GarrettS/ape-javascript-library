@@ -11,7 +11,8 @@ APE.test.NativeConstraints = {
     	return function() {
     		var ret = "";
 	    	if(a !== b) {
-	    		ret = "a !== b";
+	    		ret = "Actual " + a + " (" + typeof a + ")"
+	    			+ " was not " + b + " (" + typeof b + ")";
 	    		a = b = null;
 	    	}
 	    	return ret;
