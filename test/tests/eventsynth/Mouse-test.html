@@ -15,7 +15,9 @@
     <link type="text/css" rel="stylesheet" href="../../../build/test/css/TestReporter.css">
     
 </head>
-<body>
+<body style="margin: 0">
+<div id="shim" style="height: 3000px;float: left"></div>
+<div id="testNode" style="height: 200px; position: relative; background: #ccf">-</div>
 <script type="text/javascript">
 function testMouse() {
     var test = APE.test,
@@ -23,21 +25,59 @@ function testMouse() {
         cond = test.NativeConstraints,
         testRunner = test.TestRunner.getById("TestRunner"),
         Mouse = APE.eventsynth.Mouse,
-        Constraints = test.NativeConstraints;
+        Constraints = test.NativeConstraints,
+        testNode = document.getElementById("testNode");
 
     var mouseTestCase = {
 
-        name : "Mouse test",
+        name : "click testcase",
 
-        'test click' : function() {
+        'test target' : function() {
         	var target;
-        	document.body.onclick = function(ev) {
+        	testNode.onclick = function(ev) {
         		target = ev ? ev.target : window.event.srcElement;
-        	}
-        	Mouse.click(document.body);
-            Assert.that(Constraints.areSame(target, document.body));
-
+        	};
+        	Mouse.click(testNode);
+            Assert.that(Constraints.areSame(target, testNode));
+        },
+        
+        'test pageY where pageY is present' : function() {
+            var target, pageY;
+            testNode.onclick = function(ev) {
+            	if(ev) {
+                   pageY = ev.pageY;
+            	}
+            };
+            window.scrollTo(10, 10);
+            // Assertion delayed for Opera and IE which do update 
+            // pageXOffset/scrollTop asynchronously.
+           	this.wait(function() {
+                Mouse.click(testNode, {clientY : 10} );
+                if(typeof pageY == "number") {
+                    Assert.that(Constraints.areSame(pageY, 20));
+                }
+                // TODO: tearDown.
+                window.scrollTo(0, 0);
+           	}, 100);
+        },
+        
+        // TODO: Should this be fixed for IE9 beta? Will MS fix their bugs?
+        'test offsetY where offsetY is present' : function() {
+        	var target, offsetY;
+        	testNode.onclick = function(ev) {
+            	offsetY = ev && ev.offsetY;
+            };
+            window.scrollTo(0, 10);
+            
+            if(typeof offsetY == "number") {
+                this.wait(function() {
+                    Mouse.click(testNode, {clientY : 10} );
+                    Assert.that(Constraints.areSame(offsetY, 20));
+                }, 100);
+            }
+            window.scrollTo(0, 0);
         }
+        
     };
     
     var testReporter = new APE.test.TestReporter(testRunner);
