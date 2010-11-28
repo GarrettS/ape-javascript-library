@@ -32,6 +32,10 @@ function testMouse() {
 
         name : "click testcase",
 
+        tearDown : function() {
+            window.scrollTo(0, 0);
+        },
+        
         'test target' : function() {
         	var target;
         	testNode.onclick = function(ev) {
@@ -56,8 +60,6 @@ function testMouse() {
                 if(typeof pageY == "number") {
                     Assert.that(Constraints.areSame(pageY, 20));
                 }
-                // TODO: tearDown.
-                window.scrollTo(0, 0);
            	}, 100);
         },
         
@@ -75,7 +77,6 @@ function testMouse() {
                     Assert.that(Constraints.areSame(offsetY, 20));
                 }, 100);
             }
-            window.scrollTo(0, 0);
         }
         
     };

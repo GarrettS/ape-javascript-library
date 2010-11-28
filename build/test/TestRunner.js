@@ -40,12 +40,6 @@ APE.namespace("APE.test").defineCustomFactory("TestRunner", function(TestRunner)
             }
     };
     
-    function reset(testable) {
-    	testable.testableList = 
-    		testable.queuedTestLoads = 
-    			testable.errorList.length = [];
-    }
-
     /* Add anything matching ITestable interface (start, run). */
     function testableAdd(parent, testable, name) {
         if(typeof testable == "string") {
@@ -117,11 +111,17 @@ APE.namespace("APE.test").defineCustomFactory("TestRunner", function(TestRunner)
         //console.log( testableChild , testable)
         if(testableChild) {
             EventPublisher.add(testableChild, "oncomplete", _runNextSibling);
+            if(testable.setUp) {
+                setUp(testable);
+            }
             testableChild.start();
         } else {
             testable.oncomplete();
         }
         function _runNextSibling() {
+            if(testable.tearDown) {
+               tearDown(testable);
+            }
             if(this.errorList.length > 0) {
                 testable.errorList.push(new TestError({name: "TestError", message : ""}, this));
             }
@@ -131,6 +131,48 @@ APE.namespace("APE.test").defineCustomFactory("TestRunner", function(TestRunner)
                 testable.oncomplete();
             }
         }
+    }
+    
+    function setUp(testable) {
+        try {
+            testable.setUp();
+        } catch(ex) {
+            setUpFailureHandler(testable, ex);
+        }
+        function setUpFailureHandler(testable, ex) {
+            testable.errorList.push(new TestError(
+                    { 
+                        name: "TestError", 
+                        message : "setUp for testcase '" 
+                                + testable.name 
+                                + "' threw " + ex.name 
+                                + " " + ex.message
+                    }, this));
+            // If setUp fails, it'll probably will fail on the 
+            // next test, too. The user needs to fix setUp.
+            testable.oncomplete();
+        }
+    }
+    
+    function tearDown(testable) {
+        try {
+            testable.tearDown();
+        } catch(ex) {
+            setUpFailureHandler(testable, ex);
+        }
+        function setUpFailureHandler(testable, ex) {
+            testable.errorList.push(new TestError(
+                    { 
+                        name: "TestError", 
+                        message : "tearDown for testcase '" 
+                                + testable.name 
+                                + "' threw " + ex.name 
+                                + " " + ex.message
+                    }, this));
+            // If tearDown failed, the user needs to fix it;
+            // we should not try to run more tests.
+            testable.oncomplete();
+        }        
     }
     
     function TestSuite() {
@@ -144,6 +186,8 @@ APE.namespace("APE.test").defineCustomFactory("TestRunner", function(TestRunner)
         
         buildTestableList(this, testCaseData);
         this.name = testCaseData.name || ("TestCase:" + parent.testableList.length);
+        this.setUp = testCaseData.setUp;
+        this.tearDown = testCaseData.tearDown;
         this.id = makeId(name);
         this.parent = parent;
         this.errorList = [];
