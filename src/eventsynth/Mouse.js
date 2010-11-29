@@ -160,14 +160,7 @@ APE.namespace("APE.eventsynth").Mouse = function() {
                   });
             }
         } else {
-            try {
-                alert("has own:" + ({}).hasOwnProperty.call(mouseEvent, "toElement"));
-                mouseEvent.toElement = toElement;
-                mouseEvent.fromElement = fromElement;
-            } catch (ex) {
-                // Can't set toElement in IE.
-                alert(ex.message);
-            }
+            // Can't set toElement in IE.
         }
     }
 

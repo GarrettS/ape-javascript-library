@@ -80,7 +80,7 @@ APE.namespace("APE.test").defineCustomFactory("TestRunner", function(TestRunner)
     
     function TestRunnerC() {
         this.name = "Test Runner";
-        this.id = makeId(name);
+        this.id = makeId(this.name);
         this.testableList = [];
         this.queuedTestLoads = [];
         this.errorList = [];
@@ -188,7 +188,7 @@ APE.namespace("APE.test").defineCustomFactory("TestRunner", function(TestRunner)
         this.name = testCaseData.name || ("TestCase:" + parent.testableList.length);
         this.setUp = testCaseData.setUp;
         this.tearDown = testCaseData.tearDown;
-        this.id = makeId(name);
+        this.id = makeId(this.name);
         this.parent = parent;
         this.errorList = [];
     }

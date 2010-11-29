@@ -17,12 +17,6 @@
     display: none;
 }
 
-.failed {
-	color: #900;
-	border: 1px solid #FFFCF0;
-	background: #FFFCF9;
-}
-
 .pass-flag {
 	color: #090;
 	text-transform: small-caps;
@@ -47,4 +41,10 @@
 .test-pass {
 	color: #000;
 	background: #fff;
+}
+
+.test-fail {
+    color: #900;
+    border: 1px solid #FFFCF0;
+    background: #FFFDFA;
 }
