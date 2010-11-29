@@ -1,18 +1,3 @@
-/**
- * DOM event simulation utility
- * @module event-simulate-iphone
- * @namespace YAHOO.util
- * @requires yahoo
- */
-
-/**
- * Augment UserAction with iphone events.
- * 
- * @namespace YAHOO.util
- * @class UserAction
- * @see http://developer.apple.com/safari/library/documentation/AppleApplications/Reference/SafariJSRef/GestureEvent/GestureEvent.html
- */
-// TOOD: remove this outer conditional.
 APE.namespace("APE.eventsynth").Mouse = function() {
     return {
         /*
@@ -151,10 +136,6 @@ APE.namespace("APE.eventsynth").Mouse = function() {
     }
     
     function setRelatedTargetIE(mouseEvent, data) {
-        /*
-         * In order to keep legacy YAHOO.util.getRelatedTarget() working,
-         * set proprietary fromElement property for mouseout and mouseover event.
-         */
         var fromElement, toElement;
         if(/^mouse(?:out|leave)/.test(mouseEvent.type)) {
             toElement = data.relatedTarget;
