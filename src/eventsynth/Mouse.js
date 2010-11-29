@@ -33,10 +33,10 @@ APE.namespace("APE.eventsynth").Mouse = function() {
             return fireMouseEvent("mousemove", target, options);
         },
         mouseover : function(target, options) {
-
+            return fireMouseEvent("mouseover", target, options);
         },
         mouseout : function(target, options) {
-
+            return fireMouseEvent("mouseout", target, options);
         },
         dblclick : function(target, options) {
             return fireMouseEvent("dblclick", target, options);
@@ -150,19 +150,42 @@ APE.namespace("APE.eventsynth").Mouse = function() {
         };
     }
     
-    // TODO: need to set both toElement and fromElement.
-    function setRelatedTargetIE(mouseEvent, relatedTarget) {
-        if (relatedTarget) {
-            /*
-             * In order to keep legacy YAHOO.util.getRelatedTarget() working,
-             * set proprietary fromElement property for mouseout and mouseover event.
-             */
-            var pName = /^onmouse(?:enter|out)/.test(mouseEvent.type) ? "toElement"
-                    : "fromElement";
+    function setRelatedTargetIE(mouseEvent, data) {
+        /*
+         * In order to keep legacy YAHOO.util.getRelatedTarget() working,
+         * set proprietary fromElement property for mouseout and mouseover event.
+         */
+        var fromElement, toElement;
+        if(/^mouse(?:out|leave)/.test(mouseEvent.type)) {
+            toElement = data.relatedTarget;
+            fromElement = data.target;
+        } else if(/^mouse(?:ov|ent)er/.test(mouseEvent.type)) {
+            toElement = data.target;
+            fromElement = data.relatedTarget;            
+        }
+        if(Object.defineProperty) {
+            if(typeof toElement != "undefined") {
+                Object.defineProperty(mouseEvent, "toElement", { 
+                    get : function() {
+                        return toElement;
+                    }
+                  });
+            }
+            if(typeof fromElement != "undefined") {
+                Object.defineProperty(mouseEvent, "fromElement", { 
+                    get : function() {
+                        return fromElement;
+                    }
+                  });
+            }
+        } else {
             try {
-                mouseEvent[pName] = relatedTarget;
+                alert("has own:" + ({}).hasOwnProperty.call(mouseEvent, "toElement"));
+                mouseEvent.toElement = toElement;
+                mouseEvent.fromElement = fromElement;
             } catch (ex) {
                 // Can't set toElement in IE.
+                alert(ex.message);
             }
         }
     }
@@ -192,7 +215,7 @@ APE.namespace("APE.eventsynth").Mouse = function() {
         setEventPropW3C(mouseEvent, data);
         mouseEvent.button = getMouseButtonW3CtoIE(data.button);
         mouseEvent.type = data.type;
-        setRelatedTargetIE(mouseEvent, data.relatedTarget);
+        setRelatedTargetIE(mouseEvent, data);
     }
 
     function getMouseButtonW3CtoIE(button) {

@@ -34,6 +34,8 @@ function testMouse() {
 
         tearDown : function() {
             window.scrollTo(0, 0);
+            testNode.onclick = testNode.onmousedown = testNode.onmouseup = 
+                testNode.onmouseover = testNode.onmouseout = testNode.onmousemove;
         },
         
         'test target' : function() {
@@ -46,7 +48,7 @@ function testMouse() {
         },
         
         'test pageY where pageY is present' : function() {
-            var target, pageY;
+            var pageY;
             testNode.onclick = function(ev) {
             	if(ev) {
                    pageY = ev.pageY;
@@ -63,9 +65,8 @@ function testMouse() {
            	}, 100);
         },
         
-        // TODO: Should this be fixed for IE9 beta? Will MS fix their bugs?
         'test offsetY where offsetY is present' : function() {
-        	var target, offsetY;
+        	var offsetY;
         	testNode.onclick = function(ev) {
             	offsetY = ev && ev.offsetY;
             };
@@ -77,8 +78,20 @@ function testMouse() {
                     Assert.that(Constraints.areSame(offsetY, 20));
                 }, 100);
             }
-        }
+        },
         
+        'test toElement where present' : function() {
+            var toElement = 1;
+            testNode.onmouseover = function(ev) {
+                if(window.event) {
+                    toElement = window.event.toElement;
+                }
+            };
+            Mouse.mouseover(testNode, {relatedTarget : document.body} );
+            if(typeof toElement !== "number") {
+                Assert.that(Constraints.areSame(toElement, testNode));
+            }
+        }        
     };
     
     var testReporter = new APE.test.TestReporter(testRunner);
