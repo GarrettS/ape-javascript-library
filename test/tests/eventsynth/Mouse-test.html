@@ -34,8 +34,7 @@ function testMouse() {
 
         tearDown : function() {
             window.scrollTo(0, 0);
-            testNode.onclick = testNode.onmousedown = testNode.onmouseup = 
-                testNode.onmouseover = testNode.onmouseout = testNode.onmousemove;
+            testNode.onclick = testNode.onmousedown = testNode.onmouseup;
         },
         
         'test target' : function() {
@@ -63,39 +62,36 @@ function testMouse() {
                     Assert.that(Constraints.areSame(pageY, 20));
                 }
            	}, 100);
-        },
+        }
         
-        'test offsetY where offsetY is present' : function() {
-        	var offsetY;
-        	testNode.onclick = function(ev) {
-            	offsetY = ev && ev.offsetY;
-            };
-            window.scrollTo(0, 10);
+    };
+    
+    var mouseoverTestCase = {
+            name : "mouseover",
             
-            if(typeof offsetY == "number") {
-                this.wait(function() {
-                    Mouse.click(testNode, {clientY : 10} );
-                    Assert.that(Constraints.areSame(offsetY, 20));
-                }, 100);
-            }
-        },
-        
-        'test toElement where present' : function() {
-            var toElement = 1;
-            testNode.onmouseover = function(ev) {
-                if(window.event) {
-                    toElement = window.event.toElement;
+            tearDown : function() {
+                testNode.onmouseover = testNode.onmouseout = testNode.onmousemove;
+            },
+            
+            'test offsetY where offsetY is present' : function() {
+                var offsetY;
+                testNode.onclick = function(ev) {
+                    offsetY = ev && ev.offsetY;
+                };
+                window.scrollTo(0, 10);
+                
+                if(typeof offsetY == "number") {
+                    this.wait(function() {
+                        Mouse.click(testNode, {clientY : 10} );
+                        Assert.that(Constraints.areSame(offsetY, 20));
+                    }, 100);
                 }
-            };
-            Mouse.mouseover(testNode, {relatedTarget : document.body} );
-            if(typeof toElement !== "number") {
-                Assert.that(Constraints.areSame(toElement, testNode));
             }
-        }        
     };
     
     var testReporter = new APE.test.TestReporter(testRunner);
     testRunner.addTestCase(mouseTestCase);
+    testRunner.addTestCase(mouseoverTestCase);
     testRunner.start();
 };
 
