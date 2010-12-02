@@ -30,6 +30,7 @@ APE.test.TestReporter = function(testRunner, insertBefore) {
             li;
         for(i = 0; i < len; i++) {
             li = makeItem(testableList[i], doc);
+            li.className = "test-case";
             ul.appendChild(li);
         }
         ul.onclick = listClicked;
@@ -79,9 +80,13 @@ APE.test.TestReporter = function(testRunner, insertBefore) {
             hasError = !!failedTestCount,
             hasSubtree = !!testable.testableList.length,
             testResultHeaderText = '"'
-                + testable.name + '" failure count: ' + failedTestCount;
+                + testable.name;
+        
+        if(testable.parent && !testable.parent.parent) {
+            testResultHeaderText += '"; failure count: ' + failedTestCount;
+        }
         li.id = testable.id;
-        li.className = hasError ? "test-fail" : "test-pass";
+        APE.dom.addClass(li, hasError ? "test-fail" : "test-pass");
         li.appendChild(doc.createTextNode(testResultHeaderText));
         if(hasSubtree) {
             li.appendChild(makeTree(testable, doc));
@@ -89,7 +94,6 @@ APE.test.TestReporter = function(testRunner, insertBefore) {
             if(hasError){
                 li.appendChild(makeErrorTree(testable.errorList, doc));
             } else {
-                li.className = "test-pass";
                 li.appendChild(passEl.cloneNode(true));
             }
         }
