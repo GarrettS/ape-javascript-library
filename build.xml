@@ -7,7 +7,34 @@
     <!-- property name="deploy" location='C:\Program Files\Apache Software Foundation\Tomcat 6.0\webapps\ROOT\ape/'/
     -->
 	<property name="deploy" location='/Library/Tomcat/webapps/ROOT/ape'/>
-	    
+
+    
+    <target name="deploy.domunit" depends="copy.domunit">
+    	<copy todir="${deploy}">
+            <fileset dir="."/>
+        </copy>
+    </target>
+    
+	<target name="zip.domunit" depends="deploy.domunit">
+        <zip destfile="domunit.zip" basedir="${build}/domunit" includes="**.*"/>
+	</target>
+		
+	<target name="copy.domunit" depends="js.copy">
+        <concat destfile="${build}/domunit/domunit.js">
+	            <fileset dir="${build}/" includes="APE.js, EventPublisher.js, dom/classname-f.js"/>
+	            <fileset dir="${build}/ajax" includes="AsyncRequest.js"/>
+	            <fileset dir="${build}/test" includes="*.js"/>
+	            <fileset dir="${build}/eventsynth/" includes="*.js"/>
+        </concat>
+        <copy todir="${build}/domunit">
+            <fileset dir="${src}/test/css/" includes="TestReporter.css"/>
+            <fileset dir="${test}/tests" includes="eventsynth/**.*"/>
+        </copy>
+        <copy todir="${build}/domunit/tests">
+            <fileset dir="${test}/tests/eventsynth" includes="**.*"/>
+        </copy>
+	</target>
+	
     <target name="js.rollups" depends="js.copy">
 
     <!-- concat all dom-f.js files, EXCEPT the first (style-f.js).
@@ -112,7 +139,7 @@ traversal-f.js, Event.js, Event-coords.js, style-f.js, getPixelCoords.js'/>
             <fileset dir="${build}" includes="**/*.js, **/*.css"/>
         </delete>
     </target>
-    
+	
     <target name="deploy" depends="js.minify, deploy.copy"
         description="copy test, build, example, to webserver directory">
     </target>
