@@ -19,9 +19,11 @@ APE.namespace("APE.eventsynth").Mouse = function() {
         },
         mouseover : function(target, options) {
             return fireMouseEvent("mouseover", target, options);
+            // if target does not contain options.relatedTarget, fire mouseenter
         },
         mouseout : function(target, options) {
             return fireMouseEvent("mouseout", target, options);
+            // if target does not contain options.relatedTarget, fire mouseenter
         },
         dblclick : function(target, options) {
             return fireMouseEvent("dblclick", target, options);
@@ -142,7 +144,7 @@ APE.namespace("APE.eventsynth").Mouse = function() {
             fromElement = data.target;
         } else if(/^mouse(?:ov|ent)er/.test(mouseEvent.type)) {
             toElement = data.target;
-            fromElement = data.relatedTarget;            
+            fromElement = data.relatedTarget;
         }
         if(Object.defineProperty) {
             if(typeof toElement != "undefined") {
@@ -189,6 +191,7 @@ APE.namespace("APE.eventsynth").Mouse = function() {
         setEventPropW3C(mouseEvent, data);
         mouseEvent.button = getMouseButtonW3CtoIE(data.button);
         mouseEvent.type = data.type;
+        mouseEvent.cancelBubble = !data.bubbles;
         setRelatedTargetIE(mouseEvent, data);
     }
 
@@ -197,10 +200,9 @@ APE.namespace("APE.eventsynth").Mouse = function() {
         // 1 - Middle Mouse Button
         // 2 - Right Mouse Button
         // 
-        // 0 - If no button is depressed, then button is depressed, WTF?
+        // 0 - If no button is depressed, then left button is depressed, WTF?
         // http://www.w3.org/Bugs/Public/show_bug.cgi?id=8406
         // http://www.rhinocerus.net/forum/lang-javascript/602795-positioning-div-predictive-test-lov-suggest-list.html
-        // fix button property for IE's wacky implementation
         switch (button) {
         case 0:
             return 1;
@@ -208,8 +210,8 @@ APE.namespace("APE.eventsynth").Mouse = function() {
             return 4;
         case 2:
             return 2;
-            return 0;
         }
+        return 0;
     }
 
     function getMouseEventData(target, type, data) {
