@@ -26,8 +26,11 @@ function testMouse() {
 
         name : "click testcase",
 
-        tearDown : function() {
+        setUp : function() {
             window.scrollTo(0, 0);
+        },
+        
+        tearDown : function() {
             testNode.onclick = testNode.onmousedown = testNode.onmouseup;
         },
         
@@ -55,7 +58,7 @@ function testMouse() {
                 if(typeof pageY == "number") {
                     Assert.that(Constraints.areSame(pageY, 20));
                 }
-           	}, 100);
+           	}, 300);
         }
         
     };
@@ -64,7 +67,8 @@ function testMouse() {
             name : "mouseover",
             
             tearDown : function() {
-                testNode.onmouseover = testNode.onmouseout = testNode.onmousemove;
+                testNode.onmouseover = testNode.onmouseout = testNode.onmousemove = 
+                document.onmouseover = null;
             },
             
             'test offsetY where offsetY is present' : function() {
@@ -76,10 +80,28 @@ function testMouse() {
                 
                 if(typeof offsetY == "number") {
                     this.wait(function() {
-                        Mouse.click(testNode, {clientY : 10} );
+                        Mouse.mouseover(testNode, {clientY : 10} );
                         Assert.that(Constraints.areSame(offsetY, 20));
                     }, 100);
                 }
+            },
+            
+            'test bubbles (default true)' : function() {
+                var gotBubble = false;
+                document.onmouseover = function() {
+                    gotBubble = true;
+                };
+                Mouse.mouseover(testNode);
+                Assert.that(Constraints.isTrue(gotBubble, "Event did not bubble up."));
+            },
+            
+            'test bubbles = false' : function() {
+                var gotBubble = false;
+                document.onmouseover = function() {
+                    gotBubble = true;
+                };
+                Mouse.mouseover(testNode, {bubbles : false} );
+                Assert.that(Constraints.isFalse(gotBubble, "Event bubbled up."));
             }
     };
     
