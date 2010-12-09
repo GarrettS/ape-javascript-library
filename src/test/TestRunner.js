@@ -42,15 +42,11 @@ APE.namespace("APE.test").defineCustomFactory("TestRunner", function(TestRunner)
     
     /* Add anything matching ITestable interface (start, run). */
     function testableAdd(parent, testable, name) {
-        if(typeof testable == "string") {
-            loadRemoteTest(parent, testable, testable);
-        } else {
-            name = name || testable.name || parent.name + "." + parent.testableList.length;
-            if(typeof testable == "function") {
-                testable = new Test(name, testable, parent);
-            } 
-            parent.testableList.push(testable);
-        }
+        name = name || testable.name || parent.name + "." + parent.testableList.length;
+        if(typeof testable == "function") {
+            testable = new Test(name, testable, parent);
+        } 
+        parent.testableList.push(testable);
         return parent;
     }
     
@@ -94,8 +90,12 @@ APE.namespace("APE.test").defineCustomFactory("TestRunner", function(TestRunner)
             return this;
         },
         
-        addTestCase : function(testCase) {
-            return this.add(new TestCase(testCase, this));
+        addTestCase : function(testCaseData) {
+            return this.add(new TestCase(testCaseData, this));
+        },
+        
+        addRemoteTestCase : function(url) {
+            loadRemoteTestCase(this, url);
         }
     });
     
@@ -203,11 +203,11 @@ APE.namespace("APE.test").defineCustomFactory("TestRunner", function(TestRunner)
         }
     }
     
-    function loadRemoteTest(testCase, testName, testURI) {
+    // This should block running until loaded.
+    function loadRemoteTestCase(testCase, testURI) {
         var reqData = {method: "GET", action: testURI},
             req = APE.ajax.AsyncRequest.getById(testURI, reqData),
             testIndex = testCase.testableList.length;
-
         testCase.queuedTestLoads.push(req);
         EventPublisher.add(req, "oncomplete", addRemoteTestToList);
         req.send();
@@ -219,20 +219,31 @@ APE.namespace("APE.test").defineCustomFactory("TestRunner", function(TestRunner)
                 testableList;
             
             if(source) {
-            	testData = Function("return ("+source + ")");
+                try {
+                    testData = Function("return (" + source + ")")();
+                } catch(ex) {
+                    testData = handleFailedTestLoad(reqId);
+                }
+
             } else {
-            	testData = {};
-            	testData["test " + reqId] = function(){return"Remote TestCase did not load. " + reqId;};
+                testData = handleFailedTestLoad();
             }
             testCase.add(testData);
             //newTestList = buildTestableList(testCase, testData);
             if(testCase.queuedTestLoads.length == 0) {
-                // testCase.onload();
+                 testCase.onload();
             }
             
             //testCase.testableList = insertItemsToArray(testCase.testableList, newTestList, testIndex);
             
         }
+    }
+    
+    function handleFailedTestLoad(reqId) {
+        reqId = reqId || "";
+        var testData = {};
+        testData["test " + reqId] = function(){return"Remote TestCase did not load. " + reqId;};
+        return testData;
     }
     
     function insertItemsToArray(array, newItems, start) {

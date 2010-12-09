@@ -33,7 +33,6 @@ APE.test.TestReporter = function(testRunner, insertBefore) {
             li.className = "test-case";
             ul.appendChild(li);
         }
-        ul.onclick = listClicked;
         return ul;
     }
     
@@ -98,17 +97,5 @@ APE.test.TestReporter = function(testRunner, insertBefore) {
             }
         }
         return li;
-    }
-    
-    function listClicked(ev) {
-        var target = APE.dom.Event.getTarget(ev);
-        if(target.tagName === "LI") {
-            toggleListItem(target);
-        }
-        APE.dom.Event.stopPropagation(ev);
-    }
-    
-    function toggleListItem(li) {
-        APE.dom.toggleClass(li, "expandedNode");
-    }
+    }    
 };

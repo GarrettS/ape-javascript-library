@@ -16,7 +16,7 @@
     </target>
     
 	<target name="zip.domunit" depends="deploy.domunit">
-        <zip destfile="domunit.zip" basedir="${build}/domunit" includes="**.*"/>
+        <zip destfile="domunit.zip" basedir="${build}/domunit"/>
 	</target>
 		
 	<target name="copy.domunit" depends="js.copy">
