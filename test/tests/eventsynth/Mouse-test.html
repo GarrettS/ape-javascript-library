@@ -15,6 +15,7 @@
 <script type="text/javascript">
 function testMouse() {
     var test = APE.test,
+        TestRunner = test.TestRunner,
         Assert = test.Assert,
         cond = test.NativeConstraints,
         Mouse = APE.eventsynth.Mouse,
@@ -52,14 +53,13 @@ function testMouse() {
             window.scrollTo(10, 10);
             // Assertion delayed for Opera and IE which do update 
             // pageXOffset/scrollTop asynchronously.
-           	this.wait(function() {
+           	TestRunner.wait(function() {
                 Mouse.click(testNode, {clientY : 10} );
                 if(typeof pageY == "number") {
                     Assert.that(Constraints.areSame(pageY, 20));
                 }
            	}, 300);
         }
-        
     };
     
     var mouseoverTestCase = {
@@ -78,7 +78,7 @@ function testMouse() {
                 window.scrollTo(0, 10);
                 
                 if(typeof offsetY == "number") {
-                    this.wait(function() {
+                    TestRunner.wait(function() {
                         Mouse.mouseover(testNode, {clientY : 10} );
                         Assert.that(Constraints.areSame(offsetY, 20));
                     }, 100);
@@ -104,7 +104,7 @@ function testMouse() {
             }
     };
     
-    APE.test.TestRunner.runTests([mouseTestCase, mouseoverTestCase]);    
+    TestRunner.runTests([mouseTestCase, mouseoverTestCase]);    
 };
 
 testMouse();

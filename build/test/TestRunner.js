@@ -1,30 +1,59 @@
 APE.namespace("APE.test").defineCustomFactory("TestRunner", function(TestRunner) {
     
-    TestRunner.newInstance = function(){ 
-        return TestRunner.getById(new Date);
-    };
     TestRunner.runTests = runTests;
 
+    TestRunner.wait = function(callback, delay) {
+        if(activeTest && activeTest.wait) {
+            activeTest.wait(callback, delay);
+        }
+    };
+    
+    TestRunner.waitForCondition = function(condition, callback, delay) {
+        if(activeTest && activeTest.wait) {
+            var maxDelay = delay||4000,
+                resumed,
+                timer = setInterval(function() {
+                    if(condition()){
+                        resumed = true;
+                        clearInterval(timer);
+                        callback();
+                    }
+                }, 100);
+            
+            activeTest.wait(function(){
+                clearInterval(timer);
+             // Method resume does not cancel a wait? 
+                if(resumed) return; 
+                Assert.fail("Condition not met after " + maxDelay + "ms");
+            }, maxDelay);
+        }
+    };
+    
     function getConstructor(TestRunnerFactory) {        
         return TestRunnerC;
     }
     
     function runTests(testCaseData) {
-        var runner = TestRunnerFactory.getById("Test Runner"),
-            reporter;
-        runner.addTestCase(testCaseData);
-        EventPublisher.add(runner, "oncomplete", completeHandler);
-        function completeHandler() {
-            if(testCaseData.oncomplete) {
-                testCaseData.oncomplete();
-            } else {
-                reporter = new APE.test.TestReporter(runner, document.body);
-            }
-        }
+        var runner = TestRunner.getById("Test Runner");
+        
+        addTests(runner, testCaseData);
+        new APE.test.TestReporter(runner, document.body);
         runner.start();
     }
     
-    var EventPublisher = APE.EventPublisher,
+    function addTests(runner, testCaseData) {
+        if(typeof testCaseData[0] == "object") {
+            for(var i = 0; i < testCaseData.length; i++) {
+                runner.addTestCase(testCaseData[i]);
+            }
+        } else {
+            runner.addTestCase(testCaseData);
+        }
+    }
+    
+    var activeTest,
+        Assert = APE.test.Assert,
+        EventPublisher = APE.EventPublisher,
         noop = Function.prototype,
         ITestable = {
             add : function(testable) {
@@ -115,6 +144,7 @@ APE.namespace("APE.test").defineCustomFactory("TestRunner", function(TestRunner)
                 setUp(testable);
             }
             testableChild.start();
+            activeTest = testableChild;
         } else {
             testable.oncomplete();
         }
@@ -195,7 +225,7 @@ APE.namespace("APE.test").defineCustomFactory("TestRunner", function(TestRunner)
     
     function buildTestableList(testCase, testCaseData) {
         // TODO: Handle a set of ignored tests.
-        var testName, test;
+        var testName;
         for(testName in testCaseData) {
             if(testName.indexOf("test") === 0) {
                 testableAdd(testCase, testCaseData[testName], testName);

@@ -1,10 +1,34 @@
 APE.namespace("APE.test").defineCustomFactory("TestRunner", function(TestRunner) {
     
-    TestRunner.newInstance = function(){ 
-        return TestRunner.getById(new Date);
-    };
     TestRunner.runTests = runTests;
 
+    TestRunner.wait = function(callback, delay) {
+        if(activeTest && activeTest.wait) {
+            activeTest.wait(callback, delay);
+        }
+    };
+    
+    TestRunner.waitForCondition = function(condition, callback, delay) {
+        if(activeTest && activeTest.wait) {
+            var maxDelay = delay||4000,
+                resumed,
+                timer = setInterval(function() {
+                    if(condition()){
+                        resumed = true;
+                        clearInterval(timer);
+                        callback();
+                    }
+                }, 100);
+            
+            activeTest.wait(function(){
+                clearInterval(timer);
+             // Method resume does not cancel a wait? 
+                if(resumed) return; 
+                Assert.fail("Condition not met after " + maxDelay + "ms");
+            }, maxDelay);
+        }
+    };
+    
     function getConstructor(TestRunnerFactory) {        
         return TestRunnerC;
     }
@@ -27,7 +51,9 @@ APE.namespace("APE.test").defineCustomFactory("TestRunner", function(TestRunner)
         }
     }
     
-    var EventPublisher = APE.EventPublisher,
+    var activeTest,
+        Assert = APE.test.Assert,
+        EventPublisher = APE.EventPublisher,
         noop = Function.prototype,
         ITestable = {
             add : function(testable) {
@@ -118,6 +144,7 @@ APE.namespace("APE.test").defineCustomFactory("TestRunner", function(TestRunner)
                 setUp(testable);
             }
             testableChild.start();
+            activeTest = testableChild;
         } else {
             testable.oncomplete();
         }
