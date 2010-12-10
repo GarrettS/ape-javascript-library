@@ -17,7 +17,6 @@ function testMouse() {
     var test = APE.test,
         Assert = test.Assert,
         cond = test.NativeConstraints,
-        testRunner = test.TestRunner.getById("TestRunner"),
         Mouse = APE.eventsynth.Mouse,
         Constraints = test.NativeConstraints,
         testNode = document.getElementById("testNode");
@@ -105,10 +104,7 @@ function testMouse() {
             }
     };
     
-    var testReporter = new APE.test.TestReporter(testRunner);
-    testRunner.addTestCase(mouseTestCase);
-    testRunner.addTestCase(mouseoverTestCase);
-    testRunner.start();
+    APE.test.TestRunner.runTests([mouseTestCase, mouseoverTestCase]);    
 };
 
 testMouse();

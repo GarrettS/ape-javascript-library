@@ -10,18 +10,21 @@ APE.namespace("APE.test").defineCustomFactory("TestRunner", function(TestRunner)
     }
     
     function runTests(testCaseData) {
-        var runner = TestRunnerFactory.getById("Test Runner"),
-            reporter;
-        runner.addTestCase(testCaseData);
-        EventPublisher.add(runner, "oncomplete", completeHandler);
-        function completeHandler() {
-            if(testCaseData.oncomplete) {
-                testCaseData.oncomplete();
-            } else {
-                reporter = new APE.test.TestReporter(runner, document.body);
-            }
-        }
+        var runner = TestRunner.getById("Test Runner");
+        
+        addTests(runner, testCaseData);
+        new APE.test.TestReporter(runner, document.body);
         runner.start();
+    }
+    
+    function addTests(runner, testCaseData) {
+        if(typeof testCaseData[0] == "object") {
+            for(var i = 0; i < testCaseData.length; i++) {
+                runner.addTestCase(testCaseData[i]);
+            }
+        } else {
+            runner.addTestCase(testCaseData);
+        }
     }
     
     var EventPublisher = APE.EventPublisher,
@@ -195,7 +198,7 @@ APE.namespace("APE.test").defineCustomFactory("TestRunner", function(TestRunner)
     
     function buildTestableList(testCase, testCaseData) {
         // TODO: Handle a set of ignored tests.
-        var testName, test;
+        var testName;
         for(testName in testCaseData) {
             if(testName.indexOf("test") === 0) {
                 testableAdd(testCase, testCaseData[testName], testName);

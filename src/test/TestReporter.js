@@ -1,4 +1,4 @@
-APE.test.TestReporter = function(testRunner, insertBefore) {
+APE.test.TestReporter = function(testRunner, appendTo) {
     
     APE.EventPublisher.add(testRunner, "oncomplete", completeHandler);
     
@@ -8,7 +8,7 @@ APE.test.TestReporter = function(testRunner, insertBefore) {
         passEl.appendChild(document.createTextNode("\u00a0PASS"));
         passEl.className = "pass-flag";
         
-        insertBefore = insertBefore || document.body.lastChild;
+        var insertBefore = appendTo.lastChild || document.body.lastChild;
         var ul = makeTree(this);
 //      ul.className = "test-reporter";
         insertBefore.parentNode.insertBefore(ul, insertBefore);
