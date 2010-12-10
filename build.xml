@@ -1,125 +1,128 @@
 <project name="ape" basedir="." default="js.minify">
 
-    <property name="src" location="src"/>
-    <property name="test" location="test"/>
-    <property name="example" location="example"/>
-    <property name="build" location="build"/>
-    <!-- property name="deploy" location='C:\Program Files\Apache Software Foundation\Tomcat 6.0\webapps\ROOT\ape/'/
+	<property name="src" location="src"/>
+	<property name="test" location="test"/>
+	<property name="example" location="example"/>
+	<property name="build" location="build"/>
+	<!-- property name="deploy" location='C:\Program Files\Apache Software Foundation\Tomcat 6.0\webapps\ROOT\ape/'/
     -->
 	<property name="deploy" location='/Library/Tomcat/webapps/ROOT/ape'/>
 
-    
-    <target name="deploy.domunit" depends="copy.domunit">
-    	<copy todir="${deploy}">
-            <fileset dir="."/>
-        </copy>
-    </target>
-    
-	<target name="zip.domunit" depends="deploy.domunit">
-        <zip destfile="domunit.zip" basedir="${build}/domunit"/>
-	</target>
-		
-	<target name="copy.domunit" depends="js.copy">
-        <concat destfile="${build}/domunit/domunit.js">
-	            <fileset dir="${build}/" includes="APE.js, EventPublisher.js, dom/classname-f.js"/>
-	            <fileset dir="${build}/ajax" includes="AsyncRequest.js"/>
-	            <fileset dir="${build}/test" includes="*.js"/>
-	            <fileset dir="${build}/eventsynth/" includes="*.js"/>
-        </concat>
-        <copy todir="${build}/domunit">
-            <fileset dir="${src}/test/css/" includes="TestReporter.css"/>
-            <fileset dir="${test}/tests" includes="eventsynth/**.*"/>
-        </copy>
-        <copy todir="${build}/domunit/tests">
-            <fileset dir="${test}/tests/eventsynth" includes="**.*"/>
-        </copy>
-	</target>
-	
-    <target name="js.rollups" depends="js.copy">
 
-    <!-- concat all dom-f.js files, EXCEPT the first (style-f.js).
+	<target name="deploy.domunit" depends="copy.domunit">
+		<copy todir="${deploy}">
+			<fileset dir="."/>
+		</copy>
+	</target>
+
+	<target name="zip.domunit" depends="deploy.domunit">
+		<zip destfile="domunit.zip" basedir="${build}/domunit"/>
+	</target>
+
+	<target name="copy.domunit" depends="js.copy">
+		<concat destfile="${build}/domunit/domunit.js">
+			<fileset dir="${build}/" includes="APE.js, EventPublisher.js, dom/classname-f.js"/>
+			<fileset dir="${build}/ajax" includes="AsyncRequest.js"/>
+			<fileset dir="${build}/test" includes="*.js"/>
+			<fileset dir="${build}/eventsynth/" includes="*.js"/>
+		</concat>
+		
+		<copy todir="${build}/domunit">
+			<fileset dir="${src}/test/css/" includes="TestReporter.css"/>
+            <filterchain>
+                <tokenfilter>
+                    <replacestring from='../../build/domunit/' to=""/>
+                    <replacestring from='../../build/test/css/' to=""/>
+                </tokenfilter>
+            </filterchain>
+		</copy>
+	</target>
+
+	<target name="js.rollups" depends="js.copy">
+
+		<!-- concat all dom-f.js files, EXCEPT the first (style-f.js).
          Remove the APE.namespace(APE.dom) from each file (except the first)
     -->
-        <property name='domFiles' 
+		<property name='domFiles' 
         	value='constants.js, keys.js, viewport-f.js, getOffsetCoords.js, 
         	getOffsetCoords-fallback.js, classname-f.js, 
 traversal-f.js, Event.js, Event-coords.js, style-f.js, getPixelCoords.js'/>
-        <concat destfile="${build}/dom/dom.js">
-            <filelist dir="${build}/dom" files="${domFiles}"/>
-            <!--filterchain>
+		<concat destfile="${build}/dom/dom.js">
+			<filelist dir="${build}/dom" files="${domFiles}"/>
+			<!--filterchain>
                 <tokenfilter>
                     <replacestring from=');APE.namespace("APE.dom")' to=")."/>
                 </tokenfilter>
             </filterchain-->
-        </concat>
+		</concat>
 
-        <!-- build ape-ep-dom.js rollup -->
-        <concat destfile="${build}/ape-ep-dom.js">
-            <filelist dir="${build}"
+		<!-- build ape-ep-dom.js rollup -->
+		<concat destfile="${build}/ape-ep-dom.js">
+			<filelist dir="${build}"
                  files="APE.js, EventPublisher.js, dom/dom.js"/>
-        </concat>
+		</concat>
 
-        <!-- build anim.js rollup -->
-        <property name='animFiles' value='Animation.js, StyleTransition.js'/>
-        <concat destfile="${build}/anim/anim.js">
-            <filelist dir="${build}/anim" files="${animFiles}"/>
-        </concat>
+		<!-- build anim.js rollup -->
+		<property name='animFiles' value='Animation.js, StyleTransition.js'/>
+		<concat destfile="${build}/anim/anim.js">
+			<filelist dir="${build}/anim" files="${animFiles}"/>
+		</concat>
 
-        <!-- build ajax.js rollup -->
-        <concat destfile="${build}/ajax/ajax.js">
-            <filelist dir="${src}"
+		<!-- build ajax.js rollup -->
+		<concat destfile="${build}/ajax/ajax.js">
+			<filelist dir="${src}"
                  files="ajax/ajax-base.js, ajax/AsyncRequest.js, ajax/ScriptLoader.js"/>
-        </concat>
+		</concat>
 
-        <!-- build base + ScriptLoader -->
-        <concat destfile="${build}/ajax/ScriptLoader.js">
-            <filelist dir="${src}"
+		<!-- build base + ScriptLoader -->
+		<concat destfile="${build}/ajax/ScriptLoader.js">
+			<filelist dir="${src}"
                  files="ajax/ajax-base.js, ajax/ScriptLoader.js"/>
-        </concat>
+		</concat>
 
-        <!-- build base + AsyncRequest -->
-        <concat destfile="${build}/ajax/AsyncRequest.js">
-            <filelist dir="${src}"
+		<!-- build base + AsyncRequest -->
+		<concat destfile="${build}/ajax/AsyncRequest.js">
+			<filelist dir="${src}"
                  files="ajax/ajax-base.js, ajax/AsyncRequest.js"/>
-        </concat>
+		</concat>
 
-        <!-- build drag-slider.js rollup -->
-        <concat destfile="${build}/drag/drag-slider.js">
-            <filelist dir="${build}/drag"
+		<!-- build drag-slider.js rollup -->
+		<concat destfile="${build}/drag/drag-slider.js">
+			<filelist dir="${build}/drag"
                  files="Draggable.js, Slider.js"/>
-        </concat>
-    </target>
+		</concat>
+	</target>
 
-    <target name="js.copy" depends="js.clean">
-        <copy todir="${build}">
-            <fileset dir="${src}"/>
-        </copy>
-    </target>
+	<target name="js.copy" depends="js.clean">
+		<copy todir="${build}">
+			<fileset dir="${src}"/>
+		</copy>
+	</target>
 
-    <target name="js.minify" depends="js.rollups">
-        <apply executable="java" parallel="false" dest="${build}" taskname="yui">
-            <fileset dir="${build}" includes="**/*.js"/>
-            <arg line="-jar"/>
-            <arg path="yuicompressor-2.4\build\yuicompressor-2.4.jar"/>
-            <arg line="-v"/>
-            <srcfile/>
-            <arg line="-o"/>
-            <mapper type="glob" from="*.js" to="*-min.js"/>
-            <targetfile/>
-        </apply>
+	<target name="js.minify" depends="js.rollups">
+		<apply executable="java" parallel="false" dest="${build}" taskname="yui">
+			<fileset dir="${build}" includes="**/*.js"/>
+			<arg line="-jar"/>
+			<arg path="yuicompressor-2.4\build\yuicompressor-2.4.jar"/>
+			<arg line="-v"/>
+			<srcfile/>
+			<arg line="-o"/>
+			<mapper type="glob" from="*.js" to="*-min.js"/>
+			<targetfile/>
+		</apply>
 
-        <apply executable="java" parallel="false" dest="${build}" taskname="yui">
-            <fileset dir="${build}" includes="**/*.css"/>
-            <arg line="-jar"/>
-            <arg path="yuicompressor-2.4\build\yuicompressor-2.4.jar"/>
-            <arg line="-v"/>
-            <srcfile/>
-            <arg line="-o"/>
-            <mapper type="glob" from="*.css" to="*-min.css"/>
-            <targetfile/>
-        </apply>
-        
-        <!--
+		<apply executable="java" parallel="false" dest="${build}" taskname="yui">
+			<fileset dir="${build}" includes="**/*.css"/>
+			<arg line="-jar"/>
+			<arg path="yuicompressor-2.4\build\yuicompressor-2.4.jar"/>
+			<arg line="-v"/>
+			<srcfile/>
+			<arg line="-o"/>
+			<mapper type="glob" from="*.css" to="*-min.css"/>
+			<targetfile/>
+		</apply>
+
+		<!--
         <apply executable="java" parallel="false" verbose="true" dest="${build}" taskname="js.compile">
             <fileset dir="${build}" includes="**/*.js"/>
             <arg line="-jar"/>
@@ -132,22 +135,22 @@ traversal-f.js, Event.js, Event-coords.js, style-f.js, getPixelCoords.js'/>
             <targetfile/>
         </apply>
         -->
-    </target>
+	</target>
 
-    <target name="js.clean">
-        <delete>
-            <fileset dir="${build}" includes="**/*.js, **/*.css"/>
-        </delete>
-    </target>
-	
-    <target name="deploy" depends="js.minify, deploy.copy"
+	<target name="js.clean">
+		<delete>
+			<fileset dir="${build}" includes="**/*.js, **/*.css"/>
+		</delete>
+	</target>
+
+	<target name="deploy" depends="js.minify, deploy.copy"
         description="copy test, build, example, to webserver directory">
-    </target>
-    
-    <target name="deploy.copy" depends="js.rollups"
+	</target>
+
+	<target name="deploy.copy" depends="js.rollups"
         description="copy test, build, example, to webserver directory">
-        <copy todir="${deploy}">
-            <fileset dir="."/>
-        </copy>
-    </target>
+		<copy todir="${deploy}">
+			<fileset dir="."/>
+		</copy>
+	</target>
 </project>
