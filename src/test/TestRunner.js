@@ -1,50 +1,73 @@
 APE.namespace("APE.test").defineCustomFactory("TestRunner", function(TestRunner) {
     
-    TestRunner.runTests = runTests;
+    var Assert = APE.test.Assert;
 
-    TestRunner.wait = function(callback, delay) {
-        if(activeTest && activeTest.wait) {
-            activeTest.wait(callback, delay);
-        }
-    };
-    
-    TestRunner.waitForCondition = function(condition, callback, delay) {
-        if(activeTest && activeTest.wait) {
-            var maxDelay = delay||4000,
-                resumed,
-                timer = setInterval(function() {
-                    if(condition()){
-                        resumed = true;
-                        clearInterval(timer);
-                        callback();
-                    }
-                }, 100);
+    APE.createMixin(TestRunner, {
+        assert : function(constraint, message) {
+            activeTest.hasAssert = true;
+            Assert.that(constraint, message);  
+        },
+        fail : function(message){
+            Assert.fail(message);
+        },
+        runTests : function(testCaseData) {
+            var runner = TestRunner.getById("Test Runner");
             
-            activeTest.wait(function(){
-                clearInterval(timer);
-             // Method resume does not cancel a wait? 
-                if(resumed) return; 
-                Assert.fail("Condition not met after " + maxDelay + "ms");
-            }, maxDelay);
+            addTests(runner, testCaseData);
+            new APE.test.TestReporter(runner, document.body);
+            runner.start();
+        },
+        wait : function(callback, delay) {
+            if(activeTest && activeTest.wait) {
+                activeTest.wait(callback, delay);
+            }
+        },
+        exitEarly : function(reason) {
+            if(!reason) {
+                throw TypeError("TestRunner.exitEarly(msg) called with no message");
+            }
+            var err = new EarlyExit(reason);
+            this.earlyExitMessage = err.message;
+            throw err;
+        },
+        waitForCondition : function(condition, callback, delay) {
+            if(activeTest && activeTest.wait) {
+                var maxDelay = delay||4000,
+                    resumed,
+                    timer = setInterval(function() {
+                        if(condition()){
+                            resumed = true;
+                            clearInterval(timer);
+                            callback();
+                        }
+                    }, 100);
+                
+                activeTest.wait(function(){
+                    clearInterval(timer);
+                    if(resumed) return; 
+                    Assert.fail("Condition not met after " + maxDelay + "ms");
+                }, maxDelay);
+            }
         }
-    };
-    
+    });
+        
     function getConstructor(TestRunnerFactory) {        
         return TestRunnerC;
     }
     
-    function runTests(testCaseData) {
-        var runner = TestRunner.getById("Test Runner");
-        
-        addTests(runner, testCaseData);
-        new APE.test.TestReporter(runner, document.body);
-        runner.start();
+    function EarlyExit(reason) {
+        this.reason = reason;
     }
     
     function addTests(runner, testCaseData) {
+        var i, prev, testCase;
         if(typeof testCaseData[0] == "object") {
-            for(var i = 0; i < testCaseData.length; i++) {
-                runner.addTestCase(testCaseData[i]);
+            for(i = 0; i < testCaseData.length; i++) {
+                testCase = runner.addTestCase(testCaseData[i]);
+                if(prev) {
+                    prev.nextSibling = testCase;
+                }
+                prev = testCase;
             }
         } else {
             runner.addTestCase(testCaseData);
@@ -56,29 +79,24 @@ APE.namespace("APE.test").defineCustomFactory("TestRunner", function(TestRunner)
         EventPublisher = APE.EventPublisher,
         noop = Function.prototype,
         ITestable = {
-            add : function(testable) {
-                return testableAdd(this, testable);
+            add : function(testable, name) {
+                name = name || testable.name || this.name;
+                if(typeof testable == "function") {
+                    testable = new Test(name, testable, this);
+                } 
+                this.testableList.push(testable);
+                return testable;
             },
             
             start : function() {
-                runChild(this);
+                runChildren(this);
             },
             
             toString : function() {
                 return this.name;
             }
     };
-    
-    /* Add anything matching ITestable interface (start, run). */
-    function testableAdd(parent, testable, name) {
-        name = name || testable.name || parent.name + "." + parent.testableList.length;
-        if(typeof testable == "function") {
-            testable = new Test(name, testable, parent);
-        } 
-        parent.testableList.push(testable);
-        return parent;
-    }
-    
+   
     function Testable(name) {
         this.oncomplete = noop;
         this.onload = noop;
@@ -113,12 +131,6 @@ APE.namespace("APE.test").defineCustomFactory("TestRunner", function(TestRunner)
 
     TestRunnerC.prototype = APE.createMixin(new Testable(), {
         
-        // TODO: This is not being used/tested - use it or lose it.
-        addSuite : function(testSuite) {
-            this.add(new TestSuite(testSuite, this));
-            return this;
-        },
-        
         addTestCase : function(testCaseData) {
             return this.add(new TestCase(testCaseData, this));
         },
@@ -128,39 +140,68 @@ APE.namespace("APE.test").defineCustomFactory("TestRunner", function(TestRunner)
         }
     });
     
-    TestSuite.prototype = new Testable();
-    TestCase.prototype = new Testable();
-    
-    function runChild(testable, counter) {
+    TestCase.prototype = APE.createMixin(new Testable, {
+        buildTestableList : function(testCaseData) {
+            var test, testName, prev;
+            for(testName in testCaseData) {
+                if(testName.indexOf("test") === 0) {
+                    test = this.add(testCaseData[testName], testName);
+                    if(prev) {
+                        prev.nextSibling = test;
+                    }
+                    prev = test;
+                }
+            }
+        },
+        toString : function() {
+            return"TestCase: " + this.name;
+        }
+    });
+    function runChildren(testCaseOrRunner, testOrTestCase) {
      // Run first child, when its done,
      // run next child, etc. 
      // If any child failed, then this failed.
-         counter = counter || 0;
-        var testableChild = testable.testableList[counter];
-        //console.log( testableChild , testable)
-        if(testableChild) {
-            EventPublisher.add(testableChild, "oncomplete", _runNextSibling);
-            if(testable.setUp) {
-                setUp(testable);
+        testOrTestCase = testOrTestCase || testCaseOrRunner.testableList[0];
+        if(testOrTestCase) {
+            EventPublisher.add(testOrTestCase, "oncomplete", runNextSibling);
+            if(testCaseOrRunner.setUp) {
+                setUp(testCaseOrRunner);
             }
-            testableChild.start();
-            activeTest = testableChild;
+            if(testOrTestCase instanceof Test) {
+                activeTest = testOrTestCase;
+            }
+            testOrTestCase.start();
         } else {
-            testable.oncomplete();
+            testCaseOrRunner.oncomplete();
         }
-        function _runNextSibling() {
-            if(testable.tearDown) {
-               tearDown(testable);
-            }
-            if(this.errorList.length > 0) {
-                testable.errorList.push(new TestError({name: "TestError", message : ""}, this));
-            }
-            if(++counter in testable.testableList) {
-                runChild(testable, counter);
-            } else {
-                testable.oncomplete();
+    }
+    
+    function runNextSibling() {
+        var testCase = this.parent;
+        if(testCase.tearDown) {
+            // TODO: need to report setup/tearDown errors.
+            testCase.tearDownError = tearDown(testCase);
+            if(testCase.tearDownError) {
+                return;
             }
         }
+        if(this.error) {
+            testCase.errorList.push(new TestError({name: "TestError", message : ""}));
+        } 
+        if(this.nextSibling) {
+            runChildren(testCase, this.nextSibling);
+        } else {
+            if(this instanceof Test) {
+                testDoneHandler(this);
+            }
+            testCase.oncomplete();
+        }
+    }
+
+    function testDoneHandler(test) {
+        if(!test.hasAssert && !test.earlyExitMessage) {
+            test.errorList.push(new NoAssertionMadeError(test));
+        } 
     }
     
     function setUp(testable) {
@@ -177,67 +218,54 @@ APE.namespace("APE.test").defineCustomFactory("TestRunner", function(TestRunner)
                                 + testable.name 
                                 + "' threw " + ex.name 
                                 + " " + ex.message
-                    }, this));
+                    }));
             // If setUp fails, it'll probably will fail on the 
             // next test, too. The user needs to fix setUp.
             testable.oncomplete();
         }
     }
     
-    function tearDown(testable) {
+    function tearDown(testCase) {
+        var error;
         try {
-            testable.tearDown();
+            testCase.tearDown();
         } catch(ex) {
-            setUpFailureHandler(testable, ex);
+            return setUpFailureHandler(testCase, ex);
         }
-        function setUpFailureHandler(testable, ex) {
-            testable.errorList.push(new TestError(
-                    { 
+        function setUpFailureHandler(testCase, ex) {
+            error = new TestError({ 
                         name: "TestError", 
                         message : "tearDown for testcase '" 
-                                + testable.name 
+                                + testCase.name 
                                 + "' threw " + ex.name 
                                 + " " + ex.message
-                    }, this));
+                    });
+            testCase.errorList.push(error);
             // If tearDown failed, the user needs to fix it;
             // we should not try to run more tests.
-            testable.oncomplete();
+            testCase.oncomplete();
+            return error;
         }        
     }
-    
-    function TestSuite() {
-        this.testableList = [];
-    }
-    
+        
     function TestCase(testCaseData, parent) {
         
         this.testableList = [];
         this.queuedTestLoads = [];
         
-        buildTestableList(this, testCaseData);
-        this.name = testCaseData.name || ("TestCase:" + parent.testableList.length);
+        this.buildTestableList(testCaseData);
+        this.name = testCaseData.name;
         this.setUp = testCaseData.setUp;
         this.tearDown = testCaseData.tearDown;
-        this.id = makeId(this.name);
+        this.id = makeId(this.name||"unnamed");
         this.parent = parent;
         this.errorList = [];
-    }
-    
-    function buildTestableList(testCase, testCaseData) {
-        // TODO: Handle a set of ignored tests.
-        var testName;
-        for(testName in testCaseData) {
-            if(testName.indexOf("test") === 0) {
-                testableAdd(testCase, testCaseData[testName], testName);
-            }
-        }
     }
     
     // This should block running until loaded.
     function loadRemoteTestCase(testCase, testURI) {
         var reqData = {method: "GET", action: testURI},
-            req = APE.ajax.AsyncRequest.getById(testURI, reqData),
-            testIndex = testCase.testableList.length;
+            req = APE.ajax.AsyncRequest.getById(testURI, reqData);
         testCase.queuedTestLoads.push(req);
         EventPublisher.add(req, "oncomplete", addRemoteTestToList);
         req.send();
@@ -245,8 +273,7 @@ APE.namespace("APE.test").defineCustomFactory("TestRunner", function(TestRunner)
         function addRemoteTestToList() {
             var source = req.req.responseText, 
                 reqId = req.id,
-                testData,
-                testableList;
+                testData;
             
             if(source) {
                 try {
@@ -262,10 +289,7 @@ APE.namespace("APE.test").defineCustomFactory("TestRunner", function(TestRunner)
             //newTestList = buildTestableList(testCase, testData);
             if(testCase.queuedTestLoads.length == 0) {
                  testCase.onload();
-            }
-            
-            //testCase.testableList = insertItemsToArray(testCase.testableList, newTestList, testIndex);
-            
+            }            
         }
     }
     
@@ -275,18 +299,12 @@ APE.namespace("APE.test").defineCustomFactory("TestRunner", function(TestRunner)
         testData["test " + reqId] = function(){return"Remote TestCase did not load. " + reqId;};
         return testData;
     }
-    
-    function insertItemsToArray(array, newItems, start) {
-        var tail = array.slice(start);
-        var a = array.slice(0, start);
-        a = a.concat(newItems, tail);
-        return a;
-    }
-    
+        
     var throwsExp = /@throws\s+([a-zA-Z_$]+[a-zA-Z_$]|$)/;
     function Test(name, func, parent) {
         this.name = name || func.name || parent.testableList.length;
         this.parent = parent;
+        this.rootTest = (parent instanceof TestCase) ? this : parent.rootTest;
         this.id = makeId(name);
         this.func = func;
         this.shouldThrow = throwsExp.test(name);
@@ -295,116 +313,83 @@ APE.namespace("APE.test").defineCustomFactory("TestRunner", function(TestRunner)
             this.expectedErrorName = expectedErrorName && expectedErrorName[1]||"";
         }
         
-        this.testableList = [];
         this.errorList = [];
+        this.error = null;
     }
     
     function run(test) {
         var error,
             handledError,
             stack = "";
+
         if(test.func) {
             try {
                 test.func();
             } catch(ex) {
+                if(ex instanceof EarlyExit) {
+                    test.earlyExit = EarlyExit.message;
+                    test.oncomplete();
+                    return;
+                } else if(ex instanceof TestWait) {
+                    return;
+                }
                 handledError = true;
                 handleTestRunError(test, ex);
                 stack = ex.stack || "";
             }
             if(test.shouldThrow && !handledError) {
                 error = test.expectedErrorName || "Some error";
-                test.errorList.push(new TestError({
+                test.error = new TestError({
                             name:"TestFailure", 
                             message: error + " expected but not thrown",
                             stack : stack
-                        }, test));
+                        });
+                test.errorList = [test.error];
             }
+            test.oncomplete();
         }
-        waitForDeferredSegments(test);
     }
     
     function handleTestRunError(test, ex) {
         if(test.shouldThrow) {
             if(test.expectedErrorName && test.expectedErrorName !== ex.name) {
-                test.errorList.push(ex);
+                test.error = ex;
             } 
         } else {
-            test.errorList.push(ex);
+            test.error = ex;
         }
     }
-    
-    function waitForDeferredSegments(test) {
-        if(test.testableList.length) {
-            applyListAction(test, function(seg) {
-                if(!seg.done) {
-                    EventPublisher.add(seg, "oncomplete", notifyDone);
-                } else {
-                    if(allSegsDone(test)) {
-                        test.oncomplete();
-                    }
-                }
-            });
-        } else {
-            test.oncomplete();
-        }
         
-        function notifyDone(error) {
-            this.done = true;
-            if(error) {
-                error = new TestError(error, this);
-                test.errorList.push(error);
-                test.oncomplete(error);
-            } else {
-                if(allSegsDone(test)) {
-                    test.oncomplete();
-                }
-            }
-        }
-    }
-    
-    function allSegsDone(test) {
-        var i, list = test.testableList, len = list.length;
-        for(i = 0; i < len; i++) {
-            if(!list[i].done) return false;
-        }
-        return true;
-    }
-    
-    function applyListAction(test, callback) {
-        var i, list = test.testableList, len = list.length;
-        for(i = 0; i < len; i++) {
-            callback.call(test, list[i]);
-        }
-    }
-    
-    function TestError(error, cause/*use it or lose it*/) {
+    function TestError(error) {
         this.name = error.name;
         this.message = error.message;
         this.stack = error.stack || "(not available)";
     }
+    (TestError.prototype = new Error).constructor = TestError;
+
+    function NoAssertionMadeError(test) {
+        this.name = "NoAssertionMadeError";
+        this.message = '"' + test.toString() + '". Expected a call to TestRunner.assert.';
+    }
+    (NoAssertionMadeError.prototype = new Error).constructor = NoAssertionMadeError;
     
     Test.prototype = APE.createMixin(new Testable(), {
         
         wait : function(callback, delay) {
-            var name = "Wait " + this.testableList.length,
-                deferred = new Test(name, callback),
+            var name = "Wait",
+                deferred = new Test(name, callback, this),
                 test = this;
-            this.testableList.push(deferred);
             EventPublisher.add(deferred, "oncomplete", deferredComplete);
-    
-            // TODO: implement this.
+
             deferred.startTimer = setTimeout(function(){
                 deferred.start();
             }, delay);
             
             function deferredComplete(error) {
-                if(error) {
-                    test.errorList.push(error);
-                    test.oncomplete();
-                }
-                // Stop all deferred segs.
-                cancelDeferredSegs(test);
+                test.error = error;
+                test.oncomplete();
             }
+            throw new TestWait();
         },
         
         toString : function() {
@@ -415,11 +400,7 @@ APE.namespace("APE.test").defineCustomFactory("TestRunner", function(TestRunner)
             run(this);
         }
     });
-    
-    function cancelDeferredSegs(test) {
-        applyListAction(test, function(seg){
-            clearTimeout(seg.startTimer);
-        });
-    }
+    function TestWait() {}
+    (TestWait.prototype = new Error).constructor = TestWait;
     return getConstructor;
 });

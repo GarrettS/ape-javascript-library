@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
     <meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
-    <title>Mouse test</title>
+    <title>TestRunner test</title>
     
     <script src="../../../build/domunit/domunit.js" type="text/javascript"></script>    
     <link type="text/css" rel="stylesheet" href="../../../build/test/css/TestReporter.css">
@@ -18,19 +18,21 @@ function testTestRunner() {
         cond = test.NativeConstraints,
         Constraints = test.NativeConstraints;
     
-    var waitSuite = {
+    var waitTests = {
+        name : "wait",
+        
         "test wait() actually waits" : function() {
             var waited;
+
             TestRunner.wait(function() {
-                waited = true;
+                TestRunner.assert(Constraints.isTrue(true));
             }, 1);
-            TestRunner.wait(function() {
-                Assert.that(Constraints.isTrue(waited, "test did not wait."));
-            }, 10);
         }
     };
     
-    var waitForConditionSuite = {
+    var waitForConditionTests = {
+            
+            name : "waitForCondition",
             
             setUp : function() {
             },
@@ -40,7 +42,6 @@ function testTestRunner() {
             
             "test waitForCondition() condition function called" : function() {
                 var conditionCalled;
-                
                 function condition() {
                     return conditionCalled;
                 }
@@ -62,12 +63,36 @@ function testTestRunner() {
                 }
                 
                 function deferredSeg() {
-                    Assert.that(Constraints.isTrue(conditionMet, "condition() not called."));
+                    TestRunner.assert(Constraints.isTrue(conditionMet, "condition() not called."));
                 }
                 TestRunner.waitForCondition(condition, deferredSeg, 1000);
             }
-    }
-    TestRunner.runTests([waitSuite, waitForConditionSuite]);
+    };
+     
+    var exitEarlyTests = {
+        name : "exitEarlyTests",
+        
+        tearDown : function() {
+            //TestRunner.exitEarly = oldExitEarly;
+        },
+        
+        "test exitEarly before thrown error" : function() {
+            TestRunner.exitEarly("avoiding an error!");
+            throw new Error("this should not happen!");
+        },
+        
+        "test exitEarly(message) without message throws" : function() {
+            var error;
+            try {
+                TestRunner.exitEarly(/*no message; this should throw*/);
+            } catch(ex) {
+                error = ex;
+            }
+            TestRunner.assert(Constraints.areSame(error, null));
+        }
+    };
+    
+    TestRunner.runTests([waitTests, waitForConditionTests, exitEarlyTests]);
 }
 
 testTestRunner();

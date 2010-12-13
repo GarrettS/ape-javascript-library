@@ -48,24 +48,24 @@ APE.test.TestReporter = function(testRunner, appendTo) {
         return ul;
     }
     
-    function makeErrorItem(ex) {
-        var li = document.createElement("li"),
-            ul = document.createElement("ul"),
+    function makeErrorItem(ex, doc) {
+        var li = doc.createElement("li"),
+            ul = doc.createElement("ul"),
             name, message, stack, errorStack = ex.stack,
             stackPre;
         
         message = li.cloneNode(false);
         stack = li.cloneNode(false);
         stack.className = "errorStack";
-        message.appendChild(document.createTextNode("message: "+ex.message));
+        message.appendChild(doc.createTextNode("message: "+ex.message));
         if(ex.stack) {
-        	stack.appendChild(document.createTextNode("stack: "));
+        	stack.appendChild(doc.createTextNode("stack: "));
         	errorStack = errorStack.replace("@", "<br>@");
-        	stackPre = document.createElement("pre");
+        	stackPre = doc.createElement("pre");
         	stackPre.innerHTML = errorStack;
         	stack.appendChild(stackPre);
         }
-        li.appendChild(document.createTextNode(ex.name + ":"));
+        li.appendChild(doc.createTextNode(ex.name + ":"));
         ul.appendChild(message);
         ul.appendChild(stack);
         li.appendChild(ul);
@@ -77,7 +77,7 @@ APE.test.TestReporter = function(testRunner, appendTo) {
         var li = doc.createElement("li"),
             failedTestCount = testable.errorList.length,
             hasError = !!failedTestCount,
-            hasSubtree = !!testable.testableList.length,
+            hasSubtree = "testableList"in testable && !!testable.testableList.length,
             testResultHeaderText = '"'
                 + testable.name;
         

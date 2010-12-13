@@ -40,7 +40,7 @@ function testMouse() {
         		target = ev ? ev.target : window.event.srcElement;
         	};
         	Mouse.click(testNode);
-            Assert.that(Constraints.areSame(target, testNode));
+            TestRunner.assert(Constraints.areSame(target, testNode));
         },
         
         'test pageY where pageY is present' : function() {
@@ -56,7 +56,7 @@ function testMouse() {
            	TestRunner.wait(function() {
                 Mouse.click(testNode, {clientY : 10} );
                 if(typeof pageY == "number") {
-                    Assert.that(Constraints.areSame(pageY, 20));
+                    TestRunner.assert(Constraints.areSame(pageY, 20));
                 }
            	}, 300);
         }
@@ -72,26 +72,26 @@ function testMouse() {
             
             'test offsetY where offsetY is present' : function() {
                 var offsetY;
-                testNode.onclick = function(ev) {
+                testNode.onmouseover = function(ev) {
                     offsetY = ev && ev.offsetY;
                 };
                 window.scrollTo(0, 10);
-                
-                if(typeof offsetY == "number") {
-                    TestRunner.wait(function() {
-                        Mouse.mouseover(testNode, {clientY : 10} );
-                        Assert.that(Constraints.areSame(offsetY, 20));
-                    }, 100);
-                }
+                                
+                TestRunner.wait(function() {
+                    Mouse.mouseover(testNode, {clientY : 10} );
+                    if(typeof offsetY == "number") {
+                        TestRunner.assert(Constraints.areSame(offsetY, 20));
+                    }
+                }, 100);
             },
-            
+
             'test bubbles (default true)' : function() {
                 var gotBubble = false;
                 document.onmouseover = function() {
                     gotBubble = true;
                 };
                 Mouse.mouseover(testNode);
-                Assert.that(Constraints.isTrue(gotBubble, "Event did not bubble up."));
+                TestRunner.assert(Constraints.isTrue(gotBubble, "Event did not bubble up."));
             },
             
             'test bubbles = false' : function() {
@@ -100,7 +100,7 @@ function testMouse() {
                     gotBubble = true;
                 };
                 Mouse.mouseover(testNode, {bubbles : false} );
-                Assert.that(Constraints.isFalse(gotBubble, "Event bubbled up."));
+                TestRunner.assert(Constraints.isFalse(gotBubble, "Event bubbled up."));
             }
     };
     
