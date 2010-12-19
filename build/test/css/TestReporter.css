@@ -18,8 +18,17 @@
 }
 
 .pass-flag {
-	color: #090;
-	text-transform: small-caps;
+    border: 1px solid #CCFFCC;
+    color: #00AA00;
+    padding: 0 1px;
+    font-variant: small-caps;
+}
+
+.fail-flag {
+    border: 1px solid #FFDDDD;
+    color: #990000;
+    padding: 0 1px;
+    font-variant: small-caps;
 }
 
 .test-reporter .error ul {

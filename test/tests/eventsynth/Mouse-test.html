@@ -55,9 +55,10 @@ function testMouse() {
             // pageXOffset/scrollTop asynchronously.
            	TestRunner.wait(function() {
                 Mouse.click(testNode, {clientY : 10} );
-                if(typeof pageY == "number") {
-                    TestRunner.assert(Constraints.areSame(pageY, 20));
+                if(typeof pageY != "number") {
+                    TestRunner.exitEarly('Ignored. typeof pageY != "number".');
                 }
+                TestRunner.assert(Constraints.areSame(pageY, 20));
            	}, 300);
         }
     };
@@ -79,9 +80,10 @@ function testMouse() {
                                 
                 TestRunner.wait(function() {
                     Mouse.mouseover(testNode, {clientY : 10} );
-                    if(typeof offsetY == "number") {
-                        TestRunner.assert(Constraints.areSame(offsetY, 20));
+                    if(typeof offsetY != "number") {
+                        TestRunner.exitEarly('Ignored. typeof offsetY != "number".');
                     }
+                    TestRunner.assert(Constraints.areSame(offsetY, 20));
                 }, 100);
             },
 

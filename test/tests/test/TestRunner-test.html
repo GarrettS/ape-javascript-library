@@ -40,10 +40,10 @@ function testTestRunner() {
             tearDown : function(test) {
             },
             
-            "test waitForCondition() condition function called" : function() {
+            "test waitForCondition calls condition" : function() {
                 var conditionCalled;
                 function condition() {
-                    return conditionCalled;
+                    return conditionCalled = true;
                 }
                 
                 function deferredSeg() {
@@ -92,9 +92,35 @@ function testTestRunner() {
         }
     };
     
-    TestRunner.runTests([waitTests, waitForConditionTests, exitEarlyTests]);
+    // Special test case for TestRunner: 
+    // Need to test that the errorList is reported correctly.
+    var testedErrorList;
+    function testErrorListSetup() {
+	    var mockTestCaseWithErrorList = {
+	        name : "Mock Test Case",
+	        
+	        testBlah : function() {
+	            TestRunner.d("deliberately failed.");
+	        }
+	    };
+	    
+	    TestRunner.addTestCase(mockTestCaseWithErrorList);
+	    APE.EventPublisher.addCallback(TestRunner, "oncomplete", mockTestWithErrorListCompleteHandler);
+	    
+	    function mockTestWithErrorListCompleteHandler() {
+	        testedErrorList = TestRunner.errorList;
+	    }
+	    TestRunner.start();
+    }
+    testErrorListSetup();
+    var errorListTestCase = {
+            "test errorList.length" : function() {
+                TestRunner.assert(Constraints.areSame(testedErrorList.length, 1));
+            }       
+    };
+    
+    TestRunner.runTests([waitTests, waitForConditionTests, exitEarlyTests, errorListTestCase]);
 }
-
 testTestRunner();
 </script>
 </body>

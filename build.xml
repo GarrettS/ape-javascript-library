@@ -30,6 +30,7 @@
         
         <copy todir="${build}/domunit">
             <fileset dir="${src}/test/css/" includes="TestReporter.css"/>
+            <fileset dir="${test}/tests" includes="eventsynth/*.html,test/*.html"/>
             <filterchain>
                 <tokenfilter>
                     <replacestring from='../../build/domunit/' to=""/>
