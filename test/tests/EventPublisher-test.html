@@ -126,7 +126,7 @@ var eventPublisherTest = new YAHOO.tool.TestCase({
         Assert.isFalse( called );
     },
 
-    testRemoveInFire : function() {
+    testRemoveInFireCallbacksFire : function() {
         var called1 = false, called2 = false;
 
         function cb( ev ) {
@@ -142,8 +142,7 @@ var eventPublisherTest = new YAHOO.tool.TestCase({
         ep.addCallback(cb2);
 
         testObject.fire( { isTest: true} );
-        Assert.isTrue( called1 );
-        Assert.isFalse( called2 );
+        Assert.isTrue( called2 );
     },
     
     testAsConstructor : function() {

@@ -396,7 +396,7 @@ function fire(publisher) {
     function fireEvent(e) {
         var preventDefault = false,
             i,
-            cs = publisher._callStack, csi;
+            cs = publisher._callStack.slice(), csi;
 
         // beforeFire can affect return value.
         if(typeof publisher.beforeFire == "function") {
