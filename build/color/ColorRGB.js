@@ -169,12 +169,7 @@ APE.namespace("APE.color");
      * @return {String} six digit hex string like #336699
      */ 
         toHexString : function() {
-            return "#" + toHexByte(this.r) + toHexByte(this.g) + toHexByte(this.b);
-            
-            function toHexByte(bite) {
-                var hex = bite.toString(16);
-                return (hex.length === 2 ? hex : "0" + hex);
-            }
+            return("#00000" + this.valueOf()).slice(-6);
         },
         
     /** 
