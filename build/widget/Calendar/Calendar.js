@@ -20,8 +20,10 @@ APE.namespace("APE.widget").defineCustomFactory(
         // Augment Calendar.
         APE.widget.DelegateFactory.create(Calendar, Event, "focus" /*defaultMatcher*/);
         
+        // https://bugs.webkit.org/show_bug.cgi?id=29359#c2
         inputTypeDate.setAttribute("type", "date");
-        Calendar.IS_NATIVE = /date/i.test(inputTypeDate.type);
+        inputTypeDate.value = "24.12.2010"
+        Calendar.IS_NATIVE = inputTypeDate.value == "";
         inputTypeDate = null;
         
         return getConstructor;
@@ -97,6 +99,7 @@ APE.namespace("APE.widget").defineCustomFactory(
                 duration = .1,
                 styleTransitionObjects = {},
             
+                inputIdExp = /-calendar$/,
              // Add a style transition to show() and hide() the calendar.
                 endStyle = {
                     opacity: .98, 
@@ -424,11 +427,18 @@ APE.namespace("APE.widget").defineCustomFactory(
                 activeCalendar = calendar;
                 calendar.setDate(readDateFromInput(calendar));
                 focusCalendar(calendar, calendarEl);
-                
                 // IE Needs this for showing calendar over other elements.
                 calendarEl.parentNode.style.zIndex = "100";
             }
 
+            function makeDateInputText(id) {
+                // Buggy UI for Webkit type=date
+                // https://bugs.webkit.org/show_bug.cgi?id=29359#c1
+                // Remove type *after* calendar is shown.
+                var input = document.getElementById(id);
+                if (input.type != "text") input.type = "text";
+            }
+            
             /** Try to focus the selected day, but if not possible, focus the calendar. */
             function focusCalendar(calendar, calendarEl){
                 if(CAN_FOCUS_EL) {
@@ -508,6 +518,7 @@ APE.namespace("APE.widget").defineCustomFactory(
                         }
                     }
                 }
+                makeDateInputText(this.id.replace(inputIdExp,""));
             }
             
             /** @return {APE.anim.Animation|undefined} monthYearAnim.
@@ -517,7 +528,7 @@ APE.namespace("APE.widget").defineCustomFactory(
              */
             function tryGetMonthYearAnim(calendarDiv, targetId){
                 var runMonthYearAnim,
-                    calendar = Calendar.getById(calendarDiv.id.replace(/-calendar$/,""));
+                    calendar = Calendar.getById(calendarDiv.id.replace(inputIdExp,""));
 
                 if(anim) {
                     if(!monthYearAnim){
@@ -657,7 +668,7 @@ APE.namespace("APE.widget").defineCustomFactory(
                     activeCalendar = null;
                     removeCallback(d, "onmousedown", calDocumentMouseDownHandler);
                     removeCallback(d, "onmouseup", calDocumentMouseUpHandler);                
-                }    
+                }
             }
 
             function calDocumentMouseUpHandler(ev){
