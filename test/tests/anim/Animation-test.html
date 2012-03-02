@@ -195,7 +195,7 @@ var animationTestCase = new YAHOO.tool.TestCase({
     // We need to make sure onend fires each time an 
     // animation ends.
     testToggleDirection : function() {
-        var a = new Animation();
+        var a = new Animation(.1);
         var numFrames = 0;
         var endcount = 0;
         a.onplay = function(pos) {
@@ -210,7 +210,7 @@ var animationTestCase = new YAHOO.tool.TestCase({
             YAHOO.log("numframes: " + numFrames, "info", "TestRunner");
             Assert.areEqual(2, endcount, "onend() should have fired twice.");
             Assert.areEqual(0, a.position, "Wasn't reversed back to 0");
-        }, 2100);        
+        }, 400);        
     },
 
     testStop : function() {
@@ -231,8 +231,16 @@ var animationTestCase = new YAHOO.tool.TestCase({
                 YAHOO.log("a.position: " + a.position, "info", "TestRunner");
             }, 120);
         }, 200);
-    }
+    },
 
+	testReset : function() {
+		var a = new Animation();
+		a.onend = function() {
+			Assert.fail("onend fired.");
+		}
+		a.start();
+		a.reset();
+	}
 });
 
 var transitionTestCase = new YAHOO.tool.TestCase({

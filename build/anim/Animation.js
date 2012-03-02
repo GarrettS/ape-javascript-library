@@ -234,11 +234,12 @@ APE.namespace("APE.anim");
         },
 
         /**
-         * resets the animation to position 0.
+         *  s the animation to position 0.
          */
         reset : function() {
             this.position = 0;
             this.timeLimit = this.duration;
+            this.started = false;
         },
 
         /**
@@ -270,15 +271,11 @@ APE.namespace("APE.anim");
 
         /**
          * Ends the anim.
-         * 
-         * @param {boolean} ended, if true, calls onend(). 
-         * This is not a pause() method; calling stop() 
-         * then resume() will not cause the Animation to restart.
          */
-        stop : function(ended) {
+        stop : function() {
             clearTimeout(this.startAfterTimer);
             delete this.startAfterTimer;
-            this._end(ended);
+            this._end();
         },
 
         /** Cancels the anim where it is; does not call onend() */
@@ -287,11 +284,10 @@ APE.namespace("APE.anim");
             this.onabort(ex || {});
         },
 
-        /** @protected - can use in subclass. */
-        _end : function(complete) {
+        _end : function() {
             this.playing = false;
             Manager.unregister(this);
-            if (complete !== false) {
+            if (this.started) {
                 this.onend();
             }
         }
