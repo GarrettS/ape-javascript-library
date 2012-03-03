@@ -99,14 +99,14 @@ APE.namespace("APE.anim");
 
         /**
          * @event
-         * @description If an error occurred, onabort throws the error. this can
-         *              be overridden (shadowed) by adding an onabort() to the
+         * @description If an error occurred, `onerror` throws the error. this can
+         *              be overridden (shadowed) by adding an onerror() to the
          *              Animation instance.
          * 
          * @example
          * 
          * <pre>
-         * APE.EventRegistry.add(myAnim, &quot;onabort&quot;, myErrorHandler);
+         * APE.EventRegistry.add(myAnim, &quot;onerror&quot;, myErrorHandler);
          * function myErrorHandler(ex) {
          *     alert(ex.message);
          * }
@@ -117,8 +117,8 @@ APE.namespace("APE.anim");
          * @throws {Error}
          *             throws ex in a setTimeout.
          */
-        onabort : function(ex) {
-            throw ex;
+        onerror : function(ex) {
+	        setTimeout(function(){ throw ex; }, 1);
         },
 
         /**
@@ -153,7 +153,7 @@ APE.namespace("APE.anim");
             function startAfter(){
                 anim.start();
                 // Handle subsequent calls to startAfter.
-                clearTimeout(this.startAfterTimer);
+                clearTimeout(anim.startAfterTimer);
                 delete anim.startAfterTimer;
             }
             anim.startAfterTimer = setTimeout(startAfter, delay);
@@ -278,10 +278,12 @@ APE.namespace("APE.anim");
             this._end();
         },
 
-        /** Cancels the anim where it is; does not call onend() */
+        /** Aborts the anim where it is, does not call onend(). If error was passed in, it is rethrown.*/
         abort : function(ex) {
             Manager.unregister(this);
-            this.onabort(ex || {});
+			clearTimeout(this.startAfterTimer);
+            delete this.startAfterTimer;
+			if(ex) this.onerror(ex);
         },
 
         _end : function() {
@@ -338,7 +340,7 @@ APE.namespace("APE.anim");
             }
             if (activeAnimations.length === 0) {
                 activeAnimations = [];
-                stop.call(this);
+                stop();
             }
         }
 
@@ -371,7 +373,7 @@ APE.namespace("APE.anim");
          * Called automatically when there are no more activeAnimations to run.
          */
         function stop() {
-            self.clearInterval(intervalId);
+            clearInterval(intervalId);
         }
 
         /**

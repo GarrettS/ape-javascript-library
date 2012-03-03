@@ -54,13 +54,13 @@ var animationTestCase = new YAHOO.tool.TestCase({
     // This is a test of two things.
     // (1) run throws an error.
     // (2) Manager unregisters it.
-    testAbort : function() {
+    testErrorInRun : function() {
         var abortMsg = "",
             endedSuccessfully = false;
 
         var a = new Animation();
         a.run = function(){ throw Error("run error"); };
-        a.onabort = function(ex) {
+        a.onerror = function(ex) {
             abortMsg = ex.message;
         };
         a.onend = function() {
@@ -75,7 +75,7 @@ var animationTestCase = new YAHOO.tool.TestCase({
 
     // If an error occurs, continue the other animations,
     // abort only the one that raised the error.
-    testAbortOne : function() {
+    testOneError : function() {
         var aMessage = bMessage = "",
             aExpectedMessage = "a threw error";
             bExpectedMessage = "";
@@ -85,8 +85,8 @@ var animationTestCase = new YAHOO.tool.TestCase({
 
 	    a.run = function() { throw Error(aExpectedMessage); };
 	    
-	    a.onabort = getMessageA;
-	    b.onabort = getMessageB;
+	    a.onerror = getMessageA;
+	    b.onerror = getMessageB;
 
 	    b.start(); // let b get a chance to run.
 	    a.start(); // Trigger a.run, which throws.
@@ -104,7 +104,7 @@ var animationTestCase = new YAHOO.tool.TestCase({
         }	    
     },
 
-    testStartAfterDoesNotStart : function(){
+    "test startAfter does not start" : function(){
         var a = new Animation( .5 );
         a.startAfter(250);
         this.wait(function(){
