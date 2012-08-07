@@ -49,7 +49,8 @@
         Animation.call(this, duration); // invoke super constructor.
         if (id.id)
             id = id.id;
-        this.id = id;        
+        this.id = id;
+        this.startCssText = document.getElementById(id).style.cssText;
         if (transition) {
             this.transition = transition;
         }
@@ -68,7 +69,7 @@
             this[STYLE] = null;
             ap._end.call(this);
         },
-        
+                
         /**
          * @method run
          * @memberOf APE.anim.StyleTransition
@@ -86,12 +87,18 @@
             }
         },
     
+        reset : function() {
+            // `this.style` is set to null in _end.'
+            // If the transition already ended, we must call gEBI.
+            (this.style || document.getElementById(this.id).style).cssText = this.startCssText;
+            ap.reset.call(this);
+        },
+        
         /** @private */
         init : function(styleObject) {
             var el = document.getElementById(this.id), adapters = [], adapter, 
                 prop, toValue, 
                 style = el[STYLE],
-                cssText = style.cssText,
                 fromValues = {};
     
             if(useFilter === undefined) {
@@ -107,7 +114,7 @@
             }
             
             // Set end style.
-            setEndStyle(el, styleObject);
+            this.endCssText = setEndStyle(el, styleObject);
             // Read end style, create adapter (from, to).
             for(prop in styleObject) {
                 toValue = styleObject[prop];
@@ -120,7 +127,7 @@
             }
             
             // Set the styles back.
-            style.cssText = cssText;
+            style.cssText = this.startCssText;
     
             // IE will not properly render visibility when
             // 1) visibility is initially hidden
@@ -146,19 +153,21 @@
     });
 
     function setEndStyle(el, styleObject) {
-        var prop, toValue, style = el[STYLE];
+        var prop, toValue, style = el[STYLE], cssText;
         for(prop in styleObject) {
             toValue = styleObject[prop];
-            if(prop === OPACITY){
+            if(prop === OPACITY) {
                 dom.setOpacity(el, toValue);
             } else {
                 style[prop] = toValue;
             }
         }
+        cssText = el.style.cssText;
         // Override visibility and display so we can 
         // calculate real values.
         style.visibility = "visible";
-        style.display = "block";                
+        style.display = "block";
+        return cssText;              
     }
 
     var // "1px", "1.1px", "-.1px" => ["-.1px", "-.1", "px"]

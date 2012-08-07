@@ -102,14 +102,19 @@ var styleTransitionTestCase = new YAHOO.tool.TestCase({
 
     testOpacity : function() {
 
+        c.style.opacity = 1;
         var css = { opacity: ".95" },
             st = new StyleTransition(c, css, .1);
+
         st.start();
 
         this.wait(function(){
-            var opacity = dom.getStyle(c, "opacity");
+        // In Webkit, setting a value sets an internal binary value which, when  
+        // read via getComputedStyle, returns the binary representation,  
+        // converted to a string. 
+            var opacity = Math.max(dom.getStyle(c, "opacity"), c.style.opacity, 0);
             Assert.areEqual(0.95, parseFloat(opacity));
-        }, 200);
+        }, 300);
     },
 
     testFontWeight: function() {
@@ -192,6 +197,20 @@ var styleTransitionTestCase = new YAHOO.tool.TestCase({
         }, 90);
     },
     
+    testReset : function() {
+        c.style.width = "100px";
+        var css = { width: "500px" };
+        var st = new StyleTransition(c, css, .05);
+
+		st.onend = function() {
+    		st.reset();
+    	};
+    	st.start();
+        this.wait(function() {
+            Assert.areSame("100px", c.style.width);
+        }, 90);
+	},
+
     testClip : function() {
     
         var cs = c.style;
