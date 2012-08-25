@@ -73,6 +73,11 @@ traversal-f.js, Event.js, Event-coords.js, style-f.js, getPixelCoords.js'/>
             <filelist dir="${build}/anim" files="${animFiles}"/>
         </concat>
 
+        <concat destfile="${build}/ape-ep-dom-anim.js">
+            <filelist dir="${build}/anim"
+                 files="${build}/ape-ep-dom.js, ${build}/anim/anim.js"/>
+        </concat>
+
         <!-- build ajax.js rollup -->
         <concat destfile="${build}/ajax/ajax.js">
             <filelist dir="${src}"
