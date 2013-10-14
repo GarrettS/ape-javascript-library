@@ -1,5 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
-"http://www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE HTML>
 <html lang="en">
 <head>
 <title>APE JavaScript Library</title>
@@ -27,25 +26,25 @@
 <h2>Features</h2>
 <ul>
     <li>
-        <a href="/ape/build/APE.js"><abbr title="AOP Pointcuts for EcmaScript">APE</abbr> Core</a> 
+        <a href="/ape-javascript-library/build/APE.js"><abbr title="AOP Pointcuts for EcmaScript">APE</abbr> Core</a> 
         (<abbr title="less than three kilobytes">&lt; 3k</abbr> minified) 
         Namespacing and Object creation features.
     </li>
     <li>
-        <a href="/ape/build/EventPublisher.js">EventPublisher</a> - <abbr title="Aspect Oriented Programming">AOP</abbr> custom and native events.
+        <a href="/ape-javascript-library/build/EventPublisher.js">EventPublisher</a> - <abbr title="Aspect Oriented Programming">AOP</abbr> custom and native events.
     </li>
     <li>
-        Subscription Based <a href="/ape/example/ajax/ajax-test.html">Async Requests</a> 
+        Subscription Based <a href="/ape-javascript-library/example/ajax/ajax-test.html">Async Requests</a> 
         - use APE.EventPublisher to chain multiple callbacks.
     </li>
     <li>
-        Time-based <a href="/ape/example/anim/">animation</a>.
+        Time-based <a href="/ape-javascript-library/example/anim/">animation</a>.
     </li>
     <li>
-        Featureful <a href="/ape/example/drag/">drag and drop</a>.
+        ape-javascript-library/ <a href="/ape-javascript-library/example/drag/">drag and drop</a>.
     </li>
     <li>
-        <a href="/ape/example/widget/">Widgets</a>.
+        <a href="/ape-javascript-library/example/widget/">Widgets</a>.
         APE is designed for developing widgets.    
     </li>
 </ul>
@@ -68,24 +67,24 @@
 
 <h3>Getting Started</h3>
 <p>
-    The commonly used files, <a href="/ape/build/APE.js">APE.js</a>, 
-    <a href="/ape/build/EventPublisher.js">EventPublisher.js</a>, 
-    and <a href="/ape/build/dom/dom.js">dom.js</a>, have been conveniently 
-    packaged in to one rollup file, <a href="/ape/build/ape-ep-dom.js">ape-ep-dom.js</a> 
-    (<a href="/ape/build/ape-ep-dom-min.js"><abbr title="less than seventeen kilobytes">&lt; 17k</abbr> 
+    The commonly used files, <a href="/ape-javascript-library/build/APE.js">APE.js</a>, 
+    <a href="/ape-javascript-library/build/EventPublisher.js">EventPublisher.js</a>, 
+    and <a href="/ape-javascript-library/build/dom/dom.js">dom.js</a>, have been conveniently 
+    packaged in to one rollup file, <a href="/ape-javascript-library/build/ape-ep-dom.js">ape-ep-dom.js</a> 
+    (<a href="/ape-javascript-library/build/ape-ep-dom-min.js"><abbr title="less than seventeen kilobytes">&lt; 17k</abbr> 
     minified</a>; under 8k gzip'd). 
 </p>
 
 <p>
-    For css-based animation, the files <a href="/ape/build/anim/StyleTransition.js">StyleTransition.js</a> 
-    and <a href="/ape/build/anim/Animation.js">Animation.js</a> have been rolled up into 
-    <a href="/ape/build/anim/anim.js">anim.js</a> (<a href="/ape/build/anim/anim-min.js"><abbr title="less than nine kilobytes">&lt; 3k</abbr> gzip'd and minified</a>).
+    For css-based animation, the files <a href="/ape-javascript-library/build/anim/StyleTransition.js">StyleTransition.js</a> 
+    and <a href="/ape-javascript-library/build/anim/Animation.js">Animation.js</a> have been rolled up into 
+    <a href="/ape-javascript-library/build/anim/anim.js">anim.js</a> (<a href="/ape-javascript-library/build/anim/anim-min.js"><abbr title="less than nine kilobytes">&lt; 3k</abbr> gzip'd and minified</a>).
 </p>
 
 <h3>How APE is Built</h3>
 <p>
     Get a "behind the scenes" look at how APE is built: 
-    <a href="/ape/build.html">Using ANT and YUICompressor to Build APE</a>.
+    <a href="/ape-javascript-library/build.html">Using ANT and YUICompressor to Build APE</a>.
 </p>
 
 <h3>Usage</h3>
@@ -93,6 +92,12 @@
 don't alter the copyright notice.
 </p>
 
-<jsp:include page="nav.jsp?"/>
+<ul id="nav">
+    <li id="ape-home">[ <a href="/ape/">APE JS</a> ]</li>
+    <%--li>[ <a href="/ape/docs/">Documentation</a> ]</li--%>
+    <li>[ <a class="cur" href="/ape/example/" title="Functional Examples">Examples</a> ]</li>
+    <li>[ <a href="/ape/test/tests/" title="Unit Tests">Tests</a> ]</li>
+    <li>[ <a href="http://github.com/GarrettS/ape-javascript-library/commits/">Github</a> ]</li>
+</ul>
 
 </body></html>
