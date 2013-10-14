@@ -63,11 +63,15 @@ pre {
 	height: 100%;
 }
 
-#nav li a {
+#nav li a, #nav li b {
 	font-size: 14px;
 	display: block;
 	padding: .4em .6em;
 	float: left;
+	font-weight: bold;
+}
+#nav li b { 
+	color: #333;
 }
 
 #nav li a:hover {
