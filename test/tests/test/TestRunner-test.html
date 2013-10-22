@@ -93,7 +93,7 @@ function testTestRunner() {
             } catch(ex) {
                 error = ex;
             }
-            TestRunner.assert(Constraints.areSame(error, null));
+            TestRunner.assert(Constraints.isTrue(error != undefined));
         }
     };
     
