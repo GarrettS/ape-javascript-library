@@ -1849,8 +1849,8 @@ APE.namespace("APE.dom");
  * @requires APE.dom.style-f.js
  */
 APE.dom.getPixelCoords = function(el) {
-    var ret, dom = APE.dom, 
-        getStyle = dom.getStyle,
+    var ret, dom = APE.dom,
+        getStyle = getStyle || dom.getStyle,
         parseInt = self.parseInt,
         f = (dom.IS_COMPUTED_STYLE_SUPPORTED ? function(el) {
         var cs = el[dom.OWNER_DOCUMENT].defaultView.getComputedStyle(el, "");
